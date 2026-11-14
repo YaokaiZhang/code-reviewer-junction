@@ -543,3 +543,4 @@
 .p-rdstat b { display: block; font-family: var(--serif); font-weight: 400; font-size: 2.4rem; line-height: 1; color: #fff3d6; }
 .p-rdstat b i { font-style: normal; color: var(--hot); margin: 0 .25em; font-size: .7em; vertical-align: .12em; }
 .p-rdstat span { display: block; margin-top: 6px; font-size: 14px; color: #d9c08a; }
+.p-src { margin-top: 2.5vh; max-width: 40ch; font-family: var(--mono); font-size: 13px; letter-spacing: .04em; line-height: 1.5; color: #7a6a55; }

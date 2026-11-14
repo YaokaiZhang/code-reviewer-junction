@@ -486,7 +486,8 @@
           '<li><b>1</b>Run old and new code on the same inputs.</li>' +
           '<li><b>2</b>Same output: nothing broke.</li>' +
           '<li><b>3</b>Different output: a person decides.</li>' +
-        '</ul></div>' +
+        '</ul>' +
+        '<p class="p-src">Inputs: every real project, plus every old test. All written before the fix.</p></div>' +
       '<div class="p-panel"><table class="p-vs"><thead><tr><th></th><th>New tests</th><th class="on">Old vs new</th></tr></thead><tbody>' +
         rowsT.map(function (r) { return '<tr><th>' + esc(r[0]) + '</th><td>' + esc(r[1]) + '</td><td class="on">' + esc(r[2]) + '</td></tr>'; }).join('') +
       '</tbody></table></div></div>';
