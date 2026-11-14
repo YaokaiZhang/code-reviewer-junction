@@ -398,6 +398,7 @@
           '<ul class="p-rdrules" data-rv>' + RD_RULES.map(function (r) {
             return '<li><span>' + r[0] + '</span>' + esc(r[1]) + '</li>';
           }).join('') + '</ul>' +
+          '<p class="p-ctx" data-rv>A script measures each change: copy-pasted blocks, and the paths (if, case, &amp;&amp;) through each function.</p>' +
         '</div>' +
         '<div class="p-panel" data-rv>' +
           '<div class="p-lbl">Flags</div>' +
