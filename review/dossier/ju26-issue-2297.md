@@ -2,7 +2,7 @@
 
 `32258fdb..a0aa5ab2` · 237 files +1383 −9
 
-**What the AI changed:** The AI made the source generator put `[ExcludeFromCodeCoverage]` on every formatter and resolver it emits, inside `#if !NETSTANDARD2_0 && !NETFRAMEWORK`. It edited the 6 code templates and one helper (TransformUtilities.cs), re-recorded 222 test snapshots, and added a test file and a README note.
+**What the AI changed:** The source generator now marks every formatter and resolver it emits with `[ExcludeFromCodeCoverage]`, so coverage tools skip them. The attribute sits inside `#if !NETSTANDARD2_0 && !NETFRAMEWORK`. The AI edited the 6 code templates and one helper, TransformUtilities.cs. It re-recorded 222 test snapshots (saved copies of the expected generator output) and added a test file and a README note.
 
 | ■ Proved | ▲ Tested | ● Measured | ◆ Argued | ✕ Refused |
 |:-:|:-:|:-:|:-:|:-:|
@@ -10,9 +10,9 @@
 
 #### Owner decides · 3
 
-**✕ Refused · C-2297-07** — The generator now puts [ExcludeFromCodeCoverage] on the user-declared partial resolver classes (ResolverTemplate, CompositeResolverTemplate), whose accessibility the user picks and which can be public; a user who already excluded their partial resolver by hand gets compile error CS0579 on the branch.
+**✕ Refused · C-2297-07** — The change breaks the build for users who already put [ExcludeFromCodeCoverage] on their resolver by hand: they get compile error CS0579. The generator now adds the attribute to the user's own partial resolver classes (ResolverTemplate, CompositeResolverTemplate). The user picks their visibility, and they can be public.
 
-> It touches public API, so no machine may settle it: the attribute lands in the consumer's public type metadata and breaks the build for an existing, plausible user pattern (shown on the real generator: probe passes on base, fails on branch), which is a public API and compatibility call, not a machine call.
+> It changes public API, so a person must decide. The attribute ends up in the user's public type and breaks the build for a plausible existing pattern. An experiment on the real generator confirms this: it builds before the change and fails after.
 
 R-2297-1 *(inferred)* · owner: **MessagePack-CSharp maintainer who owns public API and breaking changes**
 
@@ -27,9 +27,9 @@ R-2297-1 *(inferred)* · owner: **MessagePack-CSharp maintainer who owns public 
 - [ ] reject
 - [ ] send back
 
-**◆ Argued · C-2297-08** — Agent's claim: the guard `#if !NETSTANDARD2_0 && !NETFRAMEWORK` is needed because the attribute is not available on netstandard2.0 or .NET Framework.
+**◆ Argued · C-2297-08** — The AI says the guard `#if !NETSTANDARD2_0 && !NETFRAMEWORK` is needed because the attribute is not available on netstandard2.0 or .NET Framework.
 
-> Only the agent's word backs it, and our check contradicts it: the attribute is in the netstandard2.0 and net472 reference assemblies and an unguarded probe compiles on both, so the guard drops the feature on 2 targets; widening it is a product call.
+> Only the AI's word backs this, and our check contradicts it. The attribute is in the netstandard2.0 and net472 reference assemblies, and code without the guard compiles on both. So the guard turns the feature off on 2 targets. Whether to turn it on there is a product decision.
 
 R-2297-2 *(inferred)* · owner: **MessagePack source generator owner**
 
@@ -42,9 +42,9 @@ R-2297-2 *(inferred)* · owner: **MessagePack source generator owner**
 - [ ] reject
 - [ ] send back
 
-**◆ Argued · C-2297-09** — README: all generated formatters and resolvers carry [ExcludeFromCodeCoverage], emitted only where available (not netstandard2.0 or .NET Framework).
+**◆ Argued · C-2297-09** — The README says all generated formatters and resolvers carry [ExcludeFromCodeCoverage], but only where it is available: not on netstandard2.0 or .NET Framework.
 
-> Documentation is not machine-checked; its first sentence matches C-2297-04, its second repeats the availability statement that attribute-availability.json contradicts.
+> Documentation is not machine-checked. Its first sentence matches C-2297-04. Its second repeats the claim that the attribute is unavailable, which our check contradicts (C-2297-08).
 
 R-2297-4 *(inferred)* · owner: **MessagePack documentation owner**
 
@@ -58,9 +58,9 @@ R-2297-4 *(inferred)* · owner: **MessagePack documentation owner**
 
 #### Machine settled · 7
 
-<details><summary>■ Proved · C-2297-02 — All 222 changed snapshots are exactly what the branch's generator emits, and the emitted code compiles: the snapshot test project passes 169 of 169 on the branch (base: 167 of 167).</summary>
+<details><summary>■ Proved · C-2297-02 — All 222 changed snapshots are exactly what the new generator emits, and that code compiles. The snapshot tests pass 169 of 169 after the change (167 of 167 before).</summary>
 
-> Regeneration on the real artefact: the snapshot tests run the generator and compare its output text with the committed files, then compile it, and they pass.
+> The snapshot tests run the real generator, compare its output with the committed files, then compile it. They pass.
 
 R-2297-3 *(inferred)*
 
@@ -69,9 +69,9 @@ R-2297-3 *(inferred)*
 
 </details>
 
-<details><summary>■ Proved · C-2297-03 — The 6 committed template .cs files emit the same text as their edited .tt files: dotnet-t4 regeneration matches 6 of 6 on the branch, the same method matches 6 of 6 untouched templates on base, and the negative control differs 6 of 6.</summary>
+<details><summary>■ Proved · C-2297-03 — The 6 committed template .cs files emit the same text as their edited .tt sources. Regenerating with dotnet-t4 matches 6 of 6 after the change. The same method matches 6 of 6 unchanged templates before the change. As a control, the new output differs from the old .cs files in 6 of 6, so the comparison does catch changes.</summary>
 
-> A deterministic regeneration of the real templates, compared on the emitted text after layout normalisation and calibrated on base; it is not a byte-for-byte match with Visual Studio's tool.
+> We regenerated the real templates and compared the text they emit, ignoring layout, after checking the method on the old code. It is not a byte-for-byte match with Visual Studio's tool.
 
 R-2297-1 *(inferred)*
 
@@ -81,14 +81,14 @@ R-2297-1 *(inferred)*
 
 </details>
 
-<details><summary>▲ Tested · C-2297-04 — For a sample with an int-keyed object, a string-keyed object, an enum, a union and a resolver, every generated file contains the attribute and every occurrence sits inside the guard.</summary>
+<details><summary>▲ Tested · C-2297-04 — Every generated file has the attribute, and every copy sits inside the #if guard. This holds for a sample with an integer-keyed object, a string-keyed object, an enum, a union and a resolver.</summary>
 
-> The 2 new CodeCoverageExclusionTests fail on base (2 of 2) and pass on the branch.
+> The 2 new CodeCoverageExclusionTests fail before the change (2 of 2) and pass after.
 
 R-2297-1 *(inferred)*
 
-- ▲ Tested — new tests fail on base
-- ▲ Tested — new tests pass on branch
+- ▲ Tested — The new tests fail before the change.
+- ▲ Tested — The new tests pass after the change.
 
 - [`new-tests-on-base`](../evidence/ju26-issue-2297/new-tests-on-base.json) **FAIL** — base-newtests: 167 passed, 2 failed of 169
 - [`regeneration`](../evidence/ju26-issue-2297/regeneration.json) **pass** — base: 167 passed, 0 failed of 167; branch: 169 passed, 0 failed of 169
@@ -98,14 +98,14 @@ R-2297-1 *(inferred)*
 
 </details>
 
-<details><summary>▲ Tested · C-2297-05 — The TransformUtilities.cs edit is required: without it, a formatter nested in a generic type with constraints is emitted as `{#if ...` on one line and the generated code fails to compile (CS1040).</summary>
+<details><summary>▲ Tested · C-2297-05 — The TransformUtilities.cs edit is needed. Without it, a formatter inside a generic type with constraints comes out as `{#if ...` on one line, and the generated code fails to compile (CS1040).</summary>
 
-> Reverting only that line makes GenerationTests.GenericDataTypeWithPrivateMember fail (168 of 169 pass) and restoring it makes it pass; a hand run shows the failure is a CS1040 compile error.
+> Undoing only that line makes GenerationTests.GenericDataTypeWithPrivateMember fail (168 of 169 pass); restoring it makes it pass. A manual run shows the failure is compile error CS1040.
 
 R-2297-2 *(inferred)*
 
-- ▲ Tested — edit reverted: the snapshot test fails (script)
-- ▲ Tested — the failure is CS1040 in generated code (hand run)
+- ▲ Tested — With the edit undone, the snapshot test fails (scripted run).
+- ▲ Tested — The failure is error CS1040 in the generated code (manual run).
 
 - [`transformutilities-removal`](../evidence/ju26-issue-2297/transformutilities-removal.json) **FAIL** — no-tu: 168 passed, 1 failed of 169
 - [`transformutilities-removal-output`](../evidence/ju26-issue-2297/transformutilities-removal-output.json) **FAIL** · hand — Without the TransformUtilities.cs edit the generator emits `{#if !NETSTANDARD2_0 && !NETFRAMEWORK` on one line for the formatter nested in a constrained generic type, which fails to compile with 1 error CS1040; the Ordinal formatter loses the 1 extra blank line, so that blank line is a side effect of the edit
@@ -114,9 +114,9 @@ R-2297-2 *(inferred)*
 
 </details>
 
-<details><summary>● Measured · C-2297-01 — Of the 222 changed snapshot files, 220 change only by added attribute and #if/#endif guard lines; the other 2 are both in Resources/GenericDataTypeWithPrivateMember/ (Named: the brace moves to its own line; Ordinal: one extra blank line).</summary>
+<details><summary>● Measured · C-2297-01 — 220 of the 222 changed snapshot files only gain the attribute and its #if/#endif lines. The other 2 are both in Resources/GenericDataTypeWithPrivateMember/: in Named a brace moves to its own line, and in Ordinal there is one extra blank line.</summary>
 
-> The evidence is a count from the diff classifier script; it describes the diff and does not by itself show the snapshots are right.
+> This is a count from a script that sorts the diff. It describes the change; it does not by itself show the snapshots are correct.
 
 R-2297-3 *(inferred)*
 
@@ -125,9 +125,9 @@ R-2297-3 *(inferred)*
 
 </details>
 
-<details><summary>● Measured · C-2297-06 — The TransformUtilities.cs edit has one visible side effect in the snapshots: one extra blank line in the Ordinal formatter of GenericDataTypeWithPrivateMember.</summary>
+<details><summary>● Measured · C-2297-06 — The TransformUtilities.cs edit has one visible side effect in the snapshots: an extra blank line in the Ordinal formatter of GenericDataTypeWithPrivateMember.</summary>
 
-> Counted by the classifier and confirmed by the removal run; that the blank line is harmless (and that EnumTemplate gets the same blank line, by reading) is not machine-checked.
+> The diff-sorting script counted it, and the run with the edit removed confirmed it. Two things are not machine-checked: that the blank line is harmless, and that EnumTemplate gets the same blank line, which we found by reading the code.
 
 R-2297-3 *(inferred)*
 
@@ -138,9 +138,9 @@ R-2297-3 *(inferred)*
 
 </details>
 
-<details><summary>● Measured · C-2297-10 — The snapshot check is line-ending sensitive and passes here because .gitattributes checks the 225 snapshot .cs files out with CRLF; with LF snapshots 89 of 169 tests fail.</summary>
+<details><summary>● Measured · C-2297-10 — The snapshot check is sensitive to line endings. It passes here because .gitattributes checks out the 225 snapshot .cs files with Windows line endings (CRLF). With Unix line endings (LF), 89 of 169 tests fail.</summary>
 
-> A count from running the tests on a scratch copy with snapshots converted to LF; it qualifies C-2297-02 rather than backing a change.
+> A count from running the tests on a copy with the snapshots converted to LF. It adds a condition to C-2297-02; it does not back a change.
 
 R-2297-3 *(inferred)*
 

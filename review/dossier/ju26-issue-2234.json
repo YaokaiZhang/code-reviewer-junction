@@ -2,7 +2,7 @@
   "branch": "ju26-issue-2234",
   "issue": 2234,
   "title": "The analyzer does not work if SuppressSourceGeneration = true",
-  "summary": "The analyzer threw when a type's keys repeat or mix int and string. The AI changed TypeCollector.cs to keep the first member for each key and to skip a member of the wrong key kind once it is reported, so the analyzer reports MsgPack005 instead of crashing. It added analyzer tests, execution tests and a README section on opting out of source generation.",
+  "summary": "The analyzer crashed when a type had repeated keys, or mixed integer and string keys. The AI changed TypeCollector.cs so the analyzer reports MsgPack005 instead. It keeps the first member for each key, and skips a member with the wrong key kind once it is reported. It also added analyzer tests, execution tests and a README section on opting out of source generation.",
   "base": "32258fdb",
   "head": "9007cee1",
   "diff": {
@@ -13,9 +13,9 @@
   "claims": [
     {
       "id": "C-2234-01",
-      "claim": "The analyzer no longer throws on duplicate int keys, duplicate string keys or mixed key kinds; it reports MsgPack005 instead, with or without SuppressSourceGeneration.",
+      "claim": "The analyzer no longer crashes on duplicate integer keys, duplicate string keys or mixed key kinds. It reports MsgPack005 instead, with or without SuppressSourceGeneration.",
       "tier": "Tested",
-      "why_this_tier": "4 new tests fail on base (MsgPack005 plus AD0001 from an analyzer exception) and pass on the branch.",
+      "why_this_tier": "4 new tests fail before the change, because the analyzer crashes (AD0001) next to the MsgPack005. They pass after.",
       "requirement": "R-2234-1",
       "requirement_inferred": false,
       "evidence": [
@@ -44,9 +44,9 @@
     },
     {
       "id": "C-2234-02",
-      "claim": "For every list of 1 to 4 keyed members with int or string keys, the real TypeCollector does not throw on the branch; on base it threw on most of them.",
+      "claim": "After the change, the real TypeCollector never throws on any list of 1 to 4 keyed members with integer or string keys. Before the change, it threw on most of them.",
       "tier": "Tested",
-      "why_this_tier": "Chain: the Dafny model proves it for all lists, and the model matches the real C# on every input up to 4 members; the C# run throws on base and not on the branch, so the weakest link is Tested.",
+      "why_this_tier": "A formal model, written in Dafny, proves this for lists of any length. The model matches the real C# code on every input up to 4 members. The real code throws before the change and not after. The weakest step is a test, so the claim counts as Tested.",
       "requirement": "R-2234-2",
       "requirement_inferred": true,
       "evidence": [
@@ -68,20 +68,20 @@
       ],
       "chain": [
         {
-          "link": "Dafny model: BranchNeverFailsForIntAndStringKeys, no assume",
+          "link": "The Dafny model proves BranchNeverFailsForIntAndStringKeys with no unproven assumptions.",
           "tier": "Proved"
         },
         {
-          "link": "model matches real TypeCollector on 3710 inputs (base and branch, 0 mismatches)",
+          "link": "The model matches the real TypeCollector on 3710 inputs, before and after the change, with 0 mismatches.",
           "tier": "Tested"
         }
       ]
     },
     {
       "id": "C-2234-03",
-      "claim": "The fix is incomplete: when a type's first keyed member is a field with [Key(null)], the analyzer still throws (AD0001, ArgumentNullException), also with SuppressSourceGeneration = true.",
+      "claim": "The fix is incomplete. If a type's first keyed member is a field with [Key(null)], the analyzer still crashes (AD0001, ArgumentNullException). This also happens with SuppressSourceGeneration = true.",
       "tier": "Argued",
-      "why_this_tier": "A probe on the real analyzer reproduces the crash on base and on the branch, so it cannot be Tested; the evidence shows a gap rather than a passing check, so the owner decides.",
+      "why_this_tier": "An experiment on the real analyzer shows the crash before and after the change. That is a gap, not a passing check, so it cannot count as Tested and the owner decides.",
       "requirement": "R-2234-2",
       "requirement_inferred": true,
       "evidence": [
@@ -102,9 +102,9 @@
     },
     {
       "id": "C-2234-04",
-      "claim": "The new `continue` also skips collecting the member's type, so a member with a mixed key and an unserializable type no longer gets MsgPack003 (base reported it when the first key was a string).",
+      "claim": "The change hides a diagnostic. The new `continue` also skips collecting the member's type. So a member with a mixed key and an unserializable type no longer gets MsgPack003. Before the change, it got MsgPack003 when the first key was a string.",
       "tier": "Refused",
-      "why_this_tier": "It drops a warning that base reported; whether that is acceptable next to the MsgPack005 error on the same member is a product call.",
+      "why_this_tier": "It drops a diagnostic the old code reported. Whether that is fine, given the same member already gets the MsgPack005 error, is a product decision.",
       "requirement": "R-2234-4",
       "requirement_inferred": true,
       "evidence": [
@@ -124,9 +124,9 @@
     },
     {
       "id": "C-2234-05",
-      "claim": "When two members share a key, the first member is kept and the second gets MsgPack005 ('must be unique'); no repeated key goes unreported.",
+      "claim": "Every repeated key is reported. When two members share a key, the first one is kept and the second gets MsgPack005 ('must be unique').",
       "tier": "Tested",
-      "why_this_tier": "The duplicate-key tests fail on base and pass on the branch, and the model lemma DupReported matches the real C# on every input up to 4 members.",
+      "why_this_tier": "The duplicate-key tests fail before the change and pass after. The model's proof DupReported matches the real C# code on every input up to 4 members.",
       "requirement": "R-2234-3",
       "requirement_inferred": true,
       "evidence": [
@@ -153,24 +153,24 @@
       ],
       "chain": [
         {
-          "link": "Dafny lemma DupReported (first wins, every repeat reported)",
+          "link": "The Dafny model proves DupReported: the first member wins and every repeat is reported.",
           "tier": "Proved"
         },
         {
-          "link": "model matches real TypeCollector on 3710 inputs",
+          "link": "The model matches the real TypeCollector on 3710 inputs.",
           "tier": "Tested"
         },
         {
-          "link": "duplicate-key tests fail on base, pass on branch",
+          "link": "The duplicate-key tests fail before the change and pass after.",
           "tier": "Tested"
         }
       ]
     },
     {
       "id": "C-2234-06",
-      "claim": "The same fix is pasted into both the properties loop and the fields loop, which adds duplicated code to TypeCollector.cs.",
+      "claim": "The fix is copied into both the properties loop and the fields loop, which adds duplicate code to TypeCollector.cs.",
       "tier": "Measured",
-      "why_this_tier": "The numbers come from a clone and complexity script run on base and branch.",
+      "why_this_tier": "The numbers come from a script that measures duplicate code and complexity, run before and after the change.",
       "requirement": "R-2234-1",
       "requirement_inferred": false,
       "evidence": [
@@ -193,9 +193,9 @@
     },
     {
       "id": "C-2234-07",
-      "claim": "4 of the 8 new analyzer tests (missing key, AllowPrivate, member type, generation-only diagnostics) already pass on base; they pin existing behaviour and are not evidence for the fix.",
+      "claim": "4 of the 8 new analyzer tests already pass before the change, so they guard old behaviour and do not show the fix works. They cover a missing key, AllowPrivate, the member type and generation-only diagnostics.",
       "tier": "Measured",
-      "why_this_tier": "The count comes from the old-versus-new test runner.",
+      "why_this_tier": "The count comes from running the tests before and after the change.",
       "requirement": "R-2234-1",
       "requirement_inferred": false,
       "evidence": [
@@ -214,9 +214,9 @@
     },
     {
       "id": "C-2234-08",
-      "claim": "A suppressed type gets no generated formatter and still round-trips through the dynamic resolver (the 2 new execution tests).",
+      "claim": "A type with SuppressSourceGeneration gets no generated formatter, and still round-trips through the run-time (dynamic) resolver. The 2 new execution tests are meant to show this.",
       "tier": "Argued",
-      "why_this_tier": "The execution test project does not build in our environment on base or branch, because the source generator is not loaded (CS9057), so the tests never ran.",
+      "why_this_tier": "The tests never ran. Their project does not build here, before or after the change, because the source generator does not load (CS9057).",
       "requirement": "R-2234-1",
       "requirement_inferred": false,
       "evidence": [
@@ -234,9 +234,9 @@
     },
     {
       "id": "C-2234-09",
-      "claim": "The new README section says the analyzer validates suppressed types (MsgPack003, 004, 005, 012, 015) and skips MsgPack011, 016 and 017 for them.",
+      "claim": "The new README section says the analyzer still checks suppressed types for MsgPack003, 004, 005, 012 and 015, and skips MsgPack011, 016 and 017 for them.",
       "tier": "Argued",
-      "why_this_tier": "It is documentation. Tests cover 003, 004, 005, 015 and the skipped ones, but not 012, and C-2234-03 shows a case where MsgPack005 validation still crashes.",
+      "why_this_tier": "It is documentation. Tests cover 003, 004, 005, 015 and the skipped ones, but not 012. And C-2234-03 shows a case where the MsgPack005 check still crashes.",
       "requirement": "R-2234-1",
       "requirement_inferred": false,
       "evidence": [

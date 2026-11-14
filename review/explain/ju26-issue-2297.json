@@ -45,7 +45,7 @@
    "steps": [
     {
      "op": "GIVEN",
-     "text": "a shared sample `TestSource` with an int-keyed `MyObject`, a string-keyed `MyStringKeyObject`, an enum `MyEnum`, a union `IMyUnion` with member `MyUnionMember`, and a resolver `GeneratedMessagePackResolver`",
+     "text": "a sample source, `TestSource`, with objects, an enum, a union and a resolver.",
      "lines": [
       21,
       58
@@ -53,7 +53,7 @@
     },
     {
      "op": "AND",
-     "text": "`ExcludeAttribute` is the exact text `[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]`",
+     "text": "`ExcludeAttribute` holds the full `ExcludeFromCodeCoverage` attribute text.",
      "lines": [
       16,
       16
@@ -61,7 +61,7 @@
     },
     {
      "op": "WHEN",
-     "text": "`RunGeneratorAsync` runs the source generator once on that sample and returns each generated file's path and text",
+     "text": "`RunGeneratorAsync` runs the source generator once on the sample.",
      "lines": [
       67,
       67
@@ -69,7 +69,7 @@
     },
     {
      "op": "AND",
-     "text": "the helper throws away the generator's diagnostics and the updated compilation (`out _, out _`)",
+     "text": "the helper discards the generator's diagnostics (`out _, out _`).",
      "lines": [
       122,
       128
@@ -77,7 +77,7 @@
     },
     {
      "op": "THEN",
-     "text": "it asserts at least five files came out (`generated.Count >= 5`)",
+     "text": "at least five files are generated (`generated.Count >= 5`).",
      "lines": [
       71,
       71
@@ -85,7 +85,7 @@
     },
     {
      "op": "AND",
-     "text": "it asserts every generated file's text contains the attribute (`text.Contains(ExcludeAttribute)`)",
+     "text": "every generated file contains the attribute (`text.Contains(ExcludeAttribute)`).",
      "lines": [
       73,
       77
@@ -97,11 +97,11 @@
     "evidence/ju26-issue-2297/regeneration.json"
    ],
    "does_not_check": [
-    "It checks the attribute appears at least once per file, not that every type in the file carries it.",
-    "It does not compile the generated code, and generator errors would go unnoticed."
+    "It checks each file has the attribute at least once, not that every type has it.",
+    "It does not compile the generated code or look for generator errors."
    ],
    "notes": [
-    "Fails on base (the resolver file has no attribute) and passes on the branch."
+    "It fails before the change, because the resolver file lacks the attribute, and passes after."
    ]
   },
   {
@@ -161,7 +161,7 @@
    "steps": [
     {
      "op": "GIVEN",
-     "text": "`Guard` is the line `#if !NETSTANDARD2_0 && !NETFRAMEWORK`, meant to hide the attribute from targets said not to have it",
+     "text": "`Guard` is `#if !NETSTANDARD2_0 && !NETFRAMEWORK`, meant to hide the attribute on older targets.",
      "lines": [
       18,
       19
@@ -169,7 +169,7 @@
     },
     {
      "op": "WHEN",
-     "text": "`RunGeneratorAsync(TestSource)` runs the generator on the shared sample",
+     "text": "`RunGeneratorAsync(TestSource)` runs the generator on the sample.",
      "lines": [
       84,
       84
@@ -177,7 +177,7 @@
     },
     {
      "op": "AND",
-     "text": "for each generated file, Windows line endings are turned into plain newlines (`text.Replace(\"\\r\\n\", \"\\n\")`)",
+     "text": "each file's Windows line endings become plain newlines (`text.Replace(\"\\r\\n\", \"\\n\")`).",
      "lines": [
       88,
       88
@@ -185,7 +185,7 @@
     },
     {
      "op": "AND",
-     "text": "it counts all occurrences of the attribute, and separately the occurrences that sit in the exact block: guard line, attribute line (indented by one tab or not at all), `#endif`",
+     "text": "it counts all attributes, and those wrapped between `Guard` and `#endif`.",
      "lines": [
       91,
       93
@@ -193,7 +193,7 @@
     },
     {
      "op": "THEN",
-     "text": "it asserts the file has at least one attribute (`attributeCount > 0`) and that every one is guarded (`Assert.Equal(attributeCount, guardedCount)`)",
+     "text": "each file has an attribute, and all are guarded (`Assert.Equal(attributeCount, guardedCount)`).",
      "lines": [
       94,
       95
@@ -205,11 +205,11 @@
     "evidence/ju26-issue-2297/regeneration.json"
    ],
    "does_not_check": [
-    "It does not compile the generated code for netstandard2.0 or .NET Framework, so it does not show those consumers still build.",
-    "It does not check that the guard is needed; our evidence says the attribute exists on both targets (C-2297-08)."
+    "It does not show that netstandard2.0 or .NET Framework projects still build.",
+    "It does not check that the guard is needed, and we found the attribute exists on both targets."
    ],
    "notes": [
-    "Fails on base (no attribute in the resolver file) and passes on the branch."
+    "It fails before the change, because the resolver file lacks the attribute, and passes after."
    ]
   }
  ]

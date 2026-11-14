@@ -27,7 +27,7 @@
         "steps": [
           {
             "op": "GIVEN",
-            "text": "a class `Foo` marked `[MessagePackObject(SuppressSourceGeneration = true)]`",
+            "text": "a class `Foo` with `SuppressSourceGeneration = true`.",
             "lines": [
               24,
               25
@@ -37,12 +37,12 @@
             "problems": [],
             "tokens": [
               "Foo",
-              "[MessagePackObject(SuppressSourceGeneration = true)]"
+              "SuppressSourceGeneration = true"
             ]
           },
           {
             "op": "AND",
-            "text": "it has a public property `Member` with no key attribute",
+            "text": "it has a public property `Member` with no key.",
             "lines": [
               27,
               27
@@ -56,7 +56,7 @@
           },
           {
             "op": "WHEN",
-            "text": "the MessagePack analyzer runs on this code through `VerifyCS.Test`",
+            "text": "the analyzer runs on it through `VerifyCS.Test`.",
             "lines": [
               31,
               35
@@ -70,7 +70,7 @@
           },
           {
             "op": "THEN",
-            "text": "exactly one diagnostic is expected: `MsgPack004` on the property name `Member`; any missing or extra diagnostic fails the test",
+            "text": "exactly one `MsgPack004` is reported, on `Member`; anything else fails.",
             "lines": [
               27,
               35
@@ -88,11 +88,11 @@
           "evidence/ju26-issue-2234/old-vs-new-tests.json"
         ],
         "does_not_check": [
-          "It does not compare the diagnostic's message text; the markup only fixes the id and the location.",
-          "It does not check that the suppressed type still serializes at run time."
+          "It checks the diagnostic's id and position, not its message.",
+          "It does not check that the type still serializes at run time."
         ],
         "notes": [
-          "Also passes on base (old-vs-new-tests.json), so it pins existing behaviour and is not evidence for the fix (C-2234-07)."
+          "It also passes before the change, so it guards old behaviour, not the fix."
         ],
         "method_found": true,
         "results": [
@@ -151,7 +151,7 @@
         "steps": [
           {
             "op": "GIVEN",
-            "text": "a class `Foo` marked `MessagePackObject(SuppressSourceGeneration = true)`, which does not allow private members",
+            "text": "a class `Foo` with `SuppressSourceGeneration = true`, not allowing private members.",
             "lines": [
               42,
               43
@@ -161,12 +161,12 @@
             "problems": [],
             "tokens": [
               "Foo",
-              "MessagePackObject(SuppressSourceGeneration = true)"
+              "SuppressSourceGeneration = true"
             ]
           },
           {
             "op": "AND",
-            "text": "it has a private field `member` with `[Key(0)]`",
+            "text": "it has a private field `member` with `[Key(0)]`.",
             "lines": [
               45,
               46
@@ -181,7 +181,7 @@
           },
           {
             "op": "WHEN",
-            "text": "the MessagePack analyzer runs on this code through `VerifyCS.Test`",
+            "text": "the analyzer runs on it through `VerifyCS.Test`.",
             "lines": [
               50,
               54
@@ -195,7 +195,7 @@
           },
           {
             "op": "THEN",
-            "text": "exactly one diagnostic is expected: `MsgPack015` on the `MessagePackObject(SuppressSourceGeneration = true)` attribute; any missing or extra diagnostic fails the test",
+            "text": "exactly one `MsgPack015` is reported, on the attribute; anything else fails.",
             "lines": [
               42,
               54
@@ -204,8 +204,7 @@
             "verified": true,
             "problems": [],
             "tokens": [
-              "MsgPack015",
-              "MessagePackObject(SuppressSourceGeneration = true)"
+              "MsgPack015"
             ]
           }
         ],
@@ -213,11 +212,11 @@
           "evidence/ju26-issue-2234/old-vs-new-tests.json"
         ],
         "does_not_check": [
-          "It does not compare the diagnostic's message text; the markup only fixes the id and the location.",
-          "It does not check the code fix that the diagnostic offers."
+          "It checks the diagnostic's id and position, not its message.",
+          "It does not check the code fix the diagnostic offers."
         ],
         "notes": [
-          "Also passes on base (old-vs-new-tests.json), so it pins existing behaviour and is not evidence for the fix (C-2234-07)."
+          "It also passes before the change, so it guards old behaviour, not the fix."
         ],
         "method_found": true,
         "results": [
@@ -277,7 +276,7 @@
         "steps": [
           {
             "op": "GIVEN",
-            "text": "a plain class `Other` with no MessagePack attribute",
+            "text": "a plain class `Other` with no MessagePack attribute.",
             "lines": [
               61,
               63
@@ -291,7 +290,7 @@
           },
           {
             "op": "AND",
-            "text": "a class `Foo` marked `[MessagePackObject(SuppressSourceGeneration = true)]` with a `[Key(0)]` property `Member` of type `Other`",
+            "text": "a class `Foo` with `SuppressSourceGeneration = true` has a property `Member` of type `Other`.",
             "lines": [
               65,
               69
@@ -301,15 +300,14 @@
             "problems": [],
             "tokens": [
               "Foo",
-              "[MessagePackObject(SuppressSourceGeneration = true)]",
-              "[Key(0)]",
+              "SuppressSourceGeneration = true",
               "Member",
               "Other"
             ]
           },
           {
             "op": "WHEN",
-            "text": "the MessagePack analyzer runs on this code through `VerifyCS.Test`",
+            "text": "the analyzer runs on it through `VerifyCS.Test`.",
             "lines": [
               73,
               77
@@ -323,7 +321,7 @@
           },
           {
             "op": "THEN",
-            "text": "exactly one diagnostic is expected: `MsgPack003` on the property name `Member`; any missing or extra diagnostic fails the test",
+            "text": "exactly one `MsgPack003` is reported, on `Member`; anything else fails.",
             "lines": [
               69,
               77
@@ -341,11 +339,11 @@
           "evidence/ju26-issue-2234/old-vs-new-tests.json"
         ],
         "does_not_check": [
-          "It does not compare the diagnostic's message text; the markup only fixes the id and the location.",
-          "It does not combine an unserializable member type with a duplicate or mixed key, the case where the branch drops this diagnostic (C-2234-04)."
+          "It checks the diagnostic's id and position, not its message.",
+          "It does not try a bad member type with a duplicate or mixed key, where the change drops this diagnostic."
         ],
         "notes": [
-          "Also passes on base (old-vs-new-tests.json), so it pins existing behaviour and is not evidence for the fix (C-2234-07)."
+          "It also passes before the change, so it guards old behaviour, not the fix."
         ],
         "method_found": true,
         "results": [
@@ -409,7 +407,7 @@
         "steps": [
           {
             "op": "GIVEN",
-            "text": "a class `Foo` marked `[MessagePackObject(SuppressSourceGeneration = true)]`",
+            "text": "a class `Foo` with `SuppressSourceGeneration = true`.",
             "lines": [
               84,
               85
@@ -419,12 +417,12 @@
             "problems": [],
             "tokens": [
               "Foo",
-              "[MessagePackObject(SuppressSourceGeneration = true)]"
+              "SuppressSourceGeneration = true"
             ]
           },
           {
             "op": "AND",
-            "text": "two properties `Member1` and `Member2` that both carry `[Key(0)]`",
+            "text": "two properties, `Member1` and `Member2`, both use `[Key(0)]`.",
             "lines": [
               87,
               91
@@ -440,7 +438,7 @@
           },
           {
             "op": "WHEN",
-            "text": "the MessagePack analyzer runs on this code through `VerifyCS.Test`",
+            "text": "the analyzer runs on it through `VerifyCS.Test`.",
             "lines": [
               95,
               99
@@ -454,7 +452,7 @@
           },
           {
             "op": "THEN",
-            "text": "exactly one diagnostic is expected: `MsgPack005` covering the second member (its `[Key(0)]` and declaration); any extra diagnostic, such as an analyzer crash report, fails the test",
+            "text": "exactly one `MsgPack005` is reported, on `Member2`; a crash report would fail it.",
             "lines": [
               90,
               99
@@ -464,7 +462,7 @@
             "problems": [],
             "tokens": [
               "MsgPack005",
-              "[Key(0)]"
+              "Member2"
             ]
           }
         ],
@@ -472,11 +470,11 @@
           "evidence/ju26-issue-2234/old-vs-new-tests.json"
         ],
         "does_not_check": [
-          "It does not compare the diagnostic's message text; the markup only fixes the id and the location. So it does not show the message is 'must be unique'.",
-          "It does not cover a `[Key(null)]` member, where the analyzer still crashes on the branch (C-2234-03)."
+          "It checks the diagnostic's id and position, not that the message says 'must be unique'.",
+          "It does not try `[Key(null)]`, which still crashes the analyzer after the change."
         ],
         "notes": [
-          "Fails on base with 2 diagnostics instead of the expected 1 (the analyzer also threw) and passes on the branch."
+          "It fails before the change, when the analyzer also crashed, and passes after."
         ],
         "method_found": true,
         "results": [
@@ -539,7 +537,7 @@
         "steps": [
           {
             "op": "GIVEN",
-            "text": "a class `Foo` marked `[MessagePackObject(SuppressSourceGeneration = true)]`",
+            "text": "a class `Foo` with `SuppressSourceGeneration = true`.",
             "lines": [
               106,
               107
@@ -549,12 +547,12 @@
             "problems": [],
             "tokens": [
               "Foo",
-              "[MessagePackObject(SuppressSourceGeneration = true)]"
+              "SuppressSourceGeneration = true"
             ]
           },
           {
             "op": "AND",
-            "text": "two properties `Member1` and `Member2` that both carry the same string key `[Key(\"\"a\"\")]` (the doubled quotes are escaping inside the test's source string)",
+            "text": "two properties, `Member1` and `Member2`, both use the same string key \"a\".",
             "lines": [
               109,
               113
@@ -564,13 +562,12 @@
             "problems": [],
             "tokens": [
               "Member1",
-              "Member2",
-              "[Key(\"\"a\"\")]"
+              "Member2"
             ]
           },
           {
             "op": "WHEN",
-            "text": "the MessagePack analyzer runs on this code through `VerifyCS.Test`",
+            "text": "the analyzer runs on it through `VerifyCS.Test`.",
             "lines": [
               117,
               121
@@ -584,7 +581,7 @@
           },
           {
             "op": "THEN",
-            "text": "exactly one diagnostic is expected: `MsgPack005` covering the second member (its `[Key(\"\"a\"\")]` and declaration); any extra diagnostic, such as an analyzer crash report, fails the test",
+            "text": "exactly one `MsgPack005` is reported, on `Member2`; a crash report would fail it.",
             "lines": [
               112,
               121
@@ -594,7 +591,7 @@
             "problems": [],
             "tokens": [
               "MsgPack005",
-              "[Key(\"\"a\"\")]"
+              "Member2"
             ]
           }
         ],
@@ -602,11 +599,11 @@
           "evidence/ju26-issue-2234/old-vs-new-tests.json"
         ],
         "does_not_check": [
-          "It does not compare the diagnostic's message text; the markup only fixes the id and the location. So it does not show the message is 'must be unique'.",
-          "It does not check fields; only properties are used, although the fix was pasted into the fields loop too (C-2234-06)."
+          "It checks the diagnostic's id and position, not that the message says 'must be unique'.",
+          "It uses only properties, not fields, though the fix was also copied into the fields loop."
         ],
         "notes": [
-          "Fails on base with 2 diagnostics instead of the expected 1 (the analyzer also threw) and passes on the branch."
+          "It fails before the change, when the analyzer also crashed, and passes after."
         ],
         "method_found": true,
         "results": [
@@ -668,7 +665,7 @@
         "steps": [
           {
             "op": "GIVEN",
-            "text": "a class `Foo` marked `[MessagePackObject(SuppressSourceGeneration = true)]`",
+            "text": "a class `Foo` with `SuppressSourceGeneration = true`.",
             "lines": [
               128,
               129
@@ -678,12 +675,12 @@
             "problems": [],
             "tokens": [
               "Foo",
-              "[MessagePackObject(SuppressSourceGeneration = true)]"
+              "SuppressSourceGeneration = true"
             ]
           },
           {
             "op": "AND",
-            "text": "two properties `Member1` and `Member2` that use different key kinds: `[Key(0)]` (a number) and `[Key(\"\"Member2\"\")]` (a string)",
+            "text": "`Member1` uses a number key, `[Key(0)]`, and `Member2` uses a string key.",
             "lines": [
               131,
               135
@@ -693,14 +690,13 @@
             "problems": [],
             "tokens": [
               "Member1",
-              "Member2",
               "[Key(0)]",
-              "[Key(\"\"Member2\"\")]"
+              "Member2"
             ]
           },
           {
             "op": "WHEN",
-            "text": "the MessagePack analyzer runs on this code through `VerifyCS.Test`",
+            "text": "the analyzer runs on it through `VerifyCS.Test`.",
             "lines": [
               139,
               143
@@ -714,7 +710,7 @@
           },
           {
             "op": "THEN",
-            "text": "exactly one diagnostic is expected: `MsgPack005` covering the second member (its `[Key(\"\"Member2\"\")]` and declaration); any extra diagnostic, such as an analyzer crash report, fails the test",
+            "text": "exactly one `MsgPack005` is reported, on `Member2`; a crash report would fail it.",
             "lines": [
               134,
               143
@@ -724,7 +720,7 @@
             "problems": [],
             "tokens": [
               "MsgPack005",
-              "[Key(\"\"Member2\"\")]"
+              "Member2"
             ]
           }
         ],
@@ -732,11 +728,11 @@
           "evidence/ju26-issue-2234/old-vs-new-tests.json"
         ],
         "does_not_check": [
-          "It does not compare the diagnostic's message text; the markup only fixes the id and the location. So it cannot tell 'must be of the same type' from 'must be unique'; both share this id.",
-          "It does not try a string key first and a number key second, nor a member whose type is also unserializable (C-2234-04)."
+          "'Must be unique' and 'must be of the same type' share this id, and it does not check which message appears.",
+          "It does not try a string key first, or a member whose type is also unserializable."
         ],
         "notes": [
-          "Fails on base with 2 diagnostics instead of the expected 1 (the analyzer also threw) and passes on the branch."
+          "It fails before the change, when the analyzer also crashed, and passes after."
         ],
         "method_found": true,
         "results": [
@@ -799,7 +795,7 @@
         "steps": [
           {
             "op": "GIVEN",
-            "text": "a class `Foo` marked plain `[MessagePackObject]`, so source generation is NOT suppressed",
+            "text": "a class `Foo` with plain `[MessagePackObject]`, so generation is not suppressed.",
             "lines": [
               150,
               151
@@ -814,7 +810,7 @@
           },
           {
             "op": "AND",
-            "text": "two properties `Member1` and `Member2` that both carry `[Key(0)]`",
+            "text": "two properties, `Member1` and `Member2`, both use `[Key(0)]`.",
             "lines": [
               153,
               157
@@ -830,7 +826,7 @@
           },
           {
             "op": "WHEN",
-            "text": "the MessagePack analyzer runs on this code through `VerifyCS.Test`",
+            "text": "the analyzer runs on it through `VerifyCS.Test`.",
             "lines": [
               161,
               165
@@ -844,7 +840,7 @@
           },
           {
             "op": "THEN",
-            "text": "exactly one diagnostic is expected: `MsgPack005` covering the second member (its `[Key(0)]` and declaration); any extra diagnostic, such as an analyzer crash report, fails the test",
+            "text": "exactly one `MsgPack005` is reported, on `Member2`; a crash report would fail it.",
             "lines": [
               156,
               165
@@ -854,7 +850,7 @@
             "problems": [],
             "tokens": [
               "MsgPack005",
-              "[Key(0)]"
+              "Member2"
             ]
           }
         ],
@@ -862,11 +858,11 @@
           "evidence/ju26-issue-2234/old-vs-new-tests.json"
         ],
         "does_not_check": [
-          "It does not compare the diagnostic's message text; the markup only fixes the id and the location.",
-          "It runs only the analyzer, not the source generator, so it does not check what the generator emits for this type."
+          "It checks the diagnostic's id and position, not its message.",
+          "It runs only the analyzer, so it does not check what the generator emits."
         ],
         "notes": [
-          "Fails on base with 2 diagnostics instead of the expected 1 (the analyzer also threw) and passes on the branch."
+          "It fails before the change, when the analyzer also crashed, and passes after."
         ],
         "method_found": true,
         "results": [
@@ -929,7 +925,7 @@
         "steps": [
           {
             "op": "GIVEN",
-            "text": "(per the test's comment) `MsgPack011`, `MsgPack016` and `MsgPack017` only matter when a formatter is generated",
+            "text": "per the test comment, `MsgPack011`, `MsgPack016` and `MsgPack017` matter only for generated formatters.",
             "lines": [
               171,
               172
@@ -945,7 +941,7 @@
           },
           {
             "op": "AND",
-            "text": "a non-partial class `Foo` marked `[MessagePackObject(AllowPrivate = true, SuppressSourceGeneration = true)]`",
+            "text": "a non-partial class `Foo` sets `AllowPrivate = true, SuppressSourceGeneration = true`.",
             "lines": [
               174,
               175
@@ -955,12 +951,12 @@
             "problems": [],
             "tokens": [
               "Foo",
-              "[MessagePackObject(AllowPrivate = true, SuppressSourceGeneration = true)]"
+              "AllowPrivate = true, SuppressSourceGeneration = true"
             ]
           },
           {
             "op": "AND",
-            "text": "it has a private field `member`, an init-only property `Prop1` with a default value, and a plain property `Prop2`, keyed `[Key(0)]`, `[Key(1)]`, `[Key(2)]`",
+            "text": "it has a private field `member`, an init-only `Prop1` with a default, and `Prop2`.",
             "lines": [
               177,
               184
@@ -971,15 +967,12 @@
             "tokens": [
               "member",
               "Prop1",
-              "Prop2",
-              "[Key(0)]",
-              "[Key(1)]",
-              "[Key(2)]"
+              "Prop2"
             ]
           },
           {
             "op": "WHEN",
-            "text": "the MessagePack analyzer runs on this code through `VerifyCS.Test` with no expected-diagnostic markup",
+            "text": "the analyzer runs through `VerifyCS.Test` with no expected diagnostics marked.",
             "lines": [
               188,
               191
@@ -993,7 +986,7 @@
           },
           {
             "op": "THEN",
-            "text": "`RunAsync()` passes only if no diagnostic at all is reported, because `TestCode = input` carries no expected-diagnostic markup; there is no explicit assert",
+            "text": "`RunAsync()` passes only if no diagnostic at all is reported.",
             "lines": [
               188,
               191
@@ -1002,8 +995,7 @@
             "verified": true,
             "problems": [],
             "tokens": [
-              "RunAsync()",
-              "TestCode = input"
+              "RunAsync()"
             ]
           }
         ],
@@ -1011,11 +1003,11 @@
           "evidence/ju26-issue-2234/old-vs-new-tests.json"
         ],
         "does_not_check": [
-          "It has no control case: it does not show these diagnostics would appear for the same type without `SuppressSourceGeneration`.",
-          "It does not say which member is meant to trigger which of the three skipped diagnostics."
+          "It has no control case showing these diagnostics appear without `SuppressSourceGeneration`.",
+          "It does not say which member should trigger which skipped diagnostic."
         ],
         "notes": [
-          "Also passes on base (old-vs-new-tests.json), so it pins existing behaviour and is not evidence for the fix (C-2234-07)."
+          "It also passes before the change, so it guards old behaviour, not the fix."
         ],
         "method_found": true,
         "results": [
@@ -1090,7 +1082,7 @@
         "steps": [
           {
             "op": "GIVEN",
-            "text": "a type `SuppressedSourceGenerationType` marked `[MessagePackObject(SuppressSourceGeneration = true)]` with `Id` under `[Key(0)]` and `Name` under `[Key(1)]`",
+            "text": "a type `SuppressedSourceGenerationType` sets `SuppressSourceGeneration = true` and keys `Id` and `Name`.",
             "lines": [
               8,
               15
@@ -1100,16 +1092,14 @@
             "problems": [],
             "tokens": [
               "SuppressedSourceGenerationType",
-              "[MessagePackObject(SuppressSourceGeneration = true)]",
+              "SuppressSourceGeneration = true",
               "Id",
-              "[Key(0)]",
-              "Name",
-              "[Key(1)]"
+              "Name"
             ]
           },
           {
             "op": "WHEN",
-            "text": "the test asks the source-generated resolver `GeneratedMessagePackResolver.Instance` for a formatter for that type",
+            "text": "the test asks `GeneratedMessagePackResolver.Instance` for that type's formatter.",
             "lines": [
               23,
               23
@@ -1123,7 +1113,7 @@
           },
           {
             "op": "THEN",
-            "text": "it asserts the answer is null (`Assert.Null`)",
+            "text": "the answer must be null (`Assert.Null`).",
             "lines": [
               23,
               23
@@ -1141,11 +1131,11 @@
           "evidence/ju26-issue-2234/execution-tests-build.json"
         ],
         "does_not_check": [
-          "It does not look at the generated files; it only asks the resolver at run time.",
+          "It only asks the resolver at run time; it does not inspect generated files.",
           "It does not check that the analyzer still validates the type."
         ],
         "notes": [
-          "Never ran here: the execution test project does not build on base or branch (CS9057, generator not loaded), so the result is unknown (C-2234-08)."
+          "Result unknown: this test project does not build here, before or after the change."
         ],
         "method_found": true,
         "results": [
@@ -1213,7 +1203,7 @@
         "steps": [
           {
             "op": "GIVEN",
-            "text": "a type `SuppressedSourceGenerationType` marked `[MessagePackObject(SuppressSourceGeneration = true)]` with `Id` under `[Key(0)]` and `Name` under `[Key(1)]`",
+            "text": "a type `SuppressedSourceGenerationType` sets `SuppressSourceGeneration = true` and keys `Id` and `Name`.",
             "lines": [
               8,
               15
@@ -1223,16 +1213,14 @@
             "problems": [],
             "tokens": [
               "SuppressedSourceGenerationType",
-              "[MessagePackObject(SuppressSourceGeneration = true)]",
+              "SuppressSourceGeneration = true",
               "Id",
-              "[Key(0)]",
-              "Name",
-              "[Key(1)]"
+              "Name"
             ]
           },
           {
             "op": "AND",
-            "text": "a value with `Id = 7` and `Name = \"seven\"`",
+            "text": "a value with `Id = 7` and `Name = \"seven\"`.",
             "lines": [
               29,
               29
@@ -1247,7 +1235,7 @@
           },
           {
             "op": "WHEN",
-            "text": "it is serialized to bytes and deserialized back, both with `MessagePackSerializerOptions.Standard`",
+            "text": "it is serialized and deserialized with `MessagePackSerializerOptions.Standard`.",
             "lines": [
               31,
               32
@@ -1261,7 +1249,7 @@
           },
           {
             "op": "THEN",
-            "text": "it asserts `Assert.Equal(7, result.Id)` and `Assert.Equal(\"seven\", result.Name)`",
+            "text": "`result.Id` must be 7 and `result.Name` must be \"seven\".",
             "lines": [
               34,
               35
@@ -1270,8 +1258,8 @@
             "verified": true,
             "problems": [],
             "tokens": [
-              "Assert.Equal(7, result.Id)",
-              "Assert.Equal(\"seven\", result.Name)"
+              "result.Id",
+              "result.Name"
             ]
           }
         ],
@@ -1280,11 +1268,11 @@
           "evidence/ju26-issue-2234/execution-tests-build.json"
         ],
         "does_not_check": [
-          "Despite its name, it does not check which resolver handled the type; it only uses the standard options.",
-          "It does not check the serialized bytes, only that the value survives a round trip."
+          "Despite its name, it does not check which resolver handled the type.",
+          "It checks that the value survives the round trip, not the bytes."
         ],
         "notes": [
-          "Never ran here: the execution test project does not build on base or branch (CS9057, generator not loaded), so the result is unknown (C-2234-08)."
+          "Result unknown: this test project does not build here, before or after the change."
         ],
         "method_found": true,
         "results": [

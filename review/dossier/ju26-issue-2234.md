@@ -2,7 +2,7 @@
 
 `32258fdb..9007cee1` · 4 files +262 −4
 
-**What the AI changed:** The analyzer threw when a type's keys repeat or mix int and string. The AI changed TypeCollector.cs to keep the first member for each key and to skip a member of the wrong key kind once it is reported, so the analyzer reports MsgPack005 instead of crashing. It added analyzer tests, execution tests and a README section on opting out of source generation.
+**What the AI changed:** The analyzer crashed when a type had repeated keys, or mixed integer and string keys. The AI changed TypeCollector.cs so the analyzer reports MsgPack005 instead. It keeps the first member for each key, and skips a member with the wrong key kind once it is reported. It also added analyzer tests, execution tests and a README section on opting out of source generation.
 
 | ■ Proved | ▲ Tested | ● Measured | ◆ Argued | ✕ Refused |
 |:-:|:-:|:-:|:-:|:-:|
@@ -10,9 +10,9 @@
 
 #### Owner decides · 4
 
-**✕ Refused · C-2234-04** — The new `continue` also skips collecting the member's type, so a member with a mixed key and an unserializable type no longer gets MsgPack003 (base reported it when the first key was a string).
+**✕ Refused · C-2234-04** — The change hides a diagnostic. The new `continue` also skips collecting the member's type. So a member with a mixed key and an unserializable type no longer gets MsgPack003. Before the change, it got MsgPack003 when the first key was a string.
 
-> It drops a warning that base reported; whether that is acceptable next to the MsgPack005 error on the same member is a product call.
+> It drops a diagnostic the old code reported. Whether that is fine, given the same member already gets the MsgPack005 error, is a product decision.
 
 R-2234-4 *(inferred)* · owner: **analyzer owner**
 
@@ -24,9 +24,9 @@ R-2234-4 *(inferred)* · owner: **analyzer owner**
 - [ ] reject
 - [ ] send back
 
-**◆ Argued · C-2234-03** — The fix is incomplete: when a type's first keyed member is a field with [Key(null)], the analyzer still throws (AD0001, ArgumentNullException), also with SuppressSourceGeneration = true.
+**◆ Argued · C-2234-03** — The fix is incomplete. If a type's first keyed member is a field with [Key(null)], the analyzer still crashes (AD0001, ArgumentNullException). This also happens with SuppressSourceGeneration = true.
 
-> A probe on the real analyzer reproduces the crash on base and on the branch, so it cannot be Tested; the evidence shows a gap rather than a passing check, so the owner decides.
+> An experiment on the real analyzer shows the crash before and after the change. That is a gap, not a passing check, so it cannot count as Tested and the owner decides.
 
 R-2234-2 *(inferred)* · owner: **analyzer owner**
 
@@ -39,9 +39,9 @@ R-2234-2 *(inferred)* · owner: **analyzer owner**
 - [ ] reject
 - [ ] send back
 
-**◆ Argued · C-2234-08** — A suppressed type gets no generated formatter and still round-trips through the dynamic resolver (the 2 new execution tests).
+**◆ Argued · C-2234-08** — A type with SuppressSourceGeneration gets no generated formatter, and still round-trips through the run-time (dynamic) resolver. The 2 new execution tests are meant to show this.
 
-> The execution test project does not build in our environment on base or branch, because the source generator is not loaded (CS9057), so the tests never ran.
+> The tests never ran. Their project does not build here, before or after the change, because the source generator does not load (CS9057).
 
 R-2234-1 · owner: **test owner**
 
@@ -53,9 +53,9 @@ R-2234-1 · owner: **test owner**
 - [ ] reject
 - [ ] send back
 
-**◆ Argued · C-2234-09** — The new README section says the analyzer validates suppressed types (MsgPack003, 004, 005, 012, 015) and skips MsgPack011, 016 and 017 for them.
+**◆ Argued · C-2234-09** — The new README section says the analyzer still checks suppressed types for MsgPack003, 004, 005, 012 and 015, and skips MsgPack011, 016 and 017 for them.
 
-> It is documentation. Tests cover 003, 004, 005, 015 and the skipped ones, but not 012, and C-2234-03 shows a case where MsgPack005 validation still crashes.
+> It is documentation. Tests cover 003, 004, 005, 015 and the skipped ones, but not 012. And C-2234-03 shows a case where the MsgPack005 check still crashes.
 
 R-2234-1 · owner: **docs owner**
 
@@ -69,9 +69,9 @@ R-2234-1 · owner: **docs owner**
 
 #### Machine settled · 5
 
-<details><summary>▲ Tested · C-2234-01 — The analyzer no longer throws on duplicate int keys, duplicate string keys or mixed key kinds; it reports MsgPack005 instead, with or without SuppressSourceGeneration.</summary>
+<details><summary>▲ Tested · C-2234-01 — The analyzer no longer crashes on duplicate integer keys, duplicate string keys or mixed key kinds. It reports MsgPack005 instead, with or without SuppressSourceGeneration.</summary>
 
-> 4 new tests fail on base (MsgPack005 plus AD0001 from an analyzer exception) and pass on the branch.
+> 4 new tests fail before the change, because the analyzer crashes (AD0001) next to the MsgPack005. They pass after.
 
 R-2234-1
 
@@ -87,14 +87,14 @@ R-2234-1
 
 </details>
 
-<details><summary>▲ Tested · C-2234-02 — For every list of 1 to 4 keyed members with int or string keys, the real TypeCollector does not throw on the branch; on base it threw on most of them.</summary>
+<details><summary>▲ Tested · C-2234-02 — After the change, the real TypeCollector never throws on any list of 1 to 4 keyed members with integer or string keys. Before the change, it threw on most of them.</summary>
 
-> Chain: the Dafny model proves it for all lists, and the model matches the real C# on every input up to 4 members; the C# run throws on base and not on the branch, so the weakest link is Tested.
+> A formal model, written in Dafny, proves this for lists of any length. The model matches the real C# code on every input up to 4 members. The real code throws before the change and not after. The weakest step is a test, so the claim counts as Tested.
 
 R-2234-2 *(inferred)*
 
-- ■ Proved — Dafny model: BranchNeverFailsForIntAndStringKeys, no assume
-- ▲ Tested — model matches real TypeCollector on 3710 inputs (base and branch, 0 mismatches)
+- ■ Proved — The Dafny model proves BranchNeverFailsForIntAndStringKeys with no unproven assumptions.
+- ▲ Tested — The model matches the real TypeCollector on 3710 inputs, before and after the change, with 0 mismatches.
 
 - [`proof`](../evidence/ju26-issue-2234/proof.json) **pass** — Dafny: Dafny program verifier finished with 23 verified, 0 errors; locked theorem 'never fails' is false for the branch (counterexample: first keyed member is a field with [Key(null)]), the stated mutation fails to verify; model vs real C# on 3710 inputs of 1..4 members: branch 0 mismatches, base 0 mismatches; C# threw on 156 branch inputs and 3346 base inputs; with int/string keys only (1592 inputs) C# threw on 1500 on base and 0 on branch
 - `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1008`
@@ -106,15 +106,15 @@ R-2234-2 *(inferred)*
 
 </details>
 
-<details><summary>▲ Tested · C-2234-05 — When two members share a key, the first member is kept and the second gets MsgPack005 ('must be unique'); no repeated key goes unreported.</summary>
+<details><summary>▲ Tested · C-2234-05 — Every repeated key is reported. When two members share a key, the first one is kept and the second gets MsgPack005 ('must be unique').</summary>
 
-> The duplicate-key tests fail on base and pass on the branch, and the model lemma DupReported matches the real C# on every input up to 4 members.
+> The duplicate-key tests fail before the change and pass after. The model's proof DupReported matches the real C# code on every input up to 4 members.
 
 R-2234-3 *(inferred)*
 
-- ■ Proved — Dafny lemma DupReported (first wins, every repeat reported)
-- ▲ Tested — model matches real TypeCollector on 3710 inputs
-- ▲ Tested — duplicate-key tests fail on base, pass on branch
+- ■ Proved — The Dafny model proves DupReported: the first member wins and every repeat is reported.
+- ▲ Tested — The model matches the real TypeCollector on 3710 inputs.
+- ▲ Tested — The duplicate-key tests fail before the change and pass after.
 
 - [`old-vs-new-tests`](../evidence/ju26-issue-2234/old-vs-new-tests.json) **ERROR** — 10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 4 pass on base (not evidence), 0 fail on branch, 2 not runnable here (project does not build on branch)
 - [`findings-probes`](../evidence/ju26-issue-2234/findings-probes.json) **pass** — (a) continue skips member type: confirmed; (b) second member of a duplicate key gets MsgPack005: yes, finding dropped; null-key first field crashes analyzer on branch: confirmed (11 scenarios, real analyzer, base and branch)
@@ -126,9 +126,9 @@ R-2234-3 *(inferred)*
 
 </details>
 
-<details><summary>● Measured · C-2234-06 — The same fix is pasted into both the properties loop and the fields loop, which adds duplicated code to TypeCollector.cs.</summary>
+<details><summary>● Measured · C-2234-06 — The fix is copied into both the properties loop and the fields loop, which adds duplicate code to TypeCollector.cs.</summary>
 
-> The numbers come from a clone and complexity script run on base and branch.
+> The numbers come from a script that measures duplicate code and complexity, run before and after the change.
 
 R-2234-1
 
@@ -142,9 +142,9 @@ R-2234-1
 
 </details>
 
-<details><summary>● Measured · C-2234-07 — 4 of the 8 new analyzer tests (missing key, AllowPrivate, member type, generation-only diagnostics) already pass on base; they pin existing behaviour and are not evidence for the fix.</summary>
+<details><summary>● Measured · C-2234-07 — 4 of the 8 new analyzer tests already pass before the change, so they guard old behaviour and do not show the fix works. They cover a missing key, AllowPrivate, the member type and generation-only diagnostics.</summary>
 
-> The count comes from the old-versus-new test runner.
+> The count comes from running the tests before and after the change.
 
 R-2234-1
 

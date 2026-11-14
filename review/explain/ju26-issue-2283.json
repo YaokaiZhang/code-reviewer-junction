@@ -36,7 +36,7 @@
    "steps": [
     {
      "op": "GIVEN",
-     "text": "a library source defines a struct `MyGenericStruct<T>` marked `[MessagePackObject]` with one member `[Key(0)]` `T Content`",
+     "text": "a library struct `MyGenericStruct<T>` with one keyed member `T Content`.",
      "lines": [
       514,
       518
@@ -44,7 +44,7 @@
     },
     {
      "op": "AND",
-     "text": "an app source has a class `MyObject` with a `[Key(0)]` member of type `MyGenericStruct<int>`, plus a resolver `MyResolver` marked `[GeneratedMessagePackResolver]`",
+     "text": "an app class `MyObject` uses `MyGenericStruct<int>`, with resolver `MyResolver`.",
      "lines": [
       528,
       536
@@ -52,7 +52,7 @@
     },
     {
      "op": "WHEN",
-     "text": "`RunWithMetadataReferenceAsync` runs with expected resolver file `TempProject.MyResolver.g.cs`",
+     "text": "`RunWithMetadataReferenceAsync` runs, expecting `TempProject.MyResolver.g.cs`.",
      "lines": [
       540,
       540
@@ -60,7 +60,7 @@
     },
     {
      "op": "AND",
-     "text": "the helper first compiles the library source into a separate assembly `DefiningProject` and gives it to the app only as a metadata reference (no source)",
+     "text": "the library is compiled separately as `DefiningProject` and referenced without its source.",
      "lines": [
       635,
       647
@@ -68,7 +68,7 @@
     },
     {
      "op": "THEN",
-     "text": "the analyzers and generator run on the app with no expected diagnostics, so any diagnostic fails the test (the comment names the crash signs `AD0001` and `CS8785`)",
+     "text": "any analyzer or generator diagnostic fails the test, including crashes like `AD0001`.",
      "lines": [
       637,
       648
@@ -76,7 +76,7 @@
     },
     {
      "op": "AND",
-     "text": "a second, direct generator run must report nothing at `DiagnosticSeverity.Warning` or above (`Assert.Empty`) and its output must include a file named `expectedResolverHintName` (`Assert.Contains`)",
+     "text": "a direct generator run gives no warnings (`Assert.Empty`) and emits the resolver (`Assert.Contains`).",
      "lines": [
       651,
       658
@@ -88,11 +88,11 @@
     "evidence/ju26-issue-2283/old-vs-new-tests.json"
    ],
    "does_not_check": [
-    "It does not check the content of the generated code, or that the closed generic member serializes at run time.",
-    "It does not cover the case the new diagnostic filter hides (MsgPack003 about the app's own type, C-2283-02)."
+    "It does not check the generated code, or that the member serializes at run time.",
+    "It does not cover the MsgPack003 diagnostic about the app's own type, which the new filter hides."
    ],
    "notes": [
-    "Fails on base with the crash from the issue (analyzer exception plus generator failure) and passes on the branch; it still passes when the new filter is removed, so the crash fix alone makes it pass."
+    "It crashes before the change and passes after, even with the new filter removed."
    ]
   },
   {
@@ -127,7 +127,7 @@
    "steps": [
     {
      "op": "GIVEN",
-     "text": "a library namespace `Lib` defines `partial record struct Item<T>` with one positional member `[property: Key(0)] string Key`",
+     "text": "a library record struct `Item<T>` with one keyed member `string Key`.",
      "lines": [
       556,
       559
@@ -135,7 +135,7 @@
     },
     {
      "op": "AND",
-     "text": "an app defines a record `Cmd` with a `[Key(1)]` member `Item<int> Member`, plus a resolver `AppResolver` marked `[GeneratedMessagePackResolver]`",
+     "text": "an app record `Cmd` has a member `Item<int> Member`, with resolver `AppResolver`.",
      "lines": [
       566,
       576
@@ -143,7 +143,7 @@
     },
     {
      "op": "WHEN",
-     "text": "`RunWithMetadataReferenceAsync` runs with expected resolver file `App.AppResolver.g.cs` and `LanguageVersion.Latest`",
+     "text": "`RunWithMetadataReferenceAsync` runs with `LanguageVersion.Latest`, expecting `App.AppResolver.g.cs`.",
      "lines": [
       579,
       579
@@ -151,7 +151,7 @@
     },
     {
      "op": "AND",
-     "text": "the helper first compiles the library source into a separate assembly `DefiningProject` and gives it to the app only as a metadata reference (no source)",
+     "text": "the library is compiled separately as `DefiningProject` and referenced without its source.",
      "lines": [
       635,
       647
@@ -159,7 +159,7 @@
     },
     {
      "op": "THEN",
-     "text": "the analyzers and generator run on the app with no expected diagnostics, so any diagnostic fails the test (the comment names the crash signs `AD0001` and `CS8785`)",
+     "text": "any analyzer or generator diagnostic fails the test, including crashes like `AD0001`.",
      "lines": [
       637,
       648
@@ -167,7 +167,7 @@
     },
     {
      "op": "AND",
-     "text": "a second, direct generator run must report nothing at `DiagnosticSeverity.Warning` or above (`Assert.Empty`) and its output must include a file named `expectedResolverHintName` (`Assert.Contains`)",
+     "text": "a direct generator run gives no warnings (`Assert.Empty`) and emits the resolver (`Assert.Contains`).",
      "lines": [
       651,
       658
@@ -179,11 +179,11 @@
     "evidence/ju26-issue-2283/old-vs-new-tests.json"
    ],
    "does_not_check": [
-    "It does not check the content of the generated code, or that the record struct member serializes at run time.",
-    "The type parameter `T` of `Item<T>` is never used by a member, so it does not test a member whose type depends on `T`."
+    "It does not check the generated code, or that the record struct serializes at run time.",
+    "No member of `Item<T>` uses `T`, so a member whose type depends on `T` is not tested."
    ],
    "notes": [
-    "Fails on base with the crash from the issue and passes on the branch; it still passes when the new filter is removed."
+    "It crashes before the change and passes after, even with the new filter removed."
    ]
   },
   {
@@ -220,7 +220,7 @@
    "steps": [
     {
      "op": "GIVEN",
-     "text": "a library struct `MyGenericStruct<T>` marked `[MessagePackObject]` with a `[Key(0)]` member `Key` and a member `Unkeyed` that has no key attribute",
+     "text": "a library struct `MyGenericStruct<T>` with a keyed member `Key` and an unkeyed member `Unkeyed`.",
      "lines": [
       597,
       603
@@ -228,7 +228,7 @@
     },
     {
      "op": "AND",
-     "text": "an app class `MyObject` with a `[Key(0)]` member of type `MyGenericStruct<int>`, plus a resolver `MyResolver`",
+     "text": "an app class `MyObject` uses `MyGenericStruct<int>`, with resolver `MyResolver`.",
      "lines": [
       613,
       621
@@ -236,7 +236,7 @@
     },
     {
      "op": "WHEN",
-     "text": "`RunWithMetadataReferenceAsync` runs with expected resolver file `TempProject.MyResolver.g.cs`",
+     "text": "`RunWithMetadataReferenceAsync` runs, expecting `TempProject.MyResolver.g.cs`.",
      "lines": [
       625,
       625
@@ -244,7 +244,7 @@
     },
     {
      "op": "AND",
-     "text": "the helper compiles the library with a plain compiler call (`CreateCompilation` then `Emit`), so no analyzer ever reports the missing key in the library",
+     "text": "the library is built with a plain `Emit`, so no analyzer sees its missing key.",
      "lines": [
       661,
       673
@@ -252,7 +252,7 @@
     },
     {
      "op": "THEN",
-     "text": "the analyzers and generator run on the app with no expected diagnostics, so any diagnostic fails the test (the comment names the crash signs `AD0001` and `CS8785`)",
+     "text": "any analyzer or generator diagnostic fails the test, including crashes like `AD0001`.",
      "lines": [
       637,
       648
@@ -260,7 +260,7 @@
     },
     {
      "op": "AND",
-     "text": "a second, direct generator run must report nothing at `DiagnosticSeverity.Warning` or above (`Assert.Empty`) and its output must include a file named `expectedResolverHintName` (`Assert.Contains`)",
+     "text": "a direct generator run gives no warnings (`Assert.Empty`) and emits the resolver (`Assert.Contains`).",
      "lines": [
       651,
       658
@@ -272,12 +272,12 @@
     "evidence/ju26-issue-2283/old-vs-new-tests.json"
    ],
    "does_not_check": [
-    "It does not check that any assembly reports the missing key on `Unkeyed`; it requires the app build to stay silent about it.",
-    "It does not check the content of the generated code."
+    "It never checks that the missing key on `Unkeyed` is reported anywhere; it requires silence.",
+    "It does not check the generated code."
    ],
    "notes": [
-    "Depends on the new diagnostic filter: with only the filter reverted it fails with two MsgPack004 diagnostics about `Unkeyed` (old-vs-new-tests.json, needs_filter: true). So beyond 'does not crash' it pins the dropped diagnostics that C-2283-02 refuses.",
-    "Fails on base with 3 diagnostics (analyzer exception, MsgPack004, generator failure)."
+    "Without the new filter it fails on two MsgPack004 diagnostics, so it locks in the dropped diagnostics.",
+    "Before the change it fails with three diagnostics: an analyzer crash, MsgPack004 and a generator failure."
    ]
   }
  ]
