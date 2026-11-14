@@ -1,0 +1,27 @@
+<Project>
+  <!-- Injected with -p:CustomAfterMicrosoftCommonTargets by isolation_check.py. Before the C# compiler runs,
+       write what it would be given (sources, references, language options) so the isolation harness can
+       rebuild the same compilation outside MSBuild. Does not change the build. -->
+  <Target Name="IsolationDumpCompileInputs" BeforeTargets="CoreCompile" Condition="'$(IsolationDumpDir)' != '' and '$(Language)' == 'C#'">
+    <ItemGroup>
+      <_IsoLine Include="prop%09ProjectPath%09$(MSBuildProjectFullPath)" />
+      <_IsoLine Include="prop%09TargetFramework%09$(TargetFramework)" />
+      <_IsoLine Include="prop%09AssemblyName%09$(AssemblyName)" />
+      <_IsoLine Include="prop%09OutputType%09$(OutputType)" />
+      <_IsoLine Include="prop%09LangVersion%09$(LangVersion)" />
+      <_IsoLine Include="prop%09DefineConstants%09$(DefineConstants)" />
+      <_IsoLine Include="prop%09Nullable%09$(Nullable)" />
+      <_IsoLine Include="prop%09AllowUnsafeBlocks%09$(AllowUnsafeBlocks)" />
+      <_IsoLine Include="prop%09WarningLevel%09$(WarningLevel)" />
+      <_IsoLine Include="prop%09NoWarn%09$(NoWarn)" />
+      <_IsoLine Include="prop%09CheckForOverflowUnderflow%09$(CheckForOverflowUnderflow)" />
+      <_IsoLine Include="prop%09Optimize%09$(Optimize)" />
+      <_IsoLine Include="compile%09%(Compile.FullPath)" />
+      <_IsoLine Include="ref%09%(ReferencePathWithRefAssemblies.FullPath)" />
+      <_IsoLine Include="analyzer%09%(Analyzer.FullPath)" />
+      <_IsoLine Include="additional%09%(AdditionalFiles.FullPath)" />
+    </ItemGroup>
+    <MakeDir Directories="$(IsolationDumpDir)" />
+    <WriteLinesToFile File="$(IsolationDumpDir)/$(MSBuildProjectName).$(TargetFramework).tsv" Lines="@(_IsoLine)" Overwrite="true" />
+  </Target>
+</Project>

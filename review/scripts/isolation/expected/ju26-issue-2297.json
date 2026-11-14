@@ -1,0 +1,24 @@
+{
+  "branch": "ju26-issue-2297",
+  "note": "Written by hand from the dossier claims before looking at the differential results. Each rule names the claim that states the intent. A generated_rewrite rule is applied to the BRANCH text; the file counts as explained only if the rewritten branch text equals the base text exactly.",
+  "rules": [
+    {
+      "claim": "C-2297-01",
+      "what": "generated file gains only the [ExcludeFromCodeCoverage] attribute inside its #if !NETSTANDARD2_0 && !NETFRAMEWORK / #endif guard (3 lines per generated type)",
+      "match": {
+        "type": "generated_rewrite",
+        "regex": "^[ \\t]*#if !NETSTANDARD2_0 && !NETFRAMEWORK\\n[ \\t]*\\[global::System\\.Diagnostics\\.CodeAnalysis\\.ExcludeFromCodeCoverage\\]\\n[ \\t]*#endif\\n",
+        "replace": ""
+      }
+    },
+    {
+      "claim": "C-2297-06",
+      "what": "TransformUtilities side effect: after the constraints of a generic nesting type, the opening brace is followed by a line break (base wrote '{' with no line break)",
+      "match": {
+        "type": "generated_rewrite",
+        "regex": "^([ \\t]*where [^\\n]*\\n)\\{\\n",
+        "replace": "\\1{"
+      }
+    }
+  ]
+}

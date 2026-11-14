@@ -1,0 +1,26 @@
+{
+  "branch": "ju26-issue-2283",
+  "note": "Written by hand from the dossier claims before looking at the differential results. C-2283-02 is itself a disputed claim (needs owner): it states the filter's intent, so drops it explains are listed as explained but stay a finding in the dossier.",
+  "rules": [
+    {
+      "claim": "C-2283-01",
+      "what": "an analyzer crash (AD0001) or generator crash (CS8785) on base is gone on the branch",
+      "match": {"type": "diagnostic_removed", "id": "AD0001|CS8785", "message": ""}
+    },
+    {
+      "claim": "C-2283-01",
+      "what": "a generator exception on base is gone on the branch",
+      "match": {"type": "generator_exception_removed", "message": ""}
+    },
+    {
+      "claim": "C-2283-01",
+      "what": "generated files appear where the base generator crashed ('the resolver is generated again')",
+      "match": {"type": "generated_file_added", "file": "", "requires_base": {"id": "CS8785", "message": ""}}
+    },
+    {
+      "claim": "C-2283-02",
+      "what": "an analyzer diagnostic located outside this compilation's source (no source location) is dropped by the new filter",
+      "match": {"type": "diagnostic_removed", "categories": ["analyzer_diagnostics"], "id": "MsgPack\\d+", "location": "^\\((none|MetadataFile|ExternalFile)\\)$"}
+    }
+  ]
+}

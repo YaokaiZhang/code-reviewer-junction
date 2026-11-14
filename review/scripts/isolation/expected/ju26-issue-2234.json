@@ -1,0 +1,67 @@
+{
+  "branch": "ju26-issue-2234",
+  "note": "Written by hand from the dossier claims before looking at the differential results. C-2234-04 (hidden MsgPack003) is a finding, not an intent, so it has no rule: if it shows up it is unexplained.",
+  "rules": [
+    {
+      "claim": "C-2234-01",
+      "what": "an analyzer or generator crash on duplicate or mixed keys (AD0001 / CS8785, 'same key has already been added') is gone",
+      "match": {
+        "type": "diagnostic_removed",
+        "id": "AD0001|CS8785",
+        "message": "same key"
+      }
+    },
+    {
+      "claim": "C-2234-01",
+      "what": "a generator exception on duplicate keys is gone",
+      "match": {
+        "type": "generator_exception_removed",
+        "message": "same key"
+      }
+    },
+    {
+      "claim": "C-2234-01",
+      "what": "an analyzer or generator crash on mixed integer and string keys (AD0001 / CS8785 / generator exception, 'Nullable object must have a value') is gone",
+      "added_after_first_run": "the first rule set only named the duplicate-key crash message; C-2234-01 also states 'mixed key kinds', and the branch's new test MixedKeyKindsAreReportedWithoutAnalyzerFailure showed that crash's message. Only affects the new-inputs group.",
+      "match": {
+        "type": "diagnostic_removed",
+        "id": "AD0001|CS8785",
+        "message": "Nullable object must have a value"
+      }
+    },
+    {
+      "claim": "C-2234-01",
+      "what": "a generator exception on mixed integer and string keys ('Nullable object must have a value') is gone",
+      "added_after_first_run": "see the rule above",
+      "match": {
+        "type": "generator_exception_removed",
+        "message": "Nullable object must have a value"
+      }
+    },
+    {
+      "claim": "C-2234-05",
+      "what": "MsgPack005 ('must be unique' / key problems) is reported where base crashed on duplicate keys",
+      "match": {
+        "type": "diagnostic_added",
+        "id": "MsgPack005",
+        "message": "",
+        "requires_base": {
+          "id": "AD0001|CS8785",
+          "message": "same key"
+        }
+      }
+    },
+    {
+      "claim": "C-2234-01",
+      "what": "generated files appear where the base generator crashed on duplicate keys",
+      "match": {
+        "type": "generated_file_added",
+        "file": "",
+        "requires_base": {
+          "id": "CS8785",
+          "message": "same key"
+        }
+      }
+    }
+  ]
+}

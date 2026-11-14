@@ -1,0 +1,7 @@
+<Project>
+  <!-- Keep build output out of the review tree. -->
+  <PropertyGroup>
+    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)../../../../.work/isolation/harness-obj/</BaseIntermediateOutputPath>
+    <BaseOutputPath>$(MSBuildThisFileDirectory)../../../../.work/isolation/harness-bin/</BaseOutputPath>
+  </PropertyGroup>
+</Project>

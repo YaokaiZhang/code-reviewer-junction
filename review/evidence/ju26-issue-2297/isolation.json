@@ -1,0 +1,862 @@
+{
+  "check": "isolation",
+  "branch": "ju26-issue-2297",
+  "base": "32258fdb",
+  "command": "python3 review/scripts/isolation_check.py --repo $MP_REPO --branch ju26-issue-2297 --write  (coverage inside it: coverlet <copy of MessagePack.SourceGenerator.dll> --include-test-assembly --include '[MessagePack.SourceGenerator]*' --format json --target dotnet --targetargs '<IsolationHarness.dll> --generator <copy> --inputs <one project input> --out <dir>')",
+  "result": "pass",
+  "provides": [
+    "rebuild-compare",
+    "count"
+  ],
+  "summary": "5 real projects, 139 output units (generated files and diagnostics): 0 same, 139 differ, 139 explained by C-2297-01, 0 unexplained; coverage: 22 of 22 trackable changed lines reached, 27 not trackable; control group of 257 test inputs: 177 differ, 0 unexplained",
+  "details": {
+    "what": "Differential run: the base and branch builds of the source generator and analyzers get the same inputs; every difference in generated files or diagnostics must match a rule naming a claim.",
+    "expected_rules": "review/scripts/isolation/expected/ju26-issue-2297.json",
+    "rules": [
+      {
+        "claim": "C-2297-01",
+        "what": "generated file gains only the [ExcludeFromCodeCoverage] attribute inside its #if !NETSTANDARD2_0 && !NETFRAMEWORK / #endif guard (3 lines per generated type)"
+      },
+      {
+        "claim": "C-2297-06",
+        "what": "TransformUtilities side effect: after the constraints of a generic nesting type, the opening brace is followed by a line break (base wrote '{' with no line break)"
+      }
+    ],
+    "corpus": [
+      {
+        "group": "real projects that consume the generator (base)",
+        "role": "main",
+        "how": "each project compiled as a whole with the sources, references and options MSBuild passes to csc at base; references from each side's own build",
+        "inputs": 5,
+        "projects": [
+          "MessagePack.GeneratedCode.Tests",
+          "MessagePack.SourceGenerator.ExecutionTests",
+          "MessagePack.SourceGenerator.MapModeExecutionTests",
+          "Sandbox",
+          "SharedData"
+        ],
+        "unit": "one generated file or one diagnostic; totals count units",
+        "skipped": 11,
+        "skip_reasons": [
+          "sandbox/DynamicCodeDumper: does not reference the source generator",
+          "sandbox/MessagePack.Internal: does not reference the source generator",
+          "sandbox/PerfBenchmarkDotNet: does not reference the source generator",
+          "sandbox/PerfNetFramework: does not reference the source generator",
+          "sandbox/TestData2: does not reference the source generator",
+          "sandbox/TestData.InvalidProject: does not reference the source generator",
+          "sandbox/TestData.InvalidSyntax: does not reference the source generator",
+          "tests/MessagePack.Tests: does not reference the source generator as an analyzer (no SourceGeneratorConsumer.props)",
+          "tests/MessagePack.Internal.Tests: does not reference the source generator",
+          "tests/MessagePack.Experimental.Tests: does not reference the source generator",
+          "tests/MessagePack.AspNetCoreMvcFormatter.Tests: does not reference the source generator"
+        ]
+      },
+      {
+        "group": "generator and analyzer test inputs (base)",
+        "role": "control",
+        "how": "every distinct compilation the 167 base test cases of tests/MessagePack.SourceGenerator.Tests hand to Roslyn, recorded by running them once; already snapshot-tested by CI, so kept out of the headline totals",
+        "base_test_run": "167 of 167 passed",
+        "inputs": 257,
+        "test_methods": 144,
+        "test_methods_recorded": 138,
+        "skipped": 6,
+        "skip_reasons": [
+          "FullModelTests: 2 test method(s) build no C# compilation through the patched verifiers (Equals_ByValue, Equals_Null)",
+          "MemberSerializationInfoTests: 1 test method(s) build no C# compilation through the patched verifiers (Equals_ByValue)",
+          "MsgPack001SpecifyOptionsAnalyzerTests: 1 test method(s) build no C# compilation through the patched verifiers (Invocation_OmittedOptionalParameter_VB)",
+          "MsgPack002UseConstantOptionsAnalyzerTests: 1 test method(s) build no C# compilation through the patched verifiers (Invocation_WithImmutableStaticOptions_VB)",
+          "UnionSerializationInfoTests: 1 test method(s) build no C# compilation through the patched verifiers (Equals_ByValue)"
+        ]
+      }
+    ],
+    "totals": {
+      "inputs": 139,
+      "compared": 139,
+      "same": 0,
+      "differ": 139,
+      "explained": 139,
+      "unexplained": 0,
+      "not_compared": 0
+    },
+    "explained": [
+      {
+        "claim": "C-2297-01",
+        "what": "generated file gains only the [ExcludeFromCodeCoverage] attribute inside its #if !NETSTANDARD2_0 && !NETFRAMEWORK / #endif guard (3 lines per generated type)",
+        "units": 139,
+        "inputs": [
+          "project MessagePack.GeneratedCode.Tests",
+          "project MessagePack.SourceGenerator.ExecutionTests",
+          "project MessagePack.SourceGenerator.MapModeExecutionTests",
+          "project Sandbox",
+          "project SharedData"
+        ],
+        "example": {
+          "input": "project MessagePack.GeneratedCode.Tests",
+          "diff": "--- base/CompositeResolverWithLocalFormatters.g.cs\n+++ branch/CompositeResolverWithLocalFormatters.g.cs\n@@ -5,2 +5,5 @@\n \n+#if !NETSTANDARD2_0 && !NETFRAMEWORK\n+[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]\n+#endif\n partial class CompositeResolverWithLocalFormatters : MsgPack::IFormatterResolver\n@@ -26,2 +29,5 @@\n \n+#if !NETSTANDARD2_0 && !NETFRAMEWORK\n+\t[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]\n+#endif\n \tstatic class FormatterCache<T>"
+        }
+      }
+    ],
+    "unexplained_total_items": 0,
+    "unexplained": [],
+    "not_compared": [],
+    "per_project": [
+      {
+        "project": "MessagePack.GeneratedCode.Tests",
+        "status": "compared",
+        "documents": 6,
+        "generated_files_base": 4,
+        "generated_files_branch": 4,
+        "formatter_files_base": 3,
+        "generated_files_differ": 4,
+        "generated_files_unexplained": 0,
+        "diagnostics_base": 0,
+        "diagnostics_branch": 0,
+        "diagnostic_changes": 0,
+        "diagnostic_changes_unexplained": 0,
+        "differing_types": [
+          "CompositeResolverWithLocalFormatters.g.cs",
+          "CompositeResolverWithoutLocalFormatters.g.cs",
+          "Formatters.MessagePack.GeneratedMessagePackResolver.CompositeResolverTests.MPOFormatter.g.cs",
+          "MessagePack.GeneratedMessagePackResolver.g.cs"
+        ]
+      },
+      {
+        "project": "MessagePack.SourceGenerator.ExecutionTests",
+        "status": "compared",
+        "documents": 30,
+        "generated_files_base": 18,
+        "generated_files_branch": 18,
+        "formatter_files_base": 16,
+        "generated_files_differ": 18,
+        "generated_files_unexplained": 0,
+        "diagnostics_base": 0,
+        "diagnostics_branch": 0,
+        "diagnostic_changes": 0,
+        "diagnostic_changes_unexplained": 0,
+        "differing_types": [
+          "Formatters.GeneratedMessagePackResolver.Derived1Formatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.Derived2Formatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.DeserializingConstructorStartsWithIdx1Formatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.HasInitPropertyFormatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.HasPropertiesWithGetterAndCtorFormatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.HasPropertiesWithGetterAndSetterFormatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.HasPropertyWithCustomFormatterAttributeFormatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.HasPropertyWithTypeWithCustomFormatterFormatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.HasRequiredMembersFormatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.IMyTypeFormatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.MyEnumFormatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.MyMessagePackObjectFormatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.NewPropertyInDerivedType.BaseFormatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.NewPropertyInDerivedType.DerivedFormatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.UnionContainerFormatter.g.cs",
+          "Formatters.HasPrivateSerializedMembers.HasPrivateSerializedMembersFormatter.g.cs",
+          "GeneratedMessagePackResolver.g.cs",
+          "MyGeneratedCompositeResolver.g.cs"
+        ]
+      },
+      {
+        "project": "MessagePack.SourceGenerator.MapModeExecutionTests",
+        "status": "compared",
+        "documents": 34,
+        "generated_files_base": 26,
+        "generated_files_branch": 26,
+        "formatter_files_base": 24,
+        "generated_files_differ": 26,
+        "generated_files_unexplained": 0,
+        "diagnostics_base": 0,
+        "diagnostics_branch": 0,
+        "diagnostic_changes": 0,
+        "diagnostic_changes_unexplained": 0,
+        "differing_types": [
+          "Formatters.ClassWithUseMapAndMembersOfVariousVisibilityAllowPrivate.ClassWithUseMapAndMembersOfVariousVisibilityAllowPrivateFormatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.ClassWithUseMapAndMembersOfVariousVisibilityFormatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.Derived1Formatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.Derived2Formatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.DeserializingConstructorStartsWithIdx1Formatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.HasInitPropertyFormatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.HasPropertiesWithGetterAndCtorFormatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.HasPropertiesWithGetterAndSetterFormatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.HasPropertyWithCustomFormatterAttributeFormatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.HasPropertyWithTypeWithCustomFormatterFormatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.HasRequiredMembersFormatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.IMyTypeFormatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.MapModeWithOverriddenKeyCollision.BaseFormatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.MapModeWithOverriddenKeyCollision.DerivedFormatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.MyEnumFormatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.MyMessagePackObjectFormatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.NewPropertyInDerivedType.BaseFormatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.NewPropertyInDerivedType.DerivedFormatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.StringKeyOverrideTests.ReadOnlyFieldFormatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.StringKeyOverrideTests.ReadOnlyPropertyFormatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.StringKeyOverrideTests.SettableFieldFormatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.StringKeyOverrideTests.SettablePropertyFormatter.g.cs",
+          "Formatters.GeneratedMessagePackResolver.UnionContainerFormatter.g.cs",
+          "Formatters.HasPrivateSerializedMembers.HasPrivateSerializedMembersFormatter.g.cs",
+          "GeneratedMessagePackResolver.g.cs",
+          "MyGeneratedCompositeResolver.g.cs"
+        ]
+      },
+      {
+        "project": "Sandbox",
+        "status": "compared",
+        "documents": 5,
+        "generated_files_base": 19,
+        "generated_files_branch": 19,
+        "formatter_files_base": 18,
+        "generated_files_differ": 19,
+        "generated_files_unexplained": 0,
+        "diagnostics_base": 0,
+        "diagnostics_branch": 0,
+        "diagnostic_changes": 0,
+        "diagnostic_changes_unexplained": 0,
+        "differing_types": [
+          "Formatters.Sandbox.GeneratedMessagePackResolver.Sandbox.BarClassFormatter.g.cs",
+          "Formatters.Sandbox.GeneratedMessagePackResolver.Sandbox.Callback1Formatter.g.cs",
+          "Formatters.Sandbox.GeneratedMessagePackResolver.Sandbox.FooClassFormatter.g.cs",
+          "Formatters.Sandbox.GeneratedMessagePackResolver.Sandbox.IUnionSampleFormatter.g.cs",
+          "Formatters.Sandbox.GeneratedMessagePackResolver.Sandbox.IntKeySampleFormatter.g.cs",
+          "Formatters.Sandbox.GeneratedMessagePackResolver.Sandbox.MyClassFormatter.g.cs",
+          "Formatters.Sandbox.GeneratedMessagePackResolver.Sandbox.PersonFormatter.g.cs",
+          "Formatters.Sandbox.GeneratedMessagePackResolver.Sandbox.PointFormatter.g.cs",
+          "Formatters.Sandbox.GeneratedMessagePackResolver.Sandbox.Sample1Formatter.g.cs",
+          "Formatters.Sandbox.GeneratedMessagePackResolver.Sandbox.Sample2Formatter.g.cs",
+          "Formatters.Sandbox.GeneratedMessagePackResolver.Sandbox.SampleCallbackFormatter.g.cs",
+          "Formatters.Sandbox.GeneratedMessagePackResolver.Sandbox.SexFormatter.g.cs",
+          "Formatters.Sandbox.GeneratedMessagePackResolver.Sandbox.SimpleIntKeyDataFormatter.g.cs",
+          "Formatters.Sandbox.GeneratedMessagePackResolver.Sandbox.StringKeySerializerTarget2Formatter.g.cs",
+          "Formatters.Sandbox.GeneratedMessagePackResolver.Sandbox.TakoxFormatter.g.cs",
+          "Formatters.Sandbox.GeneratedMessagePackResolver.Sandbox.TestObject.PrimitiveObjectFormatter.g.cs",
+          "Formatters.Sandbox.GeneratedMessagePackResolver.Sandbox.TestObjectFormatter.g.cs",
+          "Formatters.Sandbox.GeneratedMessagePackResolver.SharedData.ByteEnumFormatter.g.cs",
+          "Sandbox.GeneratedMessagePackResolver.g.cs"
+        ]
+      },
+      {
+        "project": "SharedData",
+        "status": "compared",
+        "documents": 16,
+        "generated_files_base": 72,
+        "generated_files_branch": 72,
+        "formatter_files_base": 71,
+        "generated_files_differ": 72,
+        "generated_files_unexplained": 0,
+        "diagnostics_base": 0,
+        "diagnostics_branch": 0,
+        "diagnostic_changes": 0,
+        "diagnostic_changes_unexplained": 0,
+        "differing_types": [
+          "Formatters.ComplexModel.ComplexModelFormatter.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.Abcdefg.Efcdigjl.Ateatatea.Hgfagfafgad.TnonodsfarnoiuAtatqagaFormatter.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.ArrayTestTestFormatter.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.GlobalManFormatter.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.GlobalMyEnumFormatter.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.IMessageBodyFormatter.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.MessageFormatter.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.MessagePackFormatterFieldUserFormatter.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.PerfBenchmarkDotNet.StringKeySerializerTargetFormatter.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.QuestMessageBodyFormatter.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.SharedData.ArrayOptimizeClassFormatter.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.SharedData.BarClassFormatter.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.SharedData.ByteEnumFormatter.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.SharedData.Callback1Formatter.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.SharedData.Callback1_2Formatter.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.SharedData.Callback2Formatter.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.SharedData.Callback2_2Formatter.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.SharedData.DefaultValueIntKeyClassWithExplicitConstructorFormatter.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.SharedData.DefaultValueIntKeyClassWithoutExplicitConstructorFormatter.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.SharedData.DefaultValueIntKeyStructWithExplicitConstructorFormatter.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.SharedData.DefaultValueStringKeyClassWithExplicitConstructorFormatter.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.SharedData.DefaultValueStringKeyClassWithoutExplicitConstructorFormatter.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.SharedData.DefaultValueStringKeyStructWithExplicitConstructorFormatter.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.SharedData.DynamicArgumentTupleFormatter`9.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.SharedData.Empty1Formatter.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.SharedData.Empty2Formatter.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.SharedData.EmptyClassFormatter.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.SharedData.EmptyStructFormatter.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.SharedData.FirstSimpleDataFormatter.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.SharedData.FooClassFormatter.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.SharedData.GenericClassFormatter`2.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.SharedData.GenericConstrainedClassIntKeyFormatter`2.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.SharedData.GenericConstrainedClassStringKeyFormatter`2.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.SharedData.GenericConstrainedStructIntKeyFormatter`2.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.SharedData.GenericConstrainedStructStringKeyFormatter`2.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.SharedData.GenericStructFormatter`2.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.SharedData.HolderV0Formatter.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.SharedData.HolderV1Formatter.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.SharedData.HolderV2Formatter.g.cs",
+          "Formatters.SharedData.GeneratedMessagePackResolver.SharedData.IIVersioningUnionFormatter.g.cs"
+        ]
+      }
+    ],
+    "coverage": {
+      "tool": "coverlet.console 10.1.0, line coverage of the Release MessagePack.SourceGenerator.dll while the harness runs; one run per real project per side, plus one run over the whole control group per side",
+      "changed_lines_source": "git diff -U0 32258fdb...ju26-issue-2297 -- src/ (base: removed lines in base numbering; branch: added lines in branch numbering)",
+      "changed_lines": {
+        "base": 8,
+        "branch": 41
+      },
+      "trackable": 22,
+      "reached": 22,
+      "unreached": [],
+      "not_trackable": [
+        {
+          "side": "branch",
+          "file": "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt",
+          "line": 7,
+          "text": "#if !NETSTANDARD2_0 && !NETFRAMEWORK"
+        },
+        {
+          "side": "branch",
+          "file": "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt",
+          "line": 8,
+          "text": "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]"
+        },
+        {
+          "side": "branch",
+          "file": "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt",
+          "line": 9,
+          "text": "#endif"
+        },
+        {
+          "side": "branch",
+          "file": "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt",
+          "line": 35,
+          "text": "#if !NETSTANDARD2_0 && !NETFRAMEWORK"
+        },
+        {
+          "side": "branch",
+          "file": "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt",
+          "line": 36,
+          "text": "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]"
+        },
+        {
+          "side": "branch",
+          "file": "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt",
+          "line": 37,
+          "text": "#endif"
+        },
+        {
+          "side": "branch",
+          "file": "src/MessagePack.SourceGenerator/Transforms/EnumTemplate.tt",
+          "line": 8,
+          "text": "#if !NETSTANDARD2_0 && !NETFRAMEWORK"
+        },
+        {
+          "side": "branch",
+          "file": "src/MessagePack.SourceGenerator/Transforms/EnumTemplate.tt",
+          "line": 9,
+          "text": "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]"
+        },
+        {
+          "side": "branch",
+          "file": "src/MessagePack.SourceGenerator/Transforms/EnumTemplate.tt",
+          "line": 10,
+          "text": "#endif"
+        },
+        {
+          "side": "branch",
+          "file": "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.tt",
+          "line": 14,
+          "text": "#if !NETSTANDARD2_0 && !NETFRAMEWORK"
+        },
+        {
+          "side": "branch",
+          "file": "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.tt",
+          "line": 15,
+          "text": "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]"
+        },
+        {
+          "side": "branch",
+          "file": "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.tt",
+          "line": 16,
+          "text": "#endif"
+        },
+        {
+          "side": "branch",
+          "file": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt",
+          "line": 14,
+          "text": "#if !NETSTANDARD2_0 && !NETFRAMEWORK"
+        },
+        {
+          "side": "branch",
+          "file": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt",
+          "line": 15,
+          "text": "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]"
+        },
+        {
+          "side": "branch",
+          "file": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt",
+          "line": 16,
+          "text": "#endif"
+        },
+        {
+          "side": "branch",
+          "file": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt",
+          "line": 31,
+          "text": "#if !NETSTANDARD2_0 && !NETFRAMEWORK"
+        },
+        {
+          "side": "branch",
+          "file": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt",
+          "line": 32,
+          "text": "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]"
+        },
+        {
+          "side": "branch",
+          "file": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt",
+          "line": 33,
+          "text": "#endif"
+        },
+        {
+          "side": "branch",
+          "file": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt",
+          "line": 48,
+          "text": "#if !NETSTANDARD2_0 && !NETFRAMEWORK"
+        },
+        {
+          "side": "branch",
+          "file": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt",
+          "line": 49,
+          "text": "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]"
+        },
+        {
+          "side": "branch",
+          "file": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt",
+          "line": 50,
+          "text": "#endif"
+        },
+        {
+          "side": "branch",
+          "file": "src/MessagePack.SourceGenerator/Transforms/StringKey/StringKeyFormatterTemplate.tt",
+          "line": 18,
+          "text": "#if !NETSTANDARD2_0 && !NETFRAMEWORK"
+        },
+        {
+          "side": "branch",
+          "file": "src/MessagePack.SourceGenerator/Transforms/StringKey/StringKeyFormatterTemplate.tt",
+          "line": 19,
+          "text": "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]"
+        },
+        {
+          "side": "branch",
+          "file": "src/MessagePack.SourceGenerator/Transforms/StringKey/StringKeyFormatterTemplate.tt",
+          "line": 20,
+          "text": "#endif"
+        },
+        {
+          "side": "branch",
+          "file": "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.tt",
+          "line": 10,
+          "text": "#if !NETSTANDARD2_0 && !NETFRAMEWORK"
+        },
+        {
+          "side": "branch",
+          "file": "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.tt",
+          "line": 11,
+          "text": "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]"
+        },
+        {
+          "side": "branch",
+          "file": "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.tt",
+          "line": 12,
+          "text": "#endif"
+        }
+      ],
+      "not_trackable_rule": "a changed line coverlet has no sequence point for (declaration, brace, comment, attribute, constant, or a file that is not compiled such as a .tt template) is listed here and never counted as safe",
+      "inputs_touching": 5,
+      "inputs_untouched": 0,
+      "untouched_but_differ": [],
+      "per_input": [
+        {
+          "input": "MessagePack.GeneratedCode.Tests",
+          "reaches_change": true,
+          "hit_base_lines": [
+            "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.cs:27",
+            "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.cs:33",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:38",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:64",
+            "src/MessagePack.SourceGenerator/Transforms/TransformUtilities.cs:58"
+          ],
+          "hit_branch_lines": [
+            "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.cs:27",
+            "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.cs:56",
+            "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.cs:57",
+            "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.cs:58",
+            "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.cs:33",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:38",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:55",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:56",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:57",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:67",
+            "src/MessagePack.SourceGenerator/Transforms/TransformUtilities.cs:58"
+          ],
+          "output_differs": true,
+          "instrumented_output_matches": true
+        },
+        {
+          "input": "MessagePack.SourceGenerator.ExecutionTests",
+          "reaches_change": true,
+          "hit_base_lines": [
+            "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.cs:27",
+            "src/MessagePack.SourceGenerator/Transforms/EnumTemplate.cs:27",
+            "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.cs:33",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:38",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:64",
+            "src/MessagePack.SourceGenerator/Transforms/TransformUtilities.cs:58",
+            "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.cs:30"
+          ],
+          "hit_branch_lines": [
+            "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.cs:27",
+            "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.cs:56",
+            "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.cs:57",
+            "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.cs:58",
+            "src/MessagePack.SourceGenerator/Transforms/EnumTemplate.cs:27",
+            "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.cs:33",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:38",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:55",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:56",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:57",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:67",
+            "src/MessagePack.SourceGenerator/Transforms/TransformUtilities.cs:58",
+            "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.cs:30"
+          ],
+          "output_differs": true,
+          "instrumented_output_matches": true
+        },
+        {
+          "input": "MessagePack.SourceGenerator.MapModeExecutionTests",
+          "reaches_change": true,
+          "hit_base_lines": [
+            "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.cs:27",
+            "src/MessagePack.SourceGenerator/Transforms/EnumTemplate.cs:27",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:38",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:64",
+            "src/MessagePack.SourceGenerator/Transforms/StringKey/StringKeyFormatterTemplate.cs:37",
+            "src/MessagePack.SourceGenerator/Transforms/TransformUtilities.cs:58",
+            "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.cs:30"
+          ],
+          "hit_branch_lines": [
+            "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.cs:27",
+            "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.cs:56",
+            "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.cs:57",
+            "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.cs:58",
+            "src/MessagePack.SourceGenerator/Transforms/EnumTemplate.cs:27",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:38",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:55",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:56",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:57",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:67",
+            "src/MessagePack.SourceGenerator/Transforms/StringKey/StringKeyFormatterTemplate.cs:37",
+            "src/MessagePack.SourceGenerator/Transforms/TransformUtilities.cs:58",
+            "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.cs:30"
+          ],
+          "output_differs": true,
+          "instrumented_output_matches": true
+        },
+        {
+          "input": "Sandbox",
+          "reaches_change": true,
+          "hit_base_lines": [
+            "src/MessagePack.SourceGenerator/Transforms/EnumTemplate.cs:27",
+            "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.cs:33",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:38",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:64",
+            "src/MessagePack.SourceGenerator/Transforms/StringKey/StringKeyFormatterTemplate.cs:37",
+            "src/MessagePack.SourceGenerator/Transforms/TransformUtilities.cs:58",
+            "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.cs:30"
+          ],
+          "hit_branch_lines": [
+            "src/MessagePack.SourceGenerator/Transforms/EnumTemplate.cs:27",
+            "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.cs:33",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:38",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:55",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:56",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:57",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:67",
+            "src/MessagePack.SourceGenerator/Transforms/StringKey/StringKeyFormatterTemplate.cs:37",
+            "src/MessagePack.SourceGenerator/Transforms/TransformUtilities.cs:58",
+            "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.cs:30"
+          ],
+          "output_differs": true,
+          "instrumented_output_matches": true
+        },
+        {
+          "input": "SharedData",
+          "reaches_change": true,
+          "hit_base_lines": [
+            "src/MessagePack.SourceGenerator/Transforms/EnumTemplate.cs:27",
+            "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.cs:33",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:38",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:64",
+            "src/MessagePack.SourceGenerator/Transforms/StringKey/StringKeyFormatterTemplate.cs:37",
+            "src/MessagePack.SourceGenerator/Transforms/TransformUtilities.cs:58",
+            "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.cs:30"
+          ],
+          "hit_branch_lines": [
+            "src/MessagePack.SourceGenerator/Transforms/EnumTemplate.cs:27",
+            "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.cs:33",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:38",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:55",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:56",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:57",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:67",
+            "src/MessagePack.SourceGenerator/Transforms/StringKey/StringKeyFormatterTemplate.cs:37",
+            "src/MessagePack.SourceGenerator/Transforms/TransformUtilities.cs:58",
+            "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.cs:30"
+          ],
+          "output_differs": true,
+          "instrumented_output_matches": true
+        }
+      ],
+      "control_group_reached": 22,
+      "granularity_note": "coverage is per real project (one compilation), not per type, so a project counts as touching if any of its types runs a changed line",
+      "command": "/home/user/code-reviewer-junction/.work/isolation/tools/coverlet /home/user/code-reviewer-junction/.work/isolation/2297/cov-base/p-SharedData/gen/MessagePack.SourceGenerator.dll --include-test-assembly --include [MessagePack.SourceGenerator]* --format json --output /home/user/code-reviewer-junction/.work/isolation/2297/cov-base/p-SharedData/coverage.json --target dotnet --targetargs /home/user/code-reviewer-junction/.work/isolation/harness-bin/Release/net8.0/IsolationHarness.dll --generator /home/user/code-reviewer-junction/.work/isolation/2297/cov-base/p-SharedData/gen/MessagePack.SourceGenerator.dll --inputs /home/user/code-reviewer-junction/.work/isolation/2297/cov-base/p-SharedData/in --out /home/user/code-reviewer-junction/.work/isolation/2297/cov-base/p-SharedData/out"
+    },
+    "control": {
+      "totals": {
+        "inputs": 257,
+        "compared": 241,
+        "same": 64,
+        "differ": 177,
+        "explained": 177,
+        "unexplained": 0,
+        "not_compared": 16
+      },
+      "explained": [
+        {
+          "claim": "C-2297-01",
+          "what": "TransformUtilities side effect: after the constraints of a generic nesting type, the opening brace is followed by a line break (base wrote '{' with no line break)",
+          "inputs": 1,
+          "example": {
+            "input": "GenerationTests.GenericDataTypeWithPrivateMember",
+            "diff": "--- base/Formatters.HasPrivateSerializedMemberAndIsGenericNamed`1.HasPrivateSerializedMemberAndIsGenericNamedFormatter.g.cs\n+++ branch/Formatters.HasPrivateSerializedMemberAndIsGenericNamed`1.HasPrivateSerializedMemberAndIsGenericNamedFormatter.g.cs\n@@ -8,3 +8,7 @@\n \t\twhere T : struct\n-{\tinternal sealed class HasPrivateSerializedMemberAndIsGenericNamedFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::HasPrivateSerializedMemberAndIsGenericNamed<T>>\n+{\n+#if !NETSTANDARD2_0 && !NETFRAMEWORK\n+\t[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]\n+#endif\n+\tinternal sealed class HasPrivateSerializedMemberAndIsGenericNamedFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::HasPrivateSerializedMemberAndIsGenericNamed<T>>\n \t{"
+          }
+        },
+        {
+          "claim": "C-2297-01",
+          "what": "generated file gains only the [ExcludeFromCodeCoverage] attribute inside its #if !NETSTANDARD2_0 && !NETFRAMEWORK / #endif guard (3 lines per generated type)",
+          "inputs": 177,
+          "example": {
+            "input": "MsgPack00xAnalyzerTests.AddAttributesToMembers",
+            "diff": "--- base/Formatters.MessagePack.GeneratedMessagePackResolver.FooFormatter.g.cs\n+++ branch/Formatters.MessagePack.GeneratedMessagePackResolver.FooFormatter.g.cs\n@@ -11,2 +11,5 @@\n \n+#if !NETSTANDARD2_0 && !NETFRAMEWORK\n+\t[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]\n+#endif\n \tinternal sealed class FooFormatter : MsgPack::Formatters.IMessagePackFormatter<global::Foo>"
+          }
+        },
+        {
+          "claim": "C-2297-06",
+          "what": "TransformUtilities side effect: after the constraints of a generic nesting type, the opening brace is followed by a line break (base wrote '{' with no line break)",
+          "inputs": 1,
+          "example": {
+            "input": "GenerationTests.GenericDataTypeWithPrivateMember",
+            "diff": "--- base/Formatters.HasPrivateSerializedMemberAndIsGenericNamed`1.HasPrivateSerializedMemberAndIsGenericNamedFormatter.g.cs\n+++ branch/Formatters.HasPrivateSerializedMemberAndIsGenericNamed`1.HasPrivateSerializedMemberAndIsGenericNamedFormatter.g.cs\n@@ -8,3 +8,7 @@\n \t\twhere T : struct\n-{\tinternal sealed class HasPrivateSerializedMemberAndIsGenericNamedFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::HasPrivateSerializedMemberAndIsGenericNamed<T>>\n+{\n+#if !NETSTANDARD2_0 && !NETFRAMEWORK\n+\t[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]\n+#endif\n+\tinternal sealed class HasPrivateSerializedMemberAndIsGenericNamedFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::HasPrivateSerializedMemberAndIsGenericNamed<T>>\n \t{"
+          }
+        },
+        {
+          "claim": "C-2297-06",
+          "what": "generated file gains only the [ExcludeFromCodeCoverage] attribute inside its #if !NETSTANDARD2_0 && !NETFRAMEWORK / #endif guard (3 lines per generated type)",
+          "inputs": 1,
+          "example": {
+            "input": "GenerationTests.GenericDataTypeWithPrivateMember",
+            "diff": "--- base/Formatters.HasPrivateSerializedMemberAndIsGenericNamed`1.HasPrivateSerializedMemberAndIsGenericNamedFormatter.g.cs\n+++ branch/Formatters.HasPrivateSerializedMemberAndIsGenericNamed`1.HasPrivateSerializedMemberAndIsGenericNamedFormatter.g.cs\n@@ -8,3 +8,7 @@\n \t\twhere T : struct\n-{\tinternal sealed class HasPrivateSerializedMemberAndIsGenericNamedFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::HasPrivateSerializedMemberAndIsGenericNamed<T>>\n+{\n+#if !NETSTANDARD2_0 && !NETFRAMEWORK\n+\t[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]\n+#endif\n+\tinternal sealed class HasPrivateSerializedMemberAndIsGenericNamedFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::HasPrivateSerializedMemberAndIsGenericNamed<T>>\n \t{"
+          }
+        }
+      ],
+      "unexplained_total_items": 0,
+      "unexplained": [],
+      "not_compared": [
+        {
+          "input": "MsgPack00xAnalyzerTests.DoNotAddAttributesToClassWithPrimaryCtor",
+          "id": "t-0183a96b8bb8d050",
+          "reason": "base-compile-errors ['CS1705', 'CS7036']",
+          "differs_anyway": true,
+          "unexplained_items": []
+        },
+        {
+          "input": "MsgPack00xAnalyzerTests.AddAttributesToMembersOfRecordWithPrimaryCtor",
+          "id": "t-126bf4e6a2dff362",
+          "reason": "base-compile-errors ['CS1705']",
+          "differs_anyway": true,
+          "unexplained_items": []
+        },
+        {
+          "input": "MsgPack00xAnalyzerTests.DoNotAddAttributesToClassWithPrimaryCtor",
+          "id": "t-16b3846665020f9d",
+          "reason": "base-compile-errors ['CS1705', 'CS7036']",
+          "differs_anyway": true,
+          "unexplained_items": []
+        },
+        {
+          "input": "MsgPack00xAnalyzerTests.AddAttributesToMembersOfRecord",
+          "id": "t-2d2b9e339119cc33",
+          "reason": "base-compile-errors ['CS1705']",
+          "differs_anyway": true,
+          "unexplained_items": []
+        },
+        {
+          "input": "MsgPack00xAnalyzerTests.AddAttributesToMembersOfRecordStructWithPrimaryCtor",
+          "id": "t-4004ad9a9fc04e6b",
+          "reason": "base-compile-errors ['CS1705']",
+          "differs_anyway": true,
+          "unexplained_items": []
+        },
+        {
+          "input": "MsgPack00xAnalyzerTests.AddAttributesToMembersOfRecordStructWithPrimaryCtor",
+          "id": "t-450e949484d7cc56",
+          "reason": "base-compile-errors ['CS1705']",
+          "differs_anyway": true,
+          "unexplained_items": []
+        },
+        {
+          "input": "MsgPack00xAnalyzerTests.AddAttributesToMembersOfRecordWithPrimaryCtor",
+          "id": "t-5739504be80231a3",
+          "reason": "base-compile-errors ['CS1705', 'CS7036']",
+          "differs_anyway": true,
+          "unexplained_items": []
+        },
+        {
+          "input": "MsgPack00xAnalyzerTests.AddAttributesToMembersOfRecordStruct",
+          "id": "t-5d1fff46b724b655",
+          "reason": "base-compile-errors ['CS1705']",
+          "differs_anyway": true,
+          "unexplained_items": []
+        },
+        {
+          "input": "MsgPack00xAnalyzerTests.AddAttributesToMembersOfRecordWithPrimaryCtor",
+          "id": "t-65b21c91ec3b4de4",
+          "reason": "base-compile-errors ['CS1705', 'CS7036']",
+          "differs_anyway": true,
+          "unexplained_items": []
+        },
+        {
+          "input": "MsgPack00xAnalyzerTests.AddAttributesToMembersOfRecordStruct",
+          "id": "t-8ab9935b8af79b3c",
+          "reason": "base-compile-errors ['CS1705']",
+          "differs_anyway": true,
+          "unexplained_items": []
+        },
+        {
+          "input": "MsgPack00xAnalyzerTests.AddAttributesToMembersOfRecord",
+          "id": "t-91a1c91e0045adcb",
+          "reason": "base-compile-errors ['CS1705']",
+          "differs_anyway": true,
+          "unexplained_items": []
+        },
+        {
+          "input": "MsgPack00xAnalyzerTests.AddAttributesToMembersOfRecord",
+          "id": "t-9f8af5ba435ee392",
+          "reason": "base-compile-errors ['CS1705']",
+          "differs_anyway": true,
+          "unexplained_items": []
+        },
+        {
+          "input": "MsgPack00xAnalyzerTests.AddAttributesToMembersOfRecordStructWithPrimaryCtor",
+          "id": "t-ad98e6c52497cd94",
+          "reason": "base-compile-errors ['CS1705']",
+          "differs_anyway": true,
+          "unexplained_items": []
+        },
+        {
+          "input": "MsgPack00xAnalyzerTests.AddAttributeToGenericType",
+          "id": "t-d86f4d4864cfb904",
+          "reason": "base-compile-errors ['CS0426']",
+          "differs_anyway": true,
+          "unexplained_items": []
+        },
+        {
+          "input": "MsgPack00xAnalyzerTests.AddAttributesToMembersOfRecordStruct",
+          "id": "t-df0cbfb9f7c78e5a",
+          "reason": "base-compile-errors ['CS1705']",
+          "differs_anyway": true,
+          "unexplained_items": []
+        },
+        {
+          "input": "MsgPack00xAnalyzerTests.AddAttributeToGenericType",
+          "id": "t-edb13f31f9d7747e",
+          "reason": "base-compile-errors ['CS0426']",
+          "differs_anyway": true,
+          "unexplained_items": []
+        }
+      ]
+    },
+    "new_inputs": {
+      "inputs": 0,
+      "differ": 0,
+      "new_test_methods_on_branch": 2,
+      "new_test_methods_not_recorded": [
+        "CodeCoverageExclusionTests.AllGeneratedTypesAreExcludedFromCodeCoverage",
+        "CodeCoverageExclusionTests.ExcludeAttributeIsGuardedForTargetsWhereItIsUnavailable"
+      ],
+      "not_recorded_reason": "these tests build their compilation themselves (CSharpCompilation / CSharpGeneratorDriver) instead of through the verifiers the recorder patches",
+      "unexplained_inputs": 0,
+      "note": "the branch's own new or changed test inputs, recorded the same way on the branch's test project; shown separately and not part of the totals",
+      "examples": []
+    },
+    "builds": {
+      "base": {
+        "generator_exit": 0,
+        "projects": {
+          "tests/MessagePack.GeneratedCode.Tests/MessagePack.GeneratedCode.Tests.csproj": 0,
+          "tests/MessagePack.SourceGenerator.ExecutionTests/MessagePack.SourceGenerator.ExecutionTests.csproj": 0,
+          "tests/MessagePack.SourceGenerator.MapModeExecutionTests/MessagePack.SourceGenerator.MapModeExecutionTests.csproj": 0,
+          "sandbox/Sandbox/Sandbox.csproj": 0,
+          "sandbox/SharedData/SharedData.csproj": 0
+        }
+      },
+      "branch": {
+        "generator_exit": 0,
+        "projects": {
+          "tests/MessagePack.GeneratedCode.Tests/MessagePack.GeneratedCode.Tests.csproj": 0,
+          "tests/MessagePack.SourceGenerator.ExecutionTests/MessagePack.SourceGenerator.ExecutionTests.csproj": 0,
+          "tests/MessagePack.SourceGenerator.MapModeExecutionTests/MessagePack.SourceGenerator.MapModeExecutionTests.csproj": 0,
+          "sandbox/Sandbox/Sandbox.csproj": 0,
+          "sandbox/SharedData/SharedData.csproj": 0
+        }
+      }
+    },
+    "test_recording": {
+      "base": {
+        "exit_code": 0,
+        "cases": 167
+      },
+      "branch": {
+        "exit_code": 0,
+        "cases": 169
+      }
+    },
+    "harness_runs": {
+      "base": {
+        "exit_code": 0,
+        "log": [
+          "[harness] MessagePack.SourceGenerator: generators CompositeResolverGenerator, MessagePackGenerator; analyzers MsgPack001SpecifyOptionsAnalyzer, MsgPack002UseConstantOptionsAnalyzer, MsgPack00xMessagePackAnalyzer; Roslyn 4.12.0.0",
+          "[harness] 262 inputs: 262 ran, 0 harness crashes"
+        ]
+      },
+      "branch": {
+        "exit_code": 0,
+        "log": [
+          "[harness] MessagePack.SourceGenerator: generators CompositeResolverGenerator, MessagePackGenerator; analyzers MsgPack001SpecifyOptionsAnalyzer, MsgPack002UseConstantOptionsAnalyzer, MsgPack00xMessagePackAnalyzer; Roslyn 4.12.0.0",
+          "[harness] 262 inputs: 262 ran, 0 harness crashes"
+        ]
+      }
+    },
+    "compared_outputs": "generated files (hint name -> text, CRLF normalised to LF); generator, analyzer and compiler diagnostics of the final compilation (id, severity, file:line, message); generator exceptions",
+    "generators_and_analyzers": "all [Generator] types and all C# DiagnosticAnalyzers in MessagePack.SourceGenerator.dll (Release build), as a user's build gets them; analyzers see the compilation with the generated files",
+    "base_sha": "32258fdb",
+    "branch_sha": "a0aa5ab2",
+    "sdk": "9.0.321",
+    "roslyn": "4.12.0",
+    "harness": "review/scripts/isolation/harness",
+    "timings": {
+      "harness_build_s": 0.0,
+      "build_s": 39.3,
+      "record_corpus_s": 23.7,
+      "harness_s": 15.8,
+      "coverage_s": 43.6,
+      "total_s": 122.7
+    }
+  },
+  "tool_versions": {
+    "dotnet_sdk": "9.0.321",
+    "Microsoft.CodeAnalysis.CSharp": "4.12.0"
+  },
+  "produced_by": "script"
+}
