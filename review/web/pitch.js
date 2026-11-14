@@ -6,8 +6,8 @@
   /* kinds of evidence and their base score (the formula in the confidence check) */
   var KINDS = [
     ['rebuild-compare', 'Old vs new, or rebuilt: same output', 90],
-    ['proof-model', 'Model proof', 80],
-    ['flip-test', 'Test fails before, passes after', 75],
+    ['proof-model', 'Formal verification', 80],
+    ['flip-test', 'Test first: fails before, passes after', 75],
     ['revert-test', 'Undo just this change: a test fails', 75],
     ['probe', 'Experiment on the real code', 60],
     ['count', 'A number from a tool', 40],
@@ -18,11 +18,11 @@
     'rebuild-compare': ['Run the old and the new version on the same real projects and compare the output. Or run the code generator again and compare with the files in the change.',
       'A script compares every character, so no one has to trust the AI. Hard to fake, so it scores highest.',
       'Used on all three fixes: 5 real projects, 139 generated files.'],
-    'proof-model': ['Write the rule as a small math model. A prover (Dafny) checks it for every possible case, then the model is tested against the real C# code.',
+    'proof-model': ['Formal verification: write the rule as a small model. A prover (Dafny) checks it for every possible case, then the model is tested against the real C# code.',
       'Very strong, but the model is a copy of the code, not the code itself.',
       'On #2234 the prover found an input that still crashes the analyzer.'],
-    'flip-test': ['Run the AI\'s new tests on the old code too.',
-      'A test that fails before and passes after shows this change is what fixed it. A test that passes on both shows nothing about the fix.',
+    'flip-test': ['Test first, as in TDD: each new test must fail on the old code and pass on the new code.',
+      'Then the test proves the fix, and a person only has to confirm the test asks the right thing, by reading its trace.',
       'On #2283, all 3 new tests fail before and pass after.'],
     'revert-test': ['Take back only this one part of the change, then run the tests.',
       'If a test now fails, that test really depends on this part.',
@@ -242,9 +242,9 @@
     var rows = [];
 
     var iso = s.ds.filter(function (d) { return d._isolation && d._isolation.coverage && +d._isolation.coverage.trackable; });
-    if (iso.length) rows.push({ c: 'high', g: 'Old vs new', v: 90, h: 'Same input, same output.',
-      p: 'Run the old and the new version on the same real projects. Compare every file they produce.',
-      why: 'The old version is the answer key. Nobody has to write a test, so it also catches what nobody thought to test.',
+    if (iso.length) rows.push({ c: 'high', g: 'Old vs new', v: 90, h: 'Old code still works.',
+      p: 'Run the old and the new version on the same real projects. Same output means nothing broke.',
+      why: 'Old projects often have weak tests. This check needs none: the old version is the answer key, so it also catches what nobody thought to test.',
       lim: 'It only speaks for changed lines that ran. Lines that never ran go to the reviewer.',
       fig: '<div class="p-fig p-ran">' + iso.map(function (d) {
         var c = d._isolation.coverage, ran = +c.reached || 0, tot = +c.trackable, pc = Math.round(100 * ran / tot);
@@ -252,8 +252,8 @@
       }).join('') + '<p class="p-out">changed lines that ran, per fix</p></div>' });
 
     var nSnap = s.snap || 0;
-    if (findEv(s, 'regeneration') && nSnap) rows.push({ c: 'high', g: 'Rebuilt and compared', v: 90, h: 'Rebuild it. Compare.',
-      p: 'Run the code generator again. Its output must equal the files in the change, character for character.',
+    if (findEv(s, 'regeneration') && nSnap) rows.push({ c: 'high', g: 'Rebuilt and compared', v: 90, h: 'Rebuild the generated code.',
+      p: 'Some files in a change come from a code generator, not a person. Run the generator again. Its output must match those files exactly.',
       why: 'Generated files are too long to read. If the generator makes the same files again, nobody edited them by hand.',
       lim: 'It shows the files match the generator, not that the generator is right.',
       fig: '<div class="p-fig p-fig-proved">' +
@@ -264,8 +264,8 @@
     var pr = findEv(s, 'proof'), pd = pr && pr.details, mv = pd && pd.model_vs_csharp;
     if (pd && mv && mv.branch) {
       var vl = ((pd.dafny_verify || {}).result_line || [''])[0], nv = (String(vl).match(/(\d+) verified/) || [])[1];
-      rows.push({ c: 'high', g: 'Model proof', v: 80, h: 'Prove it for every case.',
-        p: 'Write the rule as a small math model. A prover checks it for every input the model allows.',
+      rows.push({ c: 'high', g: 'Formal verification', v: 80, h: 'Prove it for every case.',
+        p: 'Formal verification: write the rule as a small model, and a prover (Dafny) checks it for every input.',
         why: 'A test checks a few inputs. A proof covers all of them, so it finds the one case nobody tried.',
         lim: 'The model is a copy of the code, not the code. So we also run the model and the real code on the same inputs.',
         fig: '<div class="p-fig p-proof">' +
@@ -280,10 +280,10 @@
     if (nT) {
       var cells = '';
       for (var i = 0; i < nT; i++) cells += '<span class="x">✗</span><span class="ok">✓</span>';
-      rows.push({ c: 'medium', g: 'Fails before, passes after', v: 75, h: 'Run the new tests on the old code.',
-        p: 'Each new test must fail on the old code and pass on the new code.',
-        why: 'A new test that also passes on the old code says nothing about the fix.',
-        lim: 'It only covers the cases the test writer thought of.',
+      rows.push({ c: 'medium', g: 'Test first (TDD)', v: 75, h: 'Check the test, not the code.',
+        p: 'Each new test fails on the old code and passes on the new code. So the test is what proves the fix.',
+        why: 'The reviewer only has to confirm the test asks the right question. Each test comes with a trace in plain steps, so that takes minutes, not a full read.',
+        lim: 'It only covers the cases the test asks about.',
         fig: '<div class="p-fig"><div class="p-tgrid">' +
           '<span class="hd">old code</span><span class="hd">new code</span>' + cells + '</div><p class="p-out">fix #2283, ' + nT + ' new tests</p></div>' });
     }
@@ -301,23 +301,26 @@
           '<p class="p-out">copy-pasted blocks in one file, fix #2234</p></div>' });
     }
 
-    return '<section class="p-sec p-machine">' +
-      '<header class="p-mhead">' +
-        '<h2 class="p-h2">' + words('Each check,') + '<br>' + words('and why it counts.', 'hot', 140) + '</h2>' +
-        '<p class="p-ctx" data-rv>Every check is a script with a fixed pass rule. Same code in, same result out. Stronger checks score higher.</p>' +
-      '</header>' +
-      '<div class="p-hows">' + rows.map(function (r, i) {
-        return '<article class="p-how">' +
-          '<div class="p-how-t" data-rv>' +
-            '<span class="p-how-n">' + (i + 1) + ' / ' + rows.length + '</span>' +
-            '<span class="g c-' + r.c + '">' + esc(r.g) + ' <b>' + r.v + '</b></span>' +
-            '<h3>' + esc(r.h) + '</h3>' +
-            '<p>' + esc(r.p) + '</p>' +
-            '<dl><dt>Why it counts</dt><dd>' + esc(r.why) + '</dd><dt>What it can’t tell</dt><dd>' + esc(r.lim) + '</dd></dl>' +
-          '</div>' +
-          '<div class="p-how-f" data-rv>' + r.fig + '</div>' +
-        '</article>';
-      }).join('') + '</div>' +
+    return '<section class="p-machine" data-progress="machine" style="--n:' + rows.length + '">' +
+      '<div class="p-sticky p-machine-in">' +
+        '<header class="p-mhead">' +
+          '<h2 class="p-h2">' + words('Each check,') + ' ' + words('and why it counts.', 'hot', 140) + '</h2>' +
+          '<ol class="p-mtabs">' + rows.map(function (r, i) {
+            return '<li class="c-' + r.c + '" data-i="' + i + '"><i></i>' + esc(r.g) + '</li>';
+          }).join('') + '</ol>' +
+        '</header>' +
+        '<div class="p-hows">' + rows.map(function (r, i) {
+          return '<article class="p-how' + (i === 0 ? ' on' : '') + '">' +
+            '<div class="p-how-t">' +
+              '<span class="g c-' + r.c + '">' + esc(r.g) + ' <b>' + r.v + '</b></span>' +
+              '<h3>' + esc(r.h) + '</h3>' +
+              '<p>' + esc(r.p) + '</p>' +
+              '<dl><dt>Why it counts</dt><dd>' + esc(r.why) + '</dd><dt>What it can’t tell</dt><dd>' + esc(r.lim) + '</dd></dl>' +
+            '</div>' +
+            '<div class="p-how-f">' + r.fig + '</div>' +
+          '</article>';
+        }).join('') + '</div>' +
+      '</div>' +
     '</section>';
   }
 
@@ -562,6 +565,33 @@
     });
   }
 
+  /* the checks: one sticky screen, scrolling swaps which check is shown */
+  function setupMachine(root) {
+    var sec = root.querySelector('[data-progress="machine"]');
+    if (!sec) return;
+    var arts = sec.querySelectorAll('.p-how'), tabs = sec.querySelectorAll('.p-mtabs li'), n = arts.length, cur = -1;
+    function show(i) {
+      if (i === cur) return;
+      cur = i;
+      arts.forEach(function (a, k) {
+        a.classList.toggle('on', k === i);
+        if (k === i) a.querySelectorAll('i[data-w]').forEach(function (b) { b.style.width = b.dataset.w + '%'; });
+      });
+      tabs.forEach(function (t, k) { t.classList.toggle('on', k === i); t.classList.toggle('done', k < i); });
+    }
+    tabs.forEach(function (t, k) {
+      on(t, 'click', function () {
+        var top = sec.getBoundingClientRect().top + scrollY, span = sec.offsetHeight - innerHeight;
+        scrollTo({ top: top + span * (k + 0.5) / n, behavior: reduce ? 'auto' : 'smooth' });
+      });
+    });
+    progressFns.push(function () {
+      if (reduce || innerWidth <= 900) { arts.forEach(function (a) { a.classList.add('on'); a.querySelectorAll('i[data-w]').forEach(function (b) { b.style.width = b.dataset.w + '%'; }); }); cur = -2; return; }
+      if (cur === -2) { cur = -1; arts.forEach(function (a) { a.classList.remove('on'); }); }
+      show(Math.min(n - 1, Math.floor(progressOf(sec) * n)));
+    });
+  }
+
   function setupOwner(root) {
     var sec = root.querySelector('[data-progress="owner"]');
     if (!sec) return;
@@ -751,6 +781,7 @@
     cleanup.push(function () { wrap.remove(); down.remove(); });
     setupTransitions(wrap);
     setupOwner(wrap);
+    setupMachine(wrap);
     setupTrace(wrap);
     setupKinds(wrap);
     setupRail(wrap);
