@@ -15,14 +15,16 @@
   ];
   var BANDS = [['high', 'High', '80+'], ['medium', 'Medium', '50–79'], ['low', 'Low', 'under 50']];
   /* learning from the project: the backtest on past pull requests */
+  /* the decision shown in the trace chapter, when the data has it */
+  var DEMO = 'C-2234-04';
   var LEARN = { rules: 20, prs: 37, caught: 10, breaking: 16, falseAlarm: 55 };
   var CHAPTERS = [
     { id: 'ch-problem', n: '01', title: 'The problem' },
-    { id: 'ch-score', n: '02', title: 'The score' },
-    { id: 'ch-machine', n: '03', title: 'Machines check' },
-    { id: 'ch-owner', n: '04', title: 'Needs owner' },
-    { id: 'ch-learn', n: '05', title: 'Readable, maintainable' },
-    { id: 'ch-check', n: '06', title: 'Check our work' }
+    { id: 'ch-trace', n: '02', title: 'The trace' },
+    { id: 'ch-check', n: '03', title: 'Checked' },
+    { id: 'ch-score', n: '04', title: 'The score' },
+    { id: 'ch-owner', n: '05', title: 'Needs owner' },
+    { id: 'ch-learn', n: '06', title: 'Readable' }
   ];
 
   var cleanup = [];
@@ -47,6 +49,11 @@
     var k = Object.keys(ev).filter(function (p) { return ev[p] && ev[p].check === check; })[0];
     return k ? ev[k] : null;
   }
+  function decCards(d) { return ((d._decisions || {}).details || {}).cards || []; }
+  /* a card fit to show in the pitch: every step checks out, a short trace, a real check behind it */
+  function demoOk(c) {
+    return c.verified && c.steps && c.steps.length >= 3 && c.steps.length <= 5 && (c.because || []).some(function (b) { return b.result === 'pass'; });
+  }
   function conf(d) { return (d._confidence && d._confidence.details) || {}; }
   /* score and owner gate for one claim */
   function scoreOf(d, c) {
@@ -60,7 +67,7 @@
       .filter(function (d) { return !d.sample; });
     var s = { ds: ds, lines: 0, claims: 0, bands: { high: 0, medium: 0, low: 0 }, owner: 0,
       evidence: {}, snap: null, steps: 0, stepsOk: 0, tests: 0, replayMatch: 0, replayTotal: 0,
-      kinds: {}, rules: 0 };
+      kinds: {}, rules: 0, dec: 0, decSteps: 0, decOk: 0, decEv: 0, decAsk: 0, demo: null, asks: [] };
     ds.forEach(function (d) {
       var df = d.diff || {};
       s.lines += (+df.insertions || 0) + (+df.deletions || 0);
@@ -84,6 +91,13 @@
       ((d._tests && d._tests.details && d._tests.details.cards) || []).forEach(function (card) {
         s.tests++;
         (card.steps || []).forEach(function (st) { s.steps++; if (st.verified) s.stepsOk++; });
+      });
+      decCards(d).forEach(function (card) {
+        s.dec++;
+        if (card.ask) { s.decAsk++; s.asks.push(card.title); }
+        (card.steps || []).forEach(function (st) { s.decSteps++; if (st.verified) s.decOk++; });
+        (card.because || []).forEach(function (b) { if (b.evidence && b.result && b.result !== 'missing') s.decEv++; });
+        if (demoOk(card) && (card.id === DEMO || !s.demo)) s.demo = { d: d, card: card };
       });
       var files = (d._replay && d._replay.details && d._replay.details.files) || {};
       Object.keys(files).forEach(function (k) {
@@ -239,7 +253,8 @@
   /* needs owner: a printed slip with a generic example */
   function secOwner(s) {
     var opts = ['accept', 'send back', 'reject'];
-    var lines = [['A warning users relied on is gone', 'send back'], ['The docs now promise something new', 'accept']];
+    var t = s.asks.length >= 2 ? s.asks : ['A warning users relied on is gone', 'The docs now promise something new'];
+    var lines = [[t[0], 'send back'], [t[1], 'accept']];
     var slip = '<div class="p-slip"><div class="p-slip-in">' +
       '<h4>NEEDS OWNER</h4>' +
       '<div class="p-ex">EXAMPLE</div><hr>' +
@@ -254,8 +269,8 @@
     return '<section class="p-owner" data-progress="owner">' +
       '<div class="p-sticky p-owner-in">' +
         '<div class="p-owner-l">' +
-          '<h2 class="p-h2"><span class="p-num hot" data-count="' + s.owner + '">0</span> ' + words('claims') + '<br>' + words('need an owner.', 'hot', 120) + '</h2>' +
-          '<p class="p-ctx" data-rv>A check shows a promise to users changed. A named maintainer decides.</p>' +
+          '<h2 class="p-h2"><span class="p-num hot" data-count="' + s.owner + '">0</span> ' + words('decisions') + '<br>' + words('need an owner.', 'hot', 120) + '</h2>' +
+          '<p class="p-ctx" data-rv>Users would notice them. So the trace ends with a question, and a named maintainer answers it.</p>' +
           '<p class="p-rule" data-rv>A high score never clears it.</p>' +
         '</div>' +
         '<div class="p-owner-r"><div class="p-printer" aria-hidden="true"><span class="mouth"></span></div>' + slip + '</div>' +
@@ -301,24 +316,92 @@
     '</section>';
   }
 
-  /* reading the new tests: GIVEN / WHEN / THEN */
-  function secTests(s) {
-    var steps = [['GIVEN', 'two items share one key', 12], ['WHEN', 'the checker runs', 15], ['THEN', 'it reports one warning', 18], ['AND', 'it does not crash', 19]];
-    var card = '<div class="p-panel p-gwt" data-rv>' +
-      steps.map(function (st) {
-        return '<div class="st"><b>' + st[0] + '</b><span>' + esc(st[1]) + '</span><em>✓ line ' + st[2] + '</em></div>';
-      }).join('') +
-      '<div class="p-res"><span><i class="x">✗</i> old code</span><span><i class="ok">✓</i> new code</span></div>' +
-      '<div class="p-nc"><b>Does not check:</b> the warning’s exact wording.</div>' +
-    '</div>';
-    var big = s.steps ? '<div class="p-big p-sm"><span data-count="' + s.stepsOk + '">0</span><small>/' + s.steps + '</small></div>' +
+  /* ---------- the trace: one real decision, step by step ---------- */
+  var OPWORD = { WHEN: 'when', IF: 'if', THEN: 'then', ELSE: 'else', BEFORE: 'before', NOW: 'now', ALSO: 'also', SO: 'so', BUT: 'but', GIVEN: 'given', AND: 'and' };
+  function tokHtml(t) {
+    return esc(t).replace(/`([^`]+)`/g, function (_, x) { return '<code>' + x + '</code>'; });
+  }
+  /* the lines a step points at, as row keys: "o1007" (before) or "n1008" (after) */
+  function stepKeys(st) {
+    var k = [], c = st.side === 'old' ? 'o' : 'n';
+    for (var i = st.lines[0]; i <= st.lines[st.lines.length - 1]; i++) k.push(c + i);
+    return k;
+  }
+  /* only the rows that matter: changed lines and lines a step points at */
+  function traceRows(card) {
+    var want = {};
+    card.steps.forEach(function (st) { stepKeys(st).forEach(function (k) { want[k] = 1; }); });
+    var out = [], gap = false;
+    (card.code || []).forEach(function (g) {
+      g.rows.forEach(function (r) {
+        var keep = r[0] === '+' || r[0] === '-' || (r[1] && want['o' + r[1]]) || (r[2] && want['n' + r[2]]);
+        if (!keep) { if (out.length) gap = true; return; }
+        if (gap) out.push(null);
+        gap = false;
+        out.push(r);
+      });
+    });
+    return out.slice(0, 14);
+  }
+  function secTrace(s) {
+    if (!s.demo) return '';
+    var d = s.demo.d, c = s.demo.card;
+    var steps = c.steps.map(function (st, i) {
+      return '<li data-i="' + i + '" data-k="' + stepKeys(st).join(' ') + '"><b>' + (OPWORD[st.op] || esc(st.op)) + '</b>' +
+        '<span>' + tokHtml(st.text) + '</span><em>✓</em></li>';
+    }).join('');
+    var rows = traceRows(c).map(function (r) {
+      if (!r) return '<div class="r gap">⋯</div>';
+      var cls = r[0] === '+' ? ' add' : r[0] === '-' ? ' del' : '';
+      return '<div class="r' + cls + '"' + (r[1] ? ' data-o="' + r[1] + '"' : '') + (r[2] ? ' data-n="' + r[2] + '"' : '') + '>' +
+        '<i>' + (r[2] || r[1]) + '</i><s>' + (r[0] === ' ' ? '' : r[0] === '-' ? '−' : '+') + '</s><code>' + esc(r[3].trim()) + '</code></div>';
+    }).join('');
+    var ev = (c.because || []).filter(function (b) { return b.result; })[0];
+    var file = (c.code && c.code[0] && c.code[0].file || '').split('/').pop();
+    return '<section class="p-trace" data-progress="trace">' +
+      '<div class="p-sticky p-trace-in">' +
+        '<div class="p-trace-hd">' +
+          '<h2 class="p-h2"><span class="p-num hot" data-count="' + s.dec + '">0</span> ' + words('decisions.') + ' ' + words('Each one traced.', 'hot', 120) + '</h2>' +
+          '<p class="p-cap">A real one from fix #' + esc(issueOf(d)) + ': <b>“' + esc(c.title) + '”</b></p>' +
+        '</div>' +
+        '<div class="p-trace-p">' +
+          '<div class="p-pane p-pane-s"><div class="p-pt"><span>1</span>What the code does</div><ol>' + steps + '</ol></div>' +
+          '<div class="p-pane p-pane-c"><div class="p-pt"><span>2</span>The code <small>' + esc(file) + '</small></div><div class="p-code">' + rows + '</div></div>' +
+          '<div class="p-pane p-pane-w"><div class="p-pt"><span>3</span>Why</div>' +
+            '<p class="p-verdict">' + esc(c.verdict) + '</p>' +
+            (ev ? '<p class="p-bec">' + esc(ev.text) + '</p><span class="p-chip ' + (ev.result === 'pass' ? 'ok' : 'x') + '">' + (ev.result === 'pass' ? '✓ check passed' : '✗ check found a problem') + '</span>' : '') +
+            (c.ask ? '<div class="p-ask"><b>Your call</b>' + esc(c.ask) + '</div>' : '') +
+          '</div>' +
+        '</div>' +
+      '</div></section>';
+  }
+
+  /* ---------- checked: the script never takes the AI's word ---------- */
+  function secChecked(s) {
+    var demo = s.demo && s.demo.card, st = demo && demo.steps.filter(function (x) { return x.side === 'new' && /`/.test(x.text); })[0];
+    var row = null;
+    if (st) (demo.code || []).forEach(function (g) { g.rows.forEach(function (r) { if (!row && r[2] === st.lines[0]) row = r; }); });
+    var tok = st && (st.text.match(/`([^`]+)`/) || [])[1];
+    var line = row ? esc(row[3].trim()).replace(esc(tok), '<mark>' + esc(tok) + '</mark>') : '';
+    var demoBox = st && row ? '<div class="p-chk">' +
+        '<div class="p-chk-r"><span class="p-chk-l">The AI says</span><p>' + (OPWORD[st.op] || '') + ' ' + tokHtml(st.text).replace('<code>' + esc(tok) + '</code>', '<code><mark>' + esc(tok) + '</mark></code>') + '</p></div>' +
+        '<div class="p-chk-r"><span class="p-chk-l">Line ' + row[2] + '</span><p class="p-chk-code"><code>' + line + '</code></p></div>' +
+        '<div class="p-chk-v ok">✓ the word is there. The step stands.</div>' +
+        '<div class="p-chk-v x">If it were not, the step is marked “doesn’t match the code”.</div>' +
+      '</div>' : '';
+    var big = s.decSteps ? '<div class="p-big p-sm"><span data-count="' + s.decOk + '">0</span><small>/' + s.decSteps + '</small></div>' +
       '<h2 class="p-h3">steps match the real code</h2>' : '';
-    return '<section class="p-sec p-tests">' +
+    return '<section class="p-sec p-checked">' +
       '<div class="p-grid2">' +
         '<div>' + big +
-          '<p class="p-ctx" data-rv>Each new test, explained in plain steps. A script checks every step.</p>' +
-          replayLine(s) +
-        '</div>' + card +
+          '<ul class="p-rules" data-rv>' +
+            '<li><b>1</b>The lines a step points to must exist.</li>' +
+            '<li><b>2</b>Every code word in the step must be in those lines.</li>' +
+            '<li><b>3</b>Each result comes from the check itself, never from the AI’s words.</li>' +
+          '</ul>' +
+          (s.steps ? '<p class="p-cap" data-rv>The ' + s.tests + ' new tests are traced the same way: ' + s.stepsOk + ' of ' + s.steps + ' steps match.</p>' : '') +
+        '</div>' +
+        '<div class="p-panel" data-rv>' + demoBox + replayLine(s) + '</div>' +
       '</div>' +
     '</section>';
   }
@@ -326,8 +409,8 @@
   /* replay on a clean machine */
   function replayLine(s) {
     if (!s.replayTotal) return '';
-    return '<div class="p-replay" data-rv>' +
-      '<div class="p-panel p-replay-sq">' + squares(s.replayTotal, 'regen') + '</div>' +
+    return '<div class="p-replay">' +
+      '<div class="p-replay-sq">' + squares(s.replayTotal, 'regen') + '</div>' +
       '<p class="p-cap"><b class="p-num hot">' + s.replayMatch + ' of ' + s.replayTotal + '</b> evidence files re-run on a clean machine: identical</p>' +
     '</div>';
   }
@@ -401,6 +484,41 @@
       var p = reduce ? 1 : clamp((progressOf(sec) - 0.05) / 0.5, 0, 1);
       slip.style.height = (p * inner.offsetHeight).toFixed(1) + 'px';
       sec.classList.toggle('signed', p >= 0.98);
+    });
+  }
+
+  /* scroll walks through the steps; hover or focus picks one by hand */
+  function setupTrace(root) {
+    var sec = root.querySelector('[data-progress="trace"]');
+    if (!sec) return;
+    var lis = sec.querySelectorAll('.p-pane-s li'), why = sec.querySelector('.p-pane-w'), code = sec.querySelector('.p-code');
+    var n = lis.length, pick = -1;
+    function show(cur) {
+      lis.forEach(function (li, i) { li.classList.toggle('on', i === cur); li.classList.toggle('done', i < cur || cur >= n); });
+      var keys = cur >= 0 && cur < n ? lis[cur].dataset.k.split(' ') : [];
+      code.querySelectorAll('.r').forEach(function (r) {
+        var hit = keys.indexOf('o' + r.dataset.o) >= 0 || keys.indexOf('n' + r.dataset.n) >= 0;
+        r.classList.toggle('on', hit);
+      });
+      var hot = code.querySelector('.r.on');
+      if (hot) code.scrollTop = Math.max(0, hot.offsetTop - code.clientHeight / 2);
+      var ol = lis[0] && lis[0].parentNode, li = cur >= 0 && cur < n && pick < 0 ? lis[cur] : null;
+      if (ol && li) ol.scrollTop = Math.max(0, li.offsetTop - ol.offsetTop - ol.clientHeight / 2 + li.offsetHeight / 2);
+      why.classList.toggle('on', cur >= n);
+    }
+    lis.forEach(function (li, i) {
+      li.tabIndex = 0;
+      on(li, 'mouseenter', function () { pick = i; show(i); });
+      on(li, 'focus', function () { pick = i; show(i); });
+      on(li, 'mouseleave', function () { pick = -1; tick(); });
+      on(li, 'blur', function () { pick = -1; tick(); });
+    });
+    var still = function () { return reduce || getComputedStyle(sec.querySelector('.p-sticky')).position !== 'sticky'; };
+    progressFns.push(function () {
+      if (pick >= 0) return;
+      if (still()) { show(n); return; }
+      var p = clamp((progressOf(sec) - 0.04) / 0.86, 0, 1);
+      show(Math.min(n, Math.floor(p * (n + 1))));
     });
   }
 
@@ -483,30 +601,32 @@
     wrap.className = 'p-story' + (reduce ? ' p-reduce' : '');
     wrap.innerHTML =
       rail() +
-      transition('An AI wrote the change. Someone has to trust it.', 3, 'ch-problem',
-        'You maintain a library. An AI agent sends you code. Will it still be readable and maintainable next year?') +
+      transition('An AI made the change. Can you see why?', 4, 'ch-problem',
+        'You maintain a library. An AI agent sends you a fix: hundreds of lines, dozens of choices.') +
       secProblem(s) +
-      transition('So every claim gets a score from 0 to 100.', 4, 'ch-score',
-        'A claim is one plain sentence about what the change does.') +
+      transition('So every decision leaves a trace.', 3, 'ch-trace',
+        'What the code does, in plain steps. The real code. And why.') +
+      secTrace(s) +
+      transition('The AI writes the trace. A script checks it.', 3, 'ch-check',
+        'Nothing is taken on the AI’s word.') +
+      secChecked(s) +
+      transition('Every reason points to a real check.', 3, 'ch-score',
+        'The kind of check sets the score, by a fixed formula.') +
       secKinds(s) +
-      transition('Whatever can be checked, a machine checks.', 3, 'ch-machine',
-        'It runs the real code instead of taking the agent’s word.') +
       secMachine(s) +
-      transition('Some changes need a person, whatever the score.', 3, 'ch-owner',
-        'When a promise to users changes, a named maintainer decides.') +
+      transition('Some decisions belong to a person.', 3, 'ch-owner',
+        'When users would notice a change, the trace ends with a question for its owner.') +
       secOwner(s) +
       transition('Code is written once, then read for years.', 3, 'ch-learn',
         'Rules come from what maintainers said on past pull requests.') +
       secLearn(s) +
-      transition('And you can check our work.', 3, 'ch-check',
-        'Every new test is explained. Every result can be re-run.') +
-      secTests(s) +
       secDoors(s);
     landing.insertAdjacentElement('afterend', wrap);
 
     cleanup.push(function () { wrap.remove(); down.remove(); });
     setupTransitions(wrap);
     setupOwner(wrap);
+    setupTrace(wrap);
     setupRail(wrap);
     setupReveals(wrap);
     on(window, 'scroll', tick, { passive: true });

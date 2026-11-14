@@ -122,8 +122,8 @@
     app.innerHTML =
       '<section class="landing">' +
         '<div class="hero">' +
-          '<h1><span>Read the evidence,</span><em>not the diff.</em></h1>' +
-          '<p class="lede">An AI agent fixed ' + nIssues + ' in MessagePack-CSharp. Each fix is split into claims, and each claim gets a score from the evidence behind it. Where a check shows a promise to users changed, the owner decides; you sign.</p>' +
+          '<h1><span>Trace decisions,</span><em>not lines.</em></h1>' +
+          '<p class="lede">An AI agent fixed ' + nIssues + ' in MessagePack-CSharp. Every decision it made is traced: plain steps, the real code, and why. A script checks each step against the code. Where users would notice, the owner decides; you sign.</p>' +
           '<div class="ladder">' + caps +
             '<span class="bracket machine">scored by evidence</span><span class="bracket owner">owner decides</span>' +
           '</div>' +
