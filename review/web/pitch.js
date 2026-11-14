@@ -48,9 +48,10 @@
     { id: 'ch-problem', n: '01', title: 'The problem' },
     { id: 'ch-trace', n: '02', title: 'The trace' },
     { id: 'ch-check', n: '03', title: 'Checked' },
-    { id: 'ch-score', n: '04', title: 'The score' },
-    { id: 'ch-owner', n: '05', title: 'Needs owner' },
-    { id: 'ch-learn', n: '06', title: 'Readable' }
+    { id: 'ch-same', n: '04', title: 'Nothing else broke' },
+    { id: 'ch-score', n: '05', title: 'The score' },
+    { id: 'ch-owner', n: '06', title: 'Needs owner' },
+    { id: 'ch-learn', n: '07', title: 'Readable' }
   ];
 
   var cleanup = [];
@@ -446,6 +447,49 @@
     '</section>';
   }
 
+  /* ---------- same code in: old vs new output, and which changed lines ran ---------- */
+  function secSame(s) {
+    var rows = s.ds.filter(function (d) { return d._isolation && d._isolation.totals && d._isolation.totals.compared; });
+    if (!rows.length) return '';
+    var iso0 = rows[0]._isolation, files = +iso0.totals.compared, nproj = (iso0.projects || []).length;
+    var unexpl = 0;
+    var list = rows.map(function (d) {
+      var x = d._isolation, t = x.totals, c = x.coverage || {};
+      unexpl += +t.unexplained || 0;
+      var sq = '';
+      for (var i = 0; i < +t.compared; i++) sq += '<i class="' + (i < +t.same ? 's' : i < +t.same + (+t.explained || 0) ? 'e' : 'u') + '"></i>';
+      var ran = +c.reached || 0, tot = +c.trackable || 0, low = tot && ran / tot < 0.5;
+      var out = t.unexplained ? t.unexplained + ' changed with no claim behind it' :
+        t.differ ? t.differ + ' changed, each one stated by a claim' : 'all ' + t.same + ' the same';
+      return '<li class="' + (low ? 'low' : '') + '">' +
+        '<div class="hd"><span class="no">#' + esc(issueOf(d)) + '</span><span class="out">' + esc(out) + '</span></div>' +
+        '<div class="p-same-sq" aria-hidden="true">' + sq + '</div>' +
+        (tot ? '<div class="ran"><span class="bar"><i style="width:' + Math.round(100 * ran / tot) + '%"></i></span>' +
+          '<span><b>' + ran + ' of ' + tot + '</b> changed lines ran</span></div>' : '') +
+        (low ? '<p class="warn">Same, but most of the change never ran. That is untested, not safe. The ' + (tot - ran) + ' lines go to the reviewer.</p>' : '') +
+      '</li>';
+    }).join('');
+    return '<section class="p-sec p-same">' +
+      '<div class="p-grid2">' +
+        '<div>' +
+          '<h2 class="p-h2">' + words('Same code in.') + '<br>' + words('Compare what comes out.', 'hot', 140) + '</h2>' +
+          '<ul class="p-rules" data-rv>' +
+            '<li><b>1</b>Build the old version and the new one.</li>' +
+            '<li><b>2</b>Give both the same ' + nproj + ' real projects. They were written before the change: ' + files + ' generated files.</li>' +
+            '<li><b>3</b>Compare every file. A difference must match a claim. If not, a person looks.</li>' +
+            '<li><b>4</b>A coverage tool records which changed lines really ran.</li>' +
+          '</ul>' +
+          '<p class="p-cap p-same-rule" data-rv>If a changed line never runs, the output can’t change. So “same” only counts where the change ran.</p>' +
+        '</div>' +
+        '<div class="p-panel" data-rv>' +
+          '<ul class="p-same-list">' + list + '</ul>' +
+          '<div class="p-bandkey p-same-key"><span><i class="s"></i>Same</span><span><i class="e"></i>Changed, stated by a claim</span><span><i class="u"></i>Changed, no claim</span></div>' +
+          '<p class="p-note">' + (unexpl ? unexpl + ' files changed with no claim behind them.' : 'No file changed without a claim behind it.') + ' Tools decide every result, not the AI.</p>' +
+        '</div>' +
+      '</div>' +
+    '</section>';
+  }
+
   /* replay on a clean machine */
   function replayLine(s) {
     if (!s.replayTotal) return '';
@@ -688,6 +732,9 @@
       transition('The AI writes the trace. A script checks it.', 3, 'ch-check',
         'Nothing is taken on the AI’s word.') +
       secChecked(s) +
+      transition('Weak tests? Run the old and the new on the same code.', 4, 'ch-same',
+        'Tests only check what someone thought of. So we compare all the output instead.') +
+      secSame(s) +
       transition('Every reason points to a real check.', 3, 'ch-score',
         'The kind of check sets the score, by a fixed formula.') +
       secKinds(s) +

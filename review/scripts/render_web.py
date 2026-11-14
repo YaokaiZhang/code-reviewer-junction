@@ -41,6 +41,27 @@ def requirements():
     return out
 
 
+
+def slim_isolation(e):
+    """Only what the page shows from isolation.json (the full file stays in evidence/)."""
+    if not isinstance(e, dict):
+        return None
+    t = e.get("details") or {}
+    c = t.get("coverage") or {}
+    proj = next((g for g in t.get("corpus") or [] if g.get("role") == "main"), {})
+    return {
+        "file": f"evidence/{e.get('branch')}/isolation.json",
+        "result": e.get("result"), "summary": e.get("summary"),
+        "projects": proj.get("projects") or [], "totals": t.get("totals") or {},
+        "explained": [{"claim": x.get("claim"), "what": x.get("what"), "inputs": x.get("inputs")} for x in t.get("explained") or []],
+        "unexplained": t.get("unexplained") or [],
+        "coverage": {
+            "tool": c.get("tool"), "trackable": c.get("trackable"), "reached": c.get("reached"),
+            "not_trackable": len(c.get("not_trackable") or []),
+            "unreached": [{"side": u.get("side"), "file": u.get("file"), "line": u.get("line"), "text": (u.get("text") or "")[:160]} for u in c.get("unreached") or []],
+        },
+    }
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     g = ap.add_mutually_exclusive_group()
@@ -87,6 +108,8 @@ def main():
                          ("_readability", "readability.json"), ("_replay", "replay.json"), ("_decisions", "decision-check.json")):
             f = REVIEW / "evidence" / branch / fn
             d[name] = load(f) if f.is_file() else None
+        iso = REVIEW / "evidence" / branch / "isolation.json"
+        d["_isolation"] = slim_isolation(load(iso)) if iso.is_file() else None
         d["_requirements"] = {c["requirement"]: reqs[c["requirement"]] for c in d.get("claims") or [] if c.get("requirement") in reqs}
         d["sample"] = is_sample
         bundle[key] = d
