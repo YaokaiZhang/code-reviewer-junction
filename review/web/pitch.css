@@ -498,3 +498,8 @@
 .p-vs .on { color: #fff3d6; background: rgba(255,200,80,.07); }
 .p-vs thead .on { color: var(--ph); }
 @media (max-width: 600px) { .p-vs { font-size: .95rem; } .p-vs th, .p-vs td { padding: 10px 6px; } }
+
+.p-next { margin-top: 22px; padding-top: 16px; border-top: 1px dashed rgba(255,231,160,.25); display: grid; gap: 10px; }
+.p-next h4 { font-family: var(--vt); font-size: 1.2rem; letter-spacing: .08em; text-transform: uppercase; font-weight: 400; color: var(--ph); }
+.p-next p { font-family: var(--sans); font-size: .95rem; line-height: 1.45; color: #d9c08a; }
+.p-next b { color: #fff3d6; font-weight: 600; }
