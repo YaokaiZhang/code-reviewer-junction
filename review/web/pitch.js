@@ -5,7 +5,7 @@
 
   /* kinds of evidence and their base score (the formula in the confidence check) */
   var KINDS = [
-    ['rebuild-compare', 'Rebuilt and compared', 90],
+    ['rebuild-compare', 'Old vs new, or rebuilt: same output', 90],
     ['proof-model', 'Model proof', 80],
     ['flip-test', 'Test fails before, passes after', 75],
     ['revert-test', 'Undo just this change: a test fails', 75],
@@ -15,9 +15,9 @@
   ];
   /* what each kind of evidence means, shown on hover: plain words, why it scores that, a real example */
   var KIND_HELP = {
-    'rebuild-compare': ['Run the code generator again and compare its output with the files in the change.',
-      'Same output, character for character, means nobody slipped in a hand edit. Hard to fake, so it scores highest.',
-      'Used on #2297 for its generated files.'],
+    'rebuild-compare': ['Run the old and the new version on the same real projects and compare the output. Or run the code generator again and compare with the files in the change.',
+      'A script compares every character, so no one has to trust the AI. Hard to fake, so it scores highest.',
+      'Used on all three fixes: 5 real projects, 139 generated files.'],
     'proof-model': ['Write the rule as a small math model. A prover (Dafny) checks it for every possible case, then the model is tested against the real C# code.',
       'Very strong, but the model is a copy of the code, not the code itself.',
       'On #2234 the prover found an input that still crashes the analyzer.'],
@@ -202,7 +202,7 @@
       '<div class="p-grid2">' +
         '<div>' +
           '<h2 class="p-h2">' + words('The evidence') + '<br>' + words('sets the score.', 'hot', 140) + '</h2>' +
-          '<p class="p-ctx" data-rv>A fixed formula does the math. No AI picks the number.</p>' +
+          '<p class="p-ctx" data-rv>Deterministic checks and a fixed formula do the math. No AI picks the number.</p>' +
           bandsBar(s) +
         '</div>' +
         '<div class="p-panel" data-rv>' +
@@ -237,16 +237,43 @@
     return null;
   }
 
-  /* three checks, up close */
+  /* each check, one per row: what it does, why it counts, what it cannot tell */
   function secMachine(s) {
     var rows = [];
+
+    var iso = s.ds.filter(function (d) { return d._isolation && d._isolation.coverage && +d._isolation.coverage.trackable; });
+    if (iso.length) rows.push({ c: 'high', g: 'Old vs new', v: 90, h: 'Same input, same output.',
+      p: 'Run the old and the new version on the same real projects. Compare every file they produce.',
+      why: 'The old version is the answer key. Nobody has to write a test, so it also catches what nobody thought to test.',
+      lim: 'It only speaks for changed lines that ran. Lines that never ran go to the reviewer.',
+      fig: '<div class="p-fig p-ran">' + iso.map(function (d) {
+        var c = d._isolation.coverage, ran = +c.reached || 0, tot = +c.trackable, pc = Math.round(100 * ran / tot);
+        return '<div class="p-mbar' + (pc < 50 ? ' low' : '') + '"><span>#' + esc(issueOf(d)) + '</span><i data-w="' + pc + '"></i><b>' + ran + '/' + tot + '</b></div>';
+      }).join('') + '<p class="p-out">changed lines that ran, per fix</p></div>' });
+
     var nSnap = s.snap || 0;
     if (findEv(s, 'regeneration') && nSnap) rows.push({ c: 'high', g: 'Rebuilt and compared', v: 90, h: 'Rebuild it. Compare.',
-      p: 'Run the generator again. Its output equals the committed files, character for character.',
+      p: 'Run the code generator again. Its output must equal the files in the change, character for character.',
+      why: 'Generated files are too long to read. If the generator makes the same files again, nobody edited them by hand.',
+      lim: 'It shows the files match the generator, not that the generator is right.',
       fig: '<div class="p-fig p-fig-proved">' +
-        '<figure>' + squares(nSnap) + '<figcaption>' + fmt(nSnap) + ' files committed</figcaption></figure>' +
+        '<figure>' + squares(nSnap) + '<figcaption>' + fmt(nSnap) + ' files in the change</figcaption></figure>' +
         '<b class="p-eq">=</b>' +
         '<figure>' + squares(nSnap, 'regen') + '<figcaption>' + fmt(nSnap) + ' files rebuilt</figcaption></figure></div>' });
+
+    var pr = findEv(s, 'proof'), pd = pr && pr.details, mv = pd && pd.model_vs_csharp;
+    if (pd && mv && mv.branch) {
+      var vl = ((pd.dafny_verify || {}).result_line || [''])[0], nv = (String(vl).match(/(\d+) verified/) || [])[1];
+      rows.push({ c: 'high', g: 'Model proof', v: 80, h: 'Prove it for every case.',
+        p: 'Write the rule as a small math model. A prover checks it for every input the model allows.',
+        why: 'A test checks a few inputs. A proof covers all of them, so it finds the one case nobody tried.',
+        lim: 'The model is a copy of the code, not the code. So we also run the model and the real code on the same inputs.',
+        fig: '<div class="p-fig p-proof">' +
+          (nv ? '<div><b>' + nv + '</b><span>proof parts checked by the prover, 0 errors</span></div>' : '') +
+          '<div class="bad"><b>1</b><span>case found that still crashes: a field with an empty key comes first</span></div>' +
+          '<div><b>' + fmt(+mv.branch.inputs) + '</b><span>inputs, model vs real code: ' + (+mv.branch.mismatches) + ' differences</span></div>' +
+          '<p class="p-out">fix #2234</p></div>' });
+    }
 
     var ot = findEv(s, 'old-vs-new-tests', '2283') || findEv(s, 'old-vs-new-tests');
     var nT = ot && ot.details && ot.details.counts ? +ot.details.counts.evidence : 0;
@@ -254,27 +281,42 @@
       var cells = '';
       for (var i = 0; i < nT; i++) cells += '<span class="x">✗</span><span class="ok">✓</span>';
       rows.push({ c: 'medium', g: 'Fails before, passes after', v: 75, h: 'Run the new tests on the old code.',
+        p: 'Each new test must fail on the old code and pass on the new code.',
+        why: 'A new test that also passes on the old code says nothing about the fix.',
+        lim: 'It only covers the cases the test writer thought of.',
         fig: '<div class="p-fig"><div class="p-tgrid">' +
-          '<span class="hd">old code</span><span class="hd">new code</span>' + cells + '</div></div>' });
+          '<span class="hd">old code</span><span class="hd">new code</span>' + cells + '</div><p class="p-out">fix #2283, ' + nT + ' new tests</p></div>' });
     }
 
     var cc = findEv(s, 'clone-complexity'), cd = cc && cc.details;
     if (cd && cd.base && cd.branch) {
       var b0 = +cd.base.clones.duplicated_blocks, b1 = +cd.branch.clones.duplicated_blocks, mx = Math.max(b0, b1) || 1;
       rows.push({ c: 'low', g: 'A number from a tool', v: 40, h: 'Count it.',
-        p: 'Fix #2234 added copy-pasted code. More copies means more to keep in sync, but a count alone cannot say if the fix is right.',
+        p: 'A tool measures something, for example how much code is copy-pasted, before and after.',
+        why: 'It points the reviewer to a cost that is easy to miss in a long change.',
+        lim: 'A number alone cannot say if the fix is right. So it scores low.',
         fig: '<div class="p-fig">' +
           '<div class="p-mbar"><span>before</span><i data-w="' + (100 * b0 / mx).toFixed(1) + '"></i><b>' + b0 + '</b></div>' +
           '<div class="p-mbar"><span>after</span><i data-w="' + (100 * b1 / mx).toFixed(1) + '"></i><b>' + b1 + '</b></div>' +
-          '<p class="p-out">copy-pasted blocks in one file (fewer is better)</p></div>' });
+          '<p class="p-out">copy-pasted blocks in one file, fix #2234</p></div>' });
     }
 
     return '<section class="p-sec p-machine">' +
-      '<div class="p-hows">' + rows.map(function (r) {
-        return '<article class="p-how" data-rv>' +
-          '<div class="p-how-t"><span class="g c-' + r.c + '">' + esc(r.g) + ' <b>' + r.v + '</b></span>' +
-            '<h3>' + esc(r.h) + '</h3>' + (r.p ? '<p>' + esc(r.p) + '</p>' : '') + '</div>' +
-          r.fig + '</article>';
+      '<header class="p-mhead">' +
+        '<h2 class="p-h2">' + words('Each check,') + '<br>' + words('and why it counts.', 'hot', 140) + '</h2>' +
+        '<p class="p-ctx" data-rv>Every check is a script with a fixed pass rule. Same code in, same result out. Stronger checks score higher.</p>' +
+      '</header>' +
+      '<div class="p-hows">' + rows.map(function (r, i) {
+        return '<article class="p-how">' +
+          '<div class="p-how-t" data-rv>' +
+            '<span class="p-how-n">' + (i + 1) + ' / ' + rows.length + '</span>' +
+            '<span class="g c-' + r.c + '">' + esc(r.g) + ' <b>' + r.v + '</b></span>' +
+            '<h3>' + esc(r.h) + '</h3>' +
+            '<p>' + esc(r.p) + '</p>' +
+            '<dl><dt>Why it counts</dt><dd>' + esc(r.why) + '</dd><dt>What it can’t tell</dt><dd>' + esc(r.lim) + '</dd></dl>' +
+          '</div>' +
+          '<div class="p-how-f" data-rv>' + r.fig + '</div>' +
+        '</article>';
       }).join('') + '</div>' +
     '</section>';
   }
@@ -696,7 +738,7 @@
         'Even when the tests are weak. So we run the old and the new version on the same code, and compare.') +
       secSame(s) +
       transition('Every reason points to a real check.', 3, 'ch-score',
-        'The kind of check sets the score, by a fixed formula.') +
+        'Deterministic checks and a fixed formula set the score.') +
       secKinds(s) +
       secMachine(s) +
       transition('Some decisions belong to a person.', 3, 'ch-owner',
