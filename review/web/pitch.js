@@ -474,10 +474,11 @@
         '<div>' +
           '<h2 class="p-h2">' + words('Did it break') + '<br>' + words('old code?', 'hot', 140) + '</h2>' +
           '<p class="p-cap p-same-lede" data-rv>Old projects often have weak tests, and new tests only check what someone thought of. This check needs no tests: the old version is the answer key.</p>' +
+          '<p class="p-same-big" data-rv>Same input, same output.</p>' +
           '<ul class="p-rules" data-rv>' +
-            '<li><b>1</b>Build the old version and the new one.</li>' +
-            '<li><b>2</b>Feed both the same real projects that use the library, written before the change.</li>' +
-            '<li><b>3</b>Compare what they produce. Each difference must match a claim, or a person looks.</li>' +
+            '<li><b>1</b>Give the old and the new version the same input.</li>' +
+            '<li><b>2</b>Same output: nothing broke.</li>' +
+            '<li><b>3</b>Different output: it must match a claim, or a person looks.</li>' +
             '<li><b>4</b>Record which changed lines actually ran.</li>' +
           '</ul>' +
           '<p class="p-cap p-same-rule" data-rv>If a changed line never runs, the output can’t change. So “same” only counts where the change ran.</p>' +
