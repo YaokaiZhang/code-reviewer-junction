@@ -258,7 +258,7 @@
         var o = ovn(d);
         return '<div class="p-mbar' + (pc < 50 ? ' low' : '') + '"><span>#' + esc(issueOf(d)) + '</span><i data-w="' + pc + '"></i><b>' + ran + '/' + tot + '</b>' +
           (o ? '<em class="c-' + esc(o.band) + '">score ' + (+o.score) + '</em>' : '') + '</div>';
-      }).join('') + '<p class="p-out">changed lines that ran, and the score that gives, per fix</p></div>' });
+      }).join('') + '<p class="p-out">changed lines the real projects ran, and the score that gives</p></div>' });
 
     var nSnap = s.snap || 0;
     if (findEv(s, 'regeneration') && nSnap) rows.push({ c: 'high', g: 'Rebuilt and compared', v: 90, h: 'Rebuild the generated code.',
@@ -472,14 +472,14 @@
   function secSame(s) {
     var rows = s.ds.filter(function (d) { return d._isolation && d._isolation.totals && d._isolation.totals.compared; });
     if (!rows.length) return '';
-    var iso0 = rows[0]._isolation, files = +iso0.totals.compared, nproj = (iso0.projects || []).length;
+    var iso0 = rows[0]._isolation, files = +iso0.totals.compared, nproj = (iso0.projects || []).length, nctl = +iso0.control_inputs || 0;
     var unexpl = 0;
     var list = rows.map(function (d) {
       var x = d._isolation, t = x.totals, c = x.coverage || {};
       unexpl += +t.unexplained || 0;
       var sq = '';
       for (var i = 0; i < +t.compared; i++) sq += '<i class="' + (i < +t.same ? 's' : i < +t.same + (+t.explained || 0) ? 'e' : 'u') + '"></i>';
-      var ran = +c.reached || 0, tot = +c.trackable || 0, low = tot && ran / tot < 0.5;
+      var ran = c.reached_any != null ? +c.reached_any : +c.reached || 0, tot = +c.trackable || 0, low = tot && ran / tot < 0.5;
       var out = t.unexplained ? t.unexplained + ' changed with no claim behind it' :
         t.differ ? t.differ + ' changed, each one stated by a claim' : 'all ' + t.same + ' the same';
       return '<li class="' + (low ? 'low' : '') + '">' +
@@ -497,15 +497,15 @@
           '<p class="p-cap p-same-lede" data-rv>Old projects often have weak tests, and new tests only check what someone thought of. This check needs no tests: the old version is the answer key.</p>' +
           '<p class="p-same-big" data-rv>Same input, same output.</p>' +
           '<ul class="p-rules" data-rv>' +
-            '<li><b>1</b>Give the old and the new version the same input.</li>' +
-            '<li><b>2</b>Same output: nothing broke.</li>' +
-            '<li><b>3</b>Different output: it must match a claim, or a person looks.</li>' +
-            '<li><b>4</b>Record which changed lines actually ran.</li>' +
+            '<li><b>1</b>Many inputs: ' + nproj + ' real projects' + (nctl ? ' and the ' + nctl + ' inputs of the old tests' : '') + '.</li>' +
+            '<li><b>2</b>Run old and new on each. Record which changed lines ran.</li>' +
+            '<li><b>3</b>Line ran, same output: nothing broke.</li>' +
+            '<li><b>4</b>Output differs, or a line never ran: a person decides.</li>' +
           '</ul>' +
-          '<p class="p-cap p-same-rule" data-rv>If a changed line never runs, the output can’t change. So “same” only counts where the change ran.</p>' +
+          '<p class="p-cap p-same-rule" data-rv>A line that never runs can’t change the output. So “same” only counts where the change ran.</p>' +
         '</div>' +
         '<div class="p-panel" data-rv>' +
-          '<p class="p-same-here">Here: ' + nproj + ' real projects, ' + files + ' generated files</p>' +
+          '<p class="p-same-here">Here: ' + nproj + ' real projects' + (nctl ? ' + ' + nctl + ' old test inputs' : '') + '</p>' +
           '<ul class="p-same-list">' + list + '</ul>' +
           '<div class="p-bandkey p-same-key"><span><i class="s"></i>Same</span><span><i class="e"></i>Changed, stated by a claim</span><span><i class="u"></i>Changed, no claim</span></div>' +
           '<p class="p-note">' + (unexpl ? unexpl + ' files changed with no claim behind them.' : 'No file changed without a claim behind it.') + ' Tools decide every result, not the AI.</p>' +
