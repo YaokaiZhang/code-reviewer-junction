@@ -440,6 +440,8 @@ def main():
 
     def flag(measure, rule, vb, vr, locs, extra=None):
         r = rules[rule]
+        if r.get("off"):  # a person turned this rule off in context/history.json
+            return
         f = {"id": f"RD-{a.branch.split('-')[-1]}-{len(flags) + 1:02d}", "measure": measure,
              "value_base": vb, "value_branch": vr,
              "where": where_str(locs),

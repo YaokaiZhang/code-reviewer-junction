@@ -103,6 +103,22 @@ rules from `context/history.json`.
 The old tier names stay as words for the kinds: Proved = rebuild-compare / proof, Tested = flip or
 undo test, Measured = count, Argued = none, Refused = needs owner.
 
+## Traces for readability flags — `explain/<branch>.decisions.json`
+
+Each flag in `evidence/<branch>/readability.json` gets a decision card like a claim: `kind: "flag"`, the
+flag's id, steps that cite the real lines, a verdict and reasons. Its reasons must name the
+readability.json file. `decision_check.py` checks the steps against the code and fails when a flag has
+no card or a card names a flag that does not exist.
+
+## Learned rules — `context/history.json`
+
+People edit the rules on the owner view's Rules page (`#/rules`), served by `scripts/dev_server.py`
+(`npm run dev`). A rule is `{id, concern, rule, sources, off?}`. Rules are never deleted, only turned off
+(`off: true`), so evidence that already cites one still resolves. Each saved change appends
+`edits: [{who, when, before}]` to the rule; a new rule carries `added_by`. Saving re-runs confidence.py
+and render_web.py. Turned-off rules are left out of owner-gate citations and readability flags. The page
+reads rule text from this file, so a reworded rule shows on every flag at once.
+
 ## Honesty rules
 
 - Every number in a summary, dossier or UI must appear in an evidence file with its command.

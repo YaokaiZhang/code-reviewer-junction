@@ -93,7 +93,7 @@
 
   /* ---------- landing ---------- */
   function renderLanding() {
-    mastRight.innerHTML = '';
+    mastRight.innerHTML = '<a href="#/rules" style="text-decoration:none">learned rules ▸</a>';
     var ks = keys();
     var items = ks.map(function (k) {
       var d = DATA[k], h = humanOf(d), r = d._receipt;
@@ -563,21 +563,200 @@
   }
 
   /* ---------- readability ---------- */
-  function readabilityBlock(d) {
+  /* the learned rules (context/history.json); the page reads rule text from here, so an edit shows everywhere */
+  function rulesDoc() { return ((window.PROJECT || {}).history) || { rules: [] }; }
+  function ruleById(id) { return (rulesDoc().rules || []).filter(function (r) { return r.id === id; })[0] || null; }
+  function readabilitySection(d) {
     var fl = ((d._readability || {}).details || {}).flags || [];
     if (!fl.length) return '';
-    return '<section class="lst rd"><h4><span class="inv">READABILITY</span><span class="k">' + fl.length + '</span></h4>' +
-      '<p class="gloss">Flags tied to a maintainer rule.</p><ul>' + fl.map(function (f) {
+    return '<div class="sec-h"><span class="inv">READABILITY</span><span class="rule"></span><span class="dim">' + fl.length + '</span></div>' +
+      '<p class="sec-g">Flags tied to a maintainer rule. A tool measured each one; the AI traced what it means. <a href="#/rules">See or edit the rules ↗</a></p>' +
+      fl.map(function (f) {
+        var r = ruleById(f.rule), card = decOf(d, f.id);
+        var text = r ? r.rule : (f.rule_text || ''), src = r ? r.sources : f.sources;
         var file = base(String(f.where || '').split(/[:;]/)[0]);
-        return '<li><details><summary>' + ruleLink(f.rule, (f.sources || []).slice(0, 1)) +
-            '<span class="m" title="' + esc(f.measure) + '">' + esc(String(f.measure || '').replace(/\s*\(.*\)\s*$/, '')) + (file ? ' · ' + esc(file) : '') + '</span>' +
-            '<span class="dl">' + esc(f.value_base) + ' → ' + esc(f.value_branch) + '</span><span class="tw" aria-hidden="true">▸</span></summary>' +
-          '<div class="rb"><p>' + ruleLink(f.rule, f.sources) + ' ' + esc(f.rule_text || '') + '</p>' +
-            (f.detail ? '<p><code>' + esc(f.detail) + '</code></p>' : '') +
-            '<p class="fine">' + esc(f.where || '') + '</p>' +
-            ((f.claims || []).length ? '<p>' + f.claims.map(goto).join(' ') + '</p>' : '') + '</div></details></li>';
-      }).join('') + '</ul></section>';
+        var meas = String(f.measure || '').replace(/\s*\(.*\)\s*$/, '');
+        return '<details class="tc dc k-flag" id="row-' + esc(f.id) + '"><summary><span class="tg" aria-hidden="true">≋</span>' +
+            '<span class="tname">' + esc(card ? card.title : meas + (file ? ' · ' + file : '')) + '</span>' +
+            '<span class="say">' + esc(f.rule) + ' · ' + esc(f.value_base) + ' → ' + esc(f.value_branch) + '</span><span class="tw" aria-hidden="true">▸</span></summary>' +
+          '<div class="rdh">' +
+            '<p class="rdr">' + ruleLink(f.rule, src) + ' ' + esc(text) + (r && r.edits && r.edits.length ? ' <span class="ed">edited by ' + esc(r.edits[r.edits.length - 1].who) + '</span>' : '') + (r ? '' : ' <span class="ed">rule no longer in the rules file</span>') + '</p>' +
+            '<p class="rdm"><b>Measured:</b> ' + esc(f.measure) + ': ' + esc(f.value_base) + ' before, ' + esc(f.value_branch) + ' after.' + (f.detail ? ' ' + esc(f.detail) + '.' : '') + '</p>' +
+            ((f.claims || []).length ? '<p class="rdc">Touches ' + f.claims.map(goto).join(' ') + '</p>' : '') +
+          '</div>' +
+          (card ? decisionPanes(card) : '<p class="rdm">No trace yet: <code>' + esc(f.where || '') + '</code></p>') +
+        '</details>';
+      }).join('');
   }
+
+  /* ---------- learned rules: read and edit context/history.json ---------- */
+  var CONCERNS = ['compat-breaking', 'public-api', 'wire-format', 'generated', 'diagnostics', 'targets', 'security',
+    'user-docs', 'maintainability', 'readability', 'performance', 'tests', 'scope', 'other'];
+  var rulesState = null;
+  function quotesByUrl() {
+    var m = {};
+    ((rulesDoc().prs) || []).forEach(function (p) {
+      (p.statements || []).forEach(function (st) { if (st.url) m[st.url] = { who: st.who, quote: st.quote, date: st.date, pr: p.pr, title: p.title }; });
+    });
+    return m;
+  }
+  /* which flags and owner gates cite each rule, across the dossiers */
+  function ruleUses() {
+    var u = {};
+    keys().forEach(function (k) {
+      var d = DATA[k];
+      (((d._readability || {}).details || {}).flags || []).forEach(function (f) { (u[f.rule] = u[f.rule] || []).push({ k: k, id: f.id }); });
+      var cl = ((d._confidence || {}).details || {}).claims || {};
+      Object.keys(cl).forEach(function (cid) {
+        ((cl[cid].gate || {}).rules || []).forEach(function (r) { (u[r.id] = u[r.id] || []).push({ k: k, id: cid }); });
+      });
+    });
+    return u;
+  }
+  function rulesFromDoc() {
+    return (rulesDoc().rules || []).map(function (r) {
+      return { id: r.id, concern: r.concern, rule: r.rule, sources: (r.sources || []).slice(), off: !!r.off,
+        times_cited: r.times_cited, edits: r.edits || [], added_by: r.added_by || null, isNew: false };
+    });
+  }
+  function rulesDirty() {
+    var orig = {};
+    (rulesDoc().rules || []).forEach(function (r) { orig[r.id] = r; });
+    return rulesState.rules.some(function (r) {
+      var o = orig[r.id];
+      return !o || o.rule !== r.rule || o.concern !== r.concern || !!o.off !== r.off || (o.sources || []).join('\n') !== r.sources.join('\n');
+    });
+  }
+  function ruleCard(r, i, Q, U) {
+    var uses = U[r.id] || [];
+    var src = r.sources.map(function (u) {
+      var q = Q[u];
+      return '<li><a href="' + esc(u) + '" target="_blank" rel="noopener">' + (q ? esc(q.who) + ', PR ' + esc(q.pr) + ', ' + esc(q.date) : esc(u.replace(/^https:\/\/github\.com\//, ''))) + ' ↗</a>' +
+        (q ? '<q>' + esc(q.quote) + '</q>' : '') + '</li>';
+    }).join('');
+    var last = r.edits.length ? r.edits[r.edits.length - 1] : null;
+    return '<li class="lr' + (r.off ? ' off' : '') + '" data-i="' + i + '">' +
+      '<div class="lr-h"><b class="lr-id">' + esc(r.id) + '</b>' +
+        '<label class="lr-c"><span class="sr">Concern</span><select data-f="concern">' + CONCERNS.map(function (c) {
+          return '<option' + (c === r.concern ? ' selected' : '') + '>' + esc(c) + '</option>'; }).join('') + '</select></label>' +
+        '<label class="lr-on"><input type="checkbox" data-f="on"' + (r.off ? '' : ' checked') + '> in use</label>' +
+        '<span class="lr-meta">' + (r.isNew ? 'new' : (r.added_by ? 'added by ' + esc(r.added_by.who) : 'learned from history') +
+          (last ? ' · edited by ' + esc(last.who) + ' ' + esc(String(last.when).slice(0, 10)) : '')) + '</span></div>' +
+      '<label class="sr" for="lr-t-' + i + '">Rule ' + esc(r.id) + '</label>' +
+      '<textarea id="lr-t-' + i + '" data-f="rule" rows="2">' + esc(r.rule) + '</textarea>' +
+      (src ? '<ul class="lr-src">' + src + '</ul>' : '<p class="lr-none">No maintainer quote backs this rule yet. Add a link below.</p>') +
+      '<details class="lr-more"><summary>Edit links' + (uses.length ? ' · cited by ' + uses.length : '') + '</summary>' +
+        '<label>Links to where a maintainer said it, one per line<textarea data-f="sources" rows="' + Math.max(2, r.sources.length) + '">' + esc(r.sources.join('\n')) + '</textarea></label>' +
+        (uses.length ? '<p class="lr-uses">Cited by ' + uses.map(function (x) { return '<a href="#/d/' + encodeURIComponent(x.k) + '">' + esc(x.id) + '</a>'; }).join(', ') + '</p>' : '') +
+      '</details>' +
+    '</li>';
+  }
+  function renderRules() {
+    state.key = null;
+    mastRight.innerHTML = '<a href="#/" style="text-decoration:none">↩ dossiers</a>';
+    if (!rulesState) rulesState = { rules: rulesFromDoc(), msg: '', bad: false };
+    var doc = rulesDoc(), Q = quotesByUrl(), U = ruleUses();
+    var on = rulesState.rules.filter(function (r) { return !r.off; }).length;
+    app.innerHTML = '<section class="lrdoc">' +
+      '<header class="lrdoc-h"><p class="eyebrow">context/history.json</p><h1>Learned rules</h1>' +
+        '<p class="lede">' + esc(doc.summary || '') + ' Each rule says what the maintainers expect, with links to where they said it. ' +
+        'The owner gate and the readability flags cite these rules. You can reword a rule, change its concern, turn it off, or add one.</p>' +
+        '<p class="lrdoc-n">' + on + ' of ' + rulesState.rules.length + ' rules in use</p></header>' +
+      '<ol class="lrs">' + rulesState.rules.map(function (r, i) { return ruleCard(r, i, Q, U); }).join('') + '</ol>' +
+      '<div class="lrdoc-bar"><button type="button" class="lr-add">+ Add a rule</button>' +
+        '<label class="lr-who">Your name <input id="lr-who" autocomplete="name" value="' + esc(store('et:name') || '') + '"></label>' +
+        '<button type="button" class="lr-save">Save</button><button type="button" class="lr-reset">Undo changes</button>' +
+        '<p class="lr-msg' + (rulesState.bad ? ' bad' : '') + '" role="status">' + esc(rulesState.msg) + '</p></div>' +
+      '<p class="lrdoc-foot">Saving with <code>npm run dev</code> writes the file, records your name on each changed rule, and re-scores the dossiers. ' +
+        'Without it, Save downloads the edited file: put it at <code>review/context/history.json</code> and run <code>npm run render</code>. Rules are never deleted, only turned off, so old evidence that cites them still makes sense.</p>' +
+    '</section>';
+    refreshRulesBar();
+  }
+  function refreshRulesBar() {
+    var dirty = rulesDirty(), b = app.querySelector('.lr-save');
+    if (b) { b.disabled = !dirty; b.textContent = dirty ? 'Save' : 'Saved'; }
+    var r = app.querySelector('.lr-reset');
+    if (r) r.disabled = !dirty;
+  }
+  function payloadRules() {
+    return rulesState.rules.map(function (r) {
+      return { id: r.id, concern: r.concern, rule: r.rule, sources: r.sources, off: r.off };
+    });
+  }
+  function downloadRules(who) {
+    var doc = JSON.parse(JSON.stringify(rulesDoc())), now = new Date().toISOString().replace(/\.\d+Z$/, 'Z');
+    var old = {};
+    (doc.rules || []).forEach(function (r) { old[r.id] = r; });
+    doc.rules = rulesState.rules.map(function (r) {
+      var o = old[r.id];
+      if (!o) return { id: r.id, concern: r.concern, rule: r.rule, sources: r.sources, times_cited: 0, added_by: { who: who, when: now } };
+      var before = {};
+      ['concern', 'rule', 'sources', 'off'].forEach(function (k) {
+        var a = k === 'off' ? !!o.off : o[k], b = r[k];
+        if (JSON.stringify(a) !== JSON.stringify(b)) before[k] = a;
+      });
+      if (!Object.keys(before).length) return o;
+      var n = Object.assign({}, o, { concern: r.concern, rule: r.rule, sources: r.sources, edits: (o.edits || []).concat([{ who: who, when: now, before: before }]) });
+      if (r.off) n.off = true; else delete n.off;
+      return n;
+    });
+    var blob = new Blob([JSON.stringify(doc, null, 2) + '\n'], { type: 'application/json' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'history.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+  }
+  function saveRules() {
+    var who = (document.getElementById('lr-who') || {}).value || '';
+    who = who.trim();
+    if (!who) { rulesState.msg = 'Add your name first: each edit records who made it.'; rulesState.bad = true; renderRules(); return; }
+    store('et:name', who);
+    var empty = rulesState.rules.filter(function (r) { return !r.rule.trim(); })[0];
+    if (empty) { rulesState.msg = empty.id + ' has no text.'; rulesState.bad = true; renderRules(); return; }
+    rulesState.msg = 'Saving…'; rulesState.bad = false; renderRules();
+    fetch('/api/rules', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ who: who, rules: payloadRules() }) })
+      .then(function (res) {
+        if (res.status === 404 || res.status === 405 || res.status === 501) throw { offline: true };
+        return res.json().then(function (j) { if (!res.ok || !j.ok) throw { msg: j.error || (j.runs || []).filter(function (r) { return !r.ok; }).map(function (r) { return r.cmd + ' failed'; }).join('; ') || 'save failed' }; return j; });
+      })
+      .then(function (j) {
+        rulesState = null;
+        sessionStorage.setItem('et:rules-msg', j.summary + '. Scores re-computed.');
+        location.reload();
+      })
+      .catch(function (e) {
+        if (e && e.msg) { rulesState.msg = e.msg; rulesState.bad = true; renderRules(); return; }
+        downloadRules(who);
+        rulesState.msg = 'No dev server here, so the edited file was downloaded. Put it at review/context/history.json and run npm run render.';
+        rulesState.bad = false; renderRules();
+      });
+  }
+  app.addEventListener('input', function (e) {
+    var li = e.target.closest && e.target.closest('.lr');
+    if (!li || !rulesState) return;
+    var r = rulesState.rules[+li.dataset.i], f = e.target.dataset.f;
+    if (f === 'rule') r.rule = e.target.value;
+    else if (f === 'concern') r.concern = e.target.value;
+    else if (f === 'sources') r.sources = e.target.value.split('\n').map(function (x) { return x.trim(); }).filter(Boolean);
+    else if (f === 'on') { r.off = !e.target.checked; li.classList.toggle('off', r.off); }
+    rulesState.msg = ''; refreshRulesBar();
+  });
+  app.addEventListener('change', function (e) {
+    if (e.target.dataset && (e.target.dataset.f === 'concern' || e.target.dataset.f === 'on')) e.target.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+  app.addEventListener('click', function (e) {
+    if (!rulesState || !e.target.closest) return;
+    if (e.target.closest('.lr-save')) saveRules();
+    else if (e.target.closest('.lr-reset')) { rulesState = null; renderRules(); }
+    else if (e.target.closest('.lr-add')) {
+      var max = rulesState.rules.reduce(function (m, r) { return Math.max(m, +String(r.id).slice(2) || 0); }, 0);
+      var id = 'H-' + (max + 1 < 10 ? '0' : '') + (max + 1);
+      rulesState.rules.push({ id: id, concern: 'other', rule: '', sources: [], off: false, edits: [], added_by: null, isNew: true });
+      renderRules();
+      var t = app.querySelector('.lr:last-child textarea');
+      if (t) { t.scrollIntoView({ block: 'center' }); t.focus(); }
+    }
+  });
 
   function jumpTo(el) {
     if (!el) return;
@@ -679,12 +858,12 @@
                 '<div>' + machine.map(function (c) { return machineRow(d, c); }).join('') + '</div>' : '') +
               testsSection(d) +
               findingsSection(d) +
+              readabilitySection(d) +
               '<div class="sec-h"><span class="inv">GAPS</span><span class="rule"></span></div>' +
               '<div class="lists">' +
                 list('NOT CHECKED', 'What nobody verified.', d.not_checked, rich, true) +
                 list('NO CLAIM', 'Changed code no claim explains.', d.uncovered_diff_parts, function (p) { return '<code>' + esc(p) + '</code>'; }, true, 'Every changed line is explained by a claim.') +
                 (findingsSection(d) ? '' : list('FOUND', 'What the reviewer found.', d.found, rich) + list('SCOPE DRIFT', 'Changes the issue did not ask for.', d.scope_drift, rich, true)) +
-                readabilityBlock(d) +
               '</div>' +
               '<div class="prompt" id="prompt"></div>' +
             '</div>' +
@@ -903,12 +1082,16 @@
     var h = decodeURIComponent(location.hash.replace(/^#\/?/, ''));
     var m = h.match(/^d\/(.+)$/);
     if (m) renderDossier(m[1]);
+    else if (h === 'rules') renderRules();
     else { state.key = null; renderLanding(); }
     window.scrollTo(0, 0);
     if (document.activeElement && document.activeElement !== document.body) document.activeElement.blur();
     app.focus({ preventScroll: true });
     var d = m && DATA[m[1]];
-    document.title = d ? (d.issue != null ? '#' + d.issue + ' · ' : '') + 'Earned Trust' : 'Earned Trust';
+    document.title = d ? (d.issue != null ? '#' + d.issue + ' · ' : '') + 'Earned Trust' : h === 'rules' ? 'Learned rules · Earned Trust' : 'Earned Trust';
+    var saved = null;
+    try { saved = sessionStorage.getItem('et:rules-msg'); sessionStorage.removeItem('et:rules-msg'); } catch (e) {}
+    if (saved && h === 'rules' && rulesState) { rulesState.msg = saved; renderRules(); }
   }
   var skip = document.querySelector('.skip');
   if (skip) skip.addEventListener('click', function (e) {

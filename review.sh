@@ -38,7 +38,7 @@ cmd_dev() {
   local url="http://localhost:$PORT/web/"
   say "Owner view → $url   (Ctrl+C to stop)"
   ( sleep 1; command -v open >/dev/null && open "$url" || { command -v xdg-open >/dev/null && xdg-open "$url"; } ) >/dev/null 2>&1 &
-  python3 -m http.server "$PORT" --bind 127.0.0.1 --directory review
+  python3 review/scripts/dev_server.py --port "$PORT"
 }
 
 cmd_setup() {

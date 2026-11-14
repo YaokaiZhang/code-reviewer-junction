@@ -12,6 +12,10 @@ in review/explain/<branch>.decisions.json, written by the agent:
   unsure     what the agent could not settle (optional)
   ask        the question for the owner (optional)
 
+Kinds: claim (id = a dossier claim), found, drift, and flag (id = a readability flag in
+evidence/<branch>/readability.json; its reasons must name that file). Every claim and every
+readability flag needs a card.
+
 The agent can be wrong, so this script never takes its word:
 
   step check   the cited lines exist, and every `backticked` token appears in them (whitespace ignored).
@@ -84,6 +88,9 @@ def main():
     spec = json.load(open(os.path.join(REVIEW, spec_rel)))
     dossier = json.load(open(os.path.join(REVIEW, "dossier", f"{a.branch}.json")))
     claims = {c["id"]: c for c in dossier["claims"]}
+    rd_rel = f"evidence/{a.branch}/readability.json"
+    rd_path = os.path.join(REVIEW, rd_rel)
+    flags = {f["id"]: f for f in json.load(open(rd_path))["details"].get("flags", [])} if os.path.exists(rd_path) else {}
     revs = {"new": f"origin/{a.branch}", "old": BASE}
     head = git(a.repo, "rev-parse", "--short=8", revs["new"]).strip()
     src, hunk_cache = {}, {}
@@ -113,6 +120,11 @@ def main():
         claim = claims.get(c.get("ref", cid)) if kind == "claim" else None
         if kind == "claim" and not claim:
             probs.append("no such claim in the dossier")
+        if kind == "flag":
+            if cid not in flags:
+                probs.append(f"no such flag in {rd_rel}")
+            if not any(b.get("evidence") == rd_rel for b in c.get("because", [])):
+                probs.append(f"a flag's reasons must name {rd_rel}")
         parts = [parse_part(p) for p in (claim or {}).get("diff_parts", [])]
 
         # steps
@@ -206,6 +218,8 @@ def main():
 
     missing = [i for i in claims if i not in seen]
     problems_all += [f"{i}: no card" for i in missing]
+    missing_flags = [i for i in flags if i not in seen]
+    problems_all += [f"{i}: readability flag has no card" for i in missing_flags]
     ok = sum(c["verified"] for c in cards)
     ev = {
         "check": "decision-check",
@@ -216,7 +230,8 @@ def main():
         "result": "pass" if not problems_all and n_bad == 0 else "fail",
         "provides": ["count"],
         "summary": f"{len(cards)} decisions explained in {n_steps} steps; {n_steps - n_bad} of {n_steps} steps match the cited code; "
-                   f"{len(claims) - len(missing)} of {len(claims)} claims have a card",
+                   f"{len(claims) - len(missing)} of {len(claims)} claims have a card"
+                   + (f"; {len(flags) - len(missing_flags)} of {len(flags)} readability flags have a card" if flags else ""),
         "details": {"cards": cards, "problems": problems_all, "spec": spec_rel,
                     "pseudo_code_by": spec.get("produced_by", "agent")},
         "tool_versions": {"git": git(a.repo, "--version").strip(), "python": sys.version.split()[0]},

@@ -893,6 +893,265 @@
           "evidence": "evidence/ju26-issue-2297/transformutilities-removal.json"
         }
       ]
+    },
+    {
+      "id": "RD-2297-01",
+      "kind": "flag",
+      "title": "Three lines pasted into 9 places",
+      "steps": [
+        {
+          "op": "NOW",
+          "text": "the composite resolver template writes the target check and the mark (`#if !NETSTANDARD2_0 && !NETFRAMEWORK`, `ExcludeFromCodeCoverage`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt",
+          "lines": [
+            7,
+            9
+          ],
+          "side": "new"
+        },
+        {
+          "op": "ALSO",
+          "text": "the resolver template repeats the same three lines for each class it writes (`#endif`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt",
+          "lines": [
+            31,
+            33
+          ],
+          "side": "new"
+        },
+        {
+          "op": "ALSO",
+          "text": "so does each formatter template (`ExcludeFromCodeCoverage`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.tt",
+          "lines": [
+            10,
+            12
+          ],
+          "side": "new"
+        },
+        {
+          "op": "GIVEN",
+          "text": "the templates already call a shared helper for other repeated output (`TransformUtilities.EmitNestingTypesAndNamespaces`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt",
+          "lines": [
+            5,
+            5
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "The same three lines sit in 9 places across 6 templates. Changing the target check (see C-2297-08) means 9 matching edits; a shared helper would make it one.",
+      "because": [
+        {
+          "text": "The tool found this added three-line block 9 times across the templates.",
+          "evidence": "evidence/ju26-issue-2297/readability.json"
+        }
+      ],
+      "unsure": "Whether a helper is worth it for three lines is a style call for the owner."
+    },
+    {
+      "id": "RD-2297-02",
+      "kind": "flag",
+      "title": "Target logic in CompositeResolverTemplate.tt",
+      "steps": [
+        {
+          "op": "NOW",
+          "text": "the template now writes a target check into every generated file (`#if !NETSTANDARD2_0 && !NETFRAMEWORK`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt",
+          "lines": [
+            7,
+            7
+          ],
+          "side": "new"
+        },
+        {
+          "op": "ALSO",
+          "text": "it does so 2 times in this template, once per class (`#endif`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt",
+          "lines": [
+            37,
+            37
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "The template now makes a decision about targets, and passes it into users' generated code. Rule H-07 asks to keep logic out of templates. The logic is small, but its reason is disputed (see C-2297-08).",
+      "because": [
+        {
+          "text": "The tool counts the #if and #endif lines this template writes: 0 before, 4 after.",
+          "evidence": "evidence/ju26-issue-2297/readability.json"
+        }
+      ]
+    },
+    {
+      "id": "RD-2297-03",
+      "kind": "flag",
+      "title": "Target logic in EnumTemplate.tt",
+      "steps": [
+        {
+          "op": "NOW",
+          "text": "the template now writes a target check into every generated file (`#if !NETSTANDARD2_0 && !NETFRAMEWORK`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/EnumTemplate.tt",
+          "lines": [
+            8,
+            8
+          ],
+          "side": "new"
+        },
+        {
+          "op": "SO",
+          "text": "on older targets the mark between the lines is left out (`#endif`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/EnumTemplate.tt",
+          "lines": [
+            10,
+            10
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "The template now makes a decision about targets, and passes it into users' generated code. Rule H-07 asks to keep logic out of templates. The logic is small, but its reason is disputed (see C-2297-08).",
+      "because": [
+        {
+          "text": "The tool counts the #if and #endif lines this template writes: 0 before, 2 after.",
+          "evidence": "evidence/ju26-issue-2297/readability.json"
+        }
+      ]
+    },
+    {
+      "id": "RD-2297-04",
+      "kind": "flag",
+      "title": "Target logic in FormatterTemplate.tt",
+      "steps": [
+        {
+          "op": "NOW",
+          "text": "the template now writes a target check into every generated file (`#if !NETSTANDARD2_0 && !NETFRAMEWORK`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.tt",
+          "lines": [
+            14,
+            14
+          ],
+          "side": "new"
+        },
+        {
+          "op": "SO",
+          "text": "on older targets the mark between the lines is left out (`#endif`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.tt",
+          "lines": [
+            16,
+            16
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "The template now makes a decision about targets, and passes it into users' generated code. Rule H-07 asks to keep logic out of templates. The logic is small, but its reason is disputed (see C-2297-08).",
+      "because": [
+        {
+          "text": "The tool counts the #if and #endif lines this template writes: 0 before, 2 after.",
+          "evidence": "evidence/ju26-issue-2297/readability.json"
+        }
+      ]
+    },
+    {
+      "id": "RD-2297-05",
+      "kind": "flag",
+      "title": "Target logic in ResolverTemplate.tt",
+      "steps": [
+        {
+          "op": "NOW",
+          "text": "the template now writes a target check into every generated file (`#if !NETSTANDARD2_0 && !NETFRAMEWORK`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt",
+          "lines": [
+            14,
+            14
+          ],
+          "side": "new"
+        },
+        {
+          "op": "ALSO",
+          "text": "it does so 3 times in this template, once per class (`#endif`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt",
+          "lines": [
+            50,
+            50
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "The template now makes a decision about targets, and passes it into users' generated code. Rule H-07 asks to keep logic out of templates. The logic is small, but its reason is disputed (see C-2297-08).",
+      "because": [
+        {
+          "text": "The tool counts the #if and #endif lines this template writes: 0 before, 6 after.",
+          "evidence": "evidence/ju26-issue-2297/readability.json"
+        }
+      ]
+    },
+    {
+      "id": "RD-2297-06",
+      "kind": "flag",
+      "title": "Target logic in StringKeyFormatterTemplate.tt",
+      "steps": [
+        {
+          "op": "NOW",
+          "text": "the template now writes a target check into every generated file (`#if !NETSTANDARD2_0 && !NETFRAMEWORK`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/StringKey/StringKeyFormatterTemplate.tt",
+          "lines": [
+            18,
+            18
+          ],
+          "side": "new"
+        },
+        {
+          "op": "SO",
+          "text": "on older targets the mark between the lines is left out (`#endif`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/StringKey/StringKeyFormatterTemplate.tt",
+          "lines": [
+            20,
+            20
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "The template now makes a decision about targets, and passes it into users' generated code. Rule H-07 asks to keep logic out of templates. The logic is small, but its reason is disputed (see C-2297-08).",
+      "because": [
+        {
+          "text": "The tool counts the #if and #endif lines this template writes: 0 before, 2 after.",
+          "evidence": "evidence/ju26-issue-2297/readability.json"
+        }
+      ]
+    },
+    {
+      "id": "RD-2297-07",
+      "kind": "flag",
+      "title": "Target logic in UnionTemplate.tt",
+      "steps": [
+        {
+          "op": "NOW",
+          "text": "the template now writes a target check into every generated file (`#if !NETSTANDARD2_0 && !NETFRAMEWORK`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.tt",
+          "lines": [
+            10,
+            10
+          ],
+          "side": "new"
+        },
+        {
+          "op": "SO",
+          "text": "on older targets the mark between the lines is left out (`#endif`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.tt",
+          "lines": [
+            12,
+            12
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "The template now makes a decision about targets, and passes it into users' generated code. Rule H-07 asks to keep logic out of templates. The logic is small, but its reason is disputed (see C-2297-08).",
+      "because": [
+        {
+          "text": "The tool counts the #if and #endif lines this template writes: 0 before, 2 after.",
+          "evidence": "evidence/ju26-issue-2297/readability.json"
+        }
+      ]
     }
   ]
 }
