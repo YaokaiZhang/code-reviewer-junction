@@ -479,3 +479,22 @@
   .p-how-t dt { margin-top: 6px; }
   .p-how-t dd { line-height: 1.4; }
 }
+
+.p-keys { list-style: none; display: grid; gap: 14px; }
+.p-keys li { padding: 14px 16px; border-radius: 12px; box-shadow: inset 0 0 0 1px rgba(255,231,160,.18); font-family: var(--sans); font-size: 14px; line-height: 1.4; color: #d9c08a; }
+.p-keys li.on { box-shadow: inset 0 0 0 2px var(--ph); background: rgba(255,200,80,.06); }
+.p-keys h4 { margin: 0 0 6px; font-family: var(--vt); font-size: 1.3rem; font-weight: 400; letter-spacing: .06em; text-transform: uppercase; color: #fff3d6; }
+.p-keys li.on h4 { color: var(--ph); }
+.p-keys p { margin: 2px 0; }
+.p-keys p span { display: inline-block; min-width: 92px; color: #b39a6a; }
+.p-keys p.ex { margin-top: 6px; color: #fff3d6; }
+.p-keys li { padding: 18px 20px; font-size: 1.15rem; color: #f6e7c4; }
+.p-keys p.ex { font-size: 14px; color: #d9c08a; }
+
+.p-vs { width: 100%; border-collapse: collapse; font-family: var(--sans); font-size: 1.05rem; line-height: 1.35; color: #d9c08a; }
+.p-vs th, .p-vs td { padding: 14px 12px; text-align: left; vertical-align: top; border-top: 1px solid rgba(255,231,160,.15); }
+.p-vs thead th { border-top: 0; font-family: var(--vt); font-size: 1.3rem; font-weight: 400; letter-spacing: .06em; text-transform: uppercase; color: #fff3d6; }
+.p-vs tbody th { font-weight: 400; font-size: 14px; color: #b39a6a; white-space: nowrap; }
+.p-vs .on { color: #fff3d6; background: rgba(255,200,80,.07); }
+.p-vs thead .on { color: var(--ph); }
+@media (max-width: 600px) { .p-vs { font-size: .95rem; } .p-vs th, .p-vs td { padding: 10px 6px; } }

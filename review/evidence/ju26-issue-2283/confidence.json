@@ -154,6 +154,7 @@
           "contract": "diagnostics",
           "change": "MsgPack003 about the consumer's own unattributed type is no longer reported (base reported it)",
           "shown_by": "evidence/ju26-issue-2283/dropped-warning.json",
+          "source": "experiment",
           "hunks": [
             "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:239-239",
             "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1429-1451"
@@ -193,6 +194,7 @@
           "contract": "diagnostics",
           "change": "MsgPack003 about the consumer's own unattributed type is no longer reported (base reported it)",
           "shown_by": "evidence/ju26-issue-2283/dropped-warning.json",
+          "source": "experiment",
           "hunks": [
             "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:239-239",
             "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1429-1451"

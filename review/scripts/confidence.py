@@ -25,11 +25,21 @@ The formula (also printed into the output, so the page can show it):
   contra    evidence contradicts the claim: score is at most 25
   bands     high >= 80, medium 50-79, low < 50
 
-The gate is separate from the score. A claim NEEDS OWNER when a check shows a user-visible promise
-changed (evidence `contract_changes`), the change's diff parts overlap the claim's, and tripwires.json
-shows those hunks touch that contract; or when the claim depends on a claim that needs an owner.
-A claim whose lines only partly overlap such a change gets `shares_lines_with`, not the gate.
-A high score never clears the gate: being sure a promise changed does not make the change acceptable.
+The gate is separate from the score. It reads old vs new (isolation.json: the old and the new code run
+on the same inputs that existed before the change, with line coverage) and works line by line:
+  ran, same output       no gate: evidence that nothing broke on those inputs
+  ran, output differs    NEEDS OWNER when the difference changes a promise users rely on. The kind of
+                         difference picks the promise: a project warning (MsgPackNNN) appears or goes away
+                         -> diagnostics; a generated file that existed before now differs -> generated; a new
+                         compiler error -> generated. A crash that goes away is a fix, not a promise change.
+                         The gate goes to the claim the matching rule names; a difference no rule explains
+                         goes to every claim whose lines that input ran.
+  never ran              NEEDS OWNER when the line is in a hunk that tripwires.json ties to a promise:
+                         "no input that existed before the change runs this line".
+A planned difference still gates: a rule that explains a difference names a claim, it does not clear it.
+An experiment that records `contract_changes` gates too (its claim's lines must lie inside the change and
+tripwires must agree); a claim whose lines only partly overlap gets `shares_lines_with`. A claim that
+depends on a claim that needs an owner needs one too. A high score never clears the gate.
 
 Checks it enforces (exit 1 on failure): every `support` file is listed in `evidence`, exists, and
 `provides` the kind the claim uses it as.
@@ -104,6 +114,92 @@ def overlaps(parts_a, parts_b):
     return False
 
 
+# What kind of difference changes a promise. Keyed by the match type of the expected rule that explains it.
+
+
+def promise_of(match):
+    """The contract a difference changes, or None when it is a fix (a crash that goes away)."""
+    t, mid = match.get("type", ""), match.get("id", "")
+    if t in ("diagnostic_removed", "diagnostic_added") and mid.startswith("MsgPack"):
+        return "diagnostics"
+    if t in ("generated_rewrite", "generated_file_changed", "generated_file_removed"):
+        return "generated"
+    if t == "generated_file_added" and not match.get("requires_base"):
+        return "generated"
+    if t == "diagnostic_added" and mid.startswith("CS"):
+        return "generated"
+    return None
+
+
+def old_vs_new_gates(branch, claims, trips, errors):
+    """Per claim, the reasons old vs new sends it to an owner: [(contract, why, hunks)]."""
+    ip = os.path.join(REVIEW, f"evidence/{branch}/isolation.json")
+    if not os.path.exists(ip):
+        return {}, None
+    iso = json.load(open(ip))["details"]
+    rules = json.load(open(os.path.join(HERE, "isolation", "expected", f"{branch}.json")))["rules"]
+    match_of = {(r["claim"], r["what"]): r["match"] for r in rules}
+    own = {c["id"]: [p for p in c.get("diff_parts", []) if not p.startswith("tests/")] for c in claims}
+    trip_hunks = [(k, t["hunk"]) for k, v in trips.items() for t in v]
+    reasons = {}
+
+    def hunks_for(cid, contract):
+        return [h for k, h in trip_hunks if k == contract and own[cid] and overlaps(own[cid], [h])]
+
+    # ran, output differs: explained differences on the real projects and on the old tests' inputs
+    for group, entries in (("real projects", iso.get("explained", [])),
+                           ("old tests", iso.get("control", {}).get("explained", []))):
+        best = {}
+        for e in entries:
+            # the claim comes from the rule that explains this difference (an input can match several rules)
+            r = next((r for r in rules if r["what"] == e["what"]), None)
+            if r is None:
+                errors.append(f"isolation: no expected rule for '{e['what'][:60]}'"); continue
+            n = e.get("units") or (e["inputs"] if isinstance(e.get("inputs"), int) else len(e.get("inputs", [])))
+            key = (r["claim"], r["what"])
+            best[key] = max(best.get(key, 0), n)
+        for (cid, what), n in best.items():
+            contract = promise_of(match_of[(cid, what)])
+            if not contract:
+                continue
+            if cid not in own:
+                errors.append(f"isolation: rule names {cid}, which is not a claim"); continue
+            reasons.setdefault(cid, []).append((contract,
+                f"old vs new: {n} {'output' if n == 1 else 'outputs'} from the {group} came out different ({what})",
+                hunks_for(cid, contract)))
+    # ran, output differs, and no rule explains it: every claim whose lines that input ran
+    for u in iso.get("unexplained", []) + iso.get("control", {}).get("unexplained", []):
+        hit = next((pi for pi in iso["coverage"].get("per_input", []) if pi["input"] == u.get("input")), None)
+        lines = (hit or {}).get("hit_branch_lines", [])
+        for cid, parts in own.items():
+            if parts and (not lines or overlaps(lines, parts)):
+                for contract in sorted({k for k, h in trip_hunks if overlaps(parts, [h])}) or ["unknown"]:
+                    reasons.setdefault(cid, []).append((contract,
+                        f"old vs new: an output changed that no planned change explains ({u.get('input', 'an input')})",
+                        hunks_for(cid, contract)))
+    # never ran: a changed line no old input runs, in a hunk tied to a promise
+    unrun = {}
+    for u in iso["coverage"].get("unreached", []):
+        if u.get("reached_by_control_group"):
+            continue
+        line = f"{u['file']}:{u['line']}"
+        for k, h in trip_hunks:
+            hit = overlaps([line], [h]) if u["side"] == "branch" else h.split(":")[0] == u["file"]
+            if not hit:
+                continue
+            for cid, parts in own.items():
+                inside = overlaps([line], parts) if u["side"] == "branch" else any(p.split(":")[0] == u["file"] for p in parts)
+                if inside:
+                    g = unrun.setdefault((cid, k), {"lines": [], "hunks": []})
+                    g["lines"].append(f"{os.path.basename(u['file'])}:{u['line']}")
+                    g["hunks"].append(h)
+    for (cid, k), g in unrun.items():
+        reasons.setdefault(cid, []).append((k,
+            f"old vs new: no input that existed before the change runs {' or '.join(dict.fromkeys(g['lines']))}",
+            list(dict.fromkeys(g["hunks"]))))
+    return reasons, iso
+
+
 def score_branch(branch, project, history, errors):
     dossier = load(f"dossier/{branch}.json")
     trips = load(f"evidence/{branch}/tripwires.json")["details"]["trips"]
@@ -118,6 +214,20 @@ def score_branch(branch, project, history, errors):
             full = os.path.join(REVIEW, path)
             ev_cache[path] = json.load(open(full)) if os.path.exists(full) else None
         return ev_cache[path]
+
+    ovn, _ = old_vs_new_gates(branch, dossier["claims"], trips, errors)
+
+    def make_gate(contract, change, shown_by, hunks, source):
+        m = maint.get(contract, {})
+        return {
+            "contract": contract, "change": change, "shown_by": shown_by, "source": source,
+            "hunks": hunks,
+            "owner": (m.get("top") or [{}])[0].get("name"),
+            "owner_basis": f"most commits on the {contract} paths at base ({m.get('commits')} commits)",
+            "rules": [{"id": r["id"], "rule": r["rule"], "sources": r["sources"][:2]}
+                      for r in rules if r.get("concern") == contract
+                      or (contract == "generated" and r.get("concern") in ("public-api", "compat-breaking"))][:3],
+        }
 
     out = {}
     for c in dossier["claims"]:
@@ -161,7 +271,7 @@ def score_branch(branch, project, history, errors):
         out[cid] = {"score": score, "band": band(score), "how": how, "signals": signals,
                     "contradicted_by": contra, "gate": None, "depends_on": c.get("depends_on", [])}
 
-        # gate: a check shows a promise changed, on these diff parts, and tripwires agree the hunks touch it
+        # gate, first input: an experiment recorded that a promise changed on these lines
         for s in support + [{"file": f} for f in c.get("contradicted_by", [])]:
             for ch in (ev(s["file"]) or {}).get("contract_changes", []):
                 own = [p for p in c.get("diff_parts", []) if not p.startswith("tests/")]
@@ -175,19 +285,19 @@ def score_branch(branch, project, history, errors):
                 if not hunks:
                     errors.append(f"{cid}: {s['file']} reports a {ch['contract']} change, but no tripwire hunk matches")
                     continue
-                m = maint.get(ch["contract"], {})
-                out[cid]["gate"] = {
-                    "contract": ch["contract"], "change": ch["what"], "shown_by": s["file"],
-                    "hunks": hunks,
-                    "owner": (m.get("top") or [{}])[0].get("name"),
-                    "owner_basis": f"most commits on the {ch['contract']} paths at base ({m.get('commits')} commits)",
-                    "rules": [{"id": r["id"], "rule": r["rule"], "sources": r["sources"][:2]}
-                              for r in rules if r.get("concern") == ch["contract"]
-                              or (ch["contract"] == "generated" and r.get("concern") in ("public-api", "compat-breaking"))][:3],
-                }
+                out[cid]["gate"] = make_gate(ch["contract"], ch["what"], s["file"], hunks, "experiment")
                 break
             if out[cid]["gate"]:
                 break
+        # gate, second input: old vs new and its coverage
+        reasons = ovn.get(cid, [])
+        if reasons:
+            if not out[cid]["gate"]:
+                contract, why, hunks = reasons[0]
+                out[cid]["gate"] = make_gate(contract, why, f"evidence/{branch}/isolation.json", hunks, "old-vs-new")
+            seen = set()
+            out[cid]["gate"]["also"] = [r[1] for r in reasons if r[1] != out[cid]["gate"]["change"]
+                                        and not (r[1] in seen or seen.add(r[1]))]
 
     for cid, o in out.items():  # inherited gates
         for d in o["depends_on"]:

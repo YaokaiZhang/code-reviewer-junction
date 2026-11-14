@@ -4,7 +4,7 @@
   "base": "32258fdb",
   "command": "python3 review/scripts/confidence.py --branch ju26-issue-2297 --write",
   "result": "pass",
-  "summary": "10 claims: 4 high, 3 medium, 3 low; 1 need an owner (C-2297-07)",
+  "summary": "10 claims: 4 high, 3 medium, 3 low; 3 need an owner (C-2297-01, C-2297-06, C-2297-07)",
   "details": {
     "formula": {
       "kinds": {
@@ -60,7 +60,44 @@
           }
         ],
         "contradicted_by": [],
-        "gate": null,
+        "gate": {
+          "contract": "generated",
+          "change": "old vs new: 139 outputs from the real projects came out different (generated file gains only the [ExcludeFromCodeCoverage] attribute inside its #if !NETSTANDARD2_0 && !NETFRAMEWORK / #endif guard (3 lines per generated type))",
+          "shown_by": "evidence/ju26-issue-2297/isolation.json",
+          "source": "old-vs-new",
+          "hunks": [],
+          "owner": "Andrew Arnott",
+          "owner_basis": "most commits on the generated paths at base (31 commits)",
+          "rules": [
+            {
+              "id": "H-01",
+              "rule": "Do not take breaking changes (behavioral or binary) unless their value clearly outweighs the risk to existing users; justify any you propose.",
+              "sources": [
+                "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1074#pullrequestreview-511006338",
+                "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1074#issuecomment-711061875"
+              ]
+            },
+            {
+              "id": "H-02",
+              "rule": "Public API shape is frozen within a major version: e.g. changing a public field to a property is binary breaking and not allowed.",
+              "sources": [
+                "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/889#discussion_r410767424",
+                "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/645#issuecomment-555589493"
+              ]
+            },
+            {
+              "id": "H-04",
+              "rule": "Deserialization must not overwrite values the type itself set (constructor or initializer) when a member is missing from the data, and should fail loudly rather than quietly return null.",
+              "sources": [
+                "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1369#issuecomment-1002726721",
+                "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1137#pullrequestreview-537353863"
+              ]
+            }
+          ],
+          "also": [
+            "old vs new: 177 outputs from the old tests came out different (generated file gains only the [ExcludeFromCodeCoverage] attribute inside its #if !NETSTANDARD2_0 && !NETFRAMEWORK / #endif guard (3 lines per generated type))"
+          ]
+        },
         "depends_on": []
       },
       "C-2297-02": {
@@ -240,7 +277,44 @@
           }
         ],
         "contradicted_by": [],
-        "gate": null,
+        "gate": {
+          "contract": "generated",
+          "change": "old vs new: 1 output from the old tests came out different (TransformUtilities side effect: after the constraints of a generic nesting type, the opening brace is followed by a line break (base wrote '{' with no line break))",
+          "shown_by": "evidence/ju26-issue-2297/isolation.json",
+          "source": "old-vs-new",
+          "hunks": [
+            "src/MessagePack.SourceGenerator/Transforms/TransformUtilities.cs:58-58"
+          ],
+          "owner": "Andrew Arnott",
+          "owner_basis": "most commits on the generated paths at base (31 commits)",
+          "rules": [
+            {
+              "id": "H-01",
+              "rule": "Do not take breaking changes (behavioral or binary) unless their value clearly outweighs the risk to existing users; justify any you propose.",
+              "sources": [
+                "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1074#pullrequestreview-511006338",
+                "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1074#issuecomment-711061875"
+              ]
+            },
+            {
+              "id": "H-02",
+              "rule": "Public API shape is frozen within a major version: e.g. changing a public field to a property is binary breaking and not allowed.",
+              "sources": [
+                "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/889#discussion_r410767424",
+                "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/645#issuecomment-555589493"
+              ]
+            },
+            {
+              "id": "H-04",
+              "rule": "Deserialization must not overwrite values the type itself set (constructor or initializer) when a member is missing from the data, and should fail loudly rather than quietly return null.",
+              "sources": [
+                "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1369#issuecomment-1002726721",
+                "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1137#pullrequestreview-537353863"
+              ]
+            }
+          ],
+          "also": []
+        },
         "depends_on": []
       },
       "C-2297-07": {
@@ -272,6 +346,7 @@
           "contract": "generated",
           "change": "a user whose partial resolver already has [ExcludeFromCodeCoverage] gets compile error CS0579 (base compiles)",
           "shown_by": "evidence/ju26-issue-2297/duplicate-attribute-probe.json",
+          "source": "experiment",
           "hunks": [
             "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.cs:27-27",
             "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt:7-9",

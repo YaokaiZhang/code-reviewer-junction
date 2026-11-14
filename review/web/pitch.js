@@ -241,7 +241,7 @@
     return null;
   }
 
-  /* each check, one per row: what it does, why we use it, why it counts, what it cannot tell */
+  /* each check, one per row: what it does, why it counts, what it cannot tell */
   function secMachine(s) {
     var rows = [];
 
@@ -250,23 +250,21 @@
     var ovs = iso.map(function (d) { return ovn(d) ? +ovn(d).score : null; }).filter(function (v) { return v != null; });
     var ovLo = Math.min.apply(null, ovs), ovHi = Math.max.apply(null, ovs);
     if (iso.length && ovs.length) rows.push({ c: band(ovHi), g: 'Old vs new', v: ovLo === ovHi ? ovLo : ovLo + '–' + ovHi, h: 'Old code still works.',
-      p: 'Run the old and the new version on the same real projects. Same output means nothing broke.',
-      use: 'Most fixes come with no test for the bug. The old version is always there, so we can check any fix against it.',
-      why: 'It needs no tests: the old version is the answer key. But its score follows how many changed lines ran, from 30 to 75.',
-      lim: 'It only speaks for changed lines that ran. Lines that never ran go to the reviewer.',
+      p: 'Run old and new code on the same projects. Same output, nothing broke.',
+      why: 'No tests needed. The old code is the answer key.',
+      lim: 'Lines that never ran. The score drops with them.',
       fig: '<div class="p-fig p-ran">' + iso.map(function (d) {
         var c = d._isolation.coverage, ran = +c.reached || 0, tot = +c.trackable, pc = Math.round(100 * ran / tot);
         var o = ovn(d);
         return '<div class="p-mbar' + (pc < 50 ? ' low' : '') + '"><span>#' + esc(issueOf(d)) + '</span><i data-w="' + pc + '"></i><b>' + ran + '/' + tot + '</b>' +
           (o ? '<em class="c-' + esc(o.band) + '">score ' + (+o.score) + '</em>' : '') + '</div>';
-      }).join('') + '<p class="p-out">changed lines that ran, and the score that gives, per fix</p></div>' });
+      }).join('') + '<p class="p-out">changed lines the real projects ran, and the score that gives</p></div>' });
 
     var nSnap = s.snap || 0;
     if (findEv(s, 'regeneration') && nSnap) rows.push({ c: 'high', g: 'Rebuilt and compared', v: 90, h: 'Rebuild the generated code.',
-      p: 'Some files in a change come from a code generator, not a person. Run the generator again. Its output must match those files exactly.',
-      use: 'Generated files can make a change look huge. This takes them off the reviewer’s desk, so only hand-written code is left.',
-      why: 'Generated files are too long to read. If the generator makes the same files again, nobody edited them by hand.',
-      lim: 'It shows the files match the generator, not that the generator is right.',
+      p: 'Run the code generator again. Its output must match the files exactly.',
+      why: 'Nobody edited them by hand, so nobody has to read them.',
+      lim: 'If the generator itself is right.',
       fig: '<div class="p-fig p-fig-proved">' +
         '<figure>' + squares(nSnap) + '<figcaption>' + fmt(nSnap) + ' files in the change</figcaption></figure>' +
         '<b class="p-eq">=</b>' +
@@ -276,10 +274,9 @@
     if (pd && mv && mv.branch) {
       var vl = ((pd.dafny_verify || {}).result_line || [''])[0], nv = (String(vl).match(/(\d+) verified/) || [])[1];
       rows.push({ c: 'high', g: 'Formal verification', v: 80, h: 'Prove it for every case.',
-        p: 'Formal verification: write what the code must do as a small model. A prover (Dafny) checks it for every possible input.',
-        use: 'For small, tricky code, like a parser, where one missed input breaks things.',
-        why: 'A test checks a few inputs. A proof covers all of them, so it finds the one case nobody tried.',
-        lim: 'The model is a copy of the code, not the code. So we also run the model and the real code on the same inputs.',
+        p: 'Model the code. A prover checks it for every possible input.',
+        why: 'Tests try a few inputs. A proof tries all of them.',
+        lim: 'If the model matches the real code. So we compare them too.',
         fig: '<div class="p-fig p-proof">' +
           (nv ? '<div><b>' + nv + '</b><span>proof steps checked by the prover, 0 errors</span></div>' : '') +
           '<div class="bad"><b>1</b><span>input still crashes: a field with an empty key comes first. It goes to the reviewer as an open problem.</span></div>' +
@@ -293,10 +290,9 @@
       var cells = '';
       for (var i = 0; i < nT; i++) cells += '<span class="x">✗</span><span class="ok">✓</span>';
       rows.push({ c: 'medium', g: 'Test first (TDD)', v: 75, h: 'Check the test, not the code.',
-        p: 'Each new test fails on the old code and passes on the new code. So the test is what proves the fix.',
-        use: 'When a fix comes with new tests, they are the fastest way into it.',
-        why: 'The reviewer only has to confirm the test asks the right question. Each test comes with a trace in plain steps, so that takes minutes, not a full read.',
-        lim: 'It only covers the cases the test asks about.',
+        p: 'Each new test fails on the old code and passes on the new.',
+        why: 'Check the test asks the right question, not every line.',
+        lim: 'Cases the test does not ask about.',
         fig: '<div class="p-fig"><div class="p-tgrid">' +
           '<span class="hd">old code</span><span class="hd">new code</span>' + cells + '</div><p class="p-out">fix #2283, ' + nT + ' new tests</p></div>' });
     }
@@ -305,10 +301,9 @@
     if (cd && cd.base && cd.branch) {
       var b0 = +cd.base.clones.duplicated_blocks, b1 = +cd.branch.clones.duplicated_blocks, mx = Math.max(b0, b1) || 1;
       rows.push({ c: 'low', g: 'A number from a tool', v: 40, h: 'Count it.',
-        p: 'A tool measures something, for example how much code is copy-pasted, before and after.',
-        use: 'Some costs never show up as a failure, like copied code. A tool is the cheapest way to see them.',
-        why: 'It points the reviewer to a cost that is easy to miss in a long change.',
-        lim: 'A number alone cannot say if the fix is right. So it scores low.',
+        p: 'A tool measures something, like copy-pasted code, before and after.',
+        why: 'It shows costs that never fail a test.',
+        lim: 'If the fix is right. So it scores low.',
         fig: '<div class="p-fig">' +
           '<div class="p-mbar"><span>before</span><i data-w="' + (100 * b0 / mx).toFixed(1) + '"></i><b>' + b0 + '</b></div>' +
           '<div class="p-mbar"><span>after</span><i data-w="' + (100 * b1 / mx).toFixed(1) + '"></i><b>' + b1 + '</b></div>' +
@@ -318,7 +313,7 @@
     return '<section class="p-machine" data-progress="machine" style="--n:' + rows.length + '">' +
       '<div class="p-sticky p-machine-in">' +
         '<header class="p-mhead">' +
-          '<h2 class="p-h2">' + words('Each check,') + ' ' + words('why we use it, why it counts.', 'hot', 140) + '</h2>' +
+          '<h2 class="p-h2">' + words('Each check,') + ' ' + words('and why it counts.', 'hot', 140) + '</h2>' +
           '<ol class="p-mtabs">' + rows.map(function (r, i) {
             return '<li class="c-' + r.c + '" data-i="' + i + '"><i></i>' + esc(r.g) + '</li>';
           }).join('') + '</ol>' +
@@ -329,7 +324,7 @@
               '<span class="g c-' + r.c + '">score <b>' + esc(String(r.v)) + '</b></span>' +
               '<h3>' + esc(r.h) + '</h3>' +
               '<p>' + esc(r.p) + '</p>' +
-              '<dl><dt>Why we use it</dt><dd>' + esc(r.use) + '</dd><dt>Why it counts</dt><dd>' + esc(r.why) + '</dd><dt>What it can’t tell</dt><dd>' + esc(r.lim) + '</dd></dl>' +
+              '<dl><dt>Counts because</dt><dd>' + esc(r.why) + '</dd><dt>Can’t tell</dt><dd>' + esc(r.lim) + '</dd></dl>' +
             '</div>' +
             '<div class="p-how-f">' + r.fig + '</div>' +
           '</article>';
@@ -346,7 +341,7 @@
     var chain = [
       ['AI', 'The AI writes the trace and the question. It can be wrong.'],
       ['Tools', 'Real tools test the old and the new code. A script checks every AI step against the lines it cites.'],
-      ['Rule', 'The project has a fixed list of things users rely on: its warnings, public API, generated code, data format and docs. When a check shows one of them changed, a fixed rule, not the AI, sends it to a person.'],
+      ['Rule', 'The old and the new code run on the same inputs from before the change. If something users rely on comes out different, or no input runs a changed line, a fixed rule sends the claim to a person. Not the AI.'],
       ['You', 'The owner of that part answers the question. You, the reviewer, sign the change.']
     ];
     var slip = '<div class="p-slip"><div class="p-slip-in">' +
@@ -473,47 +468,31 @@
       '</div></section>';
   }
 
-  /* ---------- same code in: old vs new output, and which changed lines ran ---------- */
+  /* ---------- same code in: old vs new, and how it differs from tests ---------- */
   function secSame(s) {
     var rows = s.ds.filter(function (d) { return d._isolation && d._isolation.totals && d._isolation.totals.compared; });
     if (!rows.length) return '';
-    var iso0 = rows[0]._isolation, files = +iso0.totals.compared, nproj = (iso0.projects || []).length;
-    var unexpl = 0;
-    var list = rows.map(function (d) {
-      var x = d._isolation, t = x.totals, c = x.coverage || {};
-      unexpl += +t.unexplained || 0;
-      var sq = '';
-      for (var i = 0; i < +t.compared; i++) sq += '<i class="' + (i < +t.same ? 's' : i < +t.same + (+t.explained || 0) ? 'e' : 'u') + '"></i>';
-      var ran = +c.reached || 0, tot = +c.trackable || 0, low = tot && ran / tot < 0.5;
-      var out = t.unexplained ? t.unexplained + ' changed with no claim behind it' :
-        t.differ ? t.differ + ' changed, each one stated by a claim' : 'all ' + t.same + ' the same';
-      return '<li class="' + (low ? 'low' : '') + '">' +
-        '<div class="hd"><span class="no">#' + esc(issueOf(d)) + '</span><span class="out">' + esc(out) + '</span></div>' +
-        '<div class="p-same-sq" aria-hidden="true">' + sq + '</div>' +
-        (tot ? '<div class="ran"><span class="bar"><i style="width:' + Math.round(100 * ran / tot) + '%"></i></span>' +
-          '<span><b>' + ran + ' of ' + tot + '</b> changed lines ran</span></div>' : '') +
-        (low ? '<p class="warn">Same, but most of the change never ran. That is untested, not safe. The ' + (tot - ran) + ' lines go to the reviewer.</p>' : '') +
-      '</li>';
-    }).join('');
+    var rowsT = [
+      ['Right answer', 'The author writes it', 'The old code’s output'],
+      ['Checks', 'What the author thought of', 'Everything it outputs'],
+      ['Written by', 'Often the AI that made the change', 'No one'],
+      ['Catches', 'Breaks someone predicted', 'Breaks nobody predicted']
+    ];
     return '<section class="p-sec p-same">' +
       '<div class="p-grid2">' +
         '<div>' +
           '<h2 class="p-h2">' + words('Did it break') + '<br>' + words('anything?', 'hot', 140) + '</h2>' +
-          '<p class="p-cap p-same-lede" data-rv>Old projects often have weak tests, and new tests only check what someone thought of. This check needs no tests: the old version is the answer key.</p>' +
           '<p class="p-same-big" data-rv>Same input, same output.</p>' +
           '<ul class="p-rules" data-rv>' +
-            '<li><b>1</b>Give the old and the new version the same input.</li>' +
+            '<li><b>1</b>Run old and new code on the same inputs.</li>' +
             '<li><b>2</b>Same output: nothing broke.</li>' +
-            '<li><b>3</b>Different output: it must match a claim, or a person looks.</li>' +
-            '<li><b>4</b>Record which changed lines actually ran.</li>' +
+            '<li><b>3</b>Different output, or a line never ran: a person decides.</li>' +
           '</ul>' +
-          '<p class="p-cap p-same-rule" data-rv>If a changed line never runs, the output can’t change. So “same” only counts where the change ran.</p>' +
         '</div>' +
         '<div class="p-panel" data-rv>' +
-          '<p class="p-same-here">Here: ' + nproj + ' real projects, ' + files + ' generated files</p>' +
-          '<ul class="p-same-list">' + list + '</ul>' +
-          '<div class="p-bandkey p-same-key"><span><i class="s"></i>Same</span><span><i class="e"></i>Changed, stated by a claim</span><span><i class="u"></i>Changed, no claim</span></div>' +
-          '<p class="p-note">' + (unexpl ? unexpl + ' files changed with no claim behind them.' : 'No file changed without a claim behind it.') + ' Tools decide every result, not the AI.</p>' +
+          '<table class="p-vs"><thead><tr><th></th><th>New tests</th><th class="on">Old vs new</th></tr></thead><tbody>' +
+            rowsT.map(function (r) { return '<tr><th>' + esc(r[0]) + '</th><td>' + esc(r[1]) + '</td><td class="on">' + esc(r[2]) + '</td></tr>'; }).join('') +
+          '</tbody></table>' +
         '</div>' +
       '</div>' +
     '</section>';

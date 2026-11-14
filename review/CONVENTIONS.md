@@ -87,10 +87,16 @@ supporting check, `all` the weakest. Bands: high ≥ 80, medium 50–79, low < 5
 
 The script refuses a claim that uses a file as a kind the file does not `provides`.
 
-**Owner gate (was "Refused")** — separate from the score. A claim NEEDS OWNER when an evidence file's
-`contract_changes` shows a user-visible promise changed, the claim's non-test diff parts lie inside
-that change's diff parts, and `tripwires.json` shows those hunks touch the same contract; or when it
-`depends_on` a claim that needs an owner. A high score never clears the gate. The owner is the top
+**Owner gate (was "Refused")** — separate from the score. It has two inputs.
+1. Old vs new (`isolation.json`): the old and the new code run on the same inputs from before the change,
+   with line coverage. A changed line that ran with the same output clears. A difference that changes a
+   promise gates the claim its expected rule names (a project warning appears or goes away → diagnostics;
+   a generated file that existed before differs, or a new compiler error → generated; a crash that goes
+   away is a fix). A difference no rule explains gates every claim whose lines that input ran. A changed
+   line no input runs, in a hunk `tripwires.json` ties to a contract, gates every claim that covers it.
+2. Experiments: an evidence file's `contract_changes` shows a promise changed, the claim's non-test diff
+   parts lie inside that change's diff parts, and `tripwires.json` shows those hunks touch the contract.
+A claim that `depends_on` a gated claim is gated too. A high score never clears the gate. The owner is the top
 committer on the contract's paths at base (`context/project.json`); the gate cites matching maintainer
 rules from `context/history.json`.
 
