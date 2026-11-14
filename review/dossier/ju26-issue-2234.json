@@ -65,7 +65,7 @@
       "id": "C-2234-03",
       "claim": "The fix is incomplete: when a type's first keyed member is a field with [Key(null)], the analyzer still throws (AD0001, ArgumentNullException), also with SuppressSourceGeneration = true.",
       "tier": "Argued",
-      "why_this_tier": "A probe on the real analyzer reproduces the crash on base and on the branch, so no test fails on base and passes on the branch; the tier rules give a reproduced gap no machine tier.",
+      "why_this_tier": "A probe on the real analyzer reproduces the crash on base and on the branch, so it cannot be Tested; the evidence shows a gap rather than a passing check, so the owner decides.",
       "requirement": "R-2234-2",
       "requirement_inferred": true,
       "evidence": [

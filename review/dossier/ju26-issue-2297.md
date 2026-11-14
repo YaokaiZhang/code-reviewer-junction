@@ -12,7 +12,7 @@
 
 **✕ Refused · C-2297-07** — The generator now puts [ExcludeFromCodeCoverage] on the user-declared partial resolver classes (ResolverTemplate, CompositeResolverTemplate), whose accessibility the user picks and which can be public; a user who already excluded their partial resolver by hand gets compile error CS0579 on the branch.
 
-> Rule 1 matches first: the attribute lands in the consumer's public type metadata and breaks the build for an existing, plausible user pattern (shown on the real generator: probe passes on base, fails on branch), which is a public API and compatibility call, not a machine call.
+> It touches public API, so no machine may settle it: the attribute lands in the consumer's public type metadata and breaks the build for an existing, plausible user pattern (shown on the real generator: probe passes on base, fails on branch), which is a public API and compatibility call, not a machine call.
 
 R-2297-1 *(inferred)* · owner: **MessagePack-CSharp maintainer who owns public API and breaking changes**
 
@@ -164,7 +164,7 @@ R-2297-3 *(inferred)*
 
 #### Refused · 1
 
-- **[ExcludeFromCodeCoverage] added to the user-declared partial resolver classes (C-2297-07)** — It changes the consumer's public type metadata and breaks the build (CS0579) for users who already excluded their resolver by hand; public API and compatibility rule 1, owner decides.
+- **[ExcludeFromCodeCoverage] added to the user-declared partial resolver classes (C-2297-07)** — It changes the consumer's public type metadata and breaks the build (CS0579) for users who already excluded their resolver by hand. That is a public API and compatibility call, so the owner decides.
 
 #### Scope drift · 1
 

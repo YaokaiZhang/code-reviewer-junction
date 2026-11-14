@@ -198,7 +198,7 @@
     var out = '';
     var chain = Array.isArray(c.chain) ? c.chain : [];
     if (chain.length) {
-      out += '<div class="chain">' + chain.map(function (l, i) {
+      out += '<div class="cap-l">Chain of evidence \u00b7 as strong as its weakest link</div><div class="chain">' + chain.map(function (l, i) {
         return '<span class="lk c-' + lc(l.tier) + '">' + (GLYPH[l.tier] || '·') + ' ' + esc(l.tier) + '<span>' + esc(l.link) + '</span></span>';
       }).join('') + '</div>';
     }

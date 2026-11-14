@@ -127,7 +127,7 @@
       "id": "C-2297-07",
       "claim": "The generator now puts [ExcludeFromCodeCoverage] on the user-declared partial resolver classes (ResolverTemplate, CompositeResolverTemplate), whose accessibility the user picks and which can be public; a user who already excluded their partial resolver by hand gets compile error CS0579 on the branch.",
       "tier": "Refused",
-      "why_this_tier": "Rule 1 matches first: the attribute lands in the consumer's public type metadata and breaks the build for an existing, plausible user pattern (shown on the real generator: probe passes on base, fails on branch), which is a public API and compatibility call, not a machine call.",
+      "why_this_tier": "It touches public API, so no machine may settle it: the attribute lands in the consumer's public type metadata and breaks the build for an existing, plausible user pattern (shown on the real generator: probe passes on base, fails on branch), which is a public API and compatibility call, not a machine call.",
       "requirement": "R-2297-1",
       "requirement_inferred": true,
       "evidence": [
@@ -205,7 +205,7 @@
   "refused": [
     {
       "what": "[ExcludeFromCodeCoverage] added to the user-declared partial resolver classes (C-2297-07)",
-      "why": "It changes the consumer's public type metadata and breaks the build (CS0579) for users who already excluded their resolver by hand; public API and compatibility rule 1, owner decides."
+      "why": "It changes the consumer's public type metadata and breaks the build (CS0579) for users who already excluded their resolver by hand. That is a public API and compatibility call, so the owner decides."
     }
   ],
   "scope_drift": [

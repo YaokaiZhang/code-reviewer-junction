@@ -509,7 +509,7 @@ main:focus, main:focus-visible { outline: none; }
 .evn { font-family: var(--sans); font-size: 15px; font-weight: 600; color: var(--ph-hi); border-bottom: 1px dotted var(--ph-dim); white-space: nowrap; }
 .evn::after { content: " \25B8"; color: var(--ph-dim); display: inline-block; transition: transform .15s; }
 .evl[open] .evn::after { transform: rotate(90deg); }
-.evn .hand { font-weight: 500; color: var(--bg); background: var(--ph-dim); padding: 0 5px; font-size: 12.5px; border-radius: 2px; }
+.evn .hand { font-weight: 500; color: var(--bg); background: var(--ph-dim); padding: 0 5px; font-size: 13px; border-radius: 2px; }
 .evs .again { color: var(--ph-dim); font-style: italic; }
 .evb p.evs { margin: 0; }
 .rawout summary { cursor: pointer; font-family: var(--sans); font-size: 13.5px; color: var(--txt); list-style: none; justify-self: start; }
@@ -526,8 +526,8 @@ main:focus, main:focus-visible { outline: none; }
 .evb { margin: 6px 0 8px; padding: 12px 14px; background: var(--well); border-left: 2px solid var(--ph-dim); display: grid; gap: 10px; }
 .cmd code { display: block; font-family: var(--mono); font-size: 13.5px; line-height: 1.5; color: var(--txt-hi); overflow-wrap: anywhere; }
 .cmd code::before { content: "$ "; color: var(--ph-dim); }
-.evjson { font-family: var(--mono); font-size: 12.5px; line-height: 1.5; color: var(--txt); white-space: pre-wrap; overflow-wrap: anywhere; max-height: 360px; overflow: auto; margin: 0; }
-.raw { font-family: var(--mono); font-size: 12.5px; color: var(--ph-dim); text-decoration: none; justify-self: start; }
+.evjson { font-family: var(--mono); font-size: 13px; line-height: 1.5; color: var(--txt); white-space: pre-wrap; overflow-wrap: anywhere; max-height: 360px; overflow: auto; margin: 0; }
+.raw { font-family: var(--mono); font-size: 13px; color: var(--ph-dim); text-decoration: none; justify-self: start; }
 .raw:hover, .raw:focus-visible { color: var(--ph-hi); text-decoration: underline; }
 
 .req { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; }
@@ -549,7 +549,7 @@ main:focus, main:focus-visible { outline: none; }
 .sp .ln { color: var(--ph-hi); }
 .src summary .sp::after { content: " \25B8"; color: var(--ph-dim); display: inline-block; transition: transform .15s; }
 .src[open] summary .sp::after { transform: rotate(90deg); }
-.cnt { font-family: var(--mono); font-size: 12.5px; color: var(--ph-dim); }
+.cnt { font-family: var(--mono); font-size: 13px; color: var(--ph-dim); }
 .gh { margin-left: auto; font-family: var(--mono); font-size: 13px; color: var(--txt); text-decoration: none; border: 1px solid rgba(184,131,0,.6); padding: 0 6px; border-radius: 3px; white-space: nowrap; }
 .gh:hover, .gh:focus-visible { color: var(--bg); background: var(--ph); border-color: var(--ph); outline: none; }
 .hunk { margin: 6px 0 10px; background: var(--well); border: 1px solid rgba(184,131,0,.28); border-radius: 4px; overflow-x: auto; }
@@ -669,7 +669,7 @@ main:focus, main:focus-visible { outline: none; }
   .term { font-size: 20px; }
   .ladder { grid-template-columns: repeat(3, auto) 8px repeat(2, auto); column-gap: 6px; }
   .cap { width: 58px; height: 62px; padding: 6px 7px; }
-  .cap b { font-size: 1.6rem; } .cap i { font-size: .8rem; letter-spacing: 0; }
+  .cap b { font-size: 1.6rem; } .cap i { font-size: .82rem; letter-spacing: 0; }
   .bracket { font-size: 1.05rem; }
   .tiers { grid-template-columns: repeat(6, 1fr); gap: 14px 6px; align-items: start; }
   .tiers .sep { display: none; }
@@ -678,7 +678,7 @@ main:focus, main:focus-visible { outline: none; }
   .tier .n { font-size: 52px; }
   .tier .nm { font-size: 17px; letter-spacing: .5px; }
   .tier .bar { height: 12px; }
-  .tier .gl { font-size: 12.5px; margin-top: 8px; }
+  .tier .gl { font-size: 13px; margin-top: 8px; }
   .lede { margin-bottom: 1.6rem; }
   .defs { font-size: 14.5px; gap: 4px 10px; }
   .own { padding: 14px 12px 16px 18px; }

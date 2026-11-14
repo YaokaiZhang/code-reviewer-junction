@@ -8,17 +8,17 @@
   var GLYPH = { Proved: '■', Tested: '▲', Measured: '●', Argued: '◆', Refused: '✕' };
   /* one-line meaning of each tier (CONVENTIONS.md, "Tier rules") */
   var DEF = {
-    Proved: 'A checker redid the work on the real code and got exactly the same result.',
+    Proved: 'A checker ran on the real code and passed with no gaps, for example by regenerating the output and getting the same text.',
     Tested: 'A test that fails before the change passes after it.',
-    Measured: 'A tool counted something. The number is the evidence; whether it is enough is your call.',
-    Argued: 'Only reasoning backs it. A named owner has to accept it.',
+    Measured: 'A tool produced a number, and the number is the evidence.',
+    Argued: 'No check settles it, so it rests on reasoning. A named owner decides.',
     Refused: 'No machine may settle it: public API, wire format, silenced warnings or security. A person decides.'
   };
   var SHORT = {
-    Proved: 'redone by a checker, same result',
+    Proved: 'a checker passed on the real code',
     Tested: 'a test fails before, passes after',
     Measured: 'a tool counted it',
-    Argued: 'only reasoning backs it',
+    Argued: 'no check settles it',
     Refused: 'off-limits for machines'
   };
   /* plain glosses for analyzer codes that appear in claim text */
@@ -143,7 +143,7 @@
       return plural(dt.counts.evidence, 'new test') + ' of ' + dt.counts.new_or_changed_methods + ' fail on the code before the change and pass after it.';
     }
     if (e.check === 'clone-complexity' && dt.base && dt.branch && dt.base.clones && dt.branch.clones) {
-      return 'Copy-pasted blocks in the changed file: ' + dt.base.clones.duplicated_blocks + ' before, ' + dt.branch.clones.duplicated_blocks + ' after. Whether that matters is the reader’s call.';
+      return 'Copy-pasted blocks in the changed file: ' + dt.base.clones.duplicated_blocks + ' before, ' + dt.branch.clones.duplicated_blocks + ' after.';
     }
     return e.summary || '';
   }
@@ -239,7 +239,7 @@
     var cards = TIERS.map(function (t, i) {
       var it = ex[t];
       return '<article class="p-card" data-i="' + i + '" style="--c:var(--t-' + lc(t) + ')">' +
-        '<header><span class="g">' + GLYPH[t] + ' ' + t + '</span><span class="p-cnt">' + plural(s.tiers[t], 'claim') + '</span></header>' +
+        '<header><span class="g">' + GLYPH[t] + ' ' + t + '</span></header>' +
         '<p class="p-def">' + esc(DEF[t]) + '</p>' +
         (it ? '<div class="p-ex"><span class="p-lbl">Example claim · #' + esc(issueOf(it.d)) + '</span>' +
           '<p>' + rich(it.c.claim) + '</p>' +
@@ -337,8 +337,7 @@
       '<div class="sig"><span>SIGNED</span>' + (rc ? '<em>' + esc(rc.signed_by) + '</em>' : '<span class="p-blank" aria-label="not signed"></span>') + '</div>' +
     '</div></div>' : '';
     var cap = '<p class="p-cap p-slip-cap">' +
-      (rc ? 'A signed receipt' : 'What a receipt holds') + ': the owner’s call on each open claim (accept, send back or reject), the claims machines settled, what nobody checked, and who signed — for that exact commit.' +
-      (s.receipts ? '' : ' None of these branches has been signed yet, so the boxes are empty.') + '</p>';
+      (rc ? 'A signed receipt' : 'A receipt') + ' records the owner’s call on each open claim, what machines settled, what nobody checked and who signed, for one exact commit.</p>';
     return '<section class="p-owner" data-progress="owner">' +
       '<div class="p-sticky p-owner-in">' +
         '<div class="p-owner-l">' +
