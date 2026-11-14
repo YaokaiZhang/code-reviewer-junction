@@ -11,7 +11,7 @@
     ['revert-test', 'Undo just this change: a test fails', 75],
     ['old-vs-new-run', 'Old vs new: same output', 75, '≤75'],
     ['probe', 'Experiment on the real code', 60],
-    ['count', 'Code metrics: before vs after', 40],
+    ['count', 'Easy to read and maintain? Before vs after', 40],
     ['none', 'Nothing backs it', 15]
   ];
   /* what each kind of evidence means, shown on hover: plain words, why it scores that, a real example */
@@ -34,7 +34,7 @@
     'probe': ['Write a tiny throwaway app that hits the case, then run the real compiler or analyzer on the old and new code.',
       'It shows real behaviour, but only for the cases someone thought to try.',
       'On #2234 it showed that one warning is no longer reported.'],
-    'count': ['A script measures the code before and after the fix: how many blocks are copy-pasted, and how complex a function is.',
+    'count': ['Is the code still easy to read and change? A script measures it before and after the fix: copy-pasted blocks, and how many paths (if, case, &&, ...) a function has.',
       'It shows the code got harder to maintain, but a metric cannot say whether the fix is right. So it scores low.',
       'On #2234, copy-pasted blocks in one file went from 10 to 12.'],
     'none': ['The AI says so, and nothing checks it yet.',
@@ -304,9 +304,9 @@
     var cc = findEv(s, 'clone-complexity'), cd = cc && cc.details;
     if (cd && cd.base && cd.branch) {
       var b0 = +cd.base.clones.duplicated_blocks, b1 = +cd.branch.clones.duplicated_blocks, mx = Math.max(b0, b1) || 1;
-      rows.push({ c: 'low', g: 'Code metrics', v: 40, h: 'Measure the code.',
-        p: 'A script counts copy-pasted blocks and how complex a function is, before and after the fix.',
-        use: 'Code can get worse without breaking.',
+      rows.push({ c: 'low', g: 'Readable?', v: 40, h: 'Still easy to read and change?',
+        p: 'A script counts copy-pasted blocks and the paths through each function, before and after the fix.',
+        use: 'Code can get harder to read and maintain without breaking.',
         why: 'It shows costs that never fail a test.',
         lim: 'Whether the fix is right. So it scores low.',
         fig: '<div class="p-fig">' +
