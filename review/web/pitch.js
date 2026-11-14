@@ -520,14 +520,30 @@
     var box = root.querySelector('.p-kexp');
     if (!box) return;
     var idle = box.innerHTML, items = root.querySelectorAll('.p-kinds [data-help]');
-    function show(el) {
+    function html(el) {
       var h = KIND_HELP[el.getAttribute('data-help')];
-      if (!h) return;
-      for (var i = 0; i < items.length; i++) items[i].classList.toggle('on', items[i] === el);
+      if (!h) return '';
       var name = el.querySelector('.k');
-      box.innerHTML = '<b>' + esc(name ? name.textContent : el.textContent) + '</b>' +
+      return '<b>' + esc(name ? name.textContent : el.textContent) + '</b>' +
         '<p>' + esc(h[0]) + '</p><p class="why">' + esc(h[1]) + '</p>' + (h[2] ? '<p class="eg">' + esc(h[2]) + '</p>' : '');
     }
+    function show(el) {
+      var s = html(el);
+      if (!s) return;
+      for (var i = 0; i < items.length; i++) items[i].classList.toggle('on', items[i] === el);
+      box.innerHTML = s;
+    }
+    /* reserve the tallest explanation's height, so the panel never jumps between rows */
+    function fit() {
+      var keep = box.innerHTML, mx = 0;
+      box.style.minHeight = '0';
+      for (var i = 0; i < items.length; i++) { var s = html(items[i]); if (s) { box.innerHTML = s; mx = Math.max(mx, box.offsetHeight); } }
+      box.innerHTML = keep;
+      box.style.minHeight = mx ? mx + 'px' : '';
+    }
+    fit();
+    on(window, 'resize', fit);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
     function hide() {
       for (var i = 0; i < items.length; i++) items[i].classList.remove('on');
       box.innerHTML = idle;

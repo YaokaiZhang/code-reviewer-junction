@@ -247,6 +247,16 @@
   .p-sec, .p-owner-in { padding-left: max(120px, calc(var(--gut) + 2vw)); }
 }
 
+/* short desktop screens: keep the score chapter on one screen */
+@media (min-width: 901px) and (max-height: 820px) {
+  .p-kinds { padding-top: 3vh; padding-bottom: 3vh; }
+  .p-kinds .p-panel { padding: 24px; }
+  .p-kinds .p-kbars { gap: 6px; }
+  .p-adj { margin-top: 14px; padding-top: 12px; }
+  .p-kexp { margin-top: 10px; }
+  .p-kinds .p-bandkey { margin-top: 12px; }
+}
+
 /* ---------- small screens ---------- */
 @media (max-width: 900px) {
   .p-sec { padding: 7vh 16px; min-height: 0; }
