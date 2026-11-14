@@ -67,6 +67,7 @@ cmd_evidence() {
   say "2283 report sites";      python3 review/scripts/report_sites.py --branch ju26-issue-2283 --out review/evidence/ju26-issue-2283/report-sites.json
   for b in 2297 2234 2283; do
     say "$b claim coverage";    python3 review/scripts/claim_coverage.py --branch ju26-issue-$b --write
+    say "$b source excerpts";   python3 review/scripts/source_context.py --branch ju26-issue-$b
   done
   render
 }

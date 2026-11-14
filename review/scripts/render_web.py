@@ -9,6 +9,7 @@ review/web/data.js so review/web/index.html works from file:// and on Pages.
 Standard library only.
 """
 import argparse
+import re
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -28,6 +29,18 @@ def load(path):
         return None
 
 
+def requirements():
+    """R-<issue>-n -> text, from REQUIREMENTS.md."""
+    out = {}
+    path = REVIEW / "REQUIREMENTS.md"
+    if path.is_file():
+        for line in path.read_text(encoding="utf-8").splitlines():
+            m = re.match(r"^- (R-\d+-\d+)(?: \*\(inferred\)\*)?: (.*)$", line)
+            if m:
+                out[m.group(1)] = m.group(2)
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     g = ap.add_mutually_exclusive_group()
@@ -41,6 +54,7 @@ def main():
     use_samples = a.include_sample or (not a.no_sample and not real)
     chosen = real + (samples if use_samples else [])
 
+    reqs = requirements()
     bundle = {}
     real_branches = set()
     for p in chosen:
@@ -65,6 +79,9 @@ def main():
         d["_file"] = f"dossier/{p.name}"
         d["_evidence"] = evidence
         d["_receipt"] = receipt
+        src = load(REVIEW / "source" / f"{branch}.json") if (REVIEW / "source" / f"{branch}.json").is_file() else None
+        d["_source"] = src
+        d["_requirements"] = {c["requirement"]: reqs[c["requirement"]] for c in d.get("claims") or [] if c.get("requirement") in reqs}
         d["sample"] = is_sample
         bundle[key] = d
         print(f"{p.relative_to(REVIEW)}  claims={len(d.get('claims') or [])}  evidence={sum(v is not None for v in evidence.values())}/{len(evidence)}  receipt={'yes' if receipt else 'no'}")

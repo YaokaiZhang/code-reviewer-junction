@@ -120,6 +120,7 @@
         '</div>' +
       '</section>';
     tickClock();
+    if (window.EarnedTrustPitch) window.EarnedTrustPitch.mount(app, DATA);
   }
   function kbdKeys() {
     var s = '';
@@ -137,6 +138,40 @@
   }
 
   /* ---------- dossier ---------- */
+  function shortPath(p) {
+    var m = String(p).match(/^(.*\/)?([^\/:]+)(:.*)?$/);
+    return m ? '<span class="dir">' + esc(m[1] || '') + '</span><b>' + esc(m[2]) + '</b>' + (m[3] ? '<span class="ln">' + esc(m[3]) + '</span>' : '') : esc(p);
+  }
+  function hunkHtml(h) {
+    var ind = h.lines.reduce(function (m, l) {
+      if (!l[3].trim()) return m;
+      var n = l[3].match(/^[ \t]*/)[0].length; return Math.min(m, n);
+    }, 1e9);
+    if (ind === 1e9) ind = 0;
+    return '<div class="hunk"><div class="hh">' + (h.file ? '<span>' + esc(h.file) + '</span>' : '') + '<span class="at">' + esc(h.head.replace(/^(@@[^@]*@@).*$/, '$1')) + '</span></div>' +
+      '<table><tbody>' + h.lines.map(function (l) {
+        var cls = l[0] === '+' ? 'add' : l[0] === '-' ? 'del' : '';
+        return '<tr class="' + cls + '"><td class="no">' + (l[1] == null ? '' : l[1]) + '</td><td class="no">' + (l[2] == null ? '' : l[2]) +
+          '</td><td class="op">' + (l[0] === ' ' ? '' : l[0]) + '</td><td class="tx">' + esc(l[3].slice(ind)) + '</td></tr>';
+      }).join('') + (h.cut ? '<tr class="cut"><td colspan="4">… ' + h.cut + ' more lines</td></tr>' : '') + '</tbody></table></div>';
+  }
+  function sourceBlock(d, parts) {
+    var src = d._source && d._source.parts || {};
+    return '<div class="srcs">' + parts.map(function (p) {
+      var s = src[p];
+      var gh = s ? '<a class="gh" href="' + esc(s.url) + '" target="_blank" rel="noopener">GitHub ↗</a>' : '';
+      if (!s || !s.shown.length) return '<div class="src none"><span class="sp">± ' + shortPath(p) + '</span>' + gh + '</div>';
+      var more = s.hunks > s.shown.length ? '<div class="more">' + (s.hunks - s.shown.length) + ' more hunks in ' + s.files + ' files · ' + gh + '</div>' : '';
+      return '<details class="src"><summary><span class="sp">± ' + shortPath(p) + '</span>' +
+        (s.files > 1 ? '<span class="cnt">' + s.files + ' files</span>' : '') + gh + '</summary>' +
+        s.shown.map(function (h) { return hunkHtml(s.files > 1 ? h : { head: h.head, lines: h.lines, cut: h.cut }); }).join('') + more + '</details>';
+    }).join('') + '</div>';
+  }
+  function evDetails(ev) {
+    var x = {};
+    Object.keys(ev).forEach(function (k) { if (['check', 'branch', 'result', 'summary', 'command', 'produced_by'].indexOf(k) < 0) x[k] = ev[k]; });
+    return esc(JSON.stringify(x, null, 2));
+  }
   function evidenceBlock(d, c) {
     var out = '';
     var chain = Array.isArray(c.chain) ? c.chain : [];
@@ -149,18 +184,22 @@
       var ev = (d._evidence || {})[ref];
       var name = String(ref).split('/').pop().replace(/\.json$/, '');
       var res = ev ? lc(ev.result) || 'missing' : 'missing';
-      out += '<div class="evl"><span class="res ' + esc(res) + '">' + esc(ev ? String(ev.result || '?').toUpperCase() : 'MISSING') + '</span>' +
-        '<a href="../' + esc(ref) + '" target="_blank" rel="noopener">' + esc(name) + '</a>' +
-        '<span class="evs">' + (ev ? esc(ev.summary || '') + (ev.produced_by === 'hand' ? '<span class="hand">[hand]</span>' : '') : '') + '</span>' +
-        (ev && ev.command ? '<span class="cmd">' + esc(ev.command) + '</span>' : '') +
-        '</div>';
+      out += '<details class="evl"><summary>' +
+        '<span class="res ' + esc(res) + '">' + esc(ev ? String(ev.result || '?').toUpperCase() : 'MISSING') + '</span>' +
+        '<span class="evn">' + esc(name) + (ev && ev.produced_by === 'hand' ? ' <span class="hand">hand</span>' : '') + '</span>' +
+        '<span class="evs">' + (ev ? rich(ev.summary || '') : '') + '</span></summary>' +
+        '<div class="evb">' +
+          (ev && ev.command ? '<div class="cmd"><code>' + esc(ev.command) + '</code></div>' : '') +
+          (ev ? '<pre class="evjson">' + evDetails(ev) + '</pre>' : '') +
+          '<a class="raw" href="../' + esc(ref) + '" target="_blank" rel="noopener">' + esc(ref) + ' ↗</a>' +
+        '</div></details>';
     });
-    if ((c.diff_parts || []).length) {
-      out += '<div class="dp">' + c.diff_parts.map(function (p) { return '<code>' + esc(p) + '</code>'; }).join('') + '</div>';
-    }
     if (c.requirement) {
-      out += '<div class="req">' + esc(c.requirement) + (c.requirement_inferred ? ' <span class="inf">inferred</span>' : '') + '</div>';
+      var rt = (d._requirements || {})[c.requirement];
+      out += '<div class="req"><span class="rid">' + esc(c.requirement) + (c.requirement_inferred ? ' <span class="inf">inferred</span>' : '') + '</span>' +
+        (rt ? '<span class="rt">' + rich(rt) + '</span>' : '') + '</div>';
     }
+    if ((c.diff_parts || []).length) out += sourceBlock(d, c.diff_parts);
     return out ? '<div class="ev">' + out + '</div>' : '';
   }
 
@@ -236,7 +275,7 @@
           '<h1 class="issue-title">' + esc(d.title || d.branch) + '</h1>' +
           '<dl class="meta">' +
             '<dt>branch</dt><dd>' + esc(d.branch) + '</dd>' +
-            '<dt>head</dt><dd>' + esc(d.base || '?') + ' → ' + esc(d.head || '?') + '</dd>' +
+            '<dt>head</dt><dd>' + (d._source && d._source.compare ? '<a href="' + esc(d._source.compare) + '" target="_blank" rel="noopener">' + esc(d.base || '?') + ' → ' + esc(d.head || '?') + ' ↗</a>' : esc(d.base || '?') + ' → ' + esc(d.head || '?')) + '</dd>' +
             (diff.files != null ? '<dt>diff</dt><dd>' + esc(diff.files) + ' files <span class="add">+' + esc(diff.insertions) + '</span> <span class="del">−' + esc(diff.deletions) + '</span></dd>' : '') +
           '</dl>' +
           '<div class="printer-zone" id="pzone">' +
@@ -465,6 +504,7 @@
   /* ---------- routing ---------- */
   function route() {
     clearInterval(clockTimer);
+    if (window.EarnedTrustPitch && window.EarnedTrustPitch.unmount) window.EarnedTrustPitch.unmount();
     var h = decodeURIComponent(location.hash.replace(/^#\/?/, ''));
     var m = h.match(/^d\/(.+)$/);
     if (m) renderDossier(m[1]);
