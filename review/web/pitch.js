@@ -21,7 +21,7 @@
     { id: 'ch-score', n: '02', title: 'The score' },
     { id: 'ch-machine', n: '03', title: 'Machines check' },
     { id: 'ch-owner', n: '04', title: 'Needs owner' },
-    { id: 'ch-learn', n: '05', title: 'Learns the project' },
+    { id: 'ch-learn', n: '05', title: 'Readable, maintainable' },
     { id: 'ch-check', n: '06', title: 'Check our work' }
   ];
 
@@ -157,28 +157,32 @@
         '<b>' + v + '</b></li>';
     }).join('');
     return '<section class="p-sec p-kinds">' +
-      '<h2 class="p-h2">' + words('The evidence') + '<br>' + words('sets the score.', 'hot', 140) + '</h2>' +
-      '<p class="p-ctx" data-rv>A fixed formula does the math. No AI picks the number.</p>' +
-      '<div class="p-panel" data-rv>' +
-        '<ul class="p-kbars" aria-label="Score for each kind of evidence">' + rows + '</ul>' +
-        '<div class="p-adj"><span><b>−10</b> run by hand</span><span><b>+5</b> re-run on a clean machine, same result</span></div>' +
-        bandKey() +
+      '<div class="p-grid2">' +
+        '<div>' +
+          '<h2 class="p-h2">' + words('The evidence') + '<br>' + words('sets the score.', 'hot', 140) + '</h2>' +
+          '<p class="p-ctx" data-rv>A fixed formula does the math. No AI picks the number.</p>' +
+          bandsBar(s) +
+        '</div>' +
+        '<div class="p-panel" data-rv>' +
+          '<ul class="p-kbars" aria-label="Score for each kind of evidence">' + rows + '</ul>' +
+          '<div class="p-adj"><span><b>−10</b> run by hand</span><span><b>+5</b> re-run on a clean machine, same result</span></div>' +
+          bandKey() +
+        '</div>' +
       '</div>' +
     '</section>';
   }
 
   /* how the real claims came out */
-  function secBands(s) {
+  function bandsBar(s) {
     var tot = s.claims || 1;
     var seg = BANDS.map(function (b) {
       var n = s.bands[b[0]];
       return n ? '<span class="b-' + b[0] + '" style="flex:' + n + '"><b>' + n + '</b>' + b[1] + '</span>' : '';
     }).join('');
-    return '<section class="p-sec p-bands">' +
-      '<div class="p-big p-sm" data-count="' + s.claims + '">0</div>' +
-      '<h2 class="p-h3">claims, scored</h2>' +
-      '<div class="p-stack" data-rv role="img" aria-label="' + BANDS.map(function (b) { return s.bands[b[0]] + ' ' + b[1]; }).join(', ') + ' of ' + tot + '">' + seg + '</div>' +
-    '</section>';
+    return '<div class="p-bands" data-rv>' +
+      '<div class="p-cap"><span class="p-num hot" data-count="' + s.claims + '">0</span> claims, scored</div>' +
+      '<div class="p-stack" role="img" aria-label="' + BANDS.map(function (b) { return s.bands[b[0]] + ' ' + b[1]; }).join(', ') + ' of ' + tot + '">' + seg + '</div>' +
+    '</div>';
   }
 
   /* first script-made evidence anywhere with this check (optionally on a given branch) */
@@ -257,26 +261,40 @@
       '</div></section>';
   }
 
-  /* learning from the project, with its blind spots */
+  /* learning from the project: how its maintainers want code to read and to last */
+  var RD_RULES = [
+    ['Readable', 'A small helper beats #if blocks scattered through the code.'],
+    ['Maintainable', 'Keep logic out of templates. Fix it fully, not with a patch.']
+  ];
+  function rdPhrase(f) {
+    var m = f.measure || '';
+    if (/preprocessor/.test(m)) return '#if logic added inside templates';
+    if (/identical added block/.test(m)) return 'the same new code pasted in several places';
+    if (/duplicated/.test(m)) return 'more copy-pasted lines than before';
+    return 'see the change page';
+  }
+  function rdRow(d) {
+    var fl = ((d._readability || {}).details || {}).flags || [], seen = {}, ph = [];
+    fl.forEach(function (f) { var t = rdPhrase(f); if (!seen[t]) { seen[t] = 1; ph.push(t); } });
+    return '<li><span class="no">#' + esc(issueOf(d)) + '</span>' +
+      '<b class="' + (fl.length ? 'warn' : 'none') + '">' + fl.length + '</b>' +
+      '<span class="w">' + (fl.length ? esc(ph.slice(0, 2).join('; ')) : 'nothing flagged') + '</span></li>';
+  }
   function secLearn(s) {
     var L = LEARN, rules = s.rules || L.rules;
-    var caught = Math.round(100 * L.caught / L.breaking);
     return '<section class="p-sec p-learn">' +
       '<div class="p-grid2">' +
         '<div>' +
-          '<div class="p-big" data-count="' + rules + '">0</div>' +
-          '<h2 class="p-h3">rules, from ' + L.prs + ' past pull requests</h2>' +
-          '<p class="p-ctx" data-rv>Taken from what maintainers actually wrote in review.</p>' +
+          '<h2 class="p-h2">' + words('Readable today.') + '<br>' + words('Maintainable later.', 'hot', 140) + '</h2>' +
+          '<p class="p-ctx" data-rv><b class="p-num hot">' + rules + ' rules</b> learned from ' + L.prs + ' past pull requests: what this project’s maintainers ask for in review.</p>' +
+          '<ul class="p-rdrules" data-rv>' + RD_RULES.map(function (r) {
+            return '<li><span>' + r[0] + '</span>' + esc(r[1]) + '</li>';
+          }).join('') + '</ul>' +
         '</div>' +
         '<div class="p-panel" data-rv>' +
-          '<div class="p-lbl">Tested on past pull requests</div>' +
-          '<div class="p-meter2"><div class="t"><b>' + L.caught + '</b> of ' + L.breaking + '</div>' +
-            '<span class="bar"><i class="b-high" data-w="' + caught + '"></i></span>' +
-            '<div class="l">promise-breaking changes caught</div></div>' +
-          '<div class="p-meter2"><div class="t"><b>' + L.falseAlarm + '%</b></div>' +
-            '<span class="bar"><i class="b-low" data-w="' + L.falseAlarm + '"></i></span>' +
-            '<div class="l">false alarms on ordinary changes</div></div>' +
-          '<p class="p-note">We show the misses, not just the hits.</p>' +
+          '<div class="p-lbl">Flags on these changes</div>' +
+          '<ul class="p-rdflags">' + s.ds.map(rdRow).join('') + '</ul>' +
+          '<p class="p-note">Tried on past pull requests first: caught <b>' + L.caught + ' of ' + L.breaking + '</b> real problems, with <b>' + L.falseAlarm + '%</b> false alarms. We show the misses too.</p>' +
         '</div>' +
       '</div>' +
     '</section>';
@@ -298,19 +316,19 @@
       '<div class="p-grid2">' +
         '<div>' + big +
           '<p class="p-ctx" data-rv>Each new test, explained in plain steps. A script checks every step.</p>' +
+          replayLine(s) +
         '</div>' + card +
       '</div>' +
     '</section>';
   }
 
   /* replay on a clean machine */
-  function secReplay(s) {
+  function replayLine(s) {
     if (!s.replayTotal) return '';
-    return '<section class="p-sec p-replay">' +
-      '<div class="p-big"><span data-count="' + s.replayMatch + '">0</span><small>/' + s.replayTotal + '</small></div>' +
-      '<h2 class="p-h3">evidence files reproduced on a clean machine</h2>' +
-      '<div class="p-panel p-replay-sq" data-rv>' + squares(s.replayTotal, 'regen') + '<span>identical</span></div>' +
-    '</section>';
+    return '<div class="p-replay" data-rv>' +
+      '<div class="p-panel p-replay-sq">' + squares(s.replayTotal, 'regen') + '</div>' +
+      '<p class="p-cap"><b class="p-num hot">' + s.replayMatch + ' of ' + s.replayTotal + '</b> evidence files re-run on a clean machine: identical</p>' +
+    '</div>';
   }
 
   function strip(d) {
@@ -465,25 +483,23 @@
     wrap.innerHTML =
       rail() +
       transition('An AI wrote the change. Someone has to trust it.', 3, 'ch-problem',
-        'You maintain a library. An AI agent sends you code.') +
+        'You maintain a library. An AI agent sends you code. Will it still be readable and maintainable next year?') +
       secProblem(s) +
       transition('So every claim gets a score from 0 to 100.', 4, 'ch-score',
         'A claim is one plain sentence about what the change does.') +
       secKinds(s) +
-      secBands(s) +
       transition('Whatever can be checked, a machine checks.', 3, 'ch-machine',
         'It runs the real code instead of taking the agent’s word.') +
       secMachine(s) +
       transition('Some changes need a person, whatever the score.', 3, 'ch-owner',
         'When a promise to users changes, a named maintainer decides.') +
       secOwner(s) +
-      transition('It learns what this project’s maintainers care about.', 3, 'ch-learn',
+      transition('Code is written once, then read for years.', 3, 'ch-learn',
         'Rules come from what maintainers said on past pull requests.') +
       secLearn(s) +
       transition('And you can check our work.', 3, 'ch-check',
         'Every new test is explained. Every result can be re-run.') +
       secTests(s) +
-      secReplay(s) +
       secDoors(s);
     landing.insertAdjacentElement('afterend', wrap);
 
