@@ -2,16 +2,14 @@
 (function () {
   'use strict';
 
-  var TIERS = ['Proved', 'Tested', 'Measured', 'Argued', 'Refused'];
-  var MACHINE = { Proved: 1, Tested: 1, Measured: 1 };
-  var GLYPH = { Proved: '■', Tested: '▲', Measured: '●', Argued: '◆', Refused: '✕' };
-  /* What each tier means, from CONVENTIONS.md (tier rules). `long` on the landing page, `short` under the dossier counters. */
-  var DEF = {
-    Proved: { long: 'A checker confirmed it on the real code, with no gaps.', short: 'A checker confirmed it on the real code.' },
-    Tested: { long: 'A test fails before the change and passes after it.', short: 'A test fails before, passes after.' },
-    Measured: { long: 'A tool produced a number, and the number is the evidence.', short: 'A number from a tool.' },
-    Argued: { long: 'No check settles it; it rests on reasoning. You decide.', short: 'No check settles it. You decide.' },
-    Refused: { long: 'It touches public API, wire format, warnings or security, so the tool refuses to grade it. You decide.', short: 'Touches API, wire format, warnings or security. You decide.' }
+  /* Confidence bands from confidence.json, plus the owner gate. `long` on the landing page, `short` under the dossier counters. */
+  var BANDS = ['high', 'medium', 'low'];
+  var GROUPS = BANDS.concat('owner');
+  var BAND = {
+    high: { g: '●', w: 'High', long: 'A strong check backs it: a proof, a rebuild, or a test that fails before and passes after.', short: 'A strong check backs it.' },
+    medium: { g: '◐', w: 'Medium', long: 'An experiment on the real code, or a weaker check, backs it.', short: 'Some check backs it.' },
+    low: { g: '○', w: 'Low', long: 'Only a number, or no check at all. Read it yourself.', short: 'Little or no check.' },
+    owner: { g: '✎', w: 'Needs owner', long: 'A check shows a promise to users changed. Its owner decides, and you sign.', short: 'A promise to users changed. Owner decides.' }
   };
   var RESULT = {
     pass: { w: 'PASS', t: 'The check ran and got its expected outcome. This is the check\u2019s own result, not a verdict on the claim.' },
@@ -25,12 +23,15 @@
   };
   /* what a new test shows, from explain-check.json results/verdict */
   var TK = {
-    flip: { g: '▲', w: 'fail before · pass after' },
-    weak: { g: '⚠', w: 'pass before too', flag: 'NOT A TEST OF THE CHANGE' },
-    norun: { g: '∅', w: 'did not run', flag: 'DID NOT RUN' },
-    other: { g: '·', w: 'other' }
+    flip: { g: '✓', row: 'proves the fix', one: 'proves the fix', many: 'prove the fix',
+      say: 'This test proves the fix: it fails on the old code and passes on the new.' },
+    weak: { g: '⚠', row: 'already passed before the fix', one: 'already passed before', many: 'already passed before',
+      say: 'This test passed before the fix too, so it doesn\u2019t prove the fix.' },
+    norun: { g: '∅', row: 'couldn\u2019t run here', one: 'couldn\u2019t run', many: 'couldn\u2019t run',
+      say: 'This test couldn\u2019t run here, so it doesn\u2019t prove anything yet.' },
+    other: { g: '·', row: 'unclear result', one: 'unclear', many: 'unclear', say: '' }
   };
-  var OUT = { pass: ['✓', 'PASS'], fail: ['✕', 'FAIL'], build_failed: ['∅', 'NO BUILD'] };
+  var OUT = { pass: 'passes', fail: 'fails', build_failed: 'doesn\u2019t build' };
   var NUM = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
   var PICKS = [
     { v: 'accept', k: 'A', cls: 'accept' },
@@ -56,19 +57,19 @@
     catch (e) { return null; }
   }
   function claims(d) { return Array.isArray(d.claims) ? d.claims : []; }
-  function humanOf(d) {
-    return claims(d).filter(function (c) { return !MACHINE[c.tier]; }).sort(function (a, b) {
-      return (a.tier === 'Refused' ? 0 : 1) - (b.tier === 'Refused' ? 0 : 1) || String(a.id).localeCompare(String(b.id));
-    });
-  }
+  function confOf(d, c) { return cf(d, c.id) || { score: 0, band: 'low' }; }
+  function byId(a, b) { return String(a.id).localeCompare(String(b.id)); }
+  /* claims whose evidence shows a changed contract: the owner decides these */
+  function humanOf(d) { return claims(d).filter(function (c) { return confOf(d, c).gate; }).sort(byId); }
+  /* every other claim, strongest evidence first */
   function machineOf(d) {
-    return claims(d).filter(function (c) { return MACHINE[c.tier]; }).sort(function (a, b) {
-      return TIERS.indexOf(a.tier) - TIERS.indexOf(b.tier) || String(a.id).localeCompare(String(b.id));
+    return claims(d).filter(function (c) { return !confOf(d, c).gate; }).sort(function (a, b) {
+      return confOf(d, b).score - confOf(d, a).score || byId(a, b);
     });
   }
   function counts(d) {
-    var n = {}; TIERS.forEach(function (t) { n[t] = 0; });
-    claims(d).forEach(function (c) { if (n[c.tier] != null) n[c.tier]++; });
+    var n = { high: 0, medium: 0, low: 0, owner: 0 };
+    claims(d).forEach(function (c) { var x = confOf(d, c); if (n[x.band] != null) n[x.band]++; if (x.gate) n.owner++; });
     return n;
   }
   function keys() {
@@ -83,9 +84,10 @@
     return p(d.getDate()) + '-' + M[d.getMonth()] + '-' + d.getFullYear() + ' ' + p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds());
   }
   function strip(d) {
-    var cs = claims(d).slice().sort(function (a, b) { return TIERS.indexOf(a.tier) - TIERS.indexOf(b.tier); });
+    var cs = humanOf(d).concat(machineOf(d));
     return '<span class="strip" aria-hidden="true">' + cs.map(function (c) {
-      return '<i class="c-' + lc(c.tier) + (MACHINE[c.tier] ? '' : ' human') + '" style="--c:var(--t-' + lc(c.tier) + ')"></i>';
+      var x = confOf(d, c);
+      return '<i class="bn-' + esc(x.band) + (x.gate ? ' human' : '') + '"></i>';
     }).join('') + '</span>';
   }
 
@@ -98,24 +100,24 @@
       var st = r ? '<span class="state-signed">SIGNED</span>'
         : h.length ? '<span style="color:var(--t-argued)">' + h.length + ' OPEN</span>'
         : '<span class="dim">SETTLED</span>';
-      var n = counts(d), lbl = TIERS.filter(function (t) { return n[t]; }).map(function (t) { return n[t] + ' ' + t; }).join(', ');
+      var n = counts(d), lbl = GROUPS.filter(function (t) { return n[t]; }).map(function (t) { return n[t] + ' ' + BAND[t].w; }).join(', ');
       return '<li><a href="#/d/' + encodeURIComponent(k) + '" aria-label="' + esc(d.branch + ': ' + (d.title || '') + '. ' + lbl + (r ? '. Signed.' : '')) + '">' +
         '<span class="arrow" aria-hidden="true">▸</span>' +
         '<span class="bname">' + esc(d.branch || k) + (d.sample ? ' <span class="dim">· sample</span>' : '') + '</span>' +
         '<span class="bstate">' + st + '</span>' +
         '<span class="bt">' + esc(d.title || '') + '</span>' +
         strip(d) +
-        '<span class="gc" aria-hidden="true">' + TIERS.map(function (t) {
-          return '<span class="c-' + lc(t) + (n[t] ? '' : ' z') + '">' + GLYPH[t] + n[t] + '</span>';
+        '<span class="gc" aria-hidden="true">' + GROUPS.map(function (t) {
+          return '<span class="bn-' + t + (n[t] ? '' : ' z') + '">' + BAND[t].g + n[t] + '</span>';
         }).join('') + '</span></a></li>';
     }).join('') || '<li class="empty dim">NO DOSSIERS — run render_web.py</li>';
 
-    var caps = TIERS.map(function (t, i) {
+    var caps = GROUPS.map(function (t, i) {
       return (i === 3 ? '<span class="gap"></span>' : '') +
-        '<div class="cap ' + lc(t) + '"><b aria-hidden="true">' + GLYPH[t] + '</b><i>' + t + '</i></div>';
+        '<div class="cap ' + t + '"><b aria-hidden="true">' + BAND[t].g + '</b><i>' + BAND[t].w + '</i></div>';
     }).join('');
-    var defs = TIERS.map(function (t) {
-      return '<dt class="c-' + lc(t) + '"><span aria-hidden="true">' + GLYPH[t] + '</span> ' + t + '</dt><dd>' + esc(DEF[t].long) + '</dd>';
+    var defs = GROUPS.map(function (t) {
+      return '<dt class="bn-' + t + '"><span aria-hidden="true">' + BAND[t].g + '</span> ' + BAND[t].w + '</dt><dd>' + esc(BAND[t].long) + '</dd>';
     }).join('');
     var real = ks.filter(function (k) { return !DATA[k].sample; }).length;
     var nIssues = (NUM[real] || String(real)) + ' issue' + (real === 1 ? '' : 's');
@@ -124,9 +126,9 @@
       '<section class="landing">' +
         '<div class="hero">' +
           '<h1><span>Read the evidence,</span><em>not the diff.</em></h1>' +
-          '<p class="lede">An AI agent fixed ' + nIssues + ' in MessagePack-CSharp. Each fix is split into claims, and each claim is graded by the evidence behind it. Machines settle what they can; you decide the rest and sign.</p>' +
+          '<p class="lede">An AI agent fixed ' + nIssues + ' in MessagePack-CSharp. Each fix is split into claims, and each claim gets a score from the evidence behind it. Where a check shows a promise to users changed, the owner decides; you sign.</p>' +
           '<div class="ladder">' + caps +
-            '<span class="bracket machine">settled by machine</span><span class="bracket owner">you decide</span>' +
+            '<span class="bracket machine">scored by evidence</span><span class="bracket owner">owner decides</span>' +
           '</div>' +
           '<dl class="defs">' + defs + '</dl>' +
         '</div>' +
@@ -207,28 +209,34 @@
     Object.keys(ev).forEach(function (k) { if (['check', 'branch', 'result', 'summary', 'command', 'produced_by'].indexOf(k) < 0) x[k] = ev[k]; });
     return esc(JSON.stringify(x, null, 2));
   }
-  function evidenceBlock(d, c, seen) {
-    var out = '';
+  /* script summaries say base/branch; show them as before/after the change */
+  function plain(t) {
+    return String(t == null ? '' : t)
+      .replace(/\b(on|in) (base|branch)\b/g, function (m, p, w) { return w === 'base' ? 'before the change' : 'after the change'; })
+      .replace(/\b[Bb]ase\b/g, function (w) { return w[0] === 'B' ? 'Before the change' : 'before the change'; })
+      .replace(/\b[Bb]ranch\b/g, function (w) { return w[0] === 'B' ? 'After the change' : 'after the change'; });
+  }
+  function evidenceBlock(d, c) {
+    var out = '', n = 0;
+    if (c.why_this_tier) out += '<p class="why">' + rich(c.why_this_tier) + '</p>';
     var chain = Array.isArray(c.chain) ? c.chain : [];
     if (chain.length) {
-      out += '<div class="cap-l">Chain of evidence \u00b7 as strong as its weakest link</div><div class="chain">' + chain.map(function (l, i) {
-        return '<span class="lk c-' + lc(l.tier) + '">' + (GLYPH[l.tier] || '·') + ' ' + esc(l.tier) + '<span>' + esc(l.link) + '</span></span>';
+      out += '<div class="cap-l">Chain of evidence · as strong as its weakest link</div><div class="chain">' + chain.map(function (l) {
+        return '<span class="lk"><span>' + rich(l.link) + '</span></span>';
       }).join('') + '</div>';
     }
     (c.evidence || []).forEach(function (ref) {
       var ev = (d._evidence || {})[ref];
-      var name = String(ref).split('/').pop().replace(/\.json$/, '').replace(/[-_.]+/g, ' ');
+      var name = base(ref).replace(/\.json$/, '').replace(/[-_.]+/g, ' ');
       var res = ev ? lc(ev.result) || 'missing' : 'missing';
       var rw = RESULT[res] || { w: ev ? String(ev.result || '?').toUpperCase() : 'MISSING', t: ev ? '' : 'No evidence file found.' };
-      var again = seen && seen[ref];
-      if (seen) seen[ref] = 1;
-      var sum = ev ? rich(ev.summary || '') : '';
-      out += '<details class="evl"><summary>' +
+      var sum = ev ? plain(ev.summary || '') : '';
+      n++;
+      out += '<details class="evl"><summary title="' + esc(sum) + '">' +
         '<span class="res ' + esc(res) + '" title="' + esc(rw.t) + '">' + esc(rw.w) + '</span>' +
-        '<span class="evn">' + esc(name) + (ev && ev.produced_by === 'hand' ? ' <span class="hand" title="A person or agent ran this by hand, not a script.">by hand</span>' : '') + '</span>' +
-        '<span class="evs">' + (again ? '<span class="again">Same check as above.</span>' : sum) + '</span></summary>' +
+        '<span class="evn">' + esc(name) + (ev && ev.produced_by === 'hand' ? ' <span class="hand" title="A person or agent ran this by hand, not a script.">by hand</span>' : '') + '</span></summary>' +
         '<div class="evb">' +
-          (again && sum ? '<p class="evs">' + sum + '</p>' : '') +
+          (sum ? '<p class="evs">' + rich(sum) + '</p>' : '') +
           (ev && ev.command ? '<div class="cmd"><code>' + esc(ev.command) + '</code></div>' : '') +
           (ev ? '<details class="rawout"><summary>Show raw output</summary><pre class="evjson">' + evDetails(ev) + '</pre></details>' : '') +
           '<a class="raw" href="../' + esc(ref) + '" target="_blank" rel="noopener">' + esc(ref) + ' ↗</a>' +
@@ -240,19 +248,16 @@
         '<span class="rt">' + (rt ? rich(rt) : esc(c.requirement)) + '</span></div>';
     }
     if ((c.diff_parts || []).length) out += sourceBlock(d, c.diff_parts);
-    return out ? '<div class="ev">' + out + '</div>' : '';
+    return out ? '<details class="evd"><summary>evidence' + (n ? ' <span class="k">' + n + '</span>' : '') + ' <span class="tw" aria-hidden="true">▸</span></summary><div class="ev">' + out + '</div></details>' : '';
   }
 
-  function ownerRow(d, c, seen) {
+  function ownerRow(d, c) {
     var pick = state.picks[c.id];
-    var name = 'pick-' + c.id, x = cf(d, c.id);
-    return '<article class="own c-' + lc(c.tier) + (pick ? ' picked' : '') + '" id="row-' + esc(c.id) + '" data-id="' + esc(c.id) + '" tabindex="-1">' +
-      '<div class="own-h"><span class="tg" title="' + esc(c.tier) + '">' + GLYPH[c.tier] + (x ? '' : ' ' + esc(c.tier.toUpperCase())) + '</span>' + scoreHtml(x) + '<span class="id">' + esc(c.id) + '</span>' +
-        needsBadge(x) + (c.owner_role ? '<span class="role" title="Who should decide this claim">For: ' + esc(c.owner_role) + '</span>' : '') + '</div>' +
+    var name = 'pick-' + c.id, x = confOf(d, c);
+    return '<article class="own bn-owner' + (pick ? ' picked' : '') + '" id="row-' + esc(c.id) + '" data-id="' + esc(c.id) + '" data-band="owner" tabindex="-1">' +
+      '<div class="own-h">' + scoreHtml(x) + '<span class="id">' + esc(c.id) + '</span>' + needsBadge(x) + '</div>' +
       '<p class="claim-t">' + rich(c.claim) + '</p>' +
-      gateBlock(x) + receiptBlock(d, x) +
-      (c.why_this_tier ? '<p class="why">' + rich(c.why_this_tier) + '</p>' : '') +
-      evidenceBlock(d, c, seen) +
+      gateBlock(x, c.owner_role) + receiptBlock(d, x) + evidenceBlock(d, c) +
       '<fieldset class="keys"><legend>' + esc(c.id) + '</legend>' +
         PICKS.map(function (p) {
           var id = name + '-' + p.cls;
@@ -264,11 +269,11 @@
   }
 
   function machineRow(d, c) {
-    var x = cf(d, c.id);
-    return '<details class="mach c-' + lc(c.tier) + '" id="row-' + esc(c.id) + '">' +
-      '<summary><span class="g" title="' + esc(c.tier) + '">' + GLYPH[c.tier] + '</span><span class="tn">' + (x ? scoreHtml(x) : esc(c.tier)) + '</span><span class="id">' + esc(c.id) + '</span>' +
+    var x = confOf(d, c);
+    return '<details class="mach bn-' + esc(x.band) + '" id="row-' + esc(c.id) + '" data-band="' + esc(x.band) + '">' +
+      '<summary><span class="tn">' + scoreHtml(x) + '</span><span class="id">' + esc(c.id) + '</span>' +
       '<span class="ct">' + needsBadge(x) + rich(c.claim) + '</span><span class="tw" aria-hidden="true">▸</span></summary>' +
-      '<div class="body">' + gateBlock(x) + receiptBlock(d, x) + (c.why_this_tier ? '<p class="why">' + rich(c.why_this_tier) + '</p>' : '') + evidenceBlock(d, c) + '</div>' +
+      '<div class="body">' + gateBlock(x) + receiptBlock(d, x) + evidenceBlock(d, c) + '</div>' +
     '</details>';
   }
 
@@ -296,19 +301,19 @@
   function scoreHtml(x) {
     if (!x) return '';
     var s = Math.max(0, Math.min(100, +x.score || 0));
-    return '<span class="score b-' + esc(x.band) + '" title="Score ' + s + ' of 100 · ' + esc(x.band) + '">' +
+    return '<span class="score sb-' + esc(x.band) + '" title="Score ' + s + ' of 100 · ' + esc(x.band) + '">' +
       '<span class="meter" aria-hidden="true"><b style="--s:' + s + '%"></b></span><span class="sn">' + s + '</span>' +
-      '<span class="bd">' + esc(String(x.band || '').toUpperCase()) + '</span></span>';
+      '<span class="bd">' + esc(x.band || '') + '</span></span>';
   }
-  function needsBadge(x) { return x && x.gate ? '<span class="needs" title="Changes a contract; its owner decides">NEEDS OWNER</span>' : ''; }
-  function gateBlock(x) {
+  function needsBadge(x) { return x && x.gate ? '<span class="needs" title="A promise to users changed; its owner decides">needs owner</span>' : ''; }
+  function gateBlock(x, role) {
     var g = x && x.gate;
     if (!g) return '';
     var rules = g.rules || [];
     return '<details class="gate"><summary>' +
-        '<span class="who">✎ ' + esc(g.owner || 'owner unknown') + '</span><span class="ctr">' + esc(g.contract) + '</span>' +
+        '<span class="who"' + (role ? ' title="For: ' + esc(role) + '"' : '') + '>✎ ' + esc(g.owner || 'owner unknown') + '</span><span class="ctr">' + esc(g.contract) + '</span>' +
         rules.map(function (r) { return '<span class="rid">' + esc(r.id) + '</span>'; }).join('') + '<span class="tw" aria-hidden="true">▸</span></summary>' +
-      '<div class="gb"><p>' + rich(g.change) + '</p>' +
+      '<div class="gb"><p>' + rich(plain(g.change)) + '</p>' +
         (rules.length ? '<ul class="rules">' + rules.map(function (r) { return '<li><span>' + ruleLink(r.id, r.sources) + '</span><span>' + rich(r.rule) + '</span></li>'; }).join('') + '</ul>' : '') +
         '<p class="fine">' + esc(g.owner_basis || '') + (g.inherited_from ? ' · same change as ' + goto(g.inherited_from) : '') + '</p></div></details>';
   }
@@ -326,10 +331,10 @@
         '<a class="sf" href="../' + esc(s.file) + '" target="_blank" rel="noopener">' + esc(base(s.file)) + ' ↗</a></div>';
     }).join('') || '<div class="sgl"><div class="sgh"><span>no check backs it</span><span class="ss">' + esc(x.score) + '</span></div></div>';
     if (con.length) body += '<div class="sgl con"><div class="sgh"><span>✕ contradicted</span>' + (F.contradicted_cap != null ? '<span class="ss">≤ ' + F.contradicted_cap + '</span>' : '') + '</div>' +
-      con.map(function (c) { return '<p>' + rich(c.summary) + ' <a class="sf" href="../' + esc(c.file) + '" target="_blank" rel="noopener">' + esc(base(c.file)) + ' ↗</a></p>'; }).join('') + '</div>';
-    body += '<div class="tot"><span class="sn">= ' + esc(x.score) + '</span><span class="bd">' + esc(String(x.band).toUpperCase()) + '</span><span class="fine">' + esc(x.how || '') + '</span></div>';
+      con.map(function (c) { return '<p>' + rich(plain(c.summary)) + ' <a class="sf" href="../' + esc(c.file) + '" target="_blank" rel="noopener">' + esc(base(c.file)) + ' ↗</a></p>'; }).join('') + '</div>';
+    body += '<div class="tot"><span class="sn">= ' + esc(x.score) + '</span><span class="bd">' + esc(x.band) + '</span><span class="fine">' + esc(x.how || '') + '</span></div>';
     if (dep.length) body += '<div class="rel"><span class="fine">depends on</span> ' + dep.map(goto).join(' ') + '</div>';
-    if (sh.length) body += '<div class="rel"><span class="fine">shares lines with</span><ul>' + sh.map(function (t) { return '<li>' + rich(t) + '</li>'; }).join('') + '</ul></div>';
+    if (sh.length) body += '<div class="rel"><span class="fine">shares lines with</span><ul>' + sh.map(function (t) { return '<li>' + rich(plain(t)) + '</li>'; }).join('') + '</ul></div>';
     return '<details class="rcpt"><summary>how the score adds up <span class="tw" aria-hidden="true">▸</span></summary><div class="paper">' + body + '</div></details>';
   }
 
@@ -351,15 +356,21 @@
     if (/passes before/.test(v) || (r.before && r.before.outcome === 'pass')) return 'weak';
     return 'other';
   }
-  function chip(r, label) {
-    if (!r) return '';
-    var o = OUT[r.outcome] || ['?', String(r.outcome || '?').toUpperCase()];
-    return '<span class="oc o-' + esc(String(r.outcome).replace(/_/g, '-')) + '" title="' + esc(r.run + ': ' + o[1]) + '"><i>' + esc(label) + '</i><b>' + o[0] + '<em> ' + o[1] + '</em></b></span>';
+  function runWho(r, which) {
+    if (which === 'before') return 'Old code';
+    if (which === 'after') return 'New code';
+    return /undone|revert/.test(lc(r.run)) ? 'New code with the fix undone' : plain(r.run);
   }
-  function runChips(c) {
-    var r = testRuns(c);
-    return chip(r.before, 'before') + chip(r.after, 'after') +
-      r.extra.map(function (x) { return chip(x, /undone|revert/.test(lc(x.run)) ? 'fix undone' : 'extra'); }).join('');
+  /* "Old code: fails · New code: passes" */
+  function runLine(c) {
+    var r = testRuns(c), out = [];
+    if (r.before) out.push([r.before, 'before']);
+    if (r.after) out.push([r.after, 'after']);
+    r.extra.forEach(function (x) { out.push([x, 'extra']); });
+    return out.map(function (p) {
+      var o = p[0].outcome;
+      return '<span class="oc o-' + esc(String(o).replace(/_/g, '-')) + '">' + esc(runWho(p[0], p[1])) + ': <b>' + esc(OUT[o] || o) + '</b></span>';
+    }).join('<span class="dot" aria-hidden="true"> · </span>');
   }
   function stepHtml(c, s) {
     var ln = s.lines || [], probs = s.problems || [];
@@ -401,12 +412,12 @@
   function analysisPane(c, k) {
     var dnc = c.does_not_check || [], notes = c.notes || [];
     var msgs = (c.results || []).filter(function (r) { return r.message; });
-    var more = notes.map(function (n) { return '<p>' + rich(n) + '</p>'; }).join('') +
-      (msgs.length ? '<ul class="msgs">' + msgs.map(function (r) { return '<li><span class="fine">' + esc(r.run) + '</span><code>' + esc(r.message) + '</code></li>'; }).join('') + '</ul>' : '') +
+    var more = notes.map(function (n) { return '<p>' + rich(plain(n)) + '</p>'; }).join('') +
+      (msgs.length ? '<ul class="msgs">' + msgs.map(function (r) { return '<li><span class="fine">' + esc(plain(r.run)) + '</span><code>' + esc(r.message) + '</code></li>'; }).join('') + '</ul>' : '') +
       ((c.claims || []).length ? '<p class="cl-l"><span class="fine">claims</span> ' + c.claims.map(goto).join(' ') + '</p>' : '');
     return '<div class="pane an"><h5>Analysis</h5>' +
-      '<p class="verdict">' + TK[k].g + ' ' + rich(c.verdict || '') + '</p>' +
-      '<div class="runs">' + runChips(c) + '</div>' +
+      '<p class="verdict">' + (TK[k].say ? esc(TK[k].say) : rich(c.verdict || '')) + '</p>' +
+      '<p class="runs">' + runLine(c) + '</p>' +
       (dnc.length ? '<div class="dnc"><h6>Does not check</h6><ul>' + dnc.map(function (x) { return '<li>' + rich(x) + '</li>'; }).join('') + '</ul></div>' : '') +
       (more ? '<details class="more"><summary>notes &amp; claims <span class="tw" aria-hidden="true">▸</span></summary>' + more + '</details>' : '') +
     '</div>';
@@ -414,8 +425,9 @@
   function testCard(c) {
     var k = testKind(c), t = TK[k];
     return '<details class="tc k-' + k + '" id="test-' + esc(c.id) + '"' + (k === 'flip' ? ' open' : '') + '>' +
-      '<summary><span class="tg" aria-hidden="true">' + t.g + '</span><span class="tname" title="' + esc(c.file) + '">' + esc(c.test) + '</span>' +
-        (t.flag ? '<span class="flag">' + t.flag + '</span>' : '') + '<span class="runs">' + runChips(c) + '</span><span class="tw" aria-hidden="true">▸</span></summary>' +
+      '<summary><span class="tg" aria-hidden="true">' + t.g + '</span><span class="tname" title="' + esc(c.test) + '">' + esc(c.title || c.test) + '</span>' +
+        '<span class="say">' + esc(k === 'other' ? c.verdict || t.row : t.row) + '</span><span class="tw" aria-hidden="true">▸</span></summary>' +
+      '<p class="meth">test method <code>' + esc(c.test) + '</code> in ' + esc(base(c.file)) + '</p>' +
       '<div class="panes">' +
         '<div class="pane ps"><h5>Pseudo-code</h5><ol class="steps">' + (c.steps || []).map(function (s) { return stepHtml(c, s); }).join('') + '</ol></div>' +
         '<div class="pane rc"><h5>Real code</h5><div class="code" tabindex="0" aria-label="Code of ' + esc(c.test) + '">' + codeGroups(c) + '</div></div>' +
@@ -429,9 +441,9 @@
     cards.forEach(function (c) { n[testKind(c)]++; });
     return '<section class="tests" aria-label="New tests">' +
       '<div class="sec-h"><span class="inv">NEW TESTS</span><span class="rule"></span></div>' +
-      '<div class="tstrip"><span class="tall"><b>' + cards.length + '</b> tests</span>' +
+      '<div class="tstrip"><span class="tall"><b>' + cards.length + '</b> test' + (cards.length === 1 ? '' : 's') + '</span>' +
         ['flip', 'weak', 'norun', 'other'].filter(function (k) { return n[k]; }).map(function (k) {
-          return '<span class="k-' + k + '"><i aria-hidden="true">' + TK[k].g + '</i><b>' + n[k] + '</b> ' + TK[k].w + '</span>';
+          return '<span class="k-' + k + '"><i aria-hidden="true">' + TK[k].g + '</i><b>' + n[k] + '</b> ' + (n[k] === 1 ? TK[k].one : TK[k].many) + '</span>';
         }).join('') + '</div>' +
       cards.map(testCard).join('') + '</section>';
   }
@@ -525,18 +537,18 @@
     var diff = d.diff || {};
     var issueNo = d.issue != null ? '<em>#</em>' + esc(d.issue) : esc(d.branch);
 
-    var tiers = TIERS.map(function (t, i) {
-      var owner = !MACHINE[t];
+    var F = ((d._confidence || {}).details || {}).formula || {}, cut = F.bands || { high: 80, medium: 50 };
+    var range = { high: cut.high + '+', medium: cut.medium + '–' + (cut.high - 1), low: 'under ' + cut.medium, owner: '' };
+    var tiers = GROUPS.map(function (t, i) {
       return (i === 3 ? '<span class="sep" aria-hidden="true"></span>' : '') +
-        '<button type="button" class="tier c-' + lc(t) + (owner ? ' owner' : '') + '" data-jump="' + t + '"' + (n[t] ? '' : ' disabled') + ' aria-label="' + n[t] + ' ' + t + '">' +
+        '<button type="button" class="tier bn-' + t + (t === 'owner' ? ' owner' : '') + '" data-jump="' + t + '"' + (n[t] ? '' : ' disabled') + ' aria-label="' + n[t] + ' ' + BAND[t].w + '">' +
           '<span class="n' + (n[t] ? '' : ' zero') + '">' + n[t] + '</span>' +
-          '<span class="nm"><span aria-hidden="true">' + GLYPH[t] + '</span> ' + t + '</span>' +
+          '<span class="nm"><span aria-hidden="true">' + BAND[t].g + '</span> ' + BAND[t].w + '</span>' +
           '<span class="bar"><b style="--p:' + (100 * n[t] / total).toFixed(1) + '%"></b></span>' +
-          '<span class="gl">' + esc(DEF[t].short) + '</span>' +
+          '<span class="gl">' + (range[t] ? '<b>' + esc(range[t]) + '</b> · ' : '') + esc(BAND[t].short) + '</span>' +
         '</button>';
     }).join('');
 
-    var seen = {};
     var leds = human.map(function (c) { return '<span class="led" data-led="' + esc(c.id) + '"></span>'; }).join('');
 
     app.innerHTML =
@@ -555,7 +567,7 @@
             '<form class="printer" id="printer" autocomplete="off">' +
               '<span class="stub" id="stub" aria-hidden="true"></span>' +
               '<div class="p-top"><h2 class="p-h">Sign the receipt</h2><div class="p-leds" aria-hidden="true">' + leds + '</div><div id="slip-tools"></div></div>' +
-              '<p class="p-sub">Signing records your decisions, what machines settled and what nobody checked, for commit ' + esc(d.head || '') + '.</p>' +
+              '<p class="p-sub">Signing records your decisions, every claim\u2019s score and what nobody checked, for commit ' + esc(d.head || '') + '.</p>' +
               '<div class="p-row">' +
                 '<label class="sr" for="signer">Your name</label>' +
                 '<input class="sigfield" id="signer" name="signer" placeholder="Your name" maxlength="80" spellcheck="false">' +
@@ -574,19 +586,19 @@
               '<div class="tiers">' + tiers + '</div>' +
               testsSection(d) +
               (human.length ?
-                '<div class="sec-h"><span class="inv" style="background:var(--t-argued)">YOUR CALL</span><span class="rule"></span><span id="pickcount"></span></div>' +
-                '<p class="sec-g">No machine can settle these. Read the evidence, then accept, reject, or send the claim back to the AI to rework. PASS or FAIL is each check\u2019s own outcome, not a verdict on the claim.</p>' +
-                human.map(function (c) { return ownerRow(d, c, seen); }).join('') : '') +
+                '<div class="sec-h"><span class="inv" style="background:var(--t-refused)">NEEDS OWNER</span><span class="rule"></span><span id="pickcount"></span></div>' +
+                '<p class="sec-g">A check shows a promise to users changed. Accept, reject, or send it back to the AI.</p>' +
+                human.map(function (c) { return ownerRow(d, c); }).join('') : '') +
               (machine.length ?
-                '<div class="sec-h"><span class="inv">SETTLED</span><span class="rule"></span><span class="dim">' + machine.length + '</span></div>' +
-                '<p class="sec-g">A machine check graded these. Open one to see its evidence.</p>' +
+                '<div class="sec-h"><span class="inv">' + (human.length ? 'OTHER CLAIMS' : 'CLAIMS') + '</span><span class="rule"></span><span class="dim">' + machine.length + '</span></div>' +
+                '<p class="sec-g">Strongest evidence first.</p>' +
                 '<div>' + machine.map(function (c) { return machineRow(d, c); }).join('') + '</div>' : '') +
               '<div class="sec-h"><span class="inv">LEDGER</span><span class="rule"></span></div>' +
               '<div class="lists">' +
                 list('NOT CHECKED', 'What we did not verify.', d.not_checked, rich, true) +
                 list('NO CLAIM', 'Changed code that no claim covers.', d.uncovered_diff_parts, function (p) { return '<code>' + esc(p) + '</code>'; }, true, 'Every changed line is covered by a claim.') +
                 list('FOUND', 'What the reviewer found.', d.found, rich) +
-                list('REFUSED', 'Why some claims are left to a person.', d.refused, function (r) { return r && typeof r === 'object' ? '<b>' + rich(r.what) + '</b> — ' + rich(r.why) : rich(r); }) +
+                list('NEEDS OWNER: WHY', 'Why some claims are left to a person.', d.refused, function (r) { return r && typeof r === 'object' ? '<b>' + rich(r.what) + '</b> — ' + rich(r.why) : rich(r); }) +
                 list('SCOPE DRIFT', 'Changes the issue did not ask for.', d.scope_drift, rich, true) +
                 readabilityBlock(d) +
               '</div>' +
@@ -610,10 +622,7 @@
     });
     app.querySelectorAll('[data-jump]').forEach(function (b) {
       b.addEventListener('click', function () {
-        var t = b.dataset.jump;
-        var c = claims(d).filter(function (x) { return x.tier === t; })
-          .sort(function (a, b2) { return String(a.id).localeCompare(String(b2.id)); })[0];
-        jumpTo(c && document.getElementById('row-' + c.id));
+        jumpTo(app.querySelector('[data-band="' + b.dataset.jump + '"]'));
       });
     });
     wireTests(app);
@@ -651,7 +660,7 @@
     var pc = document.getElementById('pickcount');
     if (pc) pc.innerHTML = '<span style="color:' + (picked === human.length ? 'var(--ph)' : 'var(--t-argued)') + '">' + picked + ' of ' + human.length + ' decided</span>';
     var st = document.getElementById('sign-status');
-    if (st && !state.receipt) st.textContent = picked < human.length ? 'Decide all ' + human.length + ' claims to sign (' + (human.length - picked) + ' left).' : (!ready ? 'Type your name to sign.' : 'Ready to sign.');
+    if (st && !state.receipt) st.textContent = picked < human.length ? (human.length === 1 ? 'Decide the claim to sign.' : 'Decide all ' + human.length + ' claims to sign (' + (human.length - picked) + ' left).') : (!ready ? 'Type your name to sign.' : 'Ready to sign.');
     if (st && state.receipt && !state.justSigned) st.textContent = 'Signed by ' + state.receipt.signed_by + '.';
     var ph = app.querySelector('.p-h');
     if (ph) ph.textContent = state.receipt ? 'Receipt' : 'Sign the receipt';
@@ -669,11 +678,16 @@
   }
 
   function withScore(d, c, o) {
-    var x = cf(d, c.id);
-    if (x) { o.score = x.score; o.band = x.band; if (x.gate) o.needs_owner = x.gate.owner || true; }
+    var x = confOf(d, c);
+    o.score = x.score; o.band = x.band;
+    if (x.gate) o.owner = x.gate.owner || '';
     return o;
   }
-  function slipGrade(p) { return p.band ? String(p.band).toUpperCase() + ' ' + p.score : String(p.tier).toUpperCase(); }
+  /* band and score for a receipt line; older receipts carry neither, so look them up */
+  function slipGrade(p) {
+    var x = p.band ? p : cf(DATA[state.key] || {}, p.id);
+    return x ? (BAND[x.band] || {}).g + ' ' + String(x.band).toUpperCase() + ' ' + x.score : '';
+  }
   function buildReceipt(d, name) {
     var human = humanOf(d);
     var r = {
@@ -681,8 +695,8 @@
       head: d.head,
       signed_by: name,
       signed_at: new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'),
-      picks: human.map(function (c) { return withScore(d, c, { id: c.id, tier: c.tier, pick: state.picks[c.id], claim: c.claim || '' }); }),
-      auto_settled: claims(d).filter(function (c) { return MACHINE[c.tier]; }).map(function (c) { return withScore(d, c, { id: c.id, tier: c.tier }); }),
+      picks: human.map(function (c) { return withScore(d, c, { id: c.id, pick: state.picks[c.id], claim: c.claim || '' }); }),
+      auto_settled: machineOf(d).map(function (c) { return withScore(d, c, { id: c.id }); }),
       not_checked: (d.not_checked || []).slice(),
       uncovered_diff_parts: (d.uncovered_diff_parts || []).slice()
     };
@@ -715,13 +729,13 @@
         '<div style="text-align:center" class="sub">' + esc(r.branch) + ' @ ' + esc(r.head) + (r.sample ? '<br>SAMPLE' : '') + '</div>' +
         '<hr class="rule">' +
         (r.picks || []).map(function (p) {
-          return '<div class="ln"><span>' + (GLYPH[p.tier] || '') + ' ' + esc(p.id) + '</span><span class="sub">' + esc(slipGrade(p)) + '</span>' +
+          return '<div class="ln"><span>' + esc(p.id) + '</span><span class="sub">' + esc(slipGrade(p)) + '</span>' +
             '<span class="pk ' + esc(String(p.pick).replace(' ', '-')) + '">' + esc(String(p.pick).toUpperCase()) + '</span></div>' +
             '<div class="cl">' + esc(p.claim) + '</div>';
         }).join('') +
         '<hr class="rule">' +
-        (auto.length ? '<div class="sub">SETTLED BY MACHINE</div><div class="auto">' + auto.map(function (a) {
-          return '<span title="' + esc(a.tier + (a.band ? ' · ' + a.band + ' ' + a.score : '')) + '">' + (GLYPH[a.tier] || '') + ' ' + esc(a.id) + (a.band ? ' <span class="sub">' + esc(a.score) + '</span>' : '') + '</span>';
+        (auto.length ? '<div class="sub">OTHER CLAIMS</div><div class="auto">' + auto.map(function (a) {
+          return '<span>' + esc(a.id) + ' <span class="sub">' + esc(slipGrade(a)) + '</span></span>';
         }).join('') + '</div><hr class="rule">' : '') +
         ((r.not_checked || []).length ? '<div class="sub">NOT CHECKED</div><ul>' + r.not_checked.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '') +
         ((r.uncovered_diff_parts || []).length ? '<div class="sub" style="margin-top:6px">UNCOVERED CODE</div><ul class="paths">' + r.uncovered_diff_parts.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '') +
