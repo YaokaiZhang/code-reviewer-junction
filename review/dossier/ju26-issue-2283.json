@@ -18,7 +18,8 @@
       "requirement": "R-2283-1",
       "requirement_inferred": false,
       "evidence": [
-        "evidence/ju26-issue-2283/old-vs-new-tests.json"
+        "evidence/ju26-issue-2283/old-vs-new-tests.json",
+        "evidence/ju26-issue-2283/old-vs-new-tests.script.json"
       ],
       "diff_parts": [
         "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:985",

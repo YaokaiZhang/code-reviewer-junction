@@ -626,3 +626,5 @@ main:focus, main:focus-visible { outline: none; }
 .blist .gc span { color: var(--c); text-shadow: 0 0 6px var(--c); }
 .blist .gc span.z { color: var(--ph-faint); text-shadow: none; }
 .blist li + li { border-top: 1px dashed rgba(184,131,0,.25); padding-top: 4px; }
+.ic { font-family: inherit; color: var(--ph-hi); background: rgba(255,179,0,.1); padding: 0 .2em; border-radius: 2px; }
+.slip .ic { color: inherit; background: rgba(0,0,0,.06); }

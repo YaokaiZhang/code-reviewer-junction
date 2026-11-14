@@ -22,6 +22,7 @@
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   }
+  function rich(s) { return esc(s).replace(/`([^`]+)`/g, '<code class="ic">$1</code>'); }
   function lc(t) { return String(t || '').toLowerCase(); }
   function store(k, v) {
     try { if (v === undefined) return JSON.parse(localStorage.getItem(k)); localStorage.setItem(k, JSON.stringify(v)); }
@@ -169,8 +170,8 @@
     return '<article class="own c-' + lc(c.tier) + (pick ? ' picked' : '') + '" id="row-' + esc(c.id) + '" data-id="' + esc(c.id) + '" tabindex="-1">' +
       '<div class="own-h"><span class="tg">' + GLYPH[c.tier] + ' ' + esc(c.tier.toUpperCase()) + '</span><span class="id">' + esc(c.id) + '</span>' +
         (c.owner_role ? '<span class="role">' + esc(c.owner_role) + '</span>' : '') + '</div>' +
-      '<p class="claim-t">' + esc(c.claim) + '</p>' +
-      (c.why_this_tier ? '<p class="why">' + esc(c.why_this_tier) + '</p>' : '') +
+      '<p class="claim-t">' + rich(c.claim) + '</p>' +
+      (c.why_this_tier ? '<p class="why">' + rich(c.why_this_tier) + '</p>' : '') +
       evidenceBlock(d, c) +
       '<fieldset class="keys"><legend>' + esc(c.id) + '</legend>' +
         PICKS.map(function (p) {
@@ -185,8 +186,8 @@
   function machineRow(d, c) {
     return '<details class="mach c-' + lc(c.tier) + '" id="row-' + esc(c.id) + '">' +
       '<summary><span class="g" aria-hidden="true">' + GLYPH[c.tier] + '</span><span class="tn">' + esc(c.tier) + '</span><span class="id">' + esc(c.id) + '</span>' +
-      '<span class="ct">' + esc(c.claim) + '</span><span class="tw" aria-hidden="true">▸</span></summary>' +
-      '<div class="body">' + (c.why_this_tier ? '<p class="why">' + esc(c.why_this_tier) + '</p>' : '') + evidenceBlock(d, c) + '</div>' +
+      '<span class="ct">' + rich(c.claim) + '</span><span class="tw" aria-hidden="true">▸</span></summary>' +
+      '<div class="body">' + (c.why_this_tier ? '<p class="why">' + rich(c.why_this_tier) + '</p>' : '') + evidenceBlock(d, c) + '</div>' +
     '</details>';
   }
 
@@ -267,11 +268,11 @@
                 '<div>' + machine.map(function (c) { return machineRow(d, c); }).join('') + '</div>' : '') +
               '<div class="sec-h"><span class="inv">LEDGER</span><span class="rule"></span></div>' +
               '<div class="lists">' +
-                list('NOT CHECKED', d.not_checked, esc, true) +
+                list('NOT CHECKED', d.not_checked, rich, true) +
                 list('NO CLAIM', d.uncovered_diff_parts, function (p) { return '<code>' + esc(p) + '</code>'; }, true) +
-                list('FOUND', d.found, esc) +
-                list('REFUSED', d.refused, function (r) { return r && typeof r === 'object' ? '<b>' + esc(r.what) + '</b> — ' + esc(r.why) : esc(r); }) +
-                list('SCOPE DRIFT', d.scope_drift, esc, true) +
+                list('FOUND', d.found, rich) +
+                list('REFUSED', d.refused, function (r) { return r && typeof r === 'object' ? '<b>' + rich(r.what) + '</b> — ' + rich(r.why) : rich(r); }) +
+                list('SCOPE DRIFT', d.scope_drift, rich, true) +
               '</div>' +
               '<div class="prompt" id="prompt"></div>' +
             '</div>' +
@@ -403,7 +404,7 @@
         ((r.uncovered_diff_parts || []).length ? '<div class="sub" style="margin-top:6px">NO CLAIM</div><ul class="paths">' + r.uncovered_diff_parts.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '') +
         '<hr class="rule">' +
         '<div class="sig"><span class="sub">SIGNED</span><span class="who">' + esc(r.signed_by) + '</span>' +
-        '<span class="sub">AT</span><span>' + esc(r.signed_at) + '</span></div>' +
+        '<span class="sub">AT</span><span>' + esc(r.signed_at.replace('T', ' ').replace(/Z$/, ' UTC')) + '</span></div>' +
       '</div><span class="tear"></span></div>';
     feed.innerHTML = html;
     var side = feed.closest('.side'); if (side) side.classList.add('signed');

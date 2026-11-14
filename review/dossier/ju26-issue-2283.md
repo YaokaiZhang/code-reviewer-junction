@@ -57,6 +57,7 @@ R-2283-1
 - ▲ Tested — both still pass with the filter line reverted (ablation), so the crash fix carries them
 
 - [`old-vs-new-tests`](../evidence/ju26-issue-2283/old-vs-new-tests.json) **pass** · hand — 3 of 3 new tests fail on base and pass on branch; 1 of them (ClosedGenericStruct_FromMetadataReference_UnkeyedMember) also fails when only the filter is removed; whole test project: 167 of 167 pre-existing tests pass on base and 167 on branch
+- [`old-vs-new-tests.script`](../evidence/ju26-issue-2283/old-vs-new-tests.script.json) **pass** — 3 new or changed test methods (3 added, 0 modified): 3 fail on base and pass on branch, 0 pass on base (not evidence), 0 fail on branch, 0 not runnable here (project does not build on branch)
 - `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:985`
 - `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1077`
 - `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1429-1435`

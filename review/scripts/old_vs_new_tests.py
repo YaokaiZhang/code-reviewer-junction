@@ -59,21 +59,32 @@ def show(repo, rev, path):
     return p.stdout if p.returncode == 0 else None
 
 
+def mask_strings(src):
+    """Blank out raw (\"\"\"...\"\"\") and verbatim (@"...") string contents, keeping newlines,
+    so `namespace`/`class` text inside test-input literals is not taken for real declarations."""
+    def blank(m):
+        return re.sub(r"[^\n]", " ", m.group(0))
+    src = re.sub(r'(\$*)("{3,})[\s\S]*?\2', blank, src)
+    src = re.sub(r'\$?@"(?:[^"]|"")*"', blank, src)
+    return src
+
+
 def test_methods(src):
     """Return {(class, method): body_text} for xunit test methods (simple scan, not a parser)."""
     if src is None:
         return {}
     out = {}
     lines = src.splitlines()
-    ns = NS_RE.search(src)
+    masked = mask_strings(src).splitlines()
+    ns = NS_RE.search(mask_strings(src))
     ns = ns.group(1) + "." if ns else ""
     cls = None
     pending_attr = False
     i = 0
     while i < len(lines):
         line = lines[i]
-        m = CLASS_RE.search(line)
-        if m and "class" in line and not line.strip().startswith("//"):
+        m = CLASS_RE.search(masked[i])
+        if m and not masked[i].strip().startswith("//"):
             cls = m.group(1)
         if TEST_ATTR.search(line):
             pending_attr = True
@@ -268,7 +279,9 @@ def main():
         "base": args.base,
         "head": br_sha[:8],
         "command": f"python3 review/scripts/old_vs_new_tests.py --repo <clone> --branch {args.branch} --out {rel_out}",
-        "result": "fail" if bad else ("error" if unrunnable else "pass"),
+        # Nothing actually ran: the filter matched no test. That is a tool error, not a test failure.
+        "result": "error" if new_or_changed and all(m["verdict"] in ("unknown",) or m["verdict"].startswith("not runnable") for m in new_or_changed)
+                  else ("fail" if bad else ("error" if unrunnable else "pass")),
         "summary": (f"{counts['new_or_changed_methods']} new or changed test methods "
                     f"({counts['test_methods_added']} added, {counts['test_methods_modified']} modified): "
                     f"{counts['evidence']} fail on base and pass on branch, "
