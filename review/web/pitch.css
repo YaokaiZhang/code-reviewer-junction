@@ -488,3 +488,5 @@
 .p-keys p { margin: 2px 0; }
 .p-keys p span { display: inline-block; min-width: 92px; color: #b39a6a; }
 .p-keys p.ex { margin-top: 6px; color: #fff3d6; }
+.p-keys li { padding: 18px 20px; font-size: 1.15rem; color: #f6e7c4; }
+.p-keys p.ex { font-size: 14px; color: #d9c08a; }

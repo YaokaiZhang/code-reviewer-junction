@@ -472,43 +472,29 @@
   function secSame(s) {
     var rows = s.ds.filter(function (d) { return d._isolation && d._isolation.totals && d._isolation.totals.compared; });
     if (!rows.length) return '';
-    var iso0 = rows[0]._isolation, nproj = (iso0.projects || []).length, nctl = +iso0.control_inputs || 0;
-    var by = function (n) { return rows.filter(function (d) { return String(issueOf(d)) === n; })[0]; };
     /* real examples, each shown only if the data has it */
-    var exOld = s.snap ? '#2297 rewrote ' + fmt(s.snap) + ' expected files. The old tests still pass.' : '';
-    var d83 = by('2283');
-    var exNew = d83 ? '#2283: only a case written by hand found the lost warning.' : '';
-    var d97 = by('2297'), d34 = by('2234'), ex3 = [];
-    if (d97 && +d97._isolation.control_differ) ex3.push('#2297: ' + d97._isolation.control_differ + ' old-test outputs changed. Each one matches a claim.');
-    if (d34) { var c = d34._isolation.coverage || {}, un = (+c.trackable || 0) - (+c.reached_any || 0);
-      if (un > 0) ex3.push('#2234: ' + un + ' changed lines ran on no input, so a person decides.'); }
-    var card = function (cls, name, key, gap, ex) {
-      return '<li class="' + cls + '"><h4>' + esc(name) + '</h4>' +
-        '<p><span>Answer key</span>' + esc(key) + '</p>' +
-        '<p><span>Weak spot</span>' + esc(gap) + '</p>' +
-        (ex.length ? ex.map(function (e) { return '<p class="ex">' + esc(e) + '</p>'; }).join('') : '') + '</li>';
+    var exOld = s.snap ? '#2297 edited ' + fmt(s.snap) + ' answers. The tests still pass.' : '';
+    var card = function (cls, name, line, ex) {
+      return '<li class="' + cls + '"><h4>' + esc(name) + '</h4><p>' + esc(line) + '</p>' +
+        (ex ? '<p class="ex">' + esc(ex) + '</p>' : '') + '</li>';
     };
     return '<section class="p-sec p-same">' +
       '<div class="p-grid2">' +
         '<div>' +
           '<h2 class="p-h2">' + words('Did it break') + '<br>' + words('anything?', 'hot', 140) + '</h2>' +
-          '<p class="p-cap p-same-lede" data-rv>A test checks what someone wrote down. This check compares every output with the old code.</p>' +
           '<p class="p-same-big" data-rv>Same input, same output.</p>' +
           '<ul class="p-rules" data-rv>' +
-            '<li><b>1</b>Many inputs: ' + nproj + ' real projects' + (nctl ? ' and the ' + nctl + ' inputs of the old tests' : '') + '.</li>' +
-            '<li><b>2</b>Run old and new on each. Record which changed lines ran.</li>' +
-            '<li><b>3</b>Line ran, same output: nothing broke.</li>' +
-            '<li><b>4</b>Output differs, or a line never ran: a person decides.</li>' +
+            '<li><b>1</b>Run old and new code on the same inputs.</li>' +
+            '<li><b>2</b>Same output: nothing broke.</li>' +
+            '<li><b>3</b>Different output, or a line never ran: a person decides.</li>' +
           '</ul>' +
         '</div>' +
         '<div class="p-panel" data-rv>' +
-          '<p class="p-same-here">Who writes the answer key?</p>' +
+          '<p class="p-same-here">Who writes the right answer?</p>' +
           '<ul class="p-keys">' +
-            card('', 'Old tests', 'A person, in the past.', 'The change can edit the answers.', exOld ? [exOld] : []) +
-            card('', 'New tests for old features', 'A person, now.', 'Slow. Only the cases they think of.', exNew ? [exNew] : []) +
-            card('on', 'Old vs new', 'The old code. The change can’t edit it.', 'Lines no input runs. Those go to a person.', ex3) +
+            card('', 'Tests', 'A person. The change can edit it.', exOld) +
+            card('on', 'Old vs new', 'The old code. The change can’t edit it.', '') +
           '</ul>' +
-          '<p class="p-note">Tools decide every result, not the AI.</p>' +
         '</div>' +
       '</div>' +
     '</section>';
