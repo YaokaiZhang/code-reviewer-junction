@@ -121,7 +121,13 @@ def main():
             bad_steps += bool(problems and problems != ["no token to check"])
             steps.append(dict(s, file=f, verified=not problems, problems=problems,
                               tokens=TOKEN.findall(s["text"])))
-        res = results_for(c, a.branch)
+        res = []
+        for r in results_for(c, a.branch):  # the same run recorded in two evidence files: show it once
+            same = next((x for x in res if (x["run"], x["outcome"]) == (r["run"], r["outcome"])), None)
+            if same:
+                same.setdefault("also_in", []).append(r["source"])
+            else:
+                res.append(r)
         before = [r for r in res if r["run"].startswith("before")]
         after = [r for r in res if r["run"] == "after the change"]
         flips = bool(before) and all(r["outcome"] == "fail" for r in before) and bool(after) and all(r["outcome"] == "pass" for r in after)
