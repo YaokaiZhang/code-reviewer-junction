@@ -9,7 +9,7 @@
     high: { g: '●', w: 'High', long: 'A strong check backs it: a proof, a rebuild, or a test that fails before and passes after.', short: 'A strong check backs it.' },
     medium: { g: '◐', w: 'Medium', long: 'An experiment on the real code, or a weaker check, backs it.', short: 'Some check backs it.' },
     low: { g: '○', w: 'Low', long: 'Only a number, or no check at all. Read it yourself.', short: 'Little or no check.' },
-    owner: { g: '✎', w: 'Needs owner', long: 'A check shows a promise to users changed. Its owner decides, and you sign.', short: 'A promise to users changed. Owner decides.' }
+    owner: { g: '✎', w: 'Needs owner', long: 'Something users rely on changed, or no test reaches a changed line. Its owner decides, and you sign.', short: 'A promise changed or is untested. Owner decides.' }
   };
   var RESULT = {
     pass: { w: 'PASS', t: 'The check ran and got its expected outcome. This is the check\u2019s own result, not a verdict on the claim.' },
@@ -304,6 +304,7 @@
   function needsBadge(x) { return x && x.gate ? '<span class="needs" title="A promise to users changed; its owner decides">needs owner</span>' : ''; }
   /* the promise that changed, in plain words */
   var CONTRACT_WORDS = { diagnostics: 'warnings', generated: 'generated code', 'public-api': 'public API', 'compat-breaking': 'compatibility' };
+  function capital(t) { return t.charAt(0).toUpperCase() + t.slice(1); }
   function gateBlock(x, role) {
     var g = x && x.gate;
     if (!g) return '';
@@ -316,9 +317,10 @@
         '<span class="nd">Needs an owner:</span><span class="who"' + (role ? ' title="For: ' + esc(role) + '"' : '') + '>' + esc(g.owner || 'owner unknown') + '</span>' +
         '<span class="ctr">' + esc(area) + '</span><span class="tw" aria-hidden="true">▸</span></summary>' +
       '<div class="gb">' +
-        '<div class="gq"><h6>Why</h6><p>A real check showed: ' + rich(plain(String(g.change || '').replace(/\(base reported it\)/, '(it was reported before the change)').replace(/\(base compiles\)/, '(it compiled before the change)'))) + '.' + ev + '</p>' +
+        '<div class="gq"><h6>Why</h6><p>' + (g.source === 'old-vs-new' ? '' : 'A real check showed: ') + rich(plain(capital(String(g.change || '').replace(/\(base reported it\)/, '(it was reported before the change)').replace(/\(base compiles\)/, '(it compiled before the change)')))) + '.' + ev + '</p>' +
+          ((g.also || []).length ? '<ul class="rules">' + g.also.map(function (a) { return '<li><span></span><span>' + rich(plain(capital(a))) + '.</span></li>'; }).join('') + '</ul>' : '') +
           (g.inherited_from ? '<p>This decision depends on ' + goto(g.inherited_from) + ', which needs an owner, so it does too.</p>' : '') + '</div>' +
-        '<div class="gq"><h6>Who decided</h6><p>A fixed rule, not the AI. When a check shows something users would notice has changed, and these are the lines that changed it, a person must decide. A high score never clears it, and the AI can’t either.</p></div>' +
+        '<div class="gq"><h6>Who decided</h6><p>A fixed rule, not the AI. The old and the new code run on the same inputs from before the change. If something users rely on comes out different, or no input runs a changed line at all, a person must decide. A high score never clears it, and the AI can’t either.</p></div>' +
         '<div class="gq"><h6>Why this person</h6><p>' + why + '</p></div>' +
         (rules.length ? '<div class="gq"><h6>What maintainers said before</h6><ul class="rules">' + rules.map(function (r) { return '<li><span>' + ruleLink(r.id, r.sources) + '</span><span>' + rich(r.rule) + '</span></li>'; }).join('') + '</ul></div>' : '') +
       '</div></details>';

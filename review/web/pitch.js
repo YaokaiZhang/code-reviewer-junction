@@ -346,7 +346,7 @@
     var chain = [
       ['AI', 'The AI writes the trace and the question. It can be wrong.'],
       ['Tools', 'Real tools test the old and the new code. A script checks every AI step against the lines it cites.'],
-      ['Rule', 'The project has a fixed list of things users rely on: its warnings, public API, generated code, data format and docs. When a check shows one of them changed, a fixed rule, not the AI, sends it to a person.'],
+      ['Rule', 'The old and the new code run on the same inputs from before the change. If something users rely on comes out different, or no input runs a changed line, a fixed rule sends the claim to a person. Not the AI.'],
       ['You', 'The owner of that part answers the question. You, the reviewer, sign the change.']
     ];
     var slip = '<div class="p-slip"><div class="p-slip-in">' +

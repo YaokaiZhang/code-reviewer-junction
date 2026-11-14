@@ -2,7 +2,7 @@
 
 *Read the evidence, not the diff.*
 
-An AI agent writes a change. The reviewer turns it into checkable claims. Each claim gets a **confidence score** (0–100) from the evidence behind it, by a fixed formula. When a check shows a promise to users changed, the claim **needs an owner**: a named maintainer decides and signs a receipt.
+An AI agent writes a change. The reviewer turns it into checkable claims. Each claim gets a **confidence score** (0–100) from the evidence behind it, by a fixed formula. When the old and the new code give a different result on something users rely on, or no input runs a changed line, the claim **needs an owner**: a named maintainer decides and signs a receipt.
 
 Target: [`junction26-messagepack-csharp`](https://github.com/te-industry-tech-office/junction26-messagepack-csharp), base `32258fdb`.
 

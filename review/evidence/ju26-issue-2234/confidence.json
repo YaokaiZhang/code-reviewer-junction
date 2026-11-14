@@ -4,7 +4,7 @@
   "base": "32258fdb",
   "command": "python3 review/scripts/confidence.py --branch ju26-issue-2234 --write",
   "result": "pass",
-  "summary": "9 claims: 3 high, 2 medium, 4 low; 1 need an owner (C-2234-04)",
+  "summary": "9 claims: 3 high, 2 medium, 4 low; 6 need an owner (C-2234-01, C-2234-02, C-2234-03, C-2234-04, C-2234-06, C-2234-09)",
   "details": {
     "formula": {
       "kinds": {
@@ -78,7 +78,20 @@
           }
         ],
         "contradicted_by": [],
-        "gate": null,
+        "gate": {
+          "contract": "diagnostics",
+          "change": "old vs new: no input that existed before the change runs TypeCollector.cs:1008 or TypeCollector.cs:1148",
+          "shown_by": "evidence/ju26-issue-2234/isolation.json",
+          "source": "old-vs-new",
+          "hunks": [
+            "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1008-1008",
+            "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1148-1148"
+          ],
+          "owner": "Andrew Arnott",
+          "owner_basis": "most commits on the diagnostics paths at base (85 commits)",
+          "rules": [],
+          "also": []
+        },
         "depends_on": [],
         "shares_lines_with": [
           "MsgPack003 is no longer reported for a member with a mixed key and an unserializable type (base reported it)"
@@ -109,7 +122,20 @@
           }
         ],
         "contradicted_by": [],
-        "gate": null,
+        "gate": {
+          "contract": "diagnostics",
+          "change": "old vs new: no input that existed before the change runs TypeCollector.cs:1008 or TypeCollector.cs:1148",
+          "shown_by": "evidence/ju26-issue-2234/isolation.json",
+          "source": "old-vs-new",
+          "hunks": [
+            "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1008-1008",
+            "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1148-1148"
+          ],
+          "owner": "Andrew Arnott",
+          "owner_basis": "most commits on the diagnostics paths at base (85 commits)",
+          "rules": [],
+          "also": []
+        },
         "depends_on": []
       },
       "C-2234-03": {
@@ -137,7 +163,19 @@
           }
         ],
         "contradicted_by": [],
-        "gate": null,
+        "gate": {
+          "contract": "diagnostics",
+          "change": "old vs new: no input that existed before the change runs TypeCollector.cs:1148",
+          "shown_by": "evidence/ju26-issue-2234/isolation.json",
+          "source": "old-vs-new",
+          "hunks": [
+            "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1148-1148"
+          ],
+          "owner": "Andrew Arnott",
+          "owner_basis": "most commits on the diagnostics paths at base (85 commits)",
+          "rules": [],
+          "also": []
+        },
         "depends_on": [],
         "shares_lines_with": [
           "MsgPack003 is no longer reported for a member with a mixed key and an unserializable type (base reported it)"
@@ -172,13 +210,17 @@
           "contract": "diagnostics",
           "change": "MsgPack003 is no longer reported for a member with a mixed key and an unserializable type (base reported it)",
           "shown_by": "evidence/ju26-issue-2234/findings-probes.json",
+          "source": "experiment",
           "hunks": [
             "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1008-1008",
             "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1148-1148"
           ],
           "owner": "Andrew Arnott",
           "owner_basis": "most commits on the diagnostics paths at base (85 commits)",
-          "rules": []
+          "rules": [],
+          "also": [
+            "old vs new: no input that existed before the change runs TypeCollector.cs:1008 or TypeCollector.cs:1148"
+          ]
         },
         "depends_on": []
       },
@@ -253,7 +295,20 @@
           }
         ],
         "contradicted_by": [],
-        "gate": null,
+        "gate": {
+          "contract": "diagnostics",
+          "change": "old vs new: no input that existed before the change runs TypeCollector.cs:1008 or TypeCollector.cs:1148",
+          "shown_by": "evidence/ju26-issue-2234/isolation.json",
+          "source": "old-vs-new",
+          "hunks": [
+            "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1008-1008",
+            "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1148-1148"
+          ],
+          "owner": "Andrew Arnott",
+          "owner_basis": "most commits on the diagnostics paths at base (85 commits)",
+          "rules": [],
+          "also": []
+        },
         "depends_on": []
       },
       "C-2234-07": {
@@ -323,7 +378,20 @@
             "summary": "(a) continue skips member type: confirmed; (b) second member of a duplicate key gets MsgPack005: yes, finding dropped; null-key first field crashes analyzer on branch: confirmed (11 scenarios, real analyzer, base and branch)"
           }
         ],
-        "gate": null,
+        "gate": {
+          "contract": "diagnostics",
+          "change": "old vs new: no input that existed before the change runs TypeCollector.cs:1148",
+          "shown_by": "evidence/ju26-issue-2234/isolation.json",
+          "source": "old-vs-new",
+          "hunks": [
+            "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1148-1148"
+          ],
+          "owner": "Andrew Arnott",
+          "owner_basis": "most commits on the diagnostics paths at base (85 commits)",
+          "rules": [],
+          "also": [],
+          "inherited_from": "C-2234-03"
+        },
         "depends_on": [
           "C-2234-03"
         ]
