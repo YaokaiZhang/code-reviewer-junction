@@ -18,6 +18,19 @@
     fail: { w: 'FAIL', t: 'The check ran and did not get its expected outcome. Read the line beside it for what that shows.' },
     error: { w: 'INCOMPLETE', t: 'The check could not run every case here.' }
   };
+  /* plain labels for confidence.json signal kinds */
+  var KIND = {
+    'rebuild-compare': 'rebuilt and compared', 'proof-model': 'proved on a model', 'flip-test': 'fails before, passes after',
+    'revert-test': 'fails when the fix is undone', probe: 'experiment on the real code', count: 'number from a tool', none: 'no check'
+  };
+  /* what a new test shows, from explain-check.json results/verdict */
+  var TK = {
+    flip: { g: '▲', w: 'fail before · pass after' },
+    weak: { g: '⚠', w: 'pass before too', flag: 'NOT A TEST OF THE CHANGE' },
+    norun: { g: '∅', w: 'did not run', flag: 'DID NOT RUN' },
+    other: { g: '·', w: 'other' }
+  };
+  var OUT = { pass: ['✓', 'PASS'], fail: ['✕', 'FAIL'], build_failed: ['∅', 'NO BUILD'] };
   var NUM = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
   var PICKS = [
     { v: 'accept', k: 'A', cls: 'accept' },
@@ -232,11 +245,12 @@
 
   function ownerRow(d, c, seen) {
     var pick = state.picks[c.id];
-    var name = 'pick-' + c.id;
+    var name = 'pick-' + c.id, x = cf(d, c.id);
     return '<article class="own c-' + lc(c.tier) + (pick ? ' picked' : '') + '" id="row-' + esc(c.id) + '" data-id="' + esc(c.id) + '" tabindex="-1">' +
-      '<div class="own-h"><span class="tg">' + GLYPH[c.tier] + ' ' + esc(c.tier.toUpperCase()) + '</span><span class="id">' + esc(c.id) + '</span>' +
-        (c.owner_role ? '<span class="role" title="Who should decide this claim">For: ' + esc(c.owner_role) + '</span>' : '') + '</div>' +
+      '<div class="own-h"><span class="tg" title="' + esc(c.tier) + '">' + GLYPH[c.tier] + (x ? '' : ' ' + esc(c.tier.toUpperCase())) + '</span>' + scoreHtml(x) + '<span class="id">' + esc(c.id) + '</span>' +
+        needsBadge(x) + (c.owner_role ? '<span class="role" title="Who should decide this claim">For: ' + esc(c.owner_role) + '</span>' : '') + '</div>' +
       '<p class="claim-t">' + rich(c.claim) + '</p>' +
+      gateBlock(x) + receiptBlock(d, x) +
       (c.why_this_tier ? '<p class="why">' + rich(c.why_this_tier) + '</p>' : '') +
       evidenceBlock(d, c, seen) +
       '<fieldset class="keys"><legend>' + esc(c.id) + '</legend>' +
@@ -250,10 +264,11 @@
   }
 
   function machineRow(d, c) {
+    var x = cf(d, c.id);
     return '<details class="mach c-' + lc(c.tier) + '" id="row-' + esc(c.id) + '">' +
-      '<summary><span class="g" aria-hidden="true">' + GLYPH[c.tier] + '</span><span class="tn">' + esc(c.tier) + '</span><span class="id">' + esc(c.id) + '</span>' +
-      '<span class="ct">' + rich(c.claim) + '</span><span class="tw" aria-hidden="true">▸</span></summary>' +
-      '<div class="body">' + (c.why_this_tier ? '<p class="why">' + rich(c.why_this_tier) + '</p>' : '') + evidenceBlock(d, c) + '</div>' +
+      '<summary><span class="g" title="' + esc(c.tier) + '">' + GLYPH[c.tier] + '</span><span class="tn">' + (x ? scoreHtml(x) : esc(c.tier)) + '</span><span class="id">' + esc(c.id) + '</span>' +
+      '<span class="ct">' + needsBadge(x) + rich(c.claim) + '</span><span class="tw" aria-hidden="true">▸</span></summary>' +
+      '<div class="body">' + gateBlock(x) + receiptBlock(d, x) + (c.why_this_tier ? '<p class="why">' + rich(c.why_this_tier) + '</p>' : '') + evidenceBlock(d, c) + '</div>' +
     '</details>';
   }
 
@@ -264,6 +279,231 @@
       '<p class="gloss">' + esc(items.length ? gloss : emptyText) + '</p>' +
       (items.length ? '<ul>' + items.map(function (x) { return '<li>' + fmt(x) + '</li>'; }).join('') + '</ul>' : '') + '</section>';
   }
+
+  function base(p) { return String(p || '').split('/').pop(); }
+  function goto(id) { return '<button type="button" class="goto" data-goto="' + esc(id) + '">' + esc(id) + '</button>'; }
+  function ruleLink(id, sources) {
+    var s = sources || [];
+    return (s[0] ? '<a class="rid" href="' + esc(s[0]) + '" target="_blank" rel="noopener" title="Where the maintainers said it">' + esc(id) + '</a>' : '<span class="rid">' + esc(id) + '</span>') +
+      s.slice(1).map(function (u, i) { return '<a class="srcn" href="' + esc(u) + '" target="_blank" rel="noopener" aria-label="' + esc(id) + ' source ' + (i + 2) + '">' + (i + 2) + '</a>'; }).join('');
+  }
+
+  /* ---------- confidence (score, band, gate, receipt) ---------- */
+  function cf(d, id) {
+    var x = ((d._confidence || {}).details || {}).claims;
+    return x && x[id] || null;
+  }
+  function scoreHtml(x) {
+    if (!x) return '';
+    var s = Math.max(0, Math.min(100, +x.score || 0));
+    return '<span class="score b-' + esc(x.band) + '" title="Score ' + s + ' of 100 · ' + esc(x.band) + '">' +
+      '<span class="meter" aria-hidden="true"><b style="--s:' + s + '%"></b></span><span class="sn">' + s + '</span>' +
+      '<span class="bd">' + esc(String(x.band || '').toUpperCase()) + '</span></span>';
+  }
+  function needsBadge(x) { return x && x.gate ? '<span class="needs" title="Changes a contract; its owner decides">NEEDS OWNER</span>' : ''; }
+  function gateBlock(x) {
+    var g = x && x.gate;
+    if (!g) return '';
+    var rules = g.rules || [];
+    return '<details class="gate"><summary>' +
+        '<span class="who">✎ ' + esc(g.owner || 'owner unknown') + '</span><span class="ctr">' + esc(g.contract) + '</span>' +
+        rules.map(function (r) { return '<span class="rid">' + esc(r.id) + '</span>'; }).join('') + '<span class="tw" aria-hidden="true">▸</span></summary>' +
+      '<div class="gb"><p>' + rich(g.change) + '</p>' +
+        (rules.length ? '<ul class="rules">' + rules.map(function (r) { return '<li><span>' + ruleLink(r.id, r.sources) + '</span><span>' + rich(r.rule) + '</span></li>'; }).join('') + '</ul>' : '') +
+        '<p class="fine">' + esc(g.owner_basis || '') + (g.inherited_from ? ' · same change as ' + goto(g.inherited_from) : '') + '</p></div></details>';
+  }
+  function delta(n) { return (n < 0 ? '−' : '+') + Math.abs(n); }
+  function receiptBlock(d, x) {
+    if (!x) return '';
+    var F = ((d._confidence || {}).details || {}).formula || {};
+    var sigs = x.signals || [], con = x.contradicted_by || [], sh = x.shares_lines_with || [], dep = x.depends_on || [];
+    var pick = sigs.length ? sigs.map(function (s) { return s.score; }).reduce(function (a, b) { return /weakest/.test(x.how) ? Math.min(a, b) : Math.max(a, b); }) : null;
+    var body = sigs.map(function (s) {
+      return '<div class="sgl' + (s.score === pick ? ' counts' : '') + '"><div class="sgh"><span>' + esc(KIND[s.kind] || s.kind) + '</span>' +
+          (s.produced_by === 'hand' ? '<span class="hand">by hand</span>' : '') +
+          (s.score === pick && sigs.length > 1 ? '<span class="cnt">◂ counts</span>' : '') + '<span class="ss">' + esc(s.score) + '</span></div>' +
+        (s.parts || []).map(function (p) { return '<div class="pt"><span class="d' + (p.delta < 0 ? ' neg' : '') + '">' + delta(p.delta) + '</span><span>' + esc(p.text) + '</span></div>'; }).join('') +
+        '<a class="sf" href="../' + esc(s.file) + '" target="_blank" rel="noopener">' + esc(base(s.file)) + ' ↗</a></div>';
+    }).join('') || '<div class="sgl"><div class="sgh"><span>no check backs it</span><span class="ss">' + esc(x.score) + '</span></div></div>';
+    if (con.length) body += '<div class="sgl con"><div class="sgh"><span>✕ contradicted</span>' + (F.contradicted_cap != null ? '<span class="ss">≤ ' + F.contradicted_cap + '</span>' : '') + '</div>' +
+      con.map(function (c) { return '<p>' + rich(c.summary) + ' <a class="sf" href="../' + esc(c.file) + '" target="_blank" rel="noopener">' + esc(base(c.file)) + ' ↗</a></p>'; }).join('') + '</div>';
+    body += '<div class="tot"><span class="sn">= ' + esc(x.score) + '</span><span class="bd">' + esc(String(x.band).toUpperCase()) + '</span><span class="fine">' + esc(x.how || '') + '</span></div>';
+    if (dep.length) body += '<div class="rel"><span class="fine">depends on</span> ' + dep.map(goto).join(' ') + '</div>';
+    if (sh.length) body += '<div class="rel"><span class="fine">shares lines with</span><ul>' + sh.map(function (t) { return '<li>' + rich(t) + '</li>'; }).join('') + '</ul></div>';
+    return '<details class="rcpt"><summary>how the score adds up <span class="tw" aria-hidden="true">▸</span></summary><div class="paper">' + body + '</div></details>';
+  }
+
+  /* ---------- new tests ---------- */
+  function testRuns(c) {
+    var o = { before: null, after: null, extra: [] };
+    (c.results || []).forEach(function (r) {
+      var run = lc(r.run);
+      if (!o.before && /^before/.test(run)) o.before = r;
+      else if (!o.after && run === 'after the change') o.after = r;
+      else o.extra.push(r);
+    });
+    return o;
+  }
+  function testKind(c) {
+    var r = testRuns(c), v = lc(c.verdict);
+    if (c.flips) return 'flip';
+    if (/did not run/.test(v) || (r.after && r.after.outcome === 'build_failed')) return 'norun';
+    if (/passes before/.test(v) || (r.before && r.before.outcome === 'pass')) return 'weak';
+    return 'other';
+  }
+  function chip(r, label) {
+    if (!r) return '';
+    var o = OUT[r.outcome] || ['?', String(r.outcome || '?').toUpperCase()];
+    return '<span class="oc o-' + esc(String(r.outcome).replace(/_/g, '-')) + '" title="' + esc(r.run + ': ' + o[1]) + '"><i>' + esc(label) + '</i><b>' + o[0] + '<em> ' + o[1] + '</em></b></span>';
+  }
+  function runChips(c) {
+    var r = testRuns(c);
+    return chip(r.before, 'before') + chip(r.after, 'after') +
+      r.extra.map(function (x) { return chip(x, /undone|revert/.test(lc(x.run)) ? 'fix undone' : 'extra'); }).join('');
+  }
+  function stepHtml(c, s) {
+    var ln = s.lines || [], probs = s.problems || [];
+    var where = ln.length ? 'lines ' + ln[0] + (ln[1] !== ln[0] ? '–' + ln[1] : '') : 'no lines cited';
+    return '<li class="step op-' + esc(lc(s.op)) + (s.verified === false ? ' unv' : '') + '" tabindex="0" role="button" aria-pressed="false" title="' + esc(where) + '"' +
+        ' data-f="' + esc(s.file || c.file) + '" data-a="' + esc(ln[0]) + '" data-b="' + esc(ln[1] == null ? ln[0] : ln[1]) + '">' +
+      '<span class="op">' + esc(s.op) + '</span><span class="sx">' + rich(s.text) + '</span>' +
+      (s.verified === false ? '<span class="unv-m"><b>? unverified</b>' + probs.map(function (p) { return ' ' + rich(p); }).join(' ·') + '</span>' : '') +
+    '</li>';
+  }
+  function codeGroups(c) {
+    var code = c.code || {}, used = {};
+    var gs = [{ kind: 'test', name: c.test, file: c.file, span: c.span }].concat((c.helpers || []).map(function (h) {
+      return { kind: 'helper', name: h.name, file: h.file, span: h.span };
+    }));
+    function nums(f) { return Object.keys(code[f] || {}).map(Number).sort(function (a, b) { return a - b; }); }
+    gs.forEach(function (g) {
+      var sp = g.span || [];
+      g.lines = nums(g.file).filter(function (n) { return sp.length < 2 || (n >= sp[0] && n <= sp[1]); });
+      g.lines.forEach(function (n) { used[g.file + '#' + n] = 1; });
+    });
+    Object.keys(code).forEach(function (f) {
+      var rest = nums(f).filter(function (n) { return !used[f + '#' + n]; });
+      if (rest.length) gs.push({ kind: 'lines', name: base(f), file: f, lines: rest });
+    });
+    return gs.filter(function (g) { return g.lines.length; }).map(function (g) {
+      var src = code[g.file], prev = null;
+      var ind = g.lines.reduce(function (m, n) { var t = src[n]; return t.trim() ? Math.min(m, t.match(/^[ \t]*/)[0].length) : m; }, 1e9);
+      if (ind === 1e9) ind = 0;
+      var rows = g.lines.map(function (n) {
+        var gap = prev != null && n !== prev + 1 ? '<div class="r gap"><i>⋯</i></div>' : '';
+        prev = n;
+        return gap + '<div class="r" data-n="' + n + '"><i>' + n + '</i><span>' + esc(src[n].slice(ind)) + '</span></div>';
+      }).join('');
+      return '<div class="cg"><div class="cgh">' + g.kind + ' <b>' + esc(g.name) + '</b>' + (g.kind !== 'lines' ? ' <span>' + esc(base(g.file)) + '</span>' : '') + '</div>' +
+        '<div class="cl" data-f="' + esc(g.file) + '">' + rows + '</div></div>';
+    }).join('');
+  }
+  function analysisPane(c, k) {
+    var dnc = c.does_not_check || [], notes = c.notes || [];
+    var msgs = (c.results || []).filter(function (r) { return r.message; });
+    var more = notes.map(function (n) { return '<p>' + rich(n) + '</p>'; }).join('') +
+      (msgs.length ? '<ul class="msgs">' + msgs.map(function (r) { return '<li><span class="fine">' + esc(r.run) + '</span><code>' + esc(r.message) + '</code></li>'; }).join('') + '</ul>' : '') +
+      ((c.claims || []).length ? '<p class="cl-l"><span class="fine">claims</span> ' + c.claims.map(goto).join(' ') + '</p>' : '');
+    return '<div class="pane an"><h5>Analysis</h5>' +
+      '<p class="verdict">' + TK[k].g + ' ' + rich(c.verdict || '') + '</p>' +
+      '<div class="runs">' + runChips(c) + '</div>' +
+      (dnc.length ? '<div class="dnc"><h6>Does not check</h6><ul>' + dnc.map(function (x) { return '<li>' + rich(x) + '</li>'; }).join('') + '</ul></div>' : '') +
+      (more ? '<details class="more"><summary>notes &amp; claims <span class="tw" aria-hidden="true">▸</span></summary>' + more + '</details>' : '') +
+    '</div>';
+  }
+  function testCard(c) {
+    var k = testKind(c), t = TK[k];
+    return '<details class="tc k-' + k + '" id="test-' + esc(c.id) + '"' + (k === 'flip' ? ' open' : '') + '>' +
+      '<summary><span class="tg" aria-hidden="true">' + t.g + '</span><span class="tname" title="' + esc(c.file) + '">' + esc(c.test) + '</span>' +
+        (t.flag ? '<span class="flag">' + t.flag + '</span>' : '') + '<span class="runs">' + runChips(c) + '</span><span class="tw" aria-hidden="true">▸</span></summary>' +
+      '<div class="panes">' +
+        '<div class="pane ps"><h5>Pseudo-code</h5><ol class="steps">' + (c.steps || []).map(function (s) { return stepHtml(c, s); }).join('') + '</ol></div>' +
+        '<div class="pane rc"><h5>Real code</h5><div class="code" tabindex="0" aria-label="Code of ' + esc(c.test) + '">' + codeGroups(c) + '</div></div>' +
+        analysisPane(c, k) +
+      '</div></details>';
+  }
+  function testsSection(d) {
+    var cards = ((d._tests || {}).details || {}).cards || [];
+    if (!cards.length) return '';
+    var n = { flip: 0, weak: 0, norun: 0, other: 0 };
+    cards.forEach(function (c) { n[testKind(c)]++; });
+    return '<section class="tests" aria-label="New tests">' +
+      '<div class="sec-h"><span class="inv">NEW TESTS</span><span class="rule"></span></div>' +
+      '<div class="tstrip"><span class="tall"><b>' + cards.length + '</b> tests</span>' +
+        ['flip', 'weak', 'norun', 'other'].filter(function (k) { return n[k]; }).map(function (k) {
+          return '<span class="k-' + k + '"><i aria-hidden="true">' + TK[k].g + '</i><b>' + n[k] + '</b> ' + TK[k].w + '</span>';
+        }).join('') + '</div>' +
+      cards.map(testCard).join('') + '</section>';
+  }
+  function wireTests(root) {
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    root.querySelectorAll('.tc').forEach(function (card) {
+      var pane = card.querySelector('.code'), pinned = null;
+      if (!pane) return;
+      function show(st) {
+        pane.querySelectorAll('.r.hl').forEach(function (r) { r.classList.remove('hl'); });
+        card.querySelectorAll('.step.on').forEach(function (s) { s.classList.remove('on'); });
+        if (!st) return;
+        st.classList.add('on');
+        var a = +st.dataset.a, b = +st.dataset.b, hit = [];
+        pane.querySelectorAll('.cl').forEach(function (cl) {
+          if (cl.dataset.f !== st.dataset.f) return;
+          cl.querySelectorAll('.r[data-n]').forEach(function (r) {
+            var x = +r.dataset.n;
+            if (x >= a && x <= b) { r.classList.add('hl'); hit.push(r); }
+          });
+        });
+        if (!hit.length) return;
+        var pr = pane.getBoundingClientRect(), top = hit[0].getBoundingClientRect().top - pr.top, bot = hit[hit.length - 1].getBoundingClientRect().bottom - pr.top;
+        if (top < 0 || bot > pane.clientHeight) pane.scrollTo({ top: pane.scrollTop + top - 28, behavior: reduce ? 'auto' : 'smooth' });
+      }
+      card.querySelectorAll('.step').forEach(function (st) {
+        st.addEventListener('mouseenter', function () { show(st); });
+        st.addEventListener('mouseleave', function () { show(pinned); });
+        st.addEventListener('focus', function () { show(st); });
+        st.addEventListener('blur', function () { show(pinned); });
+        function toggle() {
+          if (pinned) { pinned.classList.remove('pin'); pinned.setAttribute('aria-pressed', 'false'); }
+          pinned = pinned === st ? null : st;
+          if (pinned) { st.classList.add('pin'); st.setAttribute('aria-pressed', 'true'); }
+          show(pinned || st);
+        }
+        st.addEventListener('click', toggle);
+        st.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+      });
+    });
+  }
+
+  /* ---------- readability ---------- */
+  function readabilityBlock(d) {
+    var fl = ((d._readability || {}).details || {}).flags || [];
+    if (!fl.length) return '';
+    return '<section class="lst rd"><h4><span class="inv">READABILITY</span><span class="k">' + fl.length + '</span></h4>' +
+      '<p class="gloss">Flags tied to a maintainer rule.</p><ul>' + fl.map(function (f) {
+        var file = base(String(f.where || '').split(/[:;]/)[0]);
+        return '<li><details><summary>' + ruleLink(f.rule, (f.sources || []).slice(0, 1)) +
+            '<span class="m" title="' + esc(f.measure) + '">' + esc(String(f.measure || '').replace(/\s*\(.*\)\s*$/, '')) + (file ? ' · ' + esc(file) : '') + '</span>' +
+            '<span class="dl">' + esc(f.value_base) + ' → ' + esc(f.value_branch) + '</span><span class="tw" aria-hidden="true">▸</span></summary>' +
+          '<div class="rb"><p>' + ruleLink(f.rule, f.sources) + ' ' + esc(f.rule_text || '') + '</p>' +
+            (f.detail ? '<p><code>' + esc(f.detail) + '</code></p>' : '') +
+            '<p class="fine">' + esc(f.where || '') + '</p>' +
+            ((f.claims || []).length ? '<p>' + f.claims.map(goto).join(' ') + '</p>' : '') + '</div></details></li>';
+      }).join('') + '</ul></section>';
+  }
+
+  function jumpTo(el) {
+    if (!el) return;
+    if (el.tagName === 'DETAILS') el.open = true;
+    el.scrollIntoView({ block: 'start' });
+    var f = el.tagName === 'DETAILS' ? el.querySelector('summary') : el.querySelector('input') || el;
+    if (f) f.focus({ preventScroll: true });
+  }
+  app.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('[data-goto]');
+    if (!b) return;
+    e.preventDefault();
+    jumpTo(document.getElementById('row-' + b.dataset.goto));
+  });
 
   function renderDossier(key) {
     var d = DATA[key];
@@ -332,6 +572,7 @@
             '<div class="term" id="term" tabindex="0" aria-label="Dossier">' +
               '<div class="t-top"><span class="inv">' + esc(d.branch) + '</span><span id="sigstate" class="dim">' + esc(d.head || '') + '</span></div>' +
               '<div class="tiers">' + tiers + '</div>' +
+              testsSection(d) +
               (human.length ?
                 '<div class="sec-h"><span class="inv" style="background:var(--t-argued)">YOUR CALL</span><span class="rule"></span><span id="pickcount"></span></div>' +
                 '<p class="sec-g">No machine can settle these. Read the evidence, then accept, reject, or send the claim back to the AI to rework. PASS or FAIL is each check\u2019s own outcome, not a verdict on the claim.</p>' +
@@ -347,6 +588,7 @@
                 list('FOUND', 'What the reviewer found.', d.found, rich) +
                 list('REFUSED', 'Why some claims are left to a person.', d.refused, function (r) { return r && typeof r === 'object' ? '<b>' + rich(r.what) + '</b> — ' + rich(r.why) : rich(r); }) +
                 list('SCOPE DRIFT', 'Changes the issue did not ask for.', d.scope_drift, rich, true) +
+                readabilityBlock(d) +
               '</div>' +
               '<div class="prompt" id="prompt"></div>' +
             '</div>' +
@@ -371,14 +613,10 @@
         var t = b.dataset.jump;
         var c = claims(d).filter(function (x) { return x.tier === t; })
           .sort(function (a, b2) { return String(a.id).localeCompare(String(b2.id)); })[0];
-        var el = c && document.getElementById('row-' + c.id);
-        if (!el) return;
-        if (el.tagName === 'DETAILS') el.open = true;
-        el.scrollIntoView({ block: 'start' });
-        var f = el.tagName === 'DETAILS' ? el.querySelector('summary') : el.querySelector('input');
-        if (f) f.focus({ preventScroll: true });
+        jumpTo(c && document.getElementById('row-' + c.id));
       });
     });
+    wireTests(app);
     if (state.receipt) printSlip(state.receipt, false);
     refresh();
   }
@@ -430,6 +668,12 @@
     }
   }
 
+  function withScore(d, c, o) {
+    var x = cf(d, c.id);
+    if (x) { o.score = x.score; o.band = x.band; if (x.gate) o.needs_owner = x.gate.owner || true; }
+    return o;
+  }
+  function slipGrade(p) { return p.band ? String(p.band).toUpperCase() + ' ' + p.score : String(p.tier).toUpperCase(); }
   function buildReceipt(d, name) {
     var human = humanOf(d);
     var r = {
@@ -437,8 +681,8 @@
       head: d.head,
       signed_by: name,
       signed_at: new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'),
-      picks: human.map(function (c) { return { id: c.id, tier: c.tier, pick: state.picks[c.id], claim: c.claim || '' }; }),
-      auto_settled: claims(d).filter(function (c) { return MACHINE[c.tier]; }).map(function (c) { return { id: c.id, tier: c.tier }; }),
+      picks: human.map(function (c) { return withScore(d, c, { id: c.id, tier: c.tier, pick: state.picks[c.id], claim: c.claim || '' }); }),
+      auto_settled: claims(d).filter(function (c) { return MACHINE[c.tier]; }).map(function (c) { return withScore(d, c, { id: c.id, tier: c.tier }); }),
       not_checked: (d.not_checked || []).slice(),
       uncovered_diff_parts: (d.uncovered_diff_parts || []).slice()
     };
@@ -471,13 +715,13 @@
         '<div style="text-align:center" class="sub">' + esc(r.branch) + ' @ ' + esc(r.head) + (r.sample ? '<br>SAMPLE' : '') + '</div>' +
         '<hr class="rule">' +
         (r.picks || []).map(function (p) {
-          return '<div class="ln"><span>' + (GLYPH[p.tier] || '') + ' ' + esc(p.id) + '</span><span class="sub">' + esc(String(p.tier).toUpperCase()) + '</span>' +
+          return '<div class="ln"><span>' + (GLYPH[p.tier] || '') + ' ' + esc(p.id) + '</span><span class="sub">' + esc(slipGrade(p)) + '</span>' +
             '<span class="pk ' + esc(String(p.pick).replace(' ', '-')) + '">' + esc(String(p.pick).toUpperCase()) + '</span></div>' +
             '<div class="cl">' + esc(p.claim) + '</div>';
         }).join('') +
         '<hr class="rule">' +
         (auto.length ? '<div class="sub">SETTLED BY MACHINE</div><div class="auto">' + auto.map(function (a) {
-          return '<span title="' + esc(a.tier) + '">' + (GLYPH[a.tier] || '') + ' ' + esc(a.id) + '</span>';
+          return '<span title="' + esc(a.tier + (a.band ? ' · ' + a.band + ' ' + a.score : '')) + '">' + (GLYPH[a.tier] || '') + ' ' + esc(a.id) + (a.band ? ' <span class="sub">' + esc(a.score) + '</span>' : '') + '</span>';
         }).join('') + '</div><hr class="rule">' : '') +
         ((r.not_checked || []).length ? '<div class="sub">NOT CHECKED</div><ul>' + r.not_checked.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '') +
         ((r.uncovered_diff_parts || []).length ? '<div class="sub" style="margin-top:6px">UNCOVERED CODE</div><ul class="paths">' + r.uncovered_diff_parts.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '') +
