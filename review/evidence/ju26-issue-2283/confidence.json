@@ -29,7 +29,7 @@
     },
     "claims": {
       "C-2283-01": {
-        "score": 80,
+        "score": 85,
         "band": "high",
         "how": "best supporting check",
         "signals": [
@@ -38,7 +38,7 @@
             "kind": "flip-test",
             "summary": "3 new or changed test methods (3 added, 0 modified): 3 fail on base and pass on branch, 0 pass on base (not evidence), 0 fail on branch, 0 not runnable here (project does not build on branch)",
             "produced_by": "script",
-            "replay": "not re-run",
+            "replay": "match",
             "parts": [
               {
                 "text": "test fails before the change, passes after",
@@ -47,9 +47,13 @@
               {
                 "text": "an undo test confirms it",
                 "delta": 5
+              },
+              {
+                "text": "re-run on a clean machine: same result",
+                "delta": 5
               }
             ],
-            "score": 80
+            "score": 85
           },
           {
             "file": "evidence/ju26-issue-2283/old-vs-new-tests.json",
@@ -124,14 +128,18 @@
             "kind": "count",
             "summary": "29 live report sites in TypeCollector.cs: 28 go through the filter (19 distinct descriptors), 1 bypass it; 28 of the 28 filtered sites can have a location outside the compilation's source; simple grep for 'reportDiagnostic?.Invoke' counts 29 lines (2 of them commented out)",
             "produced_by": "script",
-            "replay": "not re-run",
+            "replay": "match",
             "parts": [
               {
                 "text": "number from a tool",
                 "delta": 40
+              },
+              {
+                "text": "re-run on a clean machine: same result",
+                "delta": 5
               }
             ],
-            "score": 40
+            "score": 45
           }
         ],
         "contradicted_by": [],
@@ -220,7 +228,7 @@
         "depends_on": []
       }
     },
-    "replayed": false,
+    "replayed": true,
     "history_rules_available": 20
   },
   "tool_versions": {

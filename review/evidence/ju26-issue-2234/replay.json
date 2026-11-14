@@ -1,0 +1,171 @@
+{
+  "check": "replay",
+  "branch": "ju26-issue-2234",
+  "base": "32258fdb",
+  "command": "python3 review/scripts/replay.py compare --copy <copy> --branch ju26-issue-2234 --write   (after: replay.py prepare --copy <copy>; in the copy: bash review.sh evidence; bash review.sh tests; tripwires.py and the other recorded script commands)",
+  "result": "pass",
+  "summary": "7 match, 0 mismatch, 3 not re-run of 10 evidence files re-checked on a clean machine",
+  "details": {
+    "files": {
+      "claim-coverage.json": "match",
+      "clone-complexity.json": "match",
+      "confidence.json": "not re-run",
+      "diff-stat.json": "not re-run",
+      "execution-tests-build.json": "not re-run",
+      "findings-probes.json": "match",
+      "old-vs-new-tests.json": "match",
+      "proof.json": "match",
+      "readability.json": "match",
+      "tripwires.json": "match"
+    },
+    "counts": {
+      "match": 7,
+      "mismatch": 0,
+      "not re-run": 3
+    },
+    "compared": {
+      "claim-coverage.json": {
+        "status": "match",
+        "committed": {
+          "result": "pass",
+          "summary": "9 of 9 changed hunks covered by a claim; 0 of 4 files have uncovered hunks"
+        },
+        "replayed": {
+          "result": "pass",
+          "summary": "9 of 9 changed hunks covered by a claim; 0 of 4 files have uncovered hunks"
+        }
+      },
+      "clone-complexity.json": {
+        "status": "match",
+        "committed": {
+          "result": "pass",
+          "summary": "TypeCollector.cs: duplicated blocks 10 -> 12, duplicated normalised lines 244 -> 258 (window 6); 6 of 10 added code lines sit in duplicated blocks; method GetObjectInfo complexity estimate 162 -> 166"
+        },
+        "replayed": {
+          "result": "pass",
+          "summary": "TypeCollector.cs: duplicated blocks 10 -> 12, duplicated normalised lines 244 -> 258 (window 6); 6 of 10 added code lines sit in duplicated blocks; method GetObjectInfo complexity estimate 162 -> 166"
+        }
+      },
+      "confidence.json": {
+        "status": "not re-run",
+        "why": "derived from the replay itself"
+      },
+      "diff-stat.json": {
+        "status": "not re-run",
+        "why": "produced_by hand"
+      },
+      "execution-tests-build.json": {
+        "status": "not re-run",
+        "why": "produced_by hand"
+      },
+      "findings-probes.json": {
+        "status": "match",
+        "committed": {
+          "result": "pass",
+          "summary": "(a) continue skips member type: confirmed; (b) second member of a duplicate key gets MsgPack005: yes, finding dropped; null-key first field crashes analyzer on branch: confirmed (11 scenarios, real analyzer, base and branch)"
+        },
+        "replayed": {
+          "result": "pass",
+          "summary": "(a) continue skips member type: confirmed; (b) second member of a duplicate key gets MsgPack005: yes, finding dropped; null-key first field crashes analyzer on branch: confirmed (11 scenarios, real analyzer, base and branch)"
+        }
+      },
+      "old-vs-new-tests.json": {
+        "status": "match",
+        "committed": {
+          "result": "error",
+          "summary": "10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 4 pass on base (not evidence), 0 fail on branch, 2 not runnable here (project does not build on branch)"
+        },
+        "replayed": {
+          "result": "error",
+          "summary": "10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 4 pass on base (not evidence), 0 fail on branch, 2 not runnable here (project does not build on branch)"
+        }
+      },
+      "proof.json": {
+        "status": "match",
+        "committed": {
+          "result": "pass",
+          "summary": "Dafny: Dafny program verifier finished with 23 verified, 0 errors; locked theorem 'never fails' is false for the branch (counterexample: first keyed member is a field with [Key(null)]), the stated mutation fails to verify; model vs real C# on 3710 inputs of 1..4 members: branch 0 mismatches, base 0 mismatches; C# threw on 156 branch inputs and 3346 base inputs; with int/string keys only (1592 inputs) C# threw on 1500 on base and 0 on branch"
+        },
+        "replayed": {
+          "result": "pass",
+          "summary": "Dafny: Dafny program verifier finished with 23 verified, 0 errors; locked theorem 'never fails' is false for the branch (counterexample: first keyed member is a field with [Key(null)]), the stated mutation fails to verify; model vs real C# on 3710 inputs of 1..4 members: branch 0 mismatches, base 0 mismatches; C# threw on 156 branch inputs and 3346 base inputs; with int/string keys only (1592 inputs) C# threw on 1500 on base and 0 on branch"
+        }
+      },
+      "readability.json": {
+        "status": "match",
+        "committed": {
+          "result": "pass",
+          "summary": "4 flags (H-20 4); 11 touched methods measured; 10 test methods added in 2 test files; 2 of 9 claims have flip/revert-test support"
+        },
+        "replayed": {
+          "result": "pass",
+          "summary": "4 flags (H-20 4); 11 touched methods measured; 10 test methods added in 2 test files; 2 of 9 claims have flip/revert-test support"
+        }
+      },
+      "tripwires.json": {
+        "status": "match",
+        "committed": {
+          "result": "pass",
+          "summary": "7 contract trips over 9 hunks (diagnostics 6; user-docs 1); 0 trips no claim answers"
+        },
+        "replayed": {
+          "result": "pass",
+          "summary": "7 contract trips over 9 hunks (diagnostics 6; user-docs 1); 0 trips no claim answers"
+        }
+      }
+    },
+    "machine": {
+      "os": "Linux 6.18.44-fc-v470 x86_64",
+      "dotnet --version": "8.0.402",
+      "git --version": "git version 2.43.0",
+      "python": "3.13.18",
+      "date": "2026-11-14T13:58:33+00:00"
+    },
+    "normalised": [
+      {
+        "what": "duration",
+        "pattern": "\\b\\d+(?:\\.\\d+)?\\s*(?:ms|s|sec|secs|seconds?|min|mins|minutes?)\\b",
+        "replacement": "<dur>"
+      },
+      {
+        "what": "temp path",
+        "pattern": "(?:/tmp|/var/folders|/private/var)/\\S*|\\S*/\\.work/\\S*",
+        "replacement": "<path>"
+      },
+      {
+        "what": "tool version",
+        "pattern": "\\b(?:git version |dotnet |SDK |version )?\\d+\\.\\d+\\.\\d+(?:[.+-][\\w.+-]*)?\\b",
+        "replacement": "<ver>"
+      },
+      {
+        "what": "whitespace",
+        "pattern": "\\s+",
+        "replacement": " "
+      }
+    ],
+    "compared_fields": [
+      "result",
+      "summary (normalised)"
+    ],
+    "run": {
+      "copy": "fresh copy of this repo (without .work) in a scratch dir; .NET SDK 8.0.402 from dotnet-install.sh into <copy>/.work/dotnet",
+      "target_clone": "full clone (git clone --no-single-branch, as review.sh setup does) into <copy>/.work/mp. A partial clone (--filter=blob:none) was tried first: every build failed in Nerdbank.GitVersioning (blob not found), so the full clone is required",
+      "commands": [
+        "bash review.sh evidence (11s)",
+        "python3 review/scripts/tripwires.py --branch <b> --write, for 3 branches",
+        "bash review.sh tests (183s wall clock, exit 0)",
+        "regen_check.py new-tests-on-base and snapshot-line-endings, commands as recorded in those files (33s together)",
+        "template_check.py with dotnet-t4 3.0.0 (dotnet tool install)",
+        "review/proof/run_2234_probes.py with Dafny 4.11.0 (dotnet tool) and Z3 4.12.1 (pip z3-solver 4.12.1.0) (36s)",
+        "python3 review/scripts/readability.py --branch <b> --write, for 3 branches (script added to the repo after the copy was made; copied in before running)"
+      ],
+      "tests_seconds": 183
+    }
+  },
+  "tool_versions": {
+    "python": "3.13.18",
+    "git": "git version 2.43.0",
+    "dotnet_sdk": "8.0.402"
+  },
+  "produced_by": "script"
+}

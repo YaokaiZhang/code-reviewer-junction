@@ -1,0 +1,170 @@
+{
+  "check": "replay",
+  "branch": "ju26-issue-2283",
+  "base": "32258fdb",
+  "command": "python3 review/scripts/replay.py compare --copy <copy> --branch ju26-issue-2283 --write   (after: replay.py prepare --copy <copy>; in the copy: bash review.sh evidence; bash review.sh tests; tripwires.py and the other recorded script commands)",
+  "result": "pass",
+  "summary": "5 match, 0 mismatch, 4 not re-run of 9 evidence files re-checked on a clean machine",
+  "details": {
+    "files": {
+      "claim-coverage.json": "match",
+      "confidence.json": "not re-run",
+      "diff-stat.json": "not re-run",
+      "dropped-warning.json": "not re-run",
+      "old-vs-new-tests.json": "not re-run",
+      "old-vs-new-tests.script.json": "match",
+      "readability.json": "match",
+      "report-sites.json": "match",
+      "tripwires.json": "match"
+    },
+    "counts": {
+      "match": 5,
+      "mismatch": 0,
+      "not re-run": 4
+    },
+    "compared": {
+      "claim-coverage.json": {
+        "status": "match",
+        "committed": {
+          "result": "pass",
+          "summary": "9 of 9 changed hunks covered by a claim; 0 of 4 files have uncovered hunks"
+        },
+        "replayed": {
+          "result": "pass",
+          "summary": "9 of 9 changed hunks covered by a claim; 0 of 4 files have uncovered hunks"
+        }
+      },
+      "confidence.json": {
+        "status": "not re-run",
+        "why": "derived from the replay itself"
+      },
+      "diff-stat.json": {
+        "status": "not re-run",
+        "why": "produced_by hand"
+      },
+      "dropped-warning.json": {
+        "status": "not re-run",
+        "why": "produced_by hand",
+        "committed": {
+          "result": "fail",
+          "summary": "MsgPack003 (unattributed_consumer_type_inside_metadata_generic) is reported on base without any analyzer crash and is absent on branch; 3 of 6 probe cases lose a diagnostic on branch"
+        },
+        "replayed": {
+          "result": "fail",
+          "summary": "MsgPack003 (unattributed_consumer_type_inside_metadata_generic) is reported on base without any analyzer crash and is absent on branch; 3 of 6 probe cases lose a diagnostic on branch"
+        },
+        "note": "the copy re-made it, shown for information only"
+      },
+      "old-vs-new-tests.json": {
+        "status": "not re-run",
+        "why": "produced_by hand",
+        "committed": {
+          "result": "pass",
+          "summary": "3 of 3 new tests fail on base and pass on branch; 1 of them (ClosedGenericStruct_FromMetadataReference_UnkeyedMember) also fails when only the filter is removed; whole test project: 167 of 167 pre-existing tests pass on base and 167 on branch"
+        },
+        "replayed": {
+          "result": "pass",
+          "summary": "3 of 3 new tests fail on base and pass on branch; 1 of them (ClosedGenericStruct_FromMetadataReference_UnkeyedMember) also fails when only the filter is removed; whole test project: 167 of 167 pre-existing tests pass on base and 167 on branch"
+        },
+        "note": "the copy re-made it, shown for information only"
+      },
+      "old-vs-new-tests.script.json": {
+        "status": "match",
+        "committed": {
+          "result": "pass",
+          "summary": "3 new or changed test methods (3 added, 0 modified): 3 fail on base and pass on branch, 0 pass on base (not evidence), 0 fail on branch, 0 not runnable here (project does not build on branch)"
+        },
+        "replayed": {
+          "result": "pass",
+          "summary": "3 new or changed test methods (3 added, 0 modified): 3 fail on base and pass on branch, 0 pass on base (not evidence), 0 fail on branch, 0 not runnable here (project does not build on branch)"
+        }
+      },
+      "readability.json": {
+        "status": "match",
+        "committed": {
+          "result": "pass",
+          "summary": "0 flags (none); 10 touched methods measured; 3 test methods added in 1 test files; 1 of 4 claims have flip/revert-test support"
+        },
+        "replayed": {
+          "result": "pass",
+          "summary": "0 flags (none); 10 touched methods measured; 3 test methods added in 1 test files; 1 of 4 claims have flip/revert-test support"
+        }
+      },
+      "report-sites.json": {
+        "status": "match",
+        "committed": {
+          "result": "pass",
+          "summary": "29 live report sites in TypeCollector.cs: 28 go through the filter (19 distinct descriptors), 1 bypass it; 28 of the 28 filtered sites can have a location outside the compilation's source; simple grep for 'reportDiagnostic?.Invoke' counts 29 lines (2 of them commented out)"
+        },
+        "replayed": {
+          "result": "pass",
+          "summary": "29 live report sites in TypeCollector.cs: 28 go through the filter (19 distinct descriptors), 1 bypass it; 28 of the 28 filtered sites can have a location outside the compilation's source; simple grep for 'reportDiagnostic?.Invoke' counts 29 lines (2 of them commented out)"
+        }
+      },
+      "tripwires.json": {
+        "status": "match",
+        "committed": {
+          "result": "pass",
+          "summary": "7 contract trips over 9 hunks (diagnostics 5; user-docs 2); 0 trips no claim answers"
+        },
+        "replayed": {
+          "result": "pass",
+          "summary": "7 contract trips over 9 hunks (diagnostics 5; user-docs 2); 0 trips no claim answers"
+        }
+      }
+    },
+    "machine": {
+      "os": "Linux 6.18.44-fc-v470 x86_64",
+      "dotnet --version": "8.0.402",
+      "git --version": "git version 2.43.0",
+      "python": "3.13.18",
+      "date": "2026-11-14T13:58:33+00:00"
+    },
+    "normalised": [
+      {
+        "what": "duration",
+        "pattern": "\\b\\d+(?:\\.\\d+)?\\s*(?:ms|s|sec|secs|seconds?|min|mins|minutes?)\\b",
+        "replacement": "<dur>"
+      },
+      {
+        "what": "temp path",
+        "pattern": "(?:/tmp|/var/folders|/private/var)/\\S*|\\S*/\\.work/\\S*",
+        "replacement": "<path>"
+      },
+      {
+        "what": "tool version",
+        "pattern": "\\b(?:git version |dotnet |SDK |version )?\\d+\\.\\d+\\.\\d+(?:[.+-][\\w.+-]*)?\\b",
+        "replacement": "<ver>"
+      },
+      {
+        "what": "whitespace",
+        "pattern": "\\s+",
+        "replacement": " "
+      }
+    ],
+    "compared_fields": [
+      "result",
+      "summary (normalised)"
+    ],
+    "run": {
+      "copy": "fresh copy of this repo (without .work) in a scratch dir; .NET SDK 8.0.402 from dotnet-install.sh into <copy>/.work/dotnet",
+      "target_clone": "full clone (git clone --no-single-branch, as review.sh setup does) into <copy>/.work/mp. A partial clone (--filter=blob:none) was tried first: every build failed in Nerdbank.GitVersioning (blob not found), so the full clone is required",
+      "commands": [
+        "bash review.sh evidence (11s)",
+        "python3 review/scripts/tripwires.py --branch <b> --write, for 3 branches",
+        "bash review.sh tests (183s wall clock, exit 0)",
+        "regen_check.py new-tests-on-base and snapshot-line-endings, commands as recorded in those files (33s together)",
+        "template_check.py with dotnet-t4 3.0.0 (dotnet tool install)",
+        "review/proof/run_2234_probes.py with Dafny 4.11.0 (dotnet tool) and Z3 4.12.1 (pip z3-solver 4.12.1.0) (36s)",
+        "python3 review/scripts/readability.py --branch <b> --write, for 3 branches (script added to the repo after the copy was made; copied in before running)"
+      ],
+      "tests_seconds": 183
+    }
+  },
+  "tool_versions": {
+    "python": "3.13.18",
+    "git": "git version 2.43.0",
+    "dotnet_sdk": "8.0.402"
+  },
+  "produced_by": "script"
+}

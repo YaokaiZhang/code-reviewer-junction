@@ -4,7 +4,7 @@
   "base": "32258fdb",
   "command": "python3 review/scripts/confidence.py --branch ju26-issue-2234 --write",
   "result": "pass",
-  "summary": "9 claims: 1 high, 4 medium, 4 low; 1 need an owner (C-2234-04)",
+  "summary": "9 claims: 3 high, 2 medium, 4 low; 1 need an owner (C-2234-04)",
   "details": {
     "formula": {
       "kinds": {
@@ -29,8 +29,8 @@
     },
     "claims": {
       "C-2234-01": {
-        "score": 75,
-        "band": "medium",
+        "score": 80,
+        "band": "high",
         "how": "best supporting check",
         "signals": [
           {
@@ -38,28 +38,36 @@
             "kind": "flip-test",
             "summary": "10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 4 pass on base (not evidence), 0 fail on branch, 2 not runnable here (project does not build on branch)",
             "produced_by": "script",
-            "replay": "not re-run",
+            "replay": "match",
             "parts": [
               {
                 "text": "test fails before the change, passes after",
                 "delta": 75
+              },
+              {
+                "text": "re-run on a clean machine: same result",
+                "delta": 5
               }
             ],
-            "score": 75
+            "score": 80
           },
           {
             "file": "evidence/ju26-issue-2234/findings-probes.json",
             "kind": "probe",
             "summary": "(a) continue skips member type: confirmed; (b) second member of a duplicate key gets MsgPack005: yes, finding dropped; null-key first field crashes analyzer on branch: confirmed (11 scenarios, real analyzer, base and branch)",
             "produced_by": "script",
-            "replay": "not re-run",
+            "replay": "match",
             "parts": [
               {
                 "text": "experiment on the real code",
                 "delta": 60
+              },
+              {
+                "text": "re-run on a clean machine: same result",
+                "delta": 5
               }
             ],
-            "score": 60
+            "score": 65
           }
         ],
         "contradicted_by": [],
@@ -70,7 +78,7 @@
         ]
       },
       "C-2234-02": {
-        "score": 80,
+        "score": 85,
         "band": "high",
         "how": "best supporting check",
         "signals": [
@@ -79,14 +87,18 @@
             "kind": "proof-model",
             "summary": "Dafny: Dafny program verifier finished with 23 verified, 0 errors; locked theorem 'never fails' is false for the branch (counterexample: first keyed member is a field with [Key(null)]), the stated mutation fails to verify; model vs real C# on 3710 inputs of 1..4 members: branch 0 mismatches, base 0 mismatches; C# threw on 156 branch inputs and 3346 base inputs; with int/string keys only (1592 inputs) C# threw on 1500 on base and 0 on branch",
             "produced_by": "script",
-            "replay": "not re-run",
+            "replay": "match",
             "parts": [
               {
                 "text": "model proved, and model matched the real code on every tested input",
                 "delta": 80
+              },
+              {
+                "text": "re-run on a clean machine: same result",
+                "delta": 5
               }
             ],
-            "score": 80
+            "score": 85
           }
         ],
         "contradicted_by": [],
@@ -94,7 +106,7 @@
         "depends_on": []
       },
       "C-2234-03": {
-        "score": 60,
+        "score": 65,
         "band": "medium",
         "how": "best supporting check",
         "signals": [
@@ -103,14 +115,18 @@
             "kind": "probe",
             "summary": "(a) continue skips member type: confirmed; (b) second member of a duplicate key gets MsgPack005: yes, finding dropped; null-key first field crashes analyzer on branch: confirmed (11 scenarios, real analyzer, base and branch)",
             "produced_by": "script",
-            "replay": "not re-run",
+            "replay": "match",
             "parts": [
               {
                 "text": "experiment on the real code",
                 "delta": 60
+              },
+              {
+                "text": "re-run on a clean machine: same result",
+                "delta": 5
               }
             ],
-            "score": 60
+            "score": 65
           }
         ],
         "contradicted_by": [],
@@ -121,7 +137,7 @@
         ]
       },
       "C-2234-04": {
-        "score": 60,
+        "score": 65,
         "band": "medium",
         "how": "best supporting check",
         "signals": [
@@ -130,14 +146,18 @@
             "kind": "probe",
             "summary": "(a) continue skips member type: confirmed; (b) second member of a duplicate key gets MsgPack005: yes, finding dropped; null-key first field crashes analyzer on branch: confirmed (11 scenarios, real analyzer, base and branch)",
             "produced_by": "script",
-            "replay": "not re-run",
+            "replay": "match",
             "parts": [
               {
                 "text": "experiment on the real code",
                 "delta": 60
+              },
+              {
+                "text": "re-run on a clean machine: same result",
+                "delta": 5
               }
             ],
-            "score": 60
+            "score": 65
           }
         ],
         "contradicted_by": [],
@@ -156,8 +176,8 @@
         "depends_on": []
       },
       "C-2234-05": {
-        "score": 75,
-        "band": "medium",
+        "score": 80,
+        "band": "high",
         "how": "weakest link of a chain",
         "signals": [
           {
@@ -165,28 +185,36 @@
             "kind": "flip-test",
             "summary": "10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 4 pass on base (not evidence), 0 fail on branch, 2 not runnable here (project does not build on branch)",
             "produced_by": "script",
-            "replay": "not re-run",
+            "replay": "match",
             "parts": [
               {
                 "text": "test fails before the change, passes after",
                 "delta": 75
+              },
+              {
+                "text": "re-run on a clean machine: same result",
+                "delta": 5
               }
             ],
-            "score": 75
+            "score": 80
           },
           {
             "file": "evidence/ju26-issue-2234/proof.json",
             "kind": "proof-model",
             "summary": "Dafny: Dafny program verifier finished with 23 verified, 0 errors; locked theorem 'never fails' is false for the branch (counterexample: first keyed member is a field with [Key(null)]), the stated mutation fails to verify; model vs real C# on 3710 inputs of 1..4 members: branch 0 mismatches, base 0 mismatches; C# threw on 156 branch inputs and 3346 base inputs; with int/string keys only (1592 inputs) C# threw on 1500 on base and 0 on branch",
             "produced_by": "script",
-            "replay": "not re-run",
+            "replay": "match",
             "parts": [
               {
                 "text": "model proved, and model matched the real code on every tested input",
                 "delta": 80
+              },
+              {
+                "text": "re-run on a clean machine: same result",
+                "delta": 5
               }
             ],
-            "score": 80
+            "score": 85
           }
         ],
         "contradicted_by": [],
@@ -194,7 +222,7 @@
         "depends_on": []
       },
       "C-2234-06": {
-        "score": 40,
+        "score": 45,
         "band": "low",
         "how": "best supporting check",
         "signals": [
@@ -203,14 +231,18 @@
             "kind": "count",
             "summary": "TypeCollector.cs: duplicated blocks 10 -> 12, duplicated normalised lines 244 -> 258 (window 6); 6 of 10 added code lines sit in duplicated blocks; method GetObjectInfo complexity estimate 162 -> 166",
             "produced_by": "script",
-            "replay": "not re-run",
+            "replay": "match",
             "parts": [
               {
                 "text": "number from a tool",
                 "delta": 40
+              },
+              {
+                "text": "re-run on a clean machine: same result",
+                "delta": 5
               }
             ],
-            "score": 40
+            "score": 45
           }
         ],
         "contradicted_by": [],
@@ -218,7 +250,7 @@
         "depends_on": []
       },
       "C-2234-07": {
-        "score": 40,
+        "score": 45,
         "band": "low",
         "how": "best supporting check",
         "signals": [
@@ -227,14 +259,18 @@
             "kind": "count",
             "summary": "10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 4 pass on base (not evidence), 0 fail on branch, 2 not runnable here (project does not build on branch)",
             "produced_by": "script",
-            "replay": "not re-run",
+            "replay": "match",
             "parts": [
               {
                 "text": "number from a tool",
                 "delta": 40
+              },
+              {
+                "text": "re-run on a clean machine: same result",
+                "delta": 5
               }
             ],
-            "score": 40
+            "score": 45
           }
         ],
         "contradicted_by": [],
@@ -272,7 +308,7 @@
         ]
       }
     },
-    "replayed": false,
+    "replayed": true,
     "history_rules_available": 20
   },
   "tool_versions": {
