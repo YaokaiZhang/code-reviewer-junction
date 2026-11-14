@@ -1,0 +1,105 @@
+{
+  "check": "proof",
+  "branch": "ju26-issue-2234",
+  "base": "32258fdb",
+  "head": "9007cee1",
+  "command": "python3 review/proof/run_2234_probes.py --repo <clone> --workdir <dir> --dafny <dafny> --z3 <z3>",
+  "result": "pass",
+  "summary": "Dafny: Dafny program verifier finished with 23 verified, 0 errors; locked theorem 'never fails' is false for the branch (counterexample: first keyed member is a field with [Key(null)]), the stated mutation fails to verify; model vs real C# on 3710 inputs of 1..4 members: branch 0 mismatches, base 0 mismatches; C# threw on 156 branch inputs and 3346 base inputs; with int/string keys only (1592 inputs) C# threw on 1500 on base and 0 on branch",
+  "details": {
+    "model": "review/proof/KeyCollection.dfy",
+    "theorem_locked_in_brief": "for any list of members, collecting keys never fails, whatever keys repeat or mix kinds",
+    "theorem_outcome": "false for the real logic; proved instead: fails iff the first keyed member is a field with [Key(null)] (BranchFailsIffFirstIsNullKeyField), never fails for int/string keys (BranchNeverFailsForIntAndStringKeys), first wins and every repeated accepted key is reported (DupReported)",
+    "requirement_inferred": true,
+    "dafny_verify": {
+      "command": "dafny verify --solver-path <z3> review/proof/KeyCollection.dfy",
+      "exit_code": 0,
+      "result_line": [
+        "Dafny program verifier finished with 23 verified, 0 errors"
+      ],
+      "lemmas": [
+        "LockedTheoremIsFalseForBranch",
+        "NewOkInv",
+        "BranchFailsIffFirstIsNullKeyField",
+        "FailSticks",
+        "BranchNeverFailsForIntAndStringKeys",
+        "BaseFailsOnDuplicateIntKey",
+        "BaseFailsOnDuplicateStringKey",
+        "BaseFailsOnIntThenString",
+        "DupReported"
+      ],
+      "proof_gaps_in_code": {
+        "assume": 0,
+        "axiom": 0,
+        "extern": 0
+      }
+    },
+    "mutation_locked_theorem": {
+      "lemma": "LockedTheoremAsStated: ensures CollectNew(ms).Ok? for all ms",
+      "exit_code": 4,
+      "output": [
+        "/tmp/claude-0/-home-user-code-reviewer-junction/9d458cbc-0a76-5977-90e9-3a92e45aab20/scratchpad/wt-2234-probe/LockedTheorem.dfy(212,0): Error: a postcondition could not be proved on this return path",
+        "Dafny program verifier finished with 23 verified, 1 error"
+      ]
+    },
+    "model_vs_csharp": {
+      "base": {
+        "inputs": 3710,
+        "mismatches": 0,
+        "first_mismatches": [],
+        "csharp_exceptions": 3346,
+        "inputs_without_null_key": 1592,
+        "csharp_exceptions_without_null_key": 1500,
+        "csharp_exceptions_first_member_null_key_field": 156,
+        "ok_inputs_with_dup_report": 0,
+        "ok_inputs_with_mix_report": 333,
+        "csharp_exception_types": [
+          "System.ArgumentException",
+          "System.ArgumentNullException",
+          "System.InvalidOperationException"
+        ],
+        "other_diagnostics": 0
+      },
+      "branch": {
+        "inputs": 3710,
+        "mismatches": 0,
+        "first_mismatches": [],
+        "csharp_exceptions": 156,
+        "inputs_without_null_key": 1592,
+        "csharp_exceptions_without_null_key": 0,
+        "csharp_exceptions_first_member_null_key_field": 156,
+        "ok_inputs_with_dup_report": 1702,
+        "ok_inputs_with_mix_report": 3249,
+        "csharp_exception_types": [
+          "System.ArgumentNullException"
+        ],
+        "other_diagnostics": 0
+      }
+    },
+    "inputs_by_length": {
+      "1": 10,
+      "2": 75,
+      "3": 500,
+      "4": 3125
+    },
+    "input_domain": "kind in {Prop, Field}, key in {0, 1, \"a\", \"b\", null}, 1..4 members, properties before fields (the C# visit order)",
+    "what_is_compared": "fail vs ok; on ok: IsIntKey, the generated model's key->member map, and the ordered Dup/Mix/BothNull reports",
+    "chain": [
+      {
+        "link": "model satisfies the lemmas",
+        "tier": "Proved"
+      },
+      {
+        "link": "model matches real TypeCollector on all inputs up to 4 members",
+        "tier": "Tested"
+      }
+    ]
+  },
+  "tool_versions": {
+    "dafny": "4.11.0+fcb2042d6d043a2634f0854338c08feeaaaf4ae2",
+    "z3": "Z3 version 4.12.1 - 64 bit",
+    "dotnet_sdk": "8.0.402",
+    "python": "3.13.18"
+  },
+  "produced_by": "script"
+}

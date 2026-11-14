@@ -1,0 +1,160 @@
+{
+  "check": "findings-probes",
+  "branch": "ju26-issue-2234",
+  "base": "32258fdb",
+  "head": "9007cee1",
+  "command": "python3 review/proof/run_2234_probes.py --repo <clone> --workdir <dir> --dafny <dafny> --z3 <z3>",
+  "result": "pass",
+  "summary": "(a) continue skips member type: confirmed; (b) second member of a duplicate key gets MsgPack005: yes, finding dropped; null-key first field crashes analyzer on branch: confirmed (11 scenarios, real analyzer, base and branch)",
+  "details": {
+    "findings": {
+      "a_continue_skips_member_type": {
+        "confirmed": true,
+        "observed": "member with a mixed key and an unserializable type: MsgPack003 reported on base (string-first case), not reported on branch; control with a valid key reports MsgPack003 on branch"
+      },
+      "b_duplicate_key_second_member_diagnostic": {
+        "confirmed_no_diagnostic": false,
+        "observed": "every duplicate-key scenario reports MsgPack005 ('must be unique') on the second member's line on the branch; the generated model keeps the first member (see proof.json exhaustive maps)"
+      },
+      "null_key_first_field_crash": {
+        "confirmed": true,
+        "observed": "a type whose first keyed member is a field with [Key(null)] makes the analyzer throw (AD0001, ArgumentNullException) on base and branch, with or without SuppressSourceGeneration"
+      }
+    },
+    "scenarios": {
+      "a_string_then_int_member_type_unserializable": {
+        "base": [
+          "MsgPack005@line7: All KeyAttribute arguments must be of the same type (either string or int)",
+          "MsgPack003@line7"
+        ],
+        "branch": [
+          "MsgPack005@line7: All KeyAttribute arguments must be of the same type (either string or int)"
+        ],
+        "source": "using MessagePack;\npublic class Other { }\n[MessagePackObject]\npublic class Foo\n{\n    [Key(\"a\")] public int Member1 { get; set; }\n    [Key(1)] public Other Member2 { get; set; }\n}"
+      },
+      "a_string_then_int_member_type_unserializable_suppressed": {
+        "base": [
+          "MsgPack005@line7: All KeyAttribute arguments must be of the same type (either string or int)",
+          "MsgPack003@line7"
+        ],
+        "branch": [
+          "MsgPack005@line7: All KeyAttribute arguments must be of the same type (either string or int)"
+        ],
+        "source": "using MessagePack;\npublic class Other { }\n[MessagePackObject(SuppressSourceGeneration = true)]\npublic class Foo\n{\n    [Key(\"a\")] public int Member1 { get; set; }\n    [Key(1)] public Other Member2 { get; set; }\n}"
+      },
+      "a_int_then_string_member_type_unserializable": {
+        "base": [
+          "AD0001@line0: Analyzer 'MessagePack.SourceGenerator.Analyzers.MsgPack00xMessagePackAnalyzer' t",
+          "MsgPack005@line7: All KeyAttribute arguments must be of the same type (either string or int)"
+        ],
+        "branch": [
+          "MsgPack005@line7: All KeyAttribute arguments must be of the same type (either string or int)"
+        ],
+        "source": "using MessagePack;\npublic class Other { }\n[MessagePackObject]\npublic class Foo\n{\n    [Key(0)] public int Member1 { get; set; }\n    [Key(\"b\")] public Other Member2 { get; set; }\n}"
+      },
+      "a_control_valid_key_member_type_unserializable": {
+        "base": [
+          "MsgPack003@line7"
+        ],
+        "branch": [
+          "MsgPack003@line7"
+        ],
+        "source": "using MessagePack;\npublic class Other { }\n[MessagePackObject]\npublic class Foo\n{\n    [Key(0)] public int Member1 { get; set; }\n    [Key(1)] public Other Member2 { get; set; }\n}"
+      },
+      "b_duplicate_int_key_different_types": {
+        "base": [
+          "AD0001@line0: Analyzer 'MessagePack.SourceGenerator.Analyzers.MsgPack00xMessagePackAnalyzer' t",
+          "MsgPack005@line6: All KeyAttribute arguments must be unique"
+        ],
+        "branch": [
+          "MsgPack005@line6: All KeyAttribute arguments must be unique"
+        ],
+        "source": "using MessagePack;\n[MessagePackObject]\npublic class Foo\n{\n    [Key(0)] public int Member1 { get; set; }\n    [Key(0)] public string Member2 { get; set; }\n}"
+      },
+      "b_duplicate_string_key_fields": {
+        "base": [
+          "AD0001@line0: Analyzer 'MessagePack.SourceGenerator.Analyzers.MsgPack00xMessagePackAnalyzer' t",
+          "MsgPack005@line6: All KeyAttribute arguments must be unique"
+        ],
+        "branch": [
+          "MsgPack005@line6: All KeyAttribute arguments must be unique"
+        ],
+        "source": "using MessagePack;\n[MessagePackObject]\npublic class Foo\n{\n    [Key(\"a\")] public int Member1;\n    [Key(\"a\")] public string Member2;\n}"
+      },
+      "b_duplicate_int_key_property_and_field": {
+        "base": [
+          "AD0001@line0: Analyzer 'MessagePack.SourceGenerator.Analyzers.MsgPack00xMessagePackAnalyzer' t",
+          "MsgPack005@line6: All KeyAttribute arguments must be unique"
+        ],
+        "branch": [
+          "MsgPack005@line6: All KeyAttribute arguments must be unique"
+        ],
+        "source": "using MessagePack;\n[MessagePackObject]\npublic class Foo\n{\n    [Key(0)] public int Member1 { get; set; }\n    [Key(0)] public int Member2;\n}"
+      },
+      "null_key_first_field": {
+        "base": [
+          "AD0001@line0: Analyzer 'MessagePack.SourceGenerator.Analyzers.MsgPack00xMessagePackAnalyzer' t",
+          "MsgPack005@line5"
+        ],
+        "branch": [
+          "AD0001@line0: Analyzer 'MessagePack.SourceGenerator.Analyzers.MsgPack00xMessagePackAnalyzer' t",
+          "MsgPack005@line5"
+        ],
+        "source": "using MessagePack;\n[MessagePackObject]\npublic class Foo\n{\n    [Key(null)] public int Member1;\n}"
+      },
+      "null_key_first_field_suppressed": {
+        "base": [
+          "AD0001@line0: Analyzer 'MessagePack.SourceGenerator.Analyzers.MsgPack00xMessagePackAnalyzer' t",
+          "MsgPack005@line5"
+        ],
+        "branch": [
+          "AD0001@line0: Analyzer 'MessagePack.SourceGenerator.Analyzers.MsgPack00xMessagePackAnalyzer' t",
+          "MsgPack005@line5"
+        ],
+        "source": "using MessagePack;\n[MessagePackObject(SuppressSourceGeneration = true)]\npublic class Foo\n{\n    [Key(null)] public int Member1;\n}"
+      },
+      "null_key_first_property": {
+        "base": [
+          "MsgPack005@line5"
+        ],
+        "branch": [
+          "MsgPack005@line5"
+        ],
+        "source": "using MessagePack;\n[MessagePackObject]\npublic class Foo\n{\n    [Key(null)] public int Member1 { get; set; }\n}"
+      },
+      "null_key_second_field": {
+        "base": [
+          "AD0001@line0: Analyzer 'MessagePack.SourceGenerator.Analyzers.MsgPack00xMessagePackAnalyzer' t",
+          "MsgPack005@line6",
+          "MsgPack005@line6: All KeyAttribute arguments must be of the same type (either string or int)"
+        ],
+        "branch": [
+          "MsgPack005@line6",
+          "MsgPack005@line6: All KeyAttribute arguments must be of the same type (either string or int)"
+        ],
+        "source": "using MessagePack;\n[MessagePackObject]\npublic class Foo\n{\n    [Key(\"a\")] public int Member1;\n    [Key(null)] public int Member2;\n}"
+      }
+    },
+    "runs": {
+      "base": {
+        "command": "dotnet test tests/MessagePack.SourceGenerator.Tests --filter FullyQualifiedName~Probe2234Tests -nologo",
+        "exit_code": 0,
+        "summary": [
+          "Passed!  - Failed:     0, Passed:     2, Skipped:     0, Total:     2, Duration: 5 s - MessagePack.SourceGenerator.Tests.dll (net8.0)"
+        ]
+      },
+      "branch": {
+        "command": "dotnet test tests/MessagePack.SourceGenerator.Tests --filter FullyQualifiedName~Probe2234Tests -nologo",
+        "exit_code": 0,
+        "summary": [
+          "Passed!  - Failed:     0, Passed:     2, Skipped:     0, Total:     2, Duration: 6 s - MessagePack.SourceGenerator.Tests.dll (net8.0)"
+        ]
+      }
+    },
+    "probe_source": "review/proof/csharp/Probe2234Tests.cs"
+  },
+  "tool_versions": {
+    "dotnet_sdk": "8.0.402"
+  },
+  "produced_by": "script"
+}

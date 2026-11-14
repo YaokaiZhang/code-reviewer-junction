@@ -1,0 +1,220 @@
+{
+  "check": "clone-complexity",
+  "branch": "ju26-issue-2234",
+  "base": "32258fdb",
+  "head": "9007cee1",
+  "command": "python3 review/scripts/clone_complexity.py --repo <clone> --branch ju26-issue-2234 --file src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs --window 6 --out review/evidence/ju26-issue-2234/clone-complexity.json",
+  "result": "pass",
+  "summary": "TypeCollector.cs: duplicated blocks 10 -> 12, duplicated normalised lines 244 -> 258 (window 6); 6 of 10 added code lines sit in duplicated blocks; method GetObjectInfo complexity estimate 162 -> 166",
+  "details": {
+    "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+    "window": 6,
+    "method": "line-window clone detection on normalised lines; cyclomatic estimate = 1 + decision tokens",
+    "base": {
+      "rev": "32258fdb",
+      "file_lines": 1491,
+      "clones": {
+        "normalised_lines": 815,
+        "duplicated_normalised_lines": 244,
+        "duplicated_share_percent": 29.9,
+        "repeated_window_hashes": 27,
+        "duplicated_blocks": 10,
+        "duplicated_block_line_ranges": [
+          "36-131",
+          "137-209",
+          "832-845",
+          "863-876",
+          "908-923",
+          "931-973",
+          "998-1015",
+          "1058-1073",
+          "1078-1120",
+          "1131-1148"
+        ]
+      }
+    },
+    "branch": {
+      "rev": "9007cee1",
+      "file_lines": 1505,
+      "clones": {
+        "normalised_lines": 821,
+        "duplicated_normalised_lines": 258,
+        "duplicated_share_percent": 31.4,
+        "repeated_window_hashes": 29,
+        "duplicated_blocks": 12,
+        "duplicated_block_line_ranges": [
+          "36-131",
+          "137-209",
+          "832-845",
+          "863-876",
+          "908-923",
+          "931-973",
+          "998-1016",
+          "1037-1050",
+          "1065-1080",
+          "1085-1127",
+          "1138-1156",
+          "1177-1190"
+        ]
+      }
+    },
+    "delta_duplicated_normalised_lines": 14,
+    "delta_duplicated_blocks": 2,
+    "added_lines_on_branch": [
+      1008,
+      1023,
+      1024,
+      1025,
+      1026,
+      1039,
+      1040,
+      1041,
+      1042,
+      1148,
+      1163,
+      1164,
+      1165,
+      1166,
+      1179,
+      1180,
+      1181,
+      1182
+    ],
+    "added_code_lines": 10,
+    "added_code_lines_in_duplicated_blocks": [
+      1008,
+      1039,
+      1041,
+      1148,
+      1179,
+      1181
+    ],
+    "complexity": [
+      {
+        "unit": "method GetObjectInfo",
+        "branch": {
+          "estimate": 166,
+          "decision_tokens": {
+            "if": 85,
+            "while": 1,
+            "for": 0,
+            "foreach": 7,
+            "case": 2,
+            "catch": 0,
+            "&&": 29,
+            "||": 20,
+            "??": 4,
+            "ternary": 17
+          },
+          "null_conditional_not_counted": 63,
+          "lines": "700-1432",
+          "line_count": 733
+        },
+        "base": {
+          "estimate": 162,
+          "decision_tokens": {
+            "if": 81,
+            "while": 1,
+            "for": 0,
+            "foreach": 7,
+            "case": 2,
+            "catch": 0,
+            "&&": 29,
+            "||": 20,
+            "??": 4,
+            "ternary": 17
+          },
+          "null_conditional_not_counted": 63,
+          "lines": "700-1418",
+          "line_count": 719
+        },
+        "delta": 4
+      },
+      {
+        "unit": "foreach IPropertySymbol loop in GetObjectInfo",
+        "branch": {
+          "estimate": 48,
+          "decision_tokens": {
+            "if": 25,
+            "while": 0,
+            "for": 0,
+            "foreach": 1,
+            "case": 0,
+            "catch": 0,
+            "&&": 10,
+            "||": 5,
+            "??": 2,
+            "ternary": 4
+          },
+          "null_conditional_not_counted": 20,
+          "lines": "886-1053",
+          "line_count": 168
+        },
+        "base": {
+          "estimate": 46,
+          "decision_tokens": {
+            "if": 23,
+            "while": 0,
+            "for": 0,
+            "foreach": 1,
+            "case": 0,
+            "catch": 0,
+            "&&": 10,
+            "||": 5,
+            "??": 2,
+            "ternary": 4
+          },
+          "null_conditional_not_counted": 20,
+          "lines": "886-1046",
+          "line_count": 161
+        },
+        "delta": 2
+      },
+      {
+        "unit": "foreach IFieldSymbol loop in GetObjectInfo",
+        "branch": {
+          "estimate": 37,
+          "decision_tokens": {
+            "if": 20,
+            "while": 0,
+            "for": 0,
+            "foreach": 1,
+            "case": 0,
+            "catch": 0,
+            "&&": 5,
+            "||": 5,
+            "??": 1,
+            "ternary": 4
+          },
+          "null_conditional_not_counted": 14,
+          "lines": "1055-1193",
+          "line_count": 139
+        },
+        "base": {
+          "estimate": 35,
+          "decision_tokens": {
+            "if": 18,
+            "while": 0,
+            "for": 0,
+            "foreach": 1,
+            "case": 0,
+            "catch": 0,
+            "&&": 5,
+            "||": 5,
+            "??": 1,
+            "ternary": 4
+          },
+          "null_conditional_not_counted": 14,
+          "lines": "1048-1179",
+          "line_count": 132
+        },
+        "delta": 2
+      }
+    ]
+  },
+  "tool_versions": {
+    "python": "3.13.18",
+    "git": "git version 2.43.0"
+  },
+  "produced_by": "script"
+}

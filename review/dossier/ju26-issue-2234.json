@@ -1,0 +1,224 @@
+{
+  "branch": "ju26-issue-2234",
+  "issue": 2234,
+  "title": "The analyzer does not work if SuppressSourceGeneration = true",
+  "base": "32258fdb",
+  "head": "9007cee1",
+  "diff": {
+    "files": 4,
+    "insertions": 262,
+    "deletions": 4
+  },
+  "claims": [
+    {
+      "id": "C-2234-01",
+      "claim": "The analyzer no longer throws on duplicate int keys, duplicate string keys or mixed key kinds; it reports MsgPack005 instead, with or without SuppressSourceGeneration.",
+      "tier": "Tested",
+      "why_this_tier": "4 new tests fail on base (MsgPack005 plus AD0001 from an analyzer exception) and pass on the branch.",
+      "requirement": "R-2234-1",
+      "requirement_inferred": false,
+      "evidence": [
+        "evidence/ju26-issue-2234/old-vs-new-tests.json",
+        "evidence/ju26-issue-2234/findings-probes.json"
+      ],
+      "diff_parts": [
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1008",
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1023-1026",
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1039-1042",
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1148",
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1163-1166",
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1179-1182",
+        "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs:80-167"
+      ]
+    },
+    {
+      "id": "C-2234-02",
+      "claim": "For every list of 1 to 4 keyed members with int or string keys, the real TypeCollector does not throw on the branch; on base it threw on most of them.",
+      "tier": "Tested",
+      "why_this_tier": "Chain: the Dafny model proves it for all lists, and the model matches the real C# on every input up to 4 members; the C# run throws on base and not on the branch, so the weakest link is Tested.",
+      "requirement": "R-2234-2",
+      "requirement_inferred": true,
+      "evidence": [
+        "evidence/ju26-issue-2234/proof.json"
+      ],
+      "diff_parts": [
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1008",
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1023-1026",
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1039-1042",
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1148",
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1163-1166",
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1179-1182"
+      ],
+      "chain": [
+        {
+          "link": "Dafny model: BranchNeverFailsForIntAndStringKeys, no assume",
+          "tier": "Proved"
+        },
+        {
+          "link": "model matches real TypeCollector on 3710 inputs (base and branch, 0 mismatches)",
+          "tier": "Tested"
+        }
+      ]
+    },
+    {
+      "id": "C-2234-03",
+      "claim": "The fix is incomplete: when a type's first keyed member is a field with [Key(null)], the analyzer still throws (AD0001, ArgumentNullException), also with SuppressSourceGeneration = true.",
+      "tier": "Argued",
+      "why_this_tier": "A probe on the real analyzer reproduces the crash on base and on the branch, so no test fails on base and passes on the branch; the tier rules give a reproduced gap no machine tier.",
+      "requirement": "R-2234-2",
+      "requirement_inferred": true,
+      "evidence": [
+        "evidence/ju26-issue-2234/findings-probes.json",
+        "evidence/ju26-issue-2234/proof.json"
+      ],
+      "diff_parts": [
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1148",
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1179-1182"
+      ],
+      "owner_role": "analyzer owner"
+    },
+    {
+      "id": "C-2234-04",
+      "claim": "The new `continue` also skips collecting the member's type, so a member with a mixed key and an unserializable type no longer gets MsgPack003 (base reported it when the first key was a string).",
+      "tier": "Refused",
+      "why_this_tier": "It drops a warning that base reported; whether that is acceptable next to the MsgPack005 error on the same member is a product call.",
+      "requirement": "R-2234-4",
+      "requirement_inferred": true,
+      "evidence": [
+        "evidence/ju26-issue-2234/findings-probes.json"
+      ],
+      "diff_parts": [
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1008",
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1148"
+      ],
+      "owner_role": "analyzer owner"
+    },
+    {
+      "id": "C-2234-05",
+      "claim": "When two members share a key, the first member is kept and the second gets MsgPack005 ('must be unique'); no repeated key goes unreported.",
+      "tier": "Tested",
+      "why_this_tier": "The duplicate-key tests fail on base and pass on the branch, and the model lemma DupReported matches the real C# on every input up to 4 members.",
+      "requirement": "R-2234-3",
+      "requirement_inferred": true,
+      "evidence": [
+        "evidence/ju26-issue-2234/old-vs-new-tests.json",
+        "evidence/ju26-issue-2234/findings-probes.json",
+        "evidence/ju26-issue-2234/proof.json"
+      ],
+      "diff_parts": [
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1023-1026",
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1039-1042",
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1163-1166",
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1179-1182"
+      ],
+      "chain": [
+        {
+          "link": "Dafny lemma DupReported (first wins, every repeat reported)",
+          "tier": "Proved"
+        },
+        {
+          "link": "model matches real TypeCollector on 3710 inputs",
+          "tier": "Tested"
+        },
+        {
+          "link": "duplicate-key tests fail on base, pass on branch",
+          "tier": "Tested"
+        }
+      ]
+    },
+    {
+      "id": "C-2234-06",
+      "claim": "The same fix is pasted into both the properties loop and the fields loop, which adds duplicated code to TypeCollector.cs.",
+      "tier": "Measured",
+      "why_this_tier": "The numbers come from a clone and complexity script run on base and branch.",
+      "requirement": "R-2234-1",
+      "requirement_inferred": false,
+      "evidence": [
+        "evidence/ju26-issue-2234/clone-complexity.json"
+      ],
+      "diff_parts": [
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1008",
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1023-1026",
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1039-1042",
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1148",
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1163-1166",
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1179-1182"
+      ]
+    },
+    {
+      "id": "C-2234-07",
+      "claim": "4 of the 8 new analyzer tests (missing key, AllowPrivate, member type, generation-only diagnostics) already pass on base; they pin existing behaviour and are not evidence for the fix.",
+      "tier": "Measured",
+      "why_this_tier": "The count comes from the old-versus-new test runner.",
+      "requirement": "R-2234-1",
+      "requirement_inferred": false,
+      "evidence": [
+        "evidence/ju26-issue-2234/old-vs-new-tests.json"
+      ],
+      "diff_parts": [
+        "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs:1-79",
+        "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs:168-193"
+      ]
+    },
+    {
+      "id": "C-2234-08",
+      "claim": "A suppressed type gets no generated formatter and still round-trips through the dynamic resolver (the 2 new execution tests).",
+      "tier": "Argued",
+      "why_this_tier": "The execution test project does not build in our environment on base or branch, because the source generator is not loaded (CS9057), so the tests never ran.",
+      "requirement": "R-2234-1",
+      "requirement_inferred": false,
+      "evidence": [
+        "evidence/ju26-issue-2234/old-vs-new-tests.json",
+        "evidence/ju26-issue-2234/execution-tests-build.json"
+      ],
+      "diff_parts": [
+        "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs:1-37"
+      ],
+      "owner_role": "test owner"
+    },
+    {
+      "id": "C-2234-09",
+      "claim": "The new README section says the analyzer validates suppressed types (MsgPack003, 004, 005, 012, 015) and skips MsgPack011, 016 and 017 for them.",
+      "tier": "Argued",
+      "why_this_tier": "It is documentation. Tests cover 003, 004, 005, 015 and the skipped ones, but not 012, and C-2234-03 shows a case where MsgPack005 validation still crashes.",
+      "requirement": "R-2234-1",
+      "requirement_inferred": false,
+      "evidence": [
+        "evidence/ju26-issue-2234/old-vs-new-tests.json",
+        "evidence/ju26-issue-2234/findings-probes.json"
+      ],
+      "diff_parts": [
+        "README.md:1620-1633"
+      ],
+      "owner_role": "docs owner"
+    }
+  ],
+  "found": [
+    "We found (probe, real analyzer): the new `continue` skips CollectCore for the member's type, so MsgPack003 is lost for a mixed-key member (C-2234-04).",
+    "We found (probe, real analyzer, Dafny model): a first field with [Key(null)] still crashes the analyzer with ArgumentNullException, on base and branch, with SuppressSourceGeneration too. The properties loop guards with `else if (stringKey is not null)`; the fields loop uses a bare `else` (C-2234-03).",
+    "The theorem in the brief ('collecting keys never fails, whatever keys repeat or mix kinds') is false for the real code. Dafny proves the exact condition instead: it fails if and only if the first keyed member is a field with [Key(null)].",
+    "Finding (b) dropped: the second member of a repeated key gets MsgPack005 on the branch, and the first one is kept (C-2234-05).",
+    "The base crash on repeated keys also happens without SuppressSourceGeneration (test DuplicateKeysAreReportedWithoutAnalyzerFailureForGeneratedTypes fails on base). The bug is not specific to suppressed types, and 4 of the 8 analyzer tests show the analyzer already validated suppressed types on base.",
+    "SuppressedSourceGenerationTests.cs raises StyleCop SA1649 (file name does not match first type name).",
+    "Pre-existing, outside the diff: the fields-loop BothStringAndIntKeyAreNull diagnostic passes no message arguments, so the message reads 'Both int and string keys are null: {0}.{1}'."
+  ],
+  "refused": [
+    {
+      "what": "C-2234-04: the `continue` drops MsgPack003 for mixed-key members",
+      "why": "Dropping a diagnostic that base reported is a product call for the analyzer owner."
+    }
+  ],
+  "scope_drift": [
+    "README.md gains a 14-line 'Opting out of source generation' section. The issue title asks for an analyzer fix, not documentation."
+  ],
+  "not_checked": [
+    "The 2 execution tests (SuppressedSourceGenerationTests.cs): the project does not build here because the generator needs compiler 4.12 and SDK 8.0.402 has 4.11 (CS9057).",
+    "Source generator output (reportDiagnostic is null in the generator path) for repeated or mixed keys: what code is emitted when the first member wins.",
+    "MsgPack012 (inaccessible types) for suppressed types, which the README claims.",
+    "The full test suite on the branch; only the new tests and our probes were run.",
+    "Members without any [Key] attribute, inherited members, records with positional parameters: not in the model's input domain.",
+    "The model's input domain is keys 0, 1, \"a\", \"b\" and null, with up to 4 members, so the model-vs-C# check covers 3710 inputs, not all inputs.",
+    "The issue body: only the issue title was available to us."
+  ],
+  "uncovered_diff_parts": []
+}

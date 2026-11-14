@@ -1,0 +1,13 @@
+{
+  "check": "diff-stat",
+  "branch": "ju26-issue-2234",
+  "base": "32258fdb",
+  "command": "git diff --shortstat 32258fdb origin/ju26-issue-2234",
+  "result": "pass",
+  "summary": "4 files changed, 262 insertions(+), 4 deletions(-)",
+  "details": {
+    "shortstat": "4 files changed, 262 insertions(+), 4 deletions(-)"
+  },
+  "tool_versions": {},
+  "produced_by": "hand"
+}

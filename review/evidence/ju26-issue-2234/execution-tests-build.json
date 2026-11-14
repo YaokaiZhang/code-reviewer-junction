@@ -1,0 +1,24 @@
+{
+  "check": "execution-tests-build",
+  "branch": "ju26-issue-2234",
+  "base": "32258fdb",
+  "command": "dotnet build tests/MessagePack.SourceGenerator.ExecutionTests -nologo | grep -E 'warning|error' | sort -u   (in a worktree of origin/ju26-issue-2234)",
+  "result": "fail",
+  "summary": "ExecutionTests does not build here: the source generator is not loaded (CS9057, generator references compiler 4.12, SDK 8.0.402 runs 4.11), so 5 CS errors; the new test file also raises SA1649",
+  "details": {
+    "lines": [
+      "CSC : warning CS9057: The analyzer assembly 'bin/MessagePack.SourceGenerator/Debug/netstandard2.0/MessagePack.SourceGenerator.dll' references version '4.12.0.0' of the compiler, which is newer than the currently running version '4.11.0.0'. ",
+      "tests/MessagePack.SourceGenerator.ExecutionTests/GeneratedCompositeResolverTests.cs(12,53): error CS0117: 'MyGeneratedCompositeResolver' does not contain a definition for 'Instance' ",
+      "tests/MessagePack.SourceGenerator.ExecutionTests/GeneratedCompositeResolverTests.cs(13,53): error CS0117: 'MyGeneratedCompositeResolver' does not contain a definition for 'Instance' ",
+      "tests/MessagePack.SourceGenerator.ExecutionTests/GeneratedCompositeResolverTests.cs(14,53): error CS0117: 'MyGeneratedCompositeResolver' does not contain a definition for 'Instance' ",
+      "tests/MessagePack.SourceGenerator.ExecutionTests/GeneratedCompositeResolverTests.cs(15,50): error CS0117: 'MyGeneratedCompositeResolver' does not contain a definition for 'Instance' ",
+      "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs(23,50): error CS0117: 'GeneratedMessagePackResolver' does not contain a definition for 'Instance' ",
+      "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs(9,14): warning SA1649: File name should match first type name (https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1649.md) "
+    ],
+    "error_count": 5
+  },
+  "tool_versions": {
+    "dotnet_sdk": "8.0.402"
+  },
+  "produced_by": "hand"
+}
