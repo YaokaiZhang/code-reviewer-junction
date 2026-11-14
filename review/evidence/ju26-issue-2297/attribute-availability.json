@@ -4,26 +4,60 @@
   "base": "32258fdb",
   "command": "P=$SCRATCH/wt-2297-attrprobe; (1) grep -c ExcludeFromCodeCoverageAttribute ~/.nuget/packages/netstandard.library/2.0.3/build/netstandard2.0/ref/netstandard.dll ~/.nuget/packages/microsoft.netframework.referenceassemblies.net472/1.0.3/build/.NETFramework/v4.7.2/{System.dll,mscorlib.dll,Facades/netstandard.dll}; (2) in $P: Probe.csproj (TargetFrameworks netstandard2.0;net472;net8.0, TreatWarningsAsErrors) + Probe.cs (unguarded [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage] on an internal sealed class, a partial class and a nested private static generic class, as the generator emits them); rm -rf bin obj && dotnet build -nodeReuse:false -nologo -v:q; (3) negative control in $P-neg: same csproj, Neg.cs uses [global::System.Diagnostics.CodeAnalysis.NotNullWhen(true)]; dotnet build; (4) dotnet msbuild Probe.csproj -p:TargetFramework=<tfm> -getProperty:DefineConstants for each tfm",
   "result": "pass",
+  "provides": [
+    "probe"
+  ],
   "summary": "ExcludeFromCodeCoverageAttribute is present in the netstandard2.0 and net472 reference assemblies, and an unguarded probe compiles for netstandard2.0, net472 and net8.0 with 0 errors and 0 warnings, so the agent's `#if !NETSTANDARD2_0 && !NETFRAMEWORK` guard is too strict: it drops the attribute on 2 targets where it exists",
   "details": {
     "reference_assemblies": [
-      {"tfm": "netstandard2.0", "file": "netstandard.library/2.0.3/build/netstandard2.0/ref/netstandard.dll", "contains_type_name": true, "sha256_prefix": "1799854d01a89d14"},
-      {"tfm": "net472", "file": "microsoft.netframework.referenceassemblies.net472/1.0.3/build/.NETFramework/v4.7.2/System.dll", "contains_type_name": true, "sha256_prefix": "541c6067cc69a436"},
-      {"tfm": "net472", "file": "microsoft.netframework.referenceassemblies.net472/1.0.3/build/.NETFramework/v4.7.2/Facades/netstandard.dll", "contains_type_name": true, "sha256_prefix": "9f12554ddf1fa4ef"},
-      {"tfm": "net472", "file": "microsoft.netframework.referenceassemblies.net472/1.0.3/build/.NETFramework/v4.7.2/mscorlib.dll", "contains_type_name": false, "sha256_prefix": "a69849cf0b433664"}
+      {
+        "tfm": "netstandard2.0",
+        "file": "netstandard.library/2.0.3/build/netstandard2.0/ref/netstandard.dll",
+        "contains_type_name": true,
+        "sha256_prefix": "1799854d01a89d14"
+      },
+      {
+        "tfm": "net472",
+        "file": "microsoft.netframework.referenceassemblies.net472/1.0.3/build/.NETFramework/v4.7.2/System.dll",
+        "contains_type_name": true,
+        "sha256_prefix": "541c6067cc69a436"
+      },
+      {
+        "tfm": "net472",
+        "file": "microsoft.netframework.referenceassemblies.net472/1.0.3/build/.NETFramework/v4.7.2/Facades/netstandard.dll",
+        "contains_type_name": true,
+        "sha256_prefix": "9f12554ddf1fa4ef"
+      },
+      {
+        "tfm": "net472",
+        "file": "microsoft.netframework.referenceassemblies.net472/1.0.3/build/.NETFramework/v4.7.2/mscorlib.dll",
+        "contains_type_name": false,
+        "sha256_prefix": "a69849cf0b433664"
+      }
     ],
     "compile_probe": {
-      "target_frameworks": ["netstandard2.0", "net472", "net8.0"],
+      "target_frameworks": [
+        "netstandard2.0",
+        "net472",
+        "net8.0"
+      ],
       "build_exit_code": 0,
       "errors": 0,
       "warnings": 0,
       "treat_warnings_as_errors": true,
-      "attribute_type_name_found_in_each_output_dll": {"netstandard2.0": true, "net472": true, "net8.0": true}
+      "attribute_type_name_found_in_each_output_dll": {
+        "netstandard2.0": true,
+        "net472": true,
+        "net8.0": true
+      }
     },
     "negative_control": {
       "attribute": "System.Diagnostics.CodeAnalysis.NotNullWhenAttribute",
       "build_exit_code": 1,
-      "failed_target_frameworks": ["net472", "netstandard2.0"],
+      "failed_target_frameworks": [
+        "net472",
+        "netstandard2.0"
+      ],
       "error": "CS0234",
       "meaning": "the probe does detect an attribute that is missing on a target, so the passing probe above is informative"
     },
@@ -40,6 +74,11 @@
       "targets_where_attribute_is_absent_not_checked": "netstandard1.x, .NET Framework < 4.0, Unity/Mono profiles and other custom symbol sets were not checked"
     }
   },
-  "tool_versions": {"dotnet_sdk": "8.0.402", "os": "Linux 6.18.44-fc-v470 x86_64 (Linux, not macOS)", "NETStandard.Library": "2.0.3", "Microsoft.NETFramework.ReferenceAssemblies.net472": "1.0.3"},
+  "tool_versions": {
+    "dotnet_sdk": "8.0.402",
+    "os": "Linux 6.18.44-fc-v470 x86_64 (Linux, not macOS)",
+    "NETStandard.Library": "2.0.3",
+    "Microsoft.NETFramework.ReferenceAssemblies.net472": "1.0.3"
+  },
   "produced_by": "hand"
 }

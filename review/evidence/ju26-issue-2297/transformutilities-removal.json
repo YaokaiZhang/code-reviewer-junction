@@ -4,6 +4,9 @@
   "base": "32258fdb",
   "command": "python3 review/scripts/regen_check.py --repo $MP_REPO --branch ju26-issue-2297 --run 'no-tu=origin/ju26-issue-2297+revert:src/MessagePack.SourceGenerator/Transforms/TransformUtilities.cs' --out transformutilities-removal --write",
   "result": "fail",
+  "provides": [
+    "revert-test"
+  ],
   "summary": "no-tu: 168 passed, 1 failed of 169",
   "details": {
     "test_project": "tests/MessagePack.SourceGenerator.Tests",

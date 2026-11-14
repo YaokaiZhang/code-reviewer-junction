@@ -22,6 +22,20 @@
         "evidence/ju26-issue-2283/old-vs-new-tests.json",
         "evidence/ju26-issue-2283/old-vs-new-tests.script.json"
       ],
+      "support": [
+        {
+          "file": "evidence/ju26-issue-2283/old-vs-new-tests.script.json",
+          "kind": "flip-test"
+        },
+        {
+          "file": "evidence/ju26-issue-2283/old-vs-new-tests.json",
+          "kind": "flip-test"
+        },
+        {
+          "file": "evidence/ju26-issue-2283/old-vs-new-tests.json",
+          "kind": "revert-test"
+        }
+      ],
       "diff_parts": [
         "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:985",
         "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1077",
@@ -56,6 +70,16 @@
         "evidence/ju26-issue-2283/dropped-warning.json",
         "evidence/ju26-issue-2283/report-sites.json",
         "evidence/ju26-issue-2283/old-vs-new-tests.json"
+      ],
+      "support": [
+        {
+          "file": "evidence/ju26-issue-2283/dropped-warning.json",
+          "kind": "probe"
+        },
+        {
+          "file": "evidence/ju26-issue-2283/report-sites.json",
+          "kind": "count"
+        }
       ],
       "diff_parts": [
         "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:239",
@@ -92,6 +116,15 @@
       "evidence": [
         "evidence/ju26-issue-2283/dropped-warning.json"
       ],
+      "support": [
+        {
+          "file": "evidence/ju26-issue-2283/dropped-warning.json",
+          "kind": "probe"
+        }
+      ],
+      "depends_on": [
+        "C-2283-02"
+      ],
       "diff_parts": [
         "README.md:1639-1643",
         "doc/analyzers/MsgPack004.md:48-52"
@@ -107,6 +140,12 @@
       "requirement_inferred": false,
       "evidence": [
         "evidence/ju26-issue-2283/old-vs-new-tests.json"
+      ],
+      "support": [
+        {
+          "file": "evidence/ju26-issue-2283/old-vs-new-tests.json",
+          "kind": "count"
+        }
       ],
       "diff_parts": [
         "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:239",

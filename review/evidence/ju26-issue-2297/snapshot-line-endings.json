@@ -4,6 +4,10 @@
   "base": "32258fdb",
   "command": "python3 review/scripts/regen_check.py --repo $MP_REPO --branch ju26-issue-2297 --run 'branch-lf=origin/ju26-issue-2297+lf-snapshots' --out snapshot-line-endings --write",
   "result": "fail",
+  "provides": [
+    "probe",
+    "count"
+  ],
   "summary": "branch-lf: 80 passed, 89 failed of 169",
   "details": {
     "test_project": "tests/MessagePack.SourceGenerator.Tests",

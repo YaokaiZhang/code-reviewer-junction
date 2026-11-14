@@ -1,0 +1,282 @@
+{
+  "check": "confidence",
+  "branch": "ju26-issue-2234",
+  "base": "32258fdb",
+  "command": "python3 review/scripts/confidence.py --branch ju26-issue-2234 --write",
+  "result": "pass",
+  "summary": "9 claims: 1 high, 4 medium, 4 low; 1 need an owner (C-2234-04)",
+  "details": {
+    "formula": {
+      "kinds": {
+        "rebuild-compare": 90,
+        "proof-model": 80,
+        "flip-test": 75,
+        "revert-test": 75,
+        "probe": 60,
+        "count": 40,
+        "none": 15
+      },
+      "hand": -10,
+      "undo_bonus": 5,
+      "replay_match": 5,
+      "replay_mismatch": -30,
+      "contradicted_cap": 25,
+      "bands": {
+        "high": 80,
+        "medium": 50
+      },
+      "combine": "any = best supporting file; all = weakest"
+    },
+    "claims": {
+      "C-2234-01": {
+        "score": 75,
+        "band": "medium",
+        "how": "best supporting check",
+        "signals": [
+          {
+            "file": "evidence/ju26-issue-2234/old-vs-new-tests.json",
+            "kind": "flip-test",
+            "summary": "10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 4 pass on base (not evidence), 0 fail on branch, 2 not runnable here (project does not build on branch)",
+            "produced_by": "script",
+            "replay": "not re-run",
+            "parts": [
+              {
+                "text": "test fails before the change, passes after",
+                "delta": 75
+              }
+            ],
+            "score": 75
+          },
+          {
+            "file": "evidence/ju26-issue-2234/findings-probes.json",
+            "kind": "probe",
+            "summary": "(a) continue skips member type: confirmed; (b) second member of a duplicate key gets MsgPack005: yes, finding dropped; null-key first field crashes analyzer on branch: confirmed (11 scenarios, real analyzer, base and branch)",
+            "produced_by": "script",
+            "replay": "not re-run",
+            "parts": [
+              {
+                "text": "experiment on the real code",
+                "delta": 60
+              }
+            ],
+            "score": 60
+          }
+        ],
+        "contradicted_by": [],
+        "gate": null,
+        "depends_on": [],
+        "shares_lines_with": [
+          "MsgPack003 is no longer reported for a member with a mixed key and an unserializable type (base reported it)"
+        ]
+      },
+      "C-2234-02": {
+        "score": 80,
+        "band": "high",
+        "how": "best supporting check",
+        "signals": [
+          {
+            "file": "evidence/ju26-issue-2234/proof.json",
+            "kind": "proof-model",
+            "summary": "Dafny: Dafny program verifier finished with 23 verified, 0 errors; locked theorem 'never fails' is false for the branch (counterexample: first keyed member is a field with [Key(null)]), the stated mutation fails to verify; model vs real C# on 3710 inputs of 1..4 members: branch 0 mismatches, base 0 mismatches; C# threw on 156 branch inputs and 3346 base inputs; with int/string keys only (1592 inputs) C# threw on 1500 on base and 0 on branch",
+            "produced_by": "script",
+            "replay": "not re-run",
+            "parts": [
+              {
+                "text": "model proved, and model matched the real code on every tested input",
+                "delta": 80
+              }
+            ],
+            "score": 80
+          }
+        ],
+        "contradicted_by": [],
+        "gate": null,
+        "depends_on": []
+      },
+      "C-2234-03": {
+        "score": 60,
+        "band": "medium",
+        "how": "best supporting check",
+        "signals": [
+          {
+            "file": "evidence/ju26-issue-2234/findings-probes.json",
+            "kind": "probe",
+            "summary": "(a) continue skips member type: confirmed; (b) second member of a duplicate key gets MsgPack005: yes, finding dropped; null-key first field crashes analyzer on branch: confirmed (11 scenarios, real analyzer, base and branch)",
+            "produced_by": "script",
+            "replay": "not re-run",
+            "parts": [
+              {
+                "text": "experiment on the real code",
+                "delta": 60
+              }
+            ],
+            "score": 60
+          }
+        ],
+        "contradicted_by": [],
+        "gate": null,
+        "depends_on": [],
+        "shares_lines_with": [
+          "MsgPack003 is no longer reported for a member with a mixed key and an unserializable type (base reported it)"
+        ]
+      },
+      "C-2234-04": {
+        "score": 60,
+        "band": "medium",
+        "how": "best supporting check",
+        "signals": [
+          {
+            "file": "evidence/ju26-issue-2234/findings-probes.json",
+            "kind": "probe",
+            "summary": "(a) continue skips member type: confirmed; (b) second member of a duplicate key gets MsgPack005: yes, finding dropped; null-key first field crashes analyzer on branch: confirmed (11 scenarios, real analyzer, base and branch)",
+            "produced_by": "script",
+            "replay": "not re-run",
+            "parts": [
+              {
+                "text": "experiment on the real code",
+                "delta": 60
+              }
+            ],
+            "score": 60
+          }
+        ],
+        "contradicted_by": [],
+        "gate": {
+          "contract": "diagnostics",
+          "change": "MsgPack003 is no longer reported for a member with a mixed key and an unserializable type (base reported it)",
+          "shown_by": "evidence/ju26-issue-2234/findings-probes.json",
+          "hunks": [
+            "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1008-1008",
+            "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1148-1148"
+          ],
+          "owner": "Andrew Arnott",
+          "owner_basis": "most commits on the diagnostics paths at base (85 commits)",
+          "rules": []
+        },
+        "depends_on": []
+      },
+      "C-2234-05": {
+        "score": 75,
+        "band": "medium",
+        "how": "weakest link of a chain",
+        "signals": [
+          {
+            "file": "evidence/ju26-issue-2234/old-vs-new-tests.json",
+            "kind": "flip-test",
+            "summary": "10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 4 pass on base (not evidence), 0 fail on branch, 2 not runnable here (project does not build on branch)",
+            "produced_by": "script",
+            "replay": "not re-run",
+            "parts": [
+              {
+                "text": "test fails before the change, passes after",
+                "delta": 75
+              }
+            ],
+            "score": 75
+          },
+          {
+            "file": "evidence/ju26-issue-2234/proof.json",
+            "kind": "proof-model",
+            "summary": "Dafny: Dafny program verifier finished with 23 verified, 0 errors; locked theorem 'never fails' is false for the branch (counterexample: first keyed member is a field with [Key(null)]), the stated mutation fails to verify; model vs real C# on 3710 inputs of 1..4 members: branch 0 mismatches, base 0 mismatches; C# threw on 156 branch inputs and 3346 base inputs; with int/string keys only (1592 inputs) C# threw on 1500 on base and 0 on branch",
+            "produced_by": "script",
+            "replay": "not re-run",
+            "parts": [
+              {
+                "text": "model proved, and model matched the real code on every tested input",
+                "delta": 80
+              }
+            ],
+            "score": 80
+          }
+        ],
+        "contradicted_by": [],
+        "gate": null,
+        "depends_on": []
+      },
+      "C-2234-06": {
+        "score": 40,
+        "band": "low",
+        "how": "best supporting check",
+        "signals": [
+          {
+            "file": "evidence/ju26-issue-2234/clone-complexity.json",
+            "kind": "count",
+            "summary": "TypeCollector.cs: duplicated blocks 10 -> 12, duplicated normalised lines 244 -> 258 (window 6); 6 of 10 added code lines sit in duplicated blocks; method GetObjectInfo complexity estimate 162 -> 166",
+            "produced_by": "script",
+            "replay": "not re-run",
+            "parts": [
+              {
+                "text": "number from a tool",
+                "delta": 40
+              }
+            ],
+            "score": 40
+          }
+        ],
+        "contradicted_by": [],
+        "gate": null,
+        "depends_on": []
+      },
+      "C-2234-07": {
+        "score": 40,
+        "band": "low",
+        "how": "best supporting check",
+        "signals": [
+          {
+            "file": "evidence/ju26-issue-2234/old-vs-new-tests.json",
+            "kind": "count",
+            "summary": "10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 4 pass on base (not evidence), 0 fail on branch, 2 not runnable here (project does not build on branch)",
+            "produced_by": "script",
+            "replay": "not re-run",
+            "parts": [
+              {
+                "text": "number from a tool",
+                "delta": 40
+              }
+            ],
+            "score": 40
+          }
+        ],
+        "contradicted_by": [],
+        "gate": null,
+        "depends_on": []
+      },
+      "C-2234-08": {
+        "score": 15,
+        "band": "low",
+        "how": "no check backs it",
+        "signals": [],
+        "contradicted_by": [
+          {
+            "file": "evidence/ju26-issue-2234/execution-tests-build.json",
+            "summary": "ExecutionTests does not build here: the source generator is not loaded (CS9057, generator references compiler 4.12, SDK 8.0.402 runs 4.11), so 5 CS errors; the new test file also raises SA1649"
+          }
+        ],
+        "gate": null,
+        "depends_on": []
+      },
+      "C-2234-09": {
+        "score": 15,
+        "band": "low",
+        "how": "no check backs it",
+        "signals": [],
+        "contradicted_by": [
+          {
+            "file": "evidence/ju26-issue-2234/findings-probes.json",
+            "summary": "(a) continue skips member type: confirmed; (b) second member of a duplicate key gets MsgPack005: yes, finding dropped; null-key first field crashes analyzer on branch: confirmed (11 scenarios, real analyzer, base and branch)"
+          }
+        ],
+        "gate": null,
+        "depends_on": [
+          "C-2234-03"
+        ]
+      }
+    },
+    "replayed": false,
+    "history_rules_available": 0
+  },
+  "tool_versions": {
+    "python": "3.13.18"
+  },
+  "produced_by": "script"
+}

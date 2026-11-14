@@ -21,6 +21,12 @@
       "evidence": [
         "evidence/ju26-issue-2297/diff-classifier.json"
       ],
+      "support": [
+        {
+          "file": "evidence/ju26-issue-2297/diff-classifier.json",
+          "kind": "count"
+        }
+      ],
       "diff_parts": [
         "tests/MessagePack.SourceGenerator.Tests/Resources/*"
       ]
@@ -35,6 +41,12 @@
       "evidence": [
         "evidence/ju26-issue-2297/regeneration.json"
       ],
+      "support": [
+        {
+          "file": "evidence/ju26-issue-2297/regeneration.json",
+          "kind": "rebuild-compare"
+        }
+      ],
       "diff_parts": [
         "tests/MessagePack.SourceGenerator.Tests/Resources/*"
       ]
@@ -48,6 +60,12 @@
       "requirement_inferred": true,
       "evidence": [
         "evidence/ju26-issue-2297/template-regeneration.json"
+      ],
+      "support": [
+        {
+          "file": "evidence/ju26-issue-2297/template-regeneration.json",
+          "kind": "rebuild-compare"
+        }
       ],
       "diff_parts": [
         "src/MessagePack.SourceGenerator/Transforms/*Template.tt",
@@ -64,6 +82,12 @@
       "evidence": [
         "evidence/ju26-issue-2297/new-tests-on-base.json",
         "evidence/ju26-issue-2297/regeneration.json"
+      ],
+      "support": [
+        {
+          "file": "evidence/ju26-issue-2297/new-tests-on-base.json",
+          "kind": "flip-test"
+        }
       ],
       "diff_parts": [
         "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
@@ -93,6 +117,16 @@
         "evidence/ju26-issue-2297/transformutilities-removal-output.json",
         "evidence/ju26-issue-2297/regeneration.json"
       ],
+      "support": [
+        {
+          "file": "evidence/ju26-issue-2297/transformutilities-removal.json",
+          "kind": "revert-test"
+        },
+        {
+          "file": "evidence/ju26-issue-2297/transformutilities-removal-output.json",
+          "kind": "probe"
+        }
+      ],
       "diff_parts": [
         "src/MessagePack.SourceGenerator/Transforms/TransformUtilities.cs:58"
       ],
@@ -118,6 +152,16 @@
         "evidence/ju26-issue-2297/diff-classifier.json",
         "evidence/ju26-issue-2297/transformutilities-removal-output.json"
       ],
+      "support": [
+        {
+          "file": "evidence/ju26-issue-2297/diff-classifier.json",
+          "kind": "count"
+        },
+        {
+          "file": "evidence/ju26-issue-2297/transformutilities-removal-output.json",
+          "kind": "probe"
+        }
+      ],
       "diff_parts": [
         "tests/MessagePack.SourceGenerator.Tests/Resources/GenericDataTypeWithPrivateMember/*",
         "src/MessagePack.SourceGenerator/Transforms/TransformUtilities.cs:58"
@@ -133,6 +177,12 @@
       "evidence": [
         "evidence/ju26-issue-2297/duplicate-attribute-probe.json",
         "evidence/ju26-issue-2297/regeneration.json"
+      ],
+      "support": [
+        {
+          "file": "evidence/ju26-issue-2297/duplicate-attribute-probe.json",
+          "kind": "probe"
+        }
       ],
       "diff_parts": [
         "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt:14-16",
@@ -150,6 +200,10 @@
       "requirement": "R-2297-2",
       "requirement_inferred": true,
       "evidence": [
+        "evidence/ju26-issue-2297/attribute-availability.json"
+      ],
+      "support": [],
+      "contradicted_by": [
         "evidence/ju26-issue-2297/attribute-availability.json"
       ],
       "diff_parts": [
@@ -170,6 +224,10 @@
         "evidence/ju26-issue-2297/attribute-availability.json",
         "evidence/ju26-issue-2297/new-tests-on-base.json"
       ],
+      "support": [],
+      "contradicted_by": [
+        "evidence/ju26-issue-2297/attribute-availability.json"
+      ],
       "diff_parts": [
         "README.md:1639-1641"
       ],
@@ -185,6 +243,12 @@
       "evidence": [
         "evidence/ju26-issue-2297/snapshot-line-endings.json",
         "evidence/ju26-issue-2297/regeneration.json"
+      ],
+      "support": [
+        {
+          "file": "evidence/ju26-issue-2297/snapshot-line-endings.json",
+          "kind": "probe"
+        }
       ],
       "diff_parts": [
         "tests/MessagePack.SourceGenerator.Tests/Resources/*"

@@ -5,6 +5,9 @@
   "head": "9007cee1",
   "command": "python3 review/proof/run_2234_probes.py --repo <clone> --workdir <dir> --dafny <dafny> --z3 <z3>",
   "result": "pass",
+  "provides": [
+    "proof-model"
+  ],
   "summary": "Dafny: Dafny program verifier finished with 23 verified, 0 errors; locked theorem 'never fails' is false for the branch (counterexample: first keyed member is a field with [Key(null)]), the stated mutation fails to verify; model vs real C# on 3710 inputs of 1..4 members: branch 0 mismatches, base 0 mismatches; C# threw on 156 branch inputs and 3346 base inputs; with int/string keys only (1592 inputs) C# threw on 1500 on base and 0 on branch",
   "details": {
     "model": "review/proof/KeyCollection.dfy",

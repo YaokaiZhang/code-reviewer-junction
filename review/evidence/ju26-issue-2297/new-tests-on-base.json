@@ -4,6 +4,9 @@
   "base": "32258fdb",
   "command": "python3 review/scripts/regen_check.py --repo $MP_REPO --branch ju26-issue-2297 --run 'base-newtests=32258fdb+take:tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs' --out new-tests-on-base --write",
   "result": "fail",
+  "provides": [
+    "flip-test"
+  ],
   "summary": "base-newtests: 167 passed, 2 failed of 169",
   "details": {
     "test_project": "tests/MessagePack.SourceGenerator.Tests",

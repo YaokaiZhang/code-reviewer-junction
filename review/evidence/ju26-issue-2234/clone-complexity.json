@@ -5,6 +5,9 @@
   "head": "9007cee1",
   "command": "python3 review/scripts/clone_complexity.py --repo <clone> --branch ju26-issue-2234 --file src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs --window 6 --out review/evidence/ju26-issue-2234/clone-complexity.json",
   "result": "pass",
+  "provides": [
+    "count"
+  ],
   "summary": "TypeCollector.cs: duplicated blocks 10 -> 12, duplicated normalised lines 244 -> 258 (window 6); 6 of 10 added code lines sit in duplicated blocks; method GetObjectInfo complexity estimate 162 -> 166",
   "details": {
     "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",

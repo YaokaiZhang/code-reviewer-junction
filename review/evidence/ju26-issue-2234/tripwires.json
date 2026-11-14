@@ -4,6 +4,9 @@
   "base": "32258fdb",
   "command": "python3 review/scripts/tripwires.py --repo $MP_REPO --branch ju26-issue-2234 --write",
   "result": "pass",
+  "provides": [
+    "count"
+  ],
   "summary": "7 contract trips over 9 hunks (diagnostics 6; user-docs 1); 0 trips no claim answers",
   "details": {
     "hunks_total": 9,

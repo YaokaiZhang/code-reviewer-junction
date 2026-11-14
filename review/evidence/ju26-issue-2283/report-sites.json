@@ -4,6 +4,9 @@
   "base": "32258fdb",
   "command": "python3 review/scripts/report_sites.py --repo <clone> --branch ju26-issue-2283 --out review/evidence/ju26-issue-2283/report-sites.json",
   "result": "pass",
+  "provides": [
+    "count"
+  ],
   "summary": "29 live report sites in TypeCollector.cs: 28 go through the filter (19 distinct descriptors), 1 bypass it; 28 of the 28 filtered sites can have a location outside the compilation's source; simple grep for 'reportDiagnostic?.Invoke' counts 29 lines (2 of them commented out)",
   "details": {
     "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",

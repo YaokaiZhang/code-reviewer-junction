@@ -4,6 +4,9 @@
   "base": "32258fdb",
   "command": "python3 review/scripts/template_check.py --repo $MP_REPO --branch ju26-issue-2297 --t4 <dotnet-t4 3.0.0 t4> --write",
   "result": "pass",
+  "provides": [
+    "rebuild-compare"
+  ],
   "summary": "dotnet-t4 regeneration of 6 templates, TransformText() compared after normalising layout: base 6 of 6 match, branch 6 of 6 match, 0 t4 errors; negative control: branch regeneration differs from base .cs for 6 of 6",
   "details": {
     "templates": [

@@ -4,6 +4,9 @@
   "base": "32258fdb",
   "command": "git -C <clone> diff --shortstat 32258fdb origin/ju26-issue-2283 && git -C <clone> diff --numstat 32258fdb origin/ju26-issue-2283",
   "result": "pass",
+  "provides": [
+    "count"
+  ],
   "summary": "4 files changed, 225 insertions, 3 deletions",
   "details": {
     "head": "9df83c38",

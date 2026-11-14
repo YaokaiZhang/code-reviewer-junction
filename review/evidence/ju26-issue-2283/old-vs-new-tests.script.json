@@ -5,6 +5,10 @@
   "head": "9df83c38",
   "command": "python3 review/scripts/old_vs_new_tests.py --repo <clone> --branch ju26-issue-2283 --out review/evidence/ju26-issue-2283/old-vs-new-tests.script.json",
   "result": "pass",
+  "provides": [
+    "flip-test",
+    "count"
+  ],
   "summary": "3 new or changed test methods (3 added, 0 modified): 3 fail on base and pass on branch, 0 pass on base (not evidence), 0 fail on branch, 0 not runnable here (project does not build on branch)",
   "details": {
     "counts": {

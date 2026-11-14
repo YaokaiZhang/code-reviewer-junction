@@ -5,6 +5,9 @@
   "head": "a0aa5ab2",
   "command": "python3 review/scripts/diff_classifier.py --repo $MP_REPO --branch ju26-issue-2297 --write",
   "result": "pass",
+  "provides": [
+    "count"
+  ],
   "summary": "237 files changed: 222 snapshot, 6 template, 6 generated-output, 1 test, 1 doc, 1 logic; 220 of 222 snapshots change only by attribute and #if/#endif guard lines, 2 do not; 3 snapshot files left unchanged, 1 Resources dir(s) with no test method",
   "details": {
     "files_changed": 237,

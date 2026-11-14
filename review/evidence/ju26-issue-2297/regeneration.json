@@ -4,6 +4,10 @@
   "base": "32258fdb",
   "command": "python3 review/scripts/regen_check.py --repo $MP_REPO --branch ju26-issue-2297 --run 'base=32258fdb' --run 'branch=origin/ju26-issue-2297' --out regeneration --write",
   "result": "pass",
+  "provides": [
+    "rebuild-compare",
+    "count"
+  ],
   "summary": "base: 167 passed, 0 failed of 167; branch: 169 passed, 0 failed of 169",
   "details": {
     "test_project": "tests/MessagePack.SourceGenerator.Tests",

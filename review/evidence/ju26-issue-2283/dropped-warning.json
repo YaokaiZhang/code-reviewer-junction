@@ -4,6 +4,19 @@
   "base": "32258fdb",
   "command": "python3 review/scripts/dropped_warning_test/run.py --repo <clone> --out-dir review/evidence/ju26-issue-2283",
   "result": "fail",
+  "provides": [
+    "probe"
+  ],
+  "contract_changes": [
+    {
+      "contract": "diagnostics",
+      "what": "MsgPack003 about the consumer's own unattributed type is no longer reported (base reported it)",
+      "diff_parts": [
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:239",
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1436-1451"
+      ]
+    }
+  ],
   "summary": "MsgPack003 (unattributed_consumer_type_inside_metadata_generic) is reported on base without any analyzer crash and is absent on branch; 3 of 6 probe cases lose a diagnostic on branch",
   "details": {
     "head": "9df83c38409c8bfad0517aebffe48211eda4a5b4",

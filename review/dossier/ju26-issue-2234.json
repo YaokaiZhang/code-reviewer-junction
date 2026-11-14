@@ -22,6 +22,16 @@
         "evidence/ju26-issue-2234/old-vs-new-tests.json",
         "evidence/ju26-issue-2234/findings-probes.json"
       ],
+      "support": [
+        {
+          "file": "evidence/ju26-issue-2234/old-vs-new-tests.json",
+          "kind": "flip-test"
+        },
+        {
+          "file": "evidence/ju26-issue-2234/findings-probes.json",
+          "kind": "probe"
+        }
+      ],
       "diff_parts": [
         "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1008",
         "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1023-1026",
@@ -41,6 +51,12 @@
       "requirement_inferred": true,
       "evidence": [
         "evidence/ju26-issue-2234/proof.json"
+      ],
+      "support": [
+        {
+          "file": "evidence/ju26-issue-2234/proof.json",
+          "kind": "proof-model"
+        }
       ],
       "diff_parts": [
         "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1008",
@@ -72,6 +88,12 @@
         "evidence/ju26-issue-2234/findings-probes.json",
         "evidence/ju26-issue-2234/proof.json"
       ],
+      "support": [
+        {
+          "file": "evidence/ju26-issue-2234/findings-probes.json",
+          "kind": "probe"
+        }
+      ],
       "diff_parts": [
         "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1148",
         "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1179-1182"
@@ -87,6 +109,12 @@
       "requirement_inferred": true,
       "evidence": [
         "evidence/ju26-issue-2234/findings-probes.json"
+      ],
+      "support": [
+        {
+          "file": "evidence/ju26-issue-2234/findings-probes.json",
+          "kind": "probe"
+        }
       ],
       "diff_parts": [
         "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1008",
@@ -106,6 +134,17 @@
         "evidence/ju26-issue-2234/findings-probes.json",
         "evidence/ju26-issue-2234/proof.json"
       ],
+      "support": [
+        {
+          "file": "evidence/ju26-issue-2234/old-vs-new-tests.json",
+          "kind": "flip-test"
+        },
+        {
+          "file": "evidence/ju26-issue-2234/proof.json",
+          "kind": "proof-model"
+        }
+      ],
+      "combine": "all",
       "diff_parts": [
         "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1023-1026",
         "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1039-1042",
@@ -137,6 +176,12 @@
       "evidence": [
         "evidence/ju26-issue-2234/clone-complexity.json"
       ],
+      "support": [
+        {
+          "file": "evidence/ju26-issue-2234/clone-complexity.json",
+          "kind": "count"
+        }
+      ],
       "diff_parts": [
         "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1008",
         "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1023-1026",
@@ -156,6 +201,12 @@
       "evidence": [
         "evidence/ju26-issue-2234/old-vs-new-tests.json"
       ],
+      "support": [
+        {
+          "file": "evidence/ju26-issue-2234/old-vs-new-tests.json",
+          "kind": "count"
+        }
+      ],
       "diff_parts": [
         "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs:1-79",
         "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs:168-193"
@@ -170,6 +221,10 @@
       "requirement_inferred": false,
       "evidence": [
         "evidence/ju26-issue-2234/old-vs-new-tests.json",
+        "evidence/ju26-issue-2234/execution-tests-build.json"
+      ],
+      "support": [],
+      "contradicted_by": [
         "evidence/ju26-issue-2234/execution-tests-build.json"
       ],
       "diff_parts": [
@@ -187,6 +242,13 @@
       "evidence": [
         "evidence/ju26-issue-2234/old-vs-new-tests.json",
         "evidence/ju26-issue-2234/findings-probes.json"
+      ],
+      "support": [],
+      "contradicted_by": [
+        "evidence/ju26-issue-2234/findings-probes.json"
+      ],
+      "depends_on": [
+        "C-2234-03"
       ],
       "diff_parts": [
         "README.md:1620-1633"

@@ -1,0 +1,230 @@
+{
+  "check": "confidence",
+  "branch": "ju26-issue-2283",
+  "base": "32258fdb",
+  "command": "python3 review/scripts/confidence.py --branch ju26-issue-2283 --write",
+  "result": "pass",
+  "summary": "4 claims: 1 high, 2 medium, 1 low; 2 need an owner (C-2283-02, C-2283-03)",
+  "details": {
+    "formula": {
+      "kinds": {
+        "rebuild-compare": 90,
+        "proof-model": 80,
+        "flip-test": 75,
+        "revert-test": 75,
+        "probe": 60,
+        "count": 40,
+        "none": 15
+      },
+      "hand": -10,
+      "undo_bonus": 5,
+      "replay_match": 5,
+      "replay_mismatch": -30,
+      "contradicted_cap": 25,
+      "bands": {
+        "high": 80,
+        "medium": 50
+      },
+      "combine": "any = best supporting file; all = weakest"
+    },
+    "claims": {
+      "C-2283-01": {
+        "score": 80,
+        "band": "high",
+        "how": "best supporting check",
+        "signals": [
+          {
+            "file": "evidence/ju26-issue-2283/old-vs-new-tests.script.json",
+            "kind": "flip-test",
+            "summary": "3 new or changed test methods (3 added, 0 modified): 3 fail on base and pass on branch, 0 pass on base (not evidence), 0 fail on branch, 0 not runnable here (project does not build on branch)",
+            "produced_by": "script",
+            "replay": "not re-run",
+            "parts": [
+              {
+                "text": "test fails before the change, passes after",
+                "delta": 75
+              },
+              {
+                "text": "an undo test confirms it",
+                "delta": 5
+              }
+            ],
+            "score": 80
+          },
+          {
+            "file": "evidence/ju26-issue-2283/old-vs-new-tests.json",
+            "kind": "flip-test",
+            "summary": "3 of 3 new tests fail on base and pass on branch; 1 of them (ClosedGenericStruct_FromMetadataReference_UnkeyedMember) also fails when only the filter is removed; whole test project: 167 of 167 pre-existing tests pass on base and 167 on branch",
+            "produced_by": "hand",
+            "replay": "not re-run",
+            "parts": [
+              {
+                "text": "test fails before the change, passes after",
+                "delta": 75
+              },
+              {
+                "text": "run by hand, not by a script",
+                "delta": -10
+              },
+              {
+                "text": "an undo test confirms it",
+                "delta": 5
+              }
+            ],
+            "score": 70
+          },
+          {
+            "file": "evidence/ju26-issue-2283/old-vs-new-tests.json",
+            "kind": "revert-test",
+            "summary": "3 of 3 new tests fail on base and pass on branch; 1 of them (ClosedGenericStruct_FromMetadataReference_UnkeyedMember) also fails when only the filter is removed; whole test project: 167 of 167 pre-existing tests pass on base and 167 on branch",
+            "produced_by": "hand",
+            "replay": "not re-run",
+            "parts": [
+              {
+                "text": "undo only this change: a test fails",
+                "delta": 75
+              },
+              {
+                "text": "run by hand, not by a script",
+                "delta": -10
+              }
+            ],
+            "score": 65
+          }
+        ],
+        "contradicted_by": [],
+        "gate": null,
+        "depends_on": []
+      },
+      "C-2283-02": {
+        "score": 50,
+        "band": "medium",
+        "how": "best supporting check",
+        "signals": [
+          {
+            "file": "evidence/ju26-issue-2283/dropped-warning.json",
+            "kind": "probe",
+            "summary": "MsgPack003 (unattributed_consumer_type_inside_metadata_generic) is reported on base without any analyzer crash and is absent on branch; 3 of 6 probe cases lose a diagnostic on branch",
+            "produced_by": "hand",
+            "replay": "not re-run",
+            "parts": [
+              {
+                "text": "experiment on the real code",
+                "delta": 60
+              },
+              {
+                "text": "run by hand, not by a script",
+                "delta": -10
+              }
+            ],
+            "score": 50
+          },
+          {
+            "file": "evidence/ju26-issue-2283/report-sites.json",
+            "kind": "count",
+            "summary": "29 live report sites in TypeCollector.cs: 28 go through the filter (19 distinct descriptors), 1 bypass it; 28 of the 28 filtered sites can have a location outside the compilation's source; simple grep for 'reportDiagnostic?.Invoke' counts 29 lines (2 of them commented out)",
+            "produced_by": "script",
+            "replay": "not re-run",
+            "parts": [
+              {
+                "text": "number from a tool",
+                "delta": 40
+              }
+            ],
+            "score": 40
+          }
+        ],
+        "contradicted_by": [],
+        "gate": {
+          "contract": "diagnostics",
+          "change": "MsgPack003 about the consumer's own unattributed type is no longer reported (base reported it)",
+          "shown_by": "evidence/ju26-issue-2283/dropped-warning.json",
+          "hunks": [
+            "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:239-239",
+            "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1429-1451"
+          ],
+          "owner": "Andrew Arnott",
+          "owner_basis": "most commits on the diagnostics paths at base (85 commits)",
+          "rules": []
+        },
+        "depends_on": []
+      },
+      "C-2283-03": {
+        "score": 50,
+        "band": "medium",
+        "how": "best supporting check",
+        "signals": [
+          {
+            "file": "evidence/ju26-issue-2283/dropped-warning.json",
+            "kind": "probe",
+            "summary": "MsgPack003 (unattributed_consumer_type_inside_metadata_generic) is reported on base without any analyzer crash and is absent on branch; 3 of 6 probe cases lose a diagnostic on branch",
+            "produced_by": "hand",
+            "replay": "not re-run",
+            "parts": [
+              {
+                "text": "experiment on the real code",
+                "delta": 60
+              },
+              {
+                "text": "run by hand, not by a script",
+                "delta": -10
+              }
+            ],
+            "score": 50
+          }
+        ],
+        "contradicted_by": [],
+        "gate": {
+          "contract": "diagnostics",
+          "change": "MsgPack003 about the consumer's own unattributed type is no longer reported (base reported it)",
+          "shown_by": "evidence/ju26-issue-2283/dropped-warning.json",
+          "hunks": [
+            "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:239-239",
+            "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1429-1451"
+          ],
+          "owner": "Andrew Arnott",
+          "owner_basis": "most commits on the diagnostics paths at base (85 commits)",
+          "rules": [],
+          "inherited_from": "C-2283-02"
+        },
+        "depends_on": [
+          "C-2283-02"
+        ]
+      },
+      "C-2283-04": {
+        "score": 30,
+        "band": "low",
+        "how": "best supporting check",
+        "signals": [
+          {
+            "file": "evidence/ju26-issue-2283/old-vs-new-tests.json",
+            "kind": "count",
+            "summary": "3 of 3 new tests fail on base and pass on branch; 1 of them (ClosedGenericStruct_FromMetadataReference_UnkeyedMember) also fails when only the filter is removed; whole test project: 167 of 167 pre-existing tests pass on base and 167 on branch",
+            "produced_by": "hand",
+            "replay": "not re-run",
+            "parts": [
+              {
+                "text": "number from a tool",
+                "delta": 40
+              },
+              {
+                "text": "run by hand, not by a script",
+                "delta": -10
+              }
+            ],
+            "score": 30
+          }
+        ],
+        "contradicted_by": [],
+        "gate": null,
+        "depends_on": []
+      }
+    },
+    "replayed": false,
+    "history_rules_available": 0
+  },
+  "tool_versions": {
+    "python": "3.13.18"
+  },
+  "produced_by": "script"
+}

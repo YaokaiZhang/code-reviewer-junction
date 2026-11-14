@@ -4,6 +4,9 @@
   "base": "32258fdb",
   "command": "dotnet build tests/MessagePack.SourceGenerator.ExecutionTests -nologo | grep -E 'warning|error' | sort -u   (in a worktree of origin/ju26-issue-2234)",
   "result": "fail",
+  "provides": [
+    "count"
+  ],
   "summary": "ExecutionTests does not build here: the source generator is not loaded (CS9057, generator references compiler 4.12, SDK 8.0.402 runs 4.11), so 5 CS errors; the new test file also raises SA1649",
   "details": {
     "lines": [

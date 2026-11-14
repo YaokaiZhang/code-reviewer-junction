@@ -5,6 +5,19 @@
   "head": "9007cee1",
   "command": "python3 review/proof/run_2234_probes.py --repo <clone> --workdir <dir> --dafny <dafny> --z3 <z3>",
   "result": "pass",
+  "provides": [
+    "probe"
+  ],
+  "contract_changes": [
+    {
+      "contract": "diagnostics",
+      "what": "MsgPack003 is no longer reported for a member with a mixed key and an unserializable type (base reported it)",
+      "diff_parts": [
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1008",
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1148"
+      ]
+    }
+  ],
   "summary": "(a) continue skips member type: confirmed; (b) second member of a duplicate key gets MsgPack005: yes, finding dropped; null-key first field crashes analyzer on branch: confirmed (11 scenarios, real analyzer, base and branch)",
   "details": {
     "findings": {

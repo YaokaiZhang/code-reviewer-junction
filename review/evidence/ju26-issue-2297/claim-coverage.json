@@ -4,6 +4,9 @@
   "base": "32258fdb",
   "command": "python3 review/scripts/claim_coverage.py --repo $MP_REPO --branch ju26-issue-2297 --write",
   "result": "pass",
+  "provides": [
+    "count"
+  ],
   "summary": "423 of 423 changed hunks covered by a claim; 0 of 237 files have uncovered hunks",
   "details": {
     "hunks_total": 423,

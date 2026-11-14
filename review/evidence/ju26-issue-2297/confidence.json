@@ -1,0 +1,316 @@
+{
+  "check": "confidence",
+  "branch": "ju26-issue-2297",
+  "base": "32258fdb",
+  "command": "python3 review/scripts/confidence.py --branch ju26-issue-2297 --write",
+  "result": "pass",
+  "summary": "10 claims: 2 high, 5 medium, 3 low; 1 need an owner (C-2297-07)",
+  "details": {
+    "formula": {
+      "kinds": {
+        "rebuild-compare": 90,
+        "proof-model": 80,
+        "flip-test": 75,
+        "revert-test": 75,
+        "probe": 60,
+        "count": 40,
+        "none": 15
+      },
+      "hand": -10,
+      "undo_bonus": 5,
+      "replay_match": 5,
+      "replay_mismatch": -30,
+      "contradicted_cap": 25,
+      "bands": {
+        "high": 80,
+        "medium": 50
+      },
+      "combine": "any = best supporting file; all = weakest"
+    },
+    "claims": {
+      "C-2297-01": {
+        "score": 40,
+        "band": "low",
+        "how": "best supporting check",
+        "signals": [
+          {
+            "file": "evidence/ju26-issue-2297/diff-classifier.json",
+            "kind": "count",
+            "summary": "237 files changed: 222 snapshot, 6 template, 6 generated-output, 1 test, 1 doc, 1 logic; 220 of 222 snapshots change only by attribute and #if/#endif guard lines, 2 do not; 3 snapshot files left unchanged, 1 Resources dir(s) with no test method",
+            "produced_by": "script",
+            "replay": "not re-run",
+            "parts": [
+              {
+                "text": "number from a tool",
+                "delta": 40
+              }
+            ],
+            "score": 40
+          }
+        ],
+        "contradicted_by": [],
+        "gate": null,
+        "depends_on": []
+      },
+      "C-2297-02": {
+        "score": 90,
+        "band": "high",
+        "how": "best supporting check",
+        "signals": [
+          {
+            "file": "evidence/ju26-issue-2297/regeneration.json",
+            "kind": "rebuild-compare",
+            "summary": "base: 167 passed, 0 failed of 167; branch: 169 passed, 0 failed of 169",
+            "produced_by": "script",
+            "replay": "not re-run",
+            "parts": [
+              {
+                "text": "rebuilt and compared: identical",
+                "delta": 90
+              }
+            ],
+            "score": 90
+          }
+        ],
+        "contradicted_by": [],
+        "gate": null,
+        "depends_on": []
+      },
+      "C-2297-03": {
+        "score": 90,
+        "band": "high",
+        "how": "best supporting check",
+        "signals": [
+          {
+            "file": "evidence/ju26-issue-2297/template-regeneration.json",
+            "kind": "rebuild-compare",
+            "summary": "dotnet-t4 regeneration of 6 templates, TransformText() compared after normalising layout: base 6 of 6 match, branch 6 of 6 match, 0 t4 errors; negative control: branch regeneration differs from base .cs for 6 of 6",
+            "produced_by": "script",
+            "replay": "not re-run",
+            "parts": [
+              {
+                "text": "rebuilt and compared: identical",
+                "delta": 90
+              }
+            ],
+            "score": 90
+          }
+        ],
+        "contradicted_by": [],
+        "gate": null,
+        "depends_on": []
+      },
+      "C-2297-04": {
+        "score": 75,
+        "band": "medium",
+        "how": "best supporting check",
+        "signals": [
+          {
+            "file": "evidence/ju26-issue-2297/new-tests-on-base.json",
+            "kind": "flip-test",
+            "summary": "base-newtests: 167 passed, 2 failed of 169",
+            "produced_by": "script",
+            "replay": "not re-run",
+            "parts": [
+              {
+                "text": "test fails before the change, passes after",
+                "delta": 75
+              }
+            ],
+            "score": 75
+          }
+        ],
+        "contradicted_by": [],
+        "gate": null,
+        "depends_on": []
+      },
+      "C-2297-05": {
+        "score": 75,
+        "band": "medium",
+        "how": "best supporting check",
+        "signals": [
+          {
+            "file": "evidence/ju26-issue-2297/transformutilities-removal.json",
+            "kind": "revert-test",
+            "summary": "no-tu: 168 passed, 1 failed of 169",
+            "produced_by": "script",
+            "replay": "not re-run",
+            "parts": [
+              {
+                "text": "undo only this change: a test fails",
+                "delta": 75
+              }
+            ],
+            "score": 75
+          },
+          {
+            "file": "evidence/ju26-issue-2297/transformutilities-removal-output.json",
+            "kind": "probe",
+            "summary": "Without the TransformUtilities.cs edit the generator emits `{#if !NETSTANDARD2_0 && !NETFRAMEWORK` on one line for the formatter nested in a constrained generic type, which fails to compile with 1 error CS1040; the Ordinal formatter loses the 1 extra blank line, so that blank line is a side effect of the edit",
+            "produced_by": "hand",
+            "replay": "not re-run",
+            "parts": [
+              {
+                "text": "experiment on the real code",
+                "delta": 60
+              },
+              {
+                "text": "run by hand, not by a script",
+                "delta": -10
+              },
+              {
+                "text": "an undo test confirms it",
+                "delta": 5
+              }
+            ],
+            "score": 55
+          }
+        ],
+        "contradicted_by": [],
+        "gate": null,
+        "depends_on": []
+      },
+      "C-2297-06": {
+        "score": 50,
+        "band": "medium",
+        "how": "best supporting check",
+        "signals": [
+          {
+            "file": "evidence/ju26-issue-2297/diff-classifier.json",
+            "kind": "count",
+            "summary": "237 files changed: 222 snapshot, 6 template, 6 generated-output, 1 test, 1 doc, 1 logic; 220 of 222 snapshots change only by attribute and #if/#endif guard lines, 2 do not; 3 snapshot files left unchanged, 1 Resources dir(s) with no test method",
+            "produced_by": "script",
+            "replay": "not re-run",
+            "parts": [
+              {
+                "text": "number from a tool",
+                "delta": 40
+              }
+            ],
+            "score": 40
+          },
+          {
+            "file": "evidence/ju26-issue-2297/transformutilities-removal-output.json",
+            "kind": "probe",
+            "summary": "Without the TransformUtilities.cs edit the generator emits `{#if !NETSTANDARD2_0 && !NETFRAMEWORK` on one line for the formatter nested in a constrained generic type, which fails to compile with 1 error CS1040; the Ordinal formatter loses the 1 extra blank line, so that blank line is a side effect of the edit",
+            "produced_by": "hand",
+            "replay": "not re-run",
+            "parts": [
+              {
+                "text": "experiment on the real code",
+                "delta": 60
+              },
+              {
+                "text": "run by hand, not by a script",
+                "delta": -10
+              }
+            ],
+            "score": 50
+          }
+        ],
+        "contradicted_by": [],
+        "gate": null,
+        "depends_on": []
+      },
+      "C-2297-07": {
+        "score": 50,
+        "band": "medium",
+        "how": "best supporting check",
+        "signals": [
+          {
+            "file": "evidence/ju26-issue-2297/duplicate-attribute-probe.json",
+            "kind": "probe",
+            "summary": "A user's own [ExcludeFromCodeCoverage] on their partial resolver compiles on base (1 of 1 probe passed) and breaks on the branch (1 of 1 failed, error CS0579 duplicate attribute)",
+            "produced_by": "hand",
+            "replay": "not re-run",
+            "parts": [
+              {
+                "text": "experiment on the real code",
+                "delta": 60
+              },
+              {
+                "text": "run by hand, not by a script",
+                "delta": -10
+              }
+            ],
+            "score": 50
+          }
+        ],
+        "contradicted_by": [],
+        "gate": {
+          "contract": "generated",
+          "change": "a user whose partial resolver already has [ExcludeFromCodeCoverage] gets compile error CS0579 (base compiles)",
+          "shown_by": "evidence/ju26-issue-2297/duplicate-attribute-probe.json",
+          "hunks": [
+            "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.cs:27-27",
+            "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt:7-9",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:38-38",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt:14-16"
+          ],
+          "owner": "Andrew Arnott",
+          "owner_basis": "most commits on the generated paths at base (31 commits)",
+          "rules": []
+        },
+        "depends_on": []
+      },
+      "C-2297-08": {
+        "score": 15,
+        "band": "low",
+        "how": "no check backs it",
+        "signals": [],
+        "contradicted_by": [
+          {
+            "file": "evidence/ju26-issue-2297/attribute-availability.json",
+            "summary": "ExcludeFromCodeCoverageAttribute is present in the netstandard2.0 and net472 reference assemblies, and an unguarded probe compiles for netstandard2.0, net472 and net8.0 with 0 errors and 0 warnings, so the agent's `#if !NETSTANDARD2_0 && !NETFRAMEWORK` guard is too strict: it drops the attribute on 2 targets where it exists"
+          }
+        ],
+        "gate": null,
+        "depends_on": []
+      },
+      "C-2297-09": {
+        "score": 15,
+        "band": "low",
+        "how": "no check backs it",
+        "signals": [],
+        "contradicted_by": [
+          {
+            "file": "evidence/ju26-issue-2297/attribute-availability.json",
+            "summary": "ExcludeFromCodeCoverageAttribute is present in the netstandard2.0 and net472 reference assemblies, and an unguarded probe compiles for netstandard2.0, net472 and net8.0 with 0 errors and 0 warnings, so the agent's `#if !NETSTANDARD2_0 && !NETFRAMEWORK` guard is too strict: it drops the attribute on 2 targets where it exists"
+          }
+        ],
+        "gate": null,
+        "depends_on": []
+      },
+      "C-2297-10": {
+        "score": 60,
+        "band": "medium",
+        "how": "best supporting check",
+        "signals": [
+          {
+            "file": "evidence/ju26-issue-2297/snapshot-line-endings.json",
+            "kind": "probe",
+            "summary": "branch-lf: 80 passed, 89 failed of 169",
+            "produced_by": "script",
+            "replay": "not re-run",
+            "parts": [
+              {
+                "text": "experiment on the real code",
+                "delta": 60
+              }
+            ],
+            "score": 60
+          }
+        ],
+        "contradicted_by": [],
+        "gate": null,
+        "depends_on": []
+      }
+    },
+    "replayed": false,
+    "history_rules_available": 0
+  },
+  "tool_versions": {
+    "python": "3.13.18"
+  },
+  "produced_by": "script"
+}
