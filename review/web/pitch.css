@@ -419,3 +419,4 @@
 }
 .p-same-lede { margin-top: 2.5vh; max-width: 40ch; font-family: var(--sans); font-size: 1.05rem; line-height: 1.45; }
 .p-same .p-rules { margin-top: 2.5vh; }
+.p-same-here { margin-bottom: 16px; font-family: var(--vt); font-size: 1.3rem; letter-spacing: .06em; text-transform: uppercase; color: var(--ph); }

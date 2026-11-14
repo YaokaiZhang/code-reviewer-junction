@@ -476,13 +476,14 @@
           '<p class="p-cap p-same-lede" data-rv>Old projects often have weak tests, and new tests only check what someone thought of. This check needs no tests: the old version is the answer key.</p>' +
           '<ul class="p-rules" data-rv>' +
             '<li><b>1</b>Build the old version and the new one.</li>' +
-            '<li><b>2</b>Give both the same ' + nproj + ' real projects. They were written before the change: ' + files + ' generated files.</li>' +
-            '<li><b>3</b>Compare every file. A difference must match a claim. If not, a person looks.</li>' +
-            '<li><b>4</b>A coverage tool records which changed lines really ran.</li>' +
+            '<li><b>2</b>Run both on code that already exists.</li>' +
+            '<li><b>3</b>Compare what they produce. Each difference must match a claim, or a person looks.</li>' +
+            '<li><b>4</b>Record which changed lines actually ran.</li>' +
           '</ul>' +
           '<p class="p-cap p-same-rule" data-rv>If a changed line never runs, the output can’t change. So “same” only counts where the change ran.</p>' +
         '</div>' +
         '<div class="p-panel" data-rv>' +
+          '<p class="p-same-here">Here: ' + nproj + ' real projects, ' + files + ' generated files</p>' +
           '<ul class="p-same-list">' + list + '</ul>' +
           '<div class="p-bandkey p-same-key"><span><i class="s"></i>Same</span><span><i class="e"></i>Changed, stated by a claim</span><span><i class="u"></i>Changed, no claim</span></div>' +
           '<p class="p-note">' + (unexpl ? unexpl + ' files changed with no claim behind them.' : 'No file changed without a claim behind it.') + ' Tools decide every result, not the AI.</p>' +
