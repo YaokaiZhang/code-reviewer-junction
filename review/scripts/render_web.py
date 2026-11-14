@@ -62,6 +62,8 @@ def slim_isolation(e):
             "reached_any": (c.get("trackable") or 0) - sum(1 for u in c.get("unreached") or [] if not u.get("reached_by_control_group")),
             "not_trackable": len(c.get("not_trackable") or []),
             "unreached": [{"side": u.get("side"), "file": u.get("file"), "line": u.get("line"), "text": (u.get("text") or "")[:160]} for u in c.get("unreached") or []],
+            "per_input": [{"input": i.get("input"), "hits": [f"base:{x}" for x in i.get("hit_base_lines") or []] + [f"branch:{x}" for x in i.get("hit_branch_lines") or []],
+                           "differs": i.get("output_differs")} for i in c.get("per_input") or []],
         },
     }
 

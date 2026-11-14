@@ -483,28 +483,65 @@
       ['Written by', 'Often the AI that made the change', 'No one'],
       ['Catches', 'Breaks someone predicted', 'Breaks nobody predicted']
     ];
-    return '<section class="p-sec p-same">' +
-      '<div class="p-grid2">' +
-        '<div>' +
-          '<h2 class="p-h2">' + words('Did it break') + '<br>' + words('anything?', 'hot', 140) + '</h2>' +
-          '<p class="p-same-big" data-rv>Same input, same output.</p>' +
-          '<ul class="p-rules" data-rv>' +
-            '<li><b>1</b>Run old and new code on the same inputs.</li>' +
-            '<li><b>2</b>Same output: nothing broke.</li>' +
-            '<li><b>3</b>Different output, or a line never ran: a person decides.</li>' +
-          '</ul>' +
-        '</div>' +
-        '<div class="p-panel" data-rv>' +
-          '<table class="p-vs"><thead><tr><th></th><th>New tests</th><th class="on">Old vs new</th></tr></thead><tbody>' +
-            rowsT.map(function (r) { return '<tr><th>' + esc(r[0]) + '</th><td>' + esc(r[1]) + '</td><td class="on">' + esc(r[2]) + '</td></tr>'; }).join('') +
-          '</tbody></table>' +
-          '<div class="p-next"><h4>The inputs</h4>' +
-            '<div class="p-nrow"><b class="n">18</b><p><b>Varied types.</b> Generics, nesting, a user’s own attribute. One break found in each fix.</p></div>' +
-            '<div class="p-nrow"><b class="n">4/5</b><p><b>Which inputs ran the change.</b> In #2234, 4 projects run the changed lines. The 5th never does, and its output matches.</p></div>' +
-          '</div>' +
-        '</div>' +
-      '</div>' +
-    '</section>';
+    var step1 = '<div class="p-sstep">' +
+      '<div><p class="p-same-big">Same input, same output.</p>' +
+        '<ul class="p-rules">' +
+          '<li><b>1</b>Run old and new code on the same inputs.</li>' +
+          '<li><b>2</b>Same output: nothing broke.</li>' +
+          '<li><b>3</b>Different output: a person decides.</li>' +
+        '</ul></div>' +
+      '<div class="p-panel"><table class="p-vs"><thead><tr><th></th><th>New tests</th><th class="on">Old vs new</th></tr></thead><tbody>' +
+        rowsT.map(function (r) { return '<tr><th>' + esc(r[0]) + '</th><td>' + esc(r[1]) + '</td><td class="on">' + esc(r[2]) + '</td></tr>'; }).join('') +
+      '</tbody></table></div></div>';
+    var cov = covGrid(rows);
+    var step2 = cov ? '<div class="p-sstep">' +
+      '<div><p class="p-same-big">But did the inputs run the change?</p>' +
+        '<ul class="p-rules">' +
+          '<li><b>1</b>A coverage tool records which changed lines each input runs.</li>' +
+          '<li><b>2</b>A line no input runs is untested: a person looks.</li>' +
+          '<li><b>3</b>Too few inputs? Vary the types to make more.</li>' +
+        '</ul></div>' +
+      '<div class="p-panel">' + cov + varied() + '</div></div>' : '';
+    return '<section class="p-same-wrap" data-progress="same">' +
+      '<div class="p-sticky p-sec p-same">' +
+        '<h2 class="p-h2">' + words('Did it break') + ' ' + words('anything?', 'hot', 140) + '</h2>' +
+        '<div class="p-ssteps">' + step1 + step2 + '</div>' +
+      '</div></section>';
+  }
+
+  /* coverage grid: each changed line (row) by each real project (column); lit = that project ran it */
+  function covGrid(rows) {
+    var d = rows.filter(function (r) { var c = r._isolation.coverage; return c && c.per_input && c.per_input.length && c.unreached && c.unreached.length; })[0];
+    if (!d) return '';
+    var c = d._isolation.coverage, ins = c.per_input, lines = {};
+    ins.forEach(function (i) { i.hits.forEach(function (h) { lines[h] = 1; }); });
+    c.unreached.forEach(function (u) { lines[u.side + ':' + u.file + ':' + u.line] = 1; });
+    var keys = Object.keys(lines).map(function (k) { var m = k.match(/^(\w+):.*:(\d+)$/); return { k: k, side: m[1], n: +m[2] }; })
+      .sort(function (x, y) { return x.n - y.n; });
+    var short = function (n) { return n.replace(/^MessagePack\./, '').replace(/SourceGenerator\./, '').replace(/ExecutionTests$/, ' exec').replace(/GeneratedCode\.Tests/, 'generated'); };
+    var head = '<div class="p-cg-r p-cg-h"><span></span>' + ins.map(function (i) { return '<em>' + esc(short(i.input)) + '</em>'; }).join('') + '<span></span></div>';
+    var body = keys.map(function (k) {
+      var hit = ins.map(function (i) { return i.hits.indexOf(k.k) >= 0; }), any = hit.some(Boolean);
+      return '<div class="p-cg-r' + (any ? '' : ' miss') + '"><span>' + (k.side === 'base' ? 'old' : 'new') + ' ' + k.n + '</span>' +
+        hit.map(function (h) { return '<i' + (h ? ' class="y"' : '') + '></i>'; }).join('') +
+        '<b>' + (any ? '' : 'no input ran it') + '</b></div>';
+    }).join('');
+    var nUntouched = ins.filter(function (i) { return !i.hits.length; }).length;
+    return '<div class="p-cg" style="--cols:' + ins.length + '">' + head + body + '</div>' +
+      '<p class="p-out">fix #' + esc(issueOf(d)) + ': ' + keys.length + ' changed lines × ' + ins.length + ' real projects' +
+      (nUntouched ? '. ' + nUntouched + ' project never runs the change, so it can’t break from it' : '') + '</p>';
+  }
+
+  /* varied types: one tile per probe; red where it broke */
+  function varied() {
+    var g = [['2234', 11, 1], ['2283', 6, 3], ['2297', 1, 1]], tot = 0;
+    var tiles = g.map(function (x) {
+      tot += x[1];
+      var t = ''; for (var i = 0; i < x[1]; i++) t += '<i' + (i < x[2] ? ' class="x"' : '') + '></i>';
+      return '<span class="p-vt-g"><span class="p-vt-t">' + t + '</span><em>#' + x[0] + '</em></span>';
+    }).join('');
+    return '<div class="p-vt"><span class="p-vt-n">' + tot + ' varied types</span>' + tiles + '</div>' +
+      '<p class="p-out">generics, nesting, a user’s own attribute. Red: it broke</p>';
   }
 
   function strip(d) {
@@ -591,6 +628,18 @@
       if (reduce || innerWidth <= 900) { arts.forEach(function (a) { a.classList.add('on'); a.querySelectorAll('i[data-w]').forEach(function (b) { b.style.width = b.dataset.w + '%'; }); }); cur = -2; return; }
       if (cur === -2) { cur = -1; arts.forEach(function (a) { a.classList.remove('on'); }); }
       show(Math.min(n - 1, Math.floor(progressOf(sec) * n)));
+    });
+  }
+
+  /* old vs new: one sticky screen, scrolling swaps the table for the coverage grid */
+  function setupSame(root) {
+    var sec = root.querySelector('[data-progress="same"]');
+    if (!sec) return;
+    var st = sec.querySelectorAll('.p-sstep');
+    if (st.length < 2) { sec.classList.add('one'); st.forEach(function (x) { x.classList.add('on'); }); return; }
+    progressFns.push(function () {
+      var all = reduce || innerWidth <= 900, k = progressOf(sec) < 0.5 ? 0 : 1;
+      st.forEach(function (x, i) { x.classList.toggle('on', all || i === k); });
     });
   }
 
@@ -786,6 +835,7 @@
     setupTransitions(wrap);
     setupOwner(wrap);
     setupMachine(wrap);
+    setupSame(wrap);
     setupTrace(wrap);
     setupKinds(wrap);
     setupRail(wrap);
