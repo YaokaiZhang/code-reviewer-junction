@@ -108,7 +108,7 @@
       "branch": 16,
       "nofilter": 16
     },
-    "dotnet_test_command": "dotnet test tests/MessagePack.SourceGenerator.Tests --filter FullyQualifiedName~DroppedWarningProbe|FullyQualifiedName~GenericsFormatterTests --logger trx;LogFileName=/tmp/claude-0/-home-user-code-reviewer-junction/9d458cbc-0a76-5977-90e9-3a92e45aab20/scratchpad/wt-2283-harness/trx-branch.trx",
+    "dotnet_test_command": "dotnet test tests/MessagePack.SourceGenerator.Tests --filter FullyQualifiedName~DroppedWarningProbe|FullyQualifiedName~GenericsFormatterTests --logger trx;LogFileName=/home/user/code-reviewer-junction/.work/worktrees/2283-probe/trx-branch.trx",
     "note": "shared review/scripts/old_vs_new_tests.py was tried first and ran 0 of the 3 tests (it reads 'namespace TempProject' from a raw string literal in the test file as the class namespace, so its test filter matched nothing); this harness was used instead"
   },
   "tool_versions": {

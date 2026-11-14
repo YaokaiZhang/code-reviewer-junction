@@ -240,33 +240,33 @@
         "project": "tests/MessagePack.SourceGenerator.Tests/MessagePack.SourceGenerator.Tests.csproj",
         "filter": "FullyQualifiedName~GenericsFormatterTests.",
         "base": {
-          "command": "dotnet test tests/MessagePack.SourceGenerator.Tests/MessagePack.SourceGenerator.Tests.csproj --filter FullyQualifiedName~GenericsFormatterTests. --logger trx;LogFileName=MessagePack.SourceGenerator.Tests-base.trx --results-directory /tmp/claude-0/-home-user-code-reviewer-junction/9d458cbc-0a76-5977-90e9-3a92e45aab20/scratchpad/wt-oldnew-2283/trx -nologo",
+          "command": "dotnet test tests/MessagePack.SourceGenerator.Tests/MessagePack.SourceGenerator.Tests.csproj --filter FullyQualifiedName~GenericsFormatterTests. --logger trx;LogFileName=MessagePack.SourceGenerator.Tests-base.trx --results-directory /home/user/code-reviewer-junction/.work/worktrees/2283/trx -nologo",
           "exit_code": 1,
           "build_errors": [],
           "notable_warnings": [
             "// warning CS8785: Generator 'MessagePackGenerator' failed to generate source. It will not contribute to the output and compilation errors may occur as a result. Exception was of type 'IndexOutOfRangeException' with message 'Index was outside the bounds of the array.'."
           ],
           "tail": [
-            "   at GenericsFormatterTests.RunWithMetadataReferenceAsync(String defineSource, String usageSource, String expectedResolverHintName, LanguageVersion languageVersion) in /tmp/claude-0/-home-user-code-reviewer-junction/9d458cbc-0a76-5977-90e9-3a92e45aab20/scratchpad/wt-oldnew-2283/base-with-branch-tests/tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs:line 648",
-            "   at GenericsFormatterTests.ClosedGenericStruct_FromMetadataReference() in /tmp/claude-0/-home-user-code-reviewer-junction/9d458cbc-0a76-5977-90e9-3a92e45aab20/scratchpad/wt-oldnew-2283/base-with-branch-tests/tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs:line 540",
+            "   at GenericsFormatterTests.RunWithMetadataReferenceAsync(String defineSource, String usageSource, String expectedResolverHintName, LanguageVersion languageVersion) in /home/user/code-reviewer-junction/.work/worktrees/2283/base-with-branch-tests/tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs:line 648",
+            "   at GenericsFormatterTests.ClosedGenericStruct_FromMetadataReference() in /home/user/code-reviewer-junction/.work/worktrees/2283/base-with-branch-tests/tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs:line 540",
             "--- End of stack trace from previous location ---",
-            "Results File: /tmp/claude-0/-home-user-code-reviewer-junction/9d458cbc-0a76-5977-90e9-3a92e45aab20/scratchpad/wt-oldnew-2283/trx/MessagePack.SourceGenerator.Tests-base.trx",
+            "Results File: /home/user/code-reviewer-junction/.work/worktrees/2283/trx/MessagePack.SourceGenerator.Tests-base.trx",
             "",
             "Failed!  - Failed:     3, Passed:    16, Skipped:     0, Total:    19, Duration: 1 s - MessagePack.SourceGenerator.Tests.dll (net8.0)",
             "",
             "Build FAILED.",
             "",
-            "/tmp/claude-0/-home-user-code-reviewer-junction/9d458cbc-0a76-5977-90e9-3a92e45aab20/scratchpad/wt-oldnew-2283/base-with-branch-tests/tests/MessagePack.SourceGenerator.Tests/MessagePack.SourceGenerator.Tests.csproj : warning NU1901: Package 'NuGet.Protocol' 6.8.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-g4vj-cjjj-v7hg",
-            "/tmp/claude-0/-home-user-code-reviewer-junction/9d458cbc-0a76-5977-90e9-3a92e45aab20/scratchpad/wt-oldnew-2283/base-with-branch-tests/tests/MessagePack.SourceGenerator.Tests/MessagePack.SourceGenerator.Tests.csproj : warning NU1901: Package 'NuGet.Protocol' 6.8.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-g4vj-cjjj-v7hg",
+            "/home/user/code-reviewer-junction/.work/worktrees/2283/base-with-branch-tests/tests/MessagePack.SourceGenerator.Tests/MessagePack.SourceGenerator.Tests.csproj : warning NU1901: Package 'NuGet.Protocol' 6.8.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-g4vj-cjjj-v7hg",
+            "/home/user/code-reviewer-junction/.work/worktrees/2283/base-with-branch-tests/tests/MessagePack.SourceGenerator.Tests/MessagePack.SourceGenerator.Tests.csproj : warning NU1901: Package 'NuGet.Protocol' 6.8.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-g4vj-cjjj-v7hg",
             "    2 Warning(s)",
             "    0 Error(s)",
             "",
-            "Time Elapsed 00:00:13.19"
+            "Time Elapsed 00:00:13.67"
           ],
           "results_count": 19
         },
         "branch": {
-          "command": "dotnet test tests/MessagePack.SourceGenerator.Tests/MessagePack.SourceGenerator.Tests.csproj --filter FullyQualifiedName~GenericsFormatterTests. --logger trx;LogFileName=MessagePack.SourceGenerator.Tests-branch.trx --results-directory /tmp/claude-0/-home-user-code-reviewer-junction/9d458cbc-0a76-5977-90e9-3a92e45aab20/scratchpad/wt-oldnew-2283/trx -nologo",
+          "command": "dotnet test tests/MessagePack.SourceGenerator.Tests/MessagePack.SourceGenerator.Tests.csproj --filter FullyQualifiedName~GenericsFormatterTests. --logger trx;LogFileName=MessagePack.SourceGenerator.Tests-branch.trx --results-directory /home/user/code-reviewer-junction/.work/worktrees/2283/trx -nologo",
           "exit_code": 0,
           "build_errors": [],
           "notable_warnings": [],
@@ -274,18 +274,18 @@
             "",
             "Starting test execution, please wait...",
             "A total of 1 test files matched the specified pattern.",
-            "Results File: /tmp/claude-0/-home-user-code-reviewer-junction/9d458cbc-0a76-5977-90e9-3a92e45aab20/scratchpad/wt-oldnew-2283/trx/MessagePack.SourceGenerator.Tests-branch.trx",
+            "Results File: /home/user/code-reviewer-junction/.work/worktrees/2283/trx/MessagePack.SourceGenerator.Tests-branch.trx",
             "",
-            "Passed!  - Failed:     0, Passed:    19, Skipped:     0, Total:    19, Duration: 1 s - MessagePack.SourceGenerator.Tests.dll (net8.0)",
+            "Passed!  - Failed:     0, Passed:    19, Skipped:     0, Total:    19, Duration: 2 s - MessagePack.SourceGenerator.Tests.dll (net8.0)",
             "",
             "Build succeeded.",
             "",
-            "/tmp/claude-0/-home-user-code-reviewer-junction/9d458cbc-0a76-5977-90e9-3a92e45aab20/scratchpad/wt-oldnew-2283/branch/tests/MessagePack.SourceGenerator.Tests/MessagePack.SourceGenerator.Tests.csproj : warning NU1901: Package 'NuGet.Protocol' 6.8.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-g4vj-cjjj-v7hg",
-            "/tmp/claude-0/-home-user-code-reviewer-junction/9d458cbc-0a76-5977-90e9-3a92e45aab20/scratchpad/wt-oldnew-2283/branch/tests/MessagePack.SourceGenerator.Tests/MessagePack.SourceGenerator.Tests.csproj : warning NU1901: Package 'NuGet.Protocol' 6.8.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-g4vj-cjjj-v7hg",
+            "/home/user/code-reviewer-junction/.work/worktrees/2283/branch/tests/MessagePack.SourceGenerator.Tests/MessagePack.SourceGenerator.Tests.csproj : warning NU1901: Package 'NuGet.Protocol' 6.8.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-g4vj-cjjj-v7hg",
+            "/home/user/code-reviewer-junction/.work/worktrees/2283/branch/tests/MessagePack.SourceGenerator.Tests/MessagePack.SourceGenerator.Tests.csproj : warning NU1901: Package 'NuGet.Protocol' 6.8.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-g4vj-cjjj-v7hg",
             "    2 Warning(s)",
             "    0 Error(s)",
             "",
-            "Time Elapsed 00:00:12.44"
+            "Time Elapsed 00:00:14.77"
           ],
           "results_count": 19
         }

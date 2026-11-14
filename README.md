@@ -31,32 +31,36 @@ review/
   web/                 static owner view
 ```
 
-## Reproduce
+## Run
 
-Needs a clone of the target with all branches, .NET SDK 8.0.402, Python 3.
+Needs Python 3, git and Node (for `npm run`; or call `./review.sh <command>` directly).
 
 ```bash
-export MP_REPO=/path/to/junction26-messagepack-csharp
+npm run dev
+```
+
+Opens the owner view at http://localhost:5173/web/. No other setup needed.
+
+To reproduce the evidence:
+
+```bash
+npm run setup
 ```
 
 ```bash
-python3 review/scripts/diff_classifier.py --repo $MP_REPO --branch ju26-issue-2297
+npm run evidence
 ```
 
 ```bash
-python3 review/scripts/old_vs_new_tests.py --repo $MP_REPO --branch ju26-issue-2234 --out review/evidence/ju26-issue-2234/old-vs-new-tests.json
+npm run tests
 ```
 
-```bash
-python3 review/scripts/claim_coverage.py --repo $MP_REPO --branch ju26-issue-2283 --write
-```
+| Command | Does | Time |
+|---|---|---|
+| `npm run dev` | render dossiers, serve the owner view | 1 s |
+| `npm run setup` | clone the target into `.work/mp`, install .NET SDK 8.0.402 into `.work/dotnet` if missing | 1–2 min |
+| `npm run evidence` | git-only collectors: diff classifier, clones and complexity, report sites, claim coverage | seconds |
+| `npm run tests` | build and run the C# tests: regeneration, TransformUtilities removal, old-vs-new tests, dropped-warning probe | ~4 min |
+| `npm run sign -- ju26-issue-2283` | sign a dossier from the terminal, writes `review/receipts/` | — |
 
-```bash
-python3 review/scripts/render_markdown.py --all && python3 review/scripts/render_web.py
-```
-
-```bash
-python3 review/scripts/sign_receipt.py ju26-issue-2283
-```
-
-Each evidence file's `command` field gives the exact invocation for that check.
+Use your own clone with `MP_REPO=/path/to/clone npm run evidence`. The Dafny proof (`review/proof/`) and the template check need Dafny and dotnet-t4 and are not part of `npm run tests`. Each evidence file's `command` field gives the exact invocation.

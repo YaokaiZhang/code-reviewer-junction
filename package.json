@@ -1,0 +1,14 @@
+{
+  "name": "earned-trust",
+  "private": true,
+  "description": "Read the evidence, not the diff.",
+  "scripts": {
+    "dev": "bash review.sh dev",
+    "render": "bash review.sh render",
+    "setup": "bash review.sh setup",
+    "evidence": "bash review.sh evidence",
+    "tests": "bash review.sh tests",
+    "all": "bash review.sh all",
+    "sign": "bash review.sh sign"
+  }
+}
