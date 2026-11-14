@@ -1,0 +1,1270 @@
+{
+  "check": "project-history",
+  "repo": "MessagePack-CSharp/MessagePack-CSharp",
+  "cutoff": "2025-03-01",
+  "produced_by": "hand",
+  "method": "Revert commits were found with `git log 32258fdb -i --grep=^revert` in the local clone and traced to their original commits/PRs via merge-commit messages; closed-unmerged PRs came from the github.com closed+unmerged PR list (pages 1-4 and a non-dependabot page) and merged PRs from searches for review:changes_requested and \"breaking change\" commented by AArnott. Each PR page was read with WebFetch; quotes are verbatim excerpts (the fetch tool limits quote length, so some are sentence fragments) and every rule cites at least one quoted statement dated on or before 2025-03-01.",
+  "summary": "37 PRs (25 closed-unmerged, 7 merged-after-changes, 4 reverted, 1 merged); 20 rules; 5 infrastructure reverts from Library.Template not pursued.",
+  "prs": [
+    {
+      "pr": 2013,
+      "title": "Secure by default",
+      "date": "2024-10-18",
+      "outcome": "reverted",
+      "concern": "compat-breaking",
+      "statements": [
+        {
+          "who": "AArnott",
+          "quote": "Use the UntrustedData security policy by default.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/2013#issue-2595260076",
+          "date": "2024-10-17"
+        },
+        {
+          "who": "AArnott",
+          "quote": "This is by design because v3 now runs in UntrustedData mode by default.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/issues/2040",
+          "date": "2024-10-24"
+        },
+        {
+          "who": "neuecc",
+          "quote": "This is too big of a breaking change.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/issues/2040",
+          "date": "2024-10-28"
+        },
+        {
+          "who": "AArnott",
+          "quote": "Revert to v2's insecure-by-default mode (effectively reverts Secure by default #2013)",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/2045",
+          "date": "2024-10-29"
+        }
+      ],
+      "merge_commit": "c1585ad7",
+      "original_commit": "c1585ad7",
+      "revert_commit": "16bda3d9 (merged via PR #2045, 1eb17e5b)",
+      "files_hint": "src/MessagePack, tests/MessagePack.Tests, doc/migrating_v2-v3.md, README.md",
+      "notes": "Reverted 11 days after merge when issue #2040 showed custom-key dictionaries broke under UntrustedData; #2045 kept a 500 stack-depth limit even for trusted data.",
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/2013"
+    },
+    {
+      "pr": 1678,
+      "title": "Allow applying `[MessagePackFormatter]` on parameters",
+      "date": "2023-09-19",
+      "outcome": "reverted",
+      "concern": "other",
+      "statements": [
+        {
+          "who": "AArnott",
+          "quote": "This shouldn't have merged into `master`. It should have been targeting `develop`. See #1680",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1679",
+          "date": "2023-09-19"
+        }
+      ],
+      "merge_commit": "fe50eef3",
+      "original_commit": "fe50eef3",
+      "revert_commit": "cf0b7d74 (merged via PR #1679, ec99ca7a)",
+      "files_hint": "src/MessagePack.UnityClient (shared sources)",
+      "notes": "Branch-targeting revert, not a code objection; re-landed against develop as #1680 (5356dfb6).",
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1678"
+    },
+    {
+      "pr": 1124,
+      "title": "Target .NET Core 3.1 and 5.0 SDKs in mpc tool (re-land of reverted 'Multiple Target Frameworks')",
+      "date": "2020-11-19",
+      "outcome": "reverted",
+      "concern": "targets",
+      "statements": [
+        {
+          "who": "AArnott",
+          "quote": "We need it to work in both worlds or we alienate a bunch of users.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1124#pullrequestreview-534474658",
+          "date": "2020-11-19"
+        }
+      ],
+      "merge_commit": "e03abbb6",
+      "original_commit": "cd7b4341",
+      "revert_commit": "cc07ead1 (inside PR #1123, merge e3db213d)",
+      "files_hint": "src/MessagePack.Generator, src/MessagePack.GeneratorCore, global.json",
+      "notes": "cd7b4341 'Multiple Target Frameworks' was pushed into the unrelated PR #1123 and reverted by its author, then submitted on its own as #1124. AArnott's change request was withdrawn the same day after he found a dotnet restore mistake in his repro; the quote still states the requirement that mpc work on both SDKs.",
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1124"
+    },
+    {
+      "pr": 777,
+      "title": "Improve performance of standard decimal serialization by using Utf8Formatter",
+      "date": "2020-01-17",
+      "outcome": "reverted",
+      "concern": "performance",
+      "statements": [
+        {
+          "who": "neuecc",
+          "quote": "use Utf8Formatter instead of ToString to avoid string allocation.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/777#issue-550299951",
+          "date": "2020-01-15"
+        },
+        {
+          "who": "AArnott",
+          "quote": "Very nice optimization!",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/777#pullrequestreview-343363141",
+          "date": "2020-01-15"
+        }
+      ],
+      "merge_commit": "dfd964c5",
+      "original_commit": "31bd18c1",
+      "revert_commit": "4b8e2a37",
+      "files_hint": "src/MessagePack.UnityClient/.../Formatters/StandardClassLibraryFormatter.cs",
+      "notes": "31bd18c1 was pushed directly to master by neuecc and reverted by him the same day (4b8e2a37), then reviewed as PR #777. No written reason for the revert; the PR got further review fixes (decimal fallback/length checks) before merge. Not used as a rule source.",
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/777"
+    },
+    {
+      "pr": 1895,
+      "title": "Performance/1807 force method inline",
+      "date": "2024-12-10",
+      "outcome": "closed-unmerged",
+      "concern": "generated",
+      "statements": [
+        {
+          "who": "AArnott",
+          "quote": "You'd have to change the `.tt` file instead and let that update the `.cs` files.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1895#discussion_r1687026969",
+          "date": "2024-07-22"
+        },
+        {
+          "who": "AArnott",
+          "quote": "you can see how adding the attribute doesn't change the compiled assembly at all",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1895#discussion_r1687035484",
+          "date": "2024-07-22"
+        },
+        {
+          "who": "neuecc",
+          "quote": "The structure has changed significantly in v3, so it is necessary to start over.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1895#issuecomment-2531213700",
+          "date": "2024-12-10"
+        }
+      ],
+      "files_hint": "src/MessagePack (T4 .tt templates and generated .cs)",
+      "merge_commit": null,
+      "original_commit": null,
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1895"
+    },
+    {
+      "pr": 1733,
+      "title": ".NET 8 Update(7): Throw Exception Helper functions",
+      "date": "2024-01-15",
+      "outcome": "closed-unmerged",
+      "concern": "readability",
+      "statements": [
+        {
+          "who": "AArnott",
+          "quote": "I don't want a bunch of `#if` statements for something so trivially addressible in another way.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1733#discussion_r1449803697",
+          "date": "2024-01-12"
+        },
+        {
+          "who": "AArnott",
+          "quote": "Just create an `internal static` helper class that has the if and throw check inside it,",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1733#discussion_r1449803697",
+          "date": "2024-01-12"
+        }
+      ],
+      "notes": "Closed by the author pending the #1734 restructure, after the change request.",
+      "merge_commit": null,
+      "original_commit": null,
+      "files_hint": null,
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1733"
+    },
+    {
+      "pr": 1828,
+      "title": "Move BuildTypeName() from TypelessFormatter to MessagePackSerializerOptions",
+      "date": "2024-05-27",
+      "outcome": "closed-unmerged",
+      "concern": "public-api",
+      "statements": [
+        {
+          "who": "AArnott",
+          "quote": "is a defective design as it leads to unexpected, unpredictable results.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1828#issuecomment-2132512201",
+          "date": "2024-05-27"
+        },
+        {
+          "who": "AArnott",
+          "quote": "I suggest opening an issue to discuss before making the code changes to avoid any lost effort.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1828#issuecomment-2132512201",
+          "date": "2024-05-27"
+        },
+        {
+          "who": "AArnott",
+          "quote": "Also, I try to avoid formatter-specific members on the options class because the latter is more general.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1828#issuecomment-2133497527",
+          "date": "2024-05-27"
+        }
+      ],
+      "merge_commit": null,
+      "original_commit": null,
+      "files_hint": null,
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1828"
+    },
+    {
+      "pr": 1755,
+      "title": "Add TargetFramework netstandard2.1 for Unity",
+      "date": "2024-01-30",
+      "outcome": "closed-unmerged",
+      "concern": "targets",
+      "statements": [
+        {
+          "who": "AArnott",
+          "quote": "The takeaway is that no, we should _not_ assume that `#if NETSTANDARD2_1` code will only run on unity.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1755#issuecomment-1917662763",
+          "date": "2024-01-30"
+        },
+        {
+          "who": "pCYSl5EDgo",
+          "quote": "Then I guess we should not increase the number of TargetFrameworks that we support.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1755#issuecomment-1917711947",
+          "date": "2024-01-30"
+        }
+      ],
+      "merge_commit": null,
+      "original_commit": null,
+      "files_hint": null,
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1755"
+    },
+    {
+      "pr": 1697,
+      "title": "Handle DataContract(Order=N) across class hierarchies?",
+      "date": "2023-11-10",
+      "outcome": "closed-unmerged",
+      "concern": "wire-format",
+      "statements": [
+        {
+          "who": "AArnott",
+          "quote": "I suspect you break backward compatibility with this change.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1697#issuecomment-1797111678",
+          "date": "2023-11-07"
+        },
+        {
+          "who": "AArnott",
+          "quote": "But with your change, things _appear_ to just work until the data isn't compatible across versions any more.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1697#issuecomment-1797111678",
+          "date": "2023-11-07"
+        }
+      ],
+      "merge_commit": null,
+      "original_commit": null,
+      "files_hint": null,
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1697"
+    },
+    {
+      "pr": 1690,
+      "title": "Add Unity.Mathematics support",
+      "date": "2024-12-10",
+      "outcome": "closed-unmerged",
+      "concern": "maintainability",
+      "statements": [
+        {
+          "who": "neuecc",
+          "quote": "This PR would cause problems in an environment where Unity.Mathematics is not installed.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1690#issuecomment-1764453369",
+          "date": "2023-10-16"
+        },
+        {
+          "who": "neuecc",
+          "quote": "Therefore, could you please separate the assemblies?",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1690#issuecomment-1785060792",
+          "date": "2023-10-30"
+        },
+        {
+          "who": "neuecc",
+          "quote": "Let's stop putting it in the StandardResolver.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1690#issuecomment-2255204882",
+          "date": "2024-07-29"
+        },
+        {
+          "who": "neuecc",
+          "quote": "Preventing this from occurring is more important and non-negotiable than Mathematics support.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1690#issuecomment-2333118505",
+          "date": "2024-09-06"
+        }
+      ],
+      "files_hint": "src/MessagePack.UnityClient",
+      "merge_commit": null,
+      "original_commit": null,
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1690"
+    },
+    {
+      "pr": 1312,
+      "title": "Add Unity mathematics support",
+      "date": "2022-02-13",
+      "outcome": "closed-unmerged",
+      "concern": "maintainability",
+      "statements": [
+        {
+          "who": "neuecc",
+          "quote": "How about separating it into a separate asmdef?",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1312#issuecomment-902539892",
+          "date": "2021-08-20"
+        },
+        {
+          "who": "AArnott",
+          "quote": "It's still failing... Can you fix?",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1312#issuecomment-959804733",
+          "date": "2021-11-03"
+        }
+      ],
+      "notes": "Closed by stale bot after CI kept failing.",
+      "merge_commit": null,
+      "original_commit": null,
+      "files_hint": null,
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1312"
+    },
+    {
+      "pr": 1694,
+      "title": "Support to analyze records and record structs",
+      "date": "2023-10-29",
+      "outcome": "closed-unmerged",
+      "concern": "tests",
+      "statements": [
+        {
+          "who": "AArnott",
+          "quote": "Can you add a test for the shorter record syntax?",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1694#pullrequestreview-1702219344",
+          "date": "2023-10-27"
+        },
+        {
+          "who": "AArnott",
+          "quote": "going forward we want to work on `develop` without a bunch of merge conflicts with main.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1694#pullrequestreview-1702219344",
+          "date": "2023-10-27"
+        }
+      ],
+      "notes": "Author re-submitted against develop as #1698 (merged f7808587).",
+      "merge_commit": null,
+      "original_commit": null,
+      "files_hint": null,
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1694"
+    },
+    {
+      "pr": 1854,
+      "title": "Support generics in analyzer",
+      "date": "2024-07-19",
+      "outcome": "closed-unmerged",
+      "concern": "scope",
+      "statements": [
+        {
+          "who": "AArnott",
+          "quote": "We won't take the PR if it only works for master and creates merge conflicts in develop.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1854#issuecomment-2186498734",
+          "date": "2024-06-24"
+        },
+        {
+          "who": "AArnott",
+          "quote": "But `develop` is very much the priority right now.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1854#issuecomment-2186498734",
+          "date": "2024-06-24"
+        }
+      ],
+      "merge_commit": null,
+      "original_commit": null,
+      "files_hint": null,
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1854"
+    },
+    {
+      "pr": 1957,
+      "title": "Fix source generated resolver containing invalid code when array of array type is used",
+      "date": "2024-09-25",
+      "outcome": "closed-unmerged",
+      "concern": "scope",
+      "statements": [
+        {
+          "who": "AArnott",
+          "quote": "Mine is much more expansive, changing the object model we use to represent data types more exhaustively",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1957#issuecomment-2374029946",
+          "date": "2024-09-25"
+        }
+      ],
+      "notes": "Superseded by a maintainer PR fixing the same bug more broadly.",
+      "merge_commit": null,
+      "original_commit": null,
+      "files_hint": null,
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1957"
+    },
+    {
+      "pr": 1636,
+      "title": "Changed version of System.Collections.Immutable to 6.0.0",
+      "date": "2023-06-12",
+      "outcome": "closed-unmerged",
+      "concern": "maintainability",
+      "statements": [
+        {
+          "who": "AArnott",
+          "quote": "Thank you, but we need a bigger and more maintainable fix than this.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1636#issuecomment-1586427588",
+          "date": "2023-06-12"
+        }
+      ],
+      "notes": "Superseded by #1641 (1cefde9b).",
+      "merge_commit": null,
+      "original_commit": null,
+      "files_hint": null,
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1636"
+    },
+    {
+      "pr": 1621,
+      "title": "Remove Analyzers.Only PackageId",
+      "date": "2023-05-20",
+      "outcome": "closed-unmerged",
+      "concern": "other",
+      "statements": [
+        {
+          "who": "AArnott",
+          "quote": "This fix was incomplete, because it was not sufficient to suppress the bad package ref.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1621#issuecomment-1555916472",
+          "date": "2023-05-20"
+        }
+      ],
+      "notes": "Closed in favor of #1622 (522b7e50).",
+      "merge_commit": null,
+      "original_commit": null,
+      "files_hint": null,
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1621"
+    },
+    {
+      "pr": 1626,
+      "title": "Add support for Fluent protocol DateTime ext format",
+      "date": "2023-06-12",
+      "outcome": "closed-unmerged",
+      "concern": "scope",
+      "statements": [
+        {
+          "who": "AArnott",
+          "quote": "Closing due to no response on the linked issue.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1626#issuecomment-1586395127",
+          "date": "2023-06-12"
+        }
+      ],
+      "merge_commit": null,
+      "original_commit": null,
+      "files_hint": null,
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1626"
+    },
+    {
+      "pr": 1609,
+      "title": "Expose written bytes from MessagePackWriter.",
+      "date": "2023-05-20",
+      "outcome": "closed-unmerged",
+      "concern": "scope",
+      "statements": [
+        {
+          "who": "AArnott",
+          "quote": "Closing due to no response on the underlying issue.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1609#issuecomment-1555927976",
+          "date": "2023-05-20"
+        }
+      ],
+      "merge_commit": null,
+      "original_commit": null,
+      "files_hint": null,
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1609"
+    },
+    {
+      "pr": 1542,
+      "title": "MessagePack.Generator.csproj target to net7.0",
+      "date": "2023-03-11",
+      "outcome": "closed-unmerged",
+      "concern": "targets",
+      "statements": [
+        {
+          "who": "AArnott",
+          "quote": "The master branch still uses the .NET 6 SDK so you can't target .NET 7.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1542#issuecomment-1341805530",
+          "date": "2022-12-08"
+        }
+      ],
+      "notes": "No explicit closing reason; closed alongside #1564.",
+      "merge_commit": null,
+      "original_commit": null,
+      "files_hint": null,
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1542"
+    },
+    {
+      "pr": 1441,
+      "title": "Get private setter and getter from base classes via reflection in DynamicObjectResolver",
+      "date": "2022-12-10",
+      "outcome": "closed-unmerged",
+      "concern": "scope",
+      "statements": [
+        {
+          "who": "AArnott",
+          "quote": "I don't think we want `Static` properties. A serializer has no business handling static data.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1441#discussion_r891709396",
+          "date": "2022-06-07"
+        },
+        {
+          "who": "AArnott",
+          "quote": "Why are you setting `Key(0)` here on a type where the property name is meant to be the key?",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1441#discussion_r891710348",
+          "date": "2022-06-07"
+        }
+      ],
+      "files_hint": "src/MessagePack (DynamicObjectResolver.cs)",
+      "notes": "Went stale after the change request; closed by AArnott after a stale-bot notice.",
+      "merge_commit": null,
+      "original_commit": null,
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1441"
+    },
+    {
+      "pr": 1416,
+      "title": "Fix for \"System.NotImplementedException: byref delegate\"",
+      "date": "2022-06-07",
+      "outcome": "closed-unmerged",
+      "concern": "scope",
+      "statements": [
+        {
+          "who": "AArnott",
+          "quote": "The answer for iOS is to use AOT, per our README file.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1416#pullrequestreview-998572043",
+          "date": "2022-06-07"
+        },
+        {
+          "who": "AArnott",
+          "quote": "Let's have a discussion around whether that works for you before we make more code changes to the library.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1416#pullrequestreview-998572043",
+          "date": "2022-06-07"
+        },
+        {
+          "who": "AArnott",
+          "quote": "This couldn't compile, as you're declaring the `serialize` local twice.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1416#discussion_r891519259",
+          "date": "2022-06-07"
+        }
+      ],
+      "merge_commit": null,
+      "original_commit": null,
+      "files_hint": null,
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1416"
+    },
+    {
+      "pr": 1374,
+      "title": "MPC: Reduce Memory Allocation",
+      "date": "2022-05-20",
+      "outcome": "closed-unmerged",
+      "concern": "maintainability",
+      "statements": [
+        {
+          "who": "neuecc",
+          "quote": "I'm against it because it adds too many unnecessary dependencies.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1374#issuecomment-1004119890",
+          "date": "2022-01-03"
+        },
+        {
+          "who": "neuecc",
+          "quote": "It is terrible to embed so many logics in a template.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1374#issuecomment-1004707810",
+          "date": "2022-01-04"
+        },
+        {
+          "who": "neuecc",
+          "quote": "It is hard to read and hard to debug.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1374#issuecomment-1004707810",
+          "date": "2022-01-04"
+        },
+        {
+          "who": "neuecc",
+          "quote": "It is more important to keep the code base clean.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1374#issuecomment-1005567533",
+          "date": "2022-01-05"
+        }
+      ],
+      "files_hint": "src/MessagePack.GeneratorCore (T4 templates)",
+      "notes": "Closed by stale bot.",
+      "merge_commit": null,
+      "original_commit": null,
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1374"
+    },
+    {
+      "pr": 1369,
+      "title": "Code generator supports init only setter",
+      "date": "2022-04-06",
+      "outcome": "closed-unmerged",
+      "concern": "compat-breaking",
+      "statements": [
+        {
+          "who": "AArnott",
+          "quote": "Now the property setter is invoked with `default(T)` when no data is in the stream.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1369#issuecomment-1002726721",
+          "date": "2021-12-29"
+        },
+        {
+          "who": "AArnott",
+          "quote": "That would overwrite any other value set by the class constructor or a property initializer, which would break reasonably expected prior behavior.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1369#issuecomment-1002726721",
+          "date": "2021-12-29"
+        },
+        {
+          "who": "pCYSl5EDgo",
+          "quote": "You should execute bat files before git commit in order to pass the CI.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1369#issuecomment-1002870275",
+          "date": "2021-12-30"
+        }
+      ],
+      "files_hint": "src/MessagePack.GeneratorCore",
+      "notes": "Closed by stale bot.",
+      "merge_commit": null,
+      "original_commit": null,
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1369"
+    },
+    {
+      "pr": 1074,
+      "title": "Beautify T4 of mpc.exe and reduce local variables of the deserialization",
+      "date": "2020-10-17",
+      "outcome": "closed-unmerged",
+      "concern": "compat-breaking",
+      "statements": [
+        {
+          "who": "AArnott",
+          "quote": "Rejecting this till the breaking change is justified",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1074#pullrequestreview-511006338",
+          "date": "2020-10-17"
+        },
+        {
+          "who": "AArnott",
+          "quote": "We should only take breaking changes if their value significantly outweighs the risk of breaking folks,",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1074#issuecomment-711061875",
+          "date": "2020-10-17"
+        },
+        {
+          "who": "AArnott",
+          "quote": "We want to keep the AOT and dynamic resolver behavior equivalent.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1074#issuecomment-711061875",
+          "date": "2020-10-17"
+        }
+      ],
+      "files_hint": "src/MessagePack.GeneratorCore (T4)",
+      "notes": "Cherry-picked as f86ec028 (#1088) in a reduced form.",
+      "merge_commit": null,
+      "original_commit": null,
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1074"
+    },
+    {
+      "pr": 998,
+      "title": "Add support for sortKeys on the MessagePackObjectAttribute",
+      "date": "2020-08-08",
+      "outcome": "closed-unmerged",
+      "concern": "scope",
+      "statements": [
+        {
+          "who": "neuecc",
+          "quote": "sortKeys is not needed at all.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/998#issuecomment-670276954",
+          "date": "2020-08-07"
+        },
+        {
+          "who": "neuecc",
+          "quote": "Usually, the order of the map is not guaranteed.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/998#issuecomment-670276954",
+          "date": "2020-08-07"
+        },
+        {
+          "who": "AArnott",
+          "quote": "you could also use the official library and use your own formatter that writes out properties in the order you require.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/998#issuecomment-671143154",
+          "date": "2020-08-10"
+        }
+      ],
+      "merge_commit": null,
+      "original_commit": null,
+      "files_hint": null,
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/998"
+    },
+    {
+      "pr": 950,
+      "title": "Added Support for Programmatically inserting Unions",
+      "date": "2020-08-03",
+      "outcome": "closed-unmerged",
+      "concern": "maintainability",
+      "statements": [
+        {
+          "who": "neuecc",
+          "quote": "It doesn't look like a good design to handle it in the same resolver.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/950#issuecomment-643146205",
+          "date": "2020-06-12"
+        },
+        {
+          "who": "neuecc",
+          "quote": "It would be better if they were independent, like the CompositeResolver.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/950#issuecomment-643146205",
+          "date": "2020-06-12"
+        }
+      ],
+      "merge_commit": null,
+      "original_commit": null,
+      "files_hint": null,
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/950"
+    },
+    {
+      "pr": 889,
+      "title": "Enable support for platforms (e.g. Blazor WASM) where System.Reflection.Emit is not supported.",
+      "date": "2020-04-19",
+      "outcome": "closed-unmerged",
+      "concern": "public-api",
+      "statements": [
+        {
+          "who": "AArnott",
+          "quote": "Changing from a field to a property is a binary breaking change. We can't do that within a major version.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/889#discussion_r410767424",
+          "date": "2020-04-18"
+        }
+      ],
+      "notes": "Closed by the author.",
+      "merge_commit": null,
+      "original_commit": null,
+      "files_hint": null,
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/889"
+    },
+    {
+      "pr": 847,
+      "title": "Bring back MessagePackBinary class for write methods",
+      "date": "2020-05-08",
+      "outcome": "closed-unmerged",
+      "concern": "performance",
+      "statements": [
+        {
+          "who": "AArnott",
+          "quote": "I don't think we should take it because it does complicate the code",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/847#pullrequestreview-383328814",
+          "date": "2020-03-28"
+        },
+        {
+          "who": "AArnott",
+          "quote": "So I'm pretty pessimistic on this idea based on maintenance cost.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/847#issuecomment-623462509",
+          "date": "2020-05-04"
+        },
+        {
+          "who": "AArnott",
+          "quote": "it certainly doesn't warrant sacrificing perf on all our existing scenarios.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/847#issuecomment-625620132",
+          "date": "2020-05-08"
+        },
+        {
+          "who": "AArnott",
+          "quote": "If you do find a way to resolve the perf regressions as found by our benchmarks, feel free to comment here",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/847#issuecomment-625620132",
+          "date": "2020-05-08"
+        }
+      ],
+      "merge_commit": null,
+      "original_commit": null,
+      "files_hint": null,
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/847"
+    },
+    {
+      "pr": 645,
+      "title": "Bring back binary compatability with version 1.8.74",
+      "date": "2019-11-19",
+      "outcome": "closed-unmerged",
+      "concern": "compat-breaking",
+      "statements": [
+        {
+          "who": "AArnott",
+          "quote": "The breaking changes are why we gave it a 2.0 version",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/645#issuecomment-555589493",
+          "date": "2019-11-19"
+        },
+        {
+          "who": "AArnott",
+          "quote": "I don't want to start going down the path of appeasing some 1.x folks since there's no end to that path.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/645#issuecomment-555589493",
+          "date": "2019-11-19"
+        }
+      ],
+      "merge_commit": null,
+      "original_commit": null,
+      "files_hint": null,
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/645"
+    },
+    {
+      "pr": 1884,
+      "title": "Avoid regenerating all formatters when only one object/union/enum changes",
+      "date": "2024-07-19",
+      "outcome": "merged-after-changes",
+      "concern": "other",
+      "statements": [
+        {
+          "who": "AArnott",
+          "quote": "This is insufficient, for the same reason we need to implement our own `Equals` method",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1884#discussion_r1680105459",
+          "date": "2024-07-16"
+        },
+        {
+          "who": "AArnott",
+          "quote": "An invariant that we must hold is that GetHashCode return the same value from two objects",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1884#discussion_r1680105459",
+          "date": "2024-07-16"
+        },
+        {
+          "who": "AArnott",
+          "quote": "Why is this necessary?",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1884#discussion_r1680103811",
+          "date": "2024-07-16"
+        }
+      ],
+      "merge_commit": "ae2a1ca1",
+      "files_hint": "src/MessagePack.SourceGenerator, tests/MessagePack.SourceGenerator.Tests",
+      "original_commit": null,
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1884"
+    },
+    {
+      "pr": 1634,
+      "title": "Union type collect",
+      "date": "2023-08-13",
+      "outcome": "merged-after-changes",
+      "concern": "tests",
+      "statements": [
+        {
+          "who": "AArnott",
+          "quote": "Thank you for this. Might I prevail upon you to add a test for this case?",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1634#pullrequestreview-1495650941",
+          "date": "2023-06-23"
+        }
+      ],
+      "merge_commit": "f54d0cd3",
+      "files_hint": "src/MessagePack.Analyzers, sandbox/TestData2",
+      "original_commit": null,
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1634"
+    },
+    {
+      "pr": 1551,
+      "title": "Fix wrong data length written in `UnsafeBlitFormatter`",
+      "date": "2023-03-12",
+      "outcome": "merged-after-changes",
+      "concern": "public-api",
+      "statements": [
+        {
+          "who": "AArnott",
+          "quote": "Thanks for the fix. It merits some discussion before merging.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1551#pullrequestreview-1263978742",
+          "date": "2023-01-20"
+        },
+        {
+          "who": "AArnott (commit eb8c898)",
+          "quote": "Also move the API from Shipped to Unshipped, because it has not in fact shipped yet.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1551",
+          "date": "2023-03-12"
+        }
+      ],
+      "merge_commit": "58c4d3cc",
+      "files_hint": "src/MessagePack, src/MessagePack.UnityClient, tests/MessagePack.Tests",
+      "original_commit": null,
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1551"
+    },
+    {
+      "pr": 1137,
+      "title": "Avoid `MissingMethodException` on generic classes with `init` property setters",
+      "date": "2021-01-29",
+      "outcome": "merged-after-changes",
+      "concern": "compat-breaking",
+      "statements": [
+        {
+          "who": "neuecc",
+          "quote": "Also, the behavior of quietly returning a null is hard to notice and makes it easy for users to bury serious bugs.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1137#pullrequestreview-537353863",
+          "date": "2020-11-24"
+        },
+        {
+          "who": "neuecc",
+          "quote": "But we had to be aware that there was a breaking changes.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1137#issuecomment-734151655",
+          "date": "2020-11-26"
+        },
+        {
+          "who": "AArnott",
+          "quote": "I think it's a good change in behavior given the reasons I include in that doc.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1137#issuecomment-749156997",
+          "date": "2020-12-21"
+        }
+      ],
+      "merge_commit": "2ec0f139",
+      "files_hint": "src/MessagePack.UnityClient, tests/MessagePack.Tests, README.md",
+      "original_commit": null,
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1137"
+    },
+    {
+      "pr": 1285,
+      "title": "Add string interning option",
+      "date": "2021-09-02",
+      "outcome": "merged-after-changes",
+      "concern": "performance",
+      "statements": [
+        {
+          "who": "AArnott",
+          "quote": "It looks to me like this may be inescapable perf cost if you want interning.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1285#issuecomment-886130679",
+          "date": "2021-07-25"
+        },
+        {
+          "who": "AArnott",
+          "quote": "So the question is, should we have it off by default?",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1285#issuecomment-886130679",
+          "date": "2021-07-25"
+        },
+        {
+          "who": "neuecc",
+          "quote": "It would be preferable if it were not included in the options, but it is going to be difficult to use.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1285#pullrequestreview-704888910",
+          "date": "2021-07-13"
+        }
+      ],
+      "merge_commit": "683d464b",
+      "files_hint": "src/MessagePack, src/MessagePack.UnityClient, README.md",
+      "notes": "Interning ended up opt-in (commit 6e4fd8d 'Remove string interning by default') via StringInterningFormatter.",
+      "original_commit": null,
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1285"
+    },
+    {
+      "pr": 1743,
+      "title": "AOT by default",
+      "date": "2024-01-30",
+      "outcome": "merged-after-changes",
+      "concern": "compat-breaking",
+      "statements": [
+        {
+          "who": "neuecc",
+          "quote": "StandardAotResolver is introduced in 2.6-alpha track so not shiped yet.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1743#issuecomment-1913286310",
+          "date": "2024-01-27"
+        },
+        {
+          "who": "neuecc",
+          "quote": "Therefore, I don't think it will be a breaking change. What do you think?",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1743#issuecomment-1913286310",
+          "date": "2024-01-27"
+        },
+        {
+          "who": "AArnott",
+          "quote": "Changes applied.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1743#issuecomment-1913325485",
+          "date": "2024-01-27"
+        }
+      ],
+      "merge_commit": "9c804613",
+      "files_hint": "src/MessagePack, src/MessagePack.SourceGenerator, tests/MessagePack.SourceGenerator.Tests",
+      "original_commit": null,
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1743"
+    },
+    {
+      "pr": 2139,
+      "title": "Change ByteListFormatter behaviour to keep binary compatibility for List<byte>",
+      "date": "2025-01-27",
+      "outcome": "merged",
+      "concern": "wire-format",
+      "statements": [
+        {
+          "who": "neuecc",
+          "quote": "The correct behavior should be returning identical serialization results across all platforms.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/2139#issue-2808388873",
+          "date": "2025-01-24"
+        },
+        {
+          "who": "neuecc",
+          "quote": "This is a breaking change that requires careful consideration.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/2139#issue-2808388873",
+          "date": "2025-01-24"
+        },
+        {
+          "who": "neuecc",
+          "quote": "we decided to support both array and binary deserialization.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/2139#issue-2808388873",
+          "date": "2025-01-24"
+        }
+      ],
+      "merge_commit": null,
+      "notes": "Merged to master as e823ea1, which exists in the local clone but is not an ancestor of base 32258fdb (develop line). Approved by AArnott without comment.",
+      "original_commit": null,
+      "files_hint": null,
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/2139"
+    },
+    {
+      "pr": 1355,
+      "title": ".NET 6 Update",
+      "date": "2021-12-25",
+      "outcome": "merged-after-changes",
+      "concern": "targets",
+      "statements": [
+        {
+          "who": "neuecc",
+          "quote": "I think we should add net6.0 to mpc targetframeworks.",
+          "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1355#issuecomment-986546329",
+          "date": "2021-12-06"
+        }
+      ],
+      "merge_commit": "fed033dd",
+      "files_hint": "src/MessagePack, src/MessagePack.GeneratorCore, tools/Install-DotNetSdk.ps1",
+      "original_commit": null,
+      "url": "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1355"
+    }
+  ],
+  "rules": [
+    {
+      "id": "H-01",
+      "concern": "compat-breaking",
+      "rule": "Do not take breaking changes (behavioral or binary) unless their value clearly outweighs the risk to existing users; justify any you propose.",
+      "sources": [
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1074#pullrequestreview-511006338",
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1074#issuecomment-711061875",
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/issues/2040",
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/645#issuecomment-555589493",
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1137#issuecomment-734151655"
+      ],
+      "times_cited": 4
+    },
+    {
+      "id": "H-02",
+      "concern": "public-api",
+      "rule": "Public API shape is frozen within a major version: e.g. changing a public field to a property is binary breaking and not allowed.",
+      "sources": [
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/889#discussion_r410767424",
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/645#issuecomment-555589493"
+      ],
+      "times_cited": 2
+    },
+    {
+      "id": "H-03",
+      "concern": "wire-format",
+      "rule": "Serialized output must stay compatible across versions and identical across platforms/targets; a change that silently alters the bytes produced for existing types is rejected or needs a read-both-forms migration.",
+      "sources": [
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1697#issuecomment-1797111678",
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/2139#issue-2808388873"
+      ],
+      "times_cited": 2
+    },
+    {
+      "id": "H-04",
+      "concern": "compat-breaking",
+      "rule": "Deserialization must not overwrite values the type itself set (constructor or initializer) when a member is missing from the data, and should fail loudly rather than quietly return null.",
+      "sources": [
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1369#issuecomment-1002726721",
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1137#pullrequestreview-537353863"
+      ],
+      "times_cited": 2
+    },
+    {
+      "id": "H-05",
+      "concern": "compat-breaking",
+      "rule": "Keep the AOT (source-generated) and dynamic resolver behavior equivalent; a change to one must be matched in the other.",
+      "sources": [
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1074#issuecomment-711061875"
+      ],
+      "times_cited": 1
+    },
+    {
+      "id": "H-06",
+      "concern": "generated",
+      "rule": "Never hand-edit generated .cs files; change the .tt template (or generator) and regenerate.",
+      "sources": [
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1895#discussion_r1687026969",
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1369#issuecomment-1002870275"
+      ],
+      "times_cited": 2
+    },
+    {
+      "id": "H-07",
+      "concern": "maintainability",
+      "rule": "Keep logic out of T4 templates and do not add unnecessary dependencies to the generator; a clean code base outranks micro-savings in tooling.",
+      "sources": [
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1374#issuecomment-1004707810",
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1374#issuecomment-1005567533",
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1374#issuecomment-1004119890"
+      ],
+      "times_cited": 1
+    },
+    {
+      "id": "H-08",
+      "concern": "performance",
+      "rule": "Performance claims need evidence: an optimization attribute or refactor that does not change compiled output or regresses benchmarks is not accepted.",
+      "sources": [
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1895#discussion_r1687035484",
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/847#issuecomment-625620132"
+      ],
+      "times_cited": 2
+    },
+    {
+      "id": "H-09",
+      "concern": "performance",
+      "rule": "Features with a significant performance cost must be opt-in, not on by default.",
+      "sources": [
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1285#issuecomment-886130679"
+      ],
+      "times_cited": 1
+    },
+    {
+      "id": "H-10",
+      "concern": "maintainability",
+      "rule": "Optional or platform-specific integrations (e.g. Unity.Mathematics) go in a separate assembly/asmdef and their own resolver, never into StandardResolver or the core assembly.",
+      "sources": [
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1690#issuecomment-1785060792",
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1690#issuecomment-2255204882",
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1312#issuecomment-902539892",
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/950#issuecomment-643146205"
+      ],
+      "times_cited": 3
+    },
+    {
+      "id": "H-11",
+      "concern": "readability",
+      "rule": "Prefer a small internal static helper over sprinkling #if blocks through code for trivial checks such as throw helpers.",
+      "sources": [
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1733#discussion_r1449803697"
+      ],
+      "times_cited": 1
+    },
+    {
+      "id": "H-12",
+      "concern": "public-api",
+      "rule": "Avoid formatter-specific members on MessagePackSerializerOptions and virtual hooks whose effect depends on which options instance is seen first.",
+      "sources": [
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1828#issuecomment-2133497527",
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1828#issuecomment-2132512201"
+      ],
+      "times_cited": 1
+    },
+    {
+      "id": "H-13",
+      "concern": "targets",
+      "rule": "Do not add target frameworks lightly, and do not assume a TFM (e.g. netstandard2.1) implies a particular runtime such as Unity; tools must keep working on the SDKs users already have.",
+      "sources": [
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1755#issuecomment-1917662763",
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1755#issuecomment-1917711947",
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1124#pullrequestreview-534474658"
+      ],
+      "times_cited": 2
+    },
+    {
+      "id": "H-14",
+      "concern": "other",
+      "rule": "Target feature work at the active branch (develop at the time) rather than master; changes that merge only to master and conflict with develop are reverted or declined.",
+      "sources": [
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1679",
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1854#issuecomment-2186498734",
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1694#pullrequestreview-1702219344"
+      ],
+      "times_cited": 3
+    },
+    {
+      "id": "H-15",
+      "concern": "tests",
+      "rule": "Bug fixes and new analyzer/generator cases need a test covering the case.",
+      "sources": [
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1634#pullrequestreview-1495650941",
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1694#pullrequestreview-1702219344"
+      ],
+      "times_cited": 2
+    },
+    {
+      "id": "H-16",
+      "concern": "scope",
+      "rule": "Discuss larger or design-level changes in an issue first; PRs whose linked issue goes unanswered, or that are superseded by a broader maintainer fix, get closed.",
+      "sources": [
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1828#issuecomment-2132512201",
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1416#pullrequestreview-998572043",
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1626#issuecomment-1586395127",
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1609#issuecomment-1555927976",
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1957#issuecomment-2374029946"
+      ],
+      "times_cited": 5
+    },
+    {
+      "id": "H-17",
+      "concern": "scope",
+      "rule": "The serializer handles instance data only; out-of-scope features (static members, guaranteed map key ordering) are declined in favor of custom formatters.",
+      "sources": [
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1441#discussion_r891709396",
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/998#issuecomment-670276954",
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/998#issuecomment-671143154"
+      ],
+      "times_cited": 2
+    },
+    {
+      "id": "H-18",
+      "concern": "other",
+      "rule": "Value types used for change detection must implement GetHashCode consistently with their custom Equals (including array fields).",
+      "sources": [
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1884#discussion_r1680105459"
+      ],
+      "times_cited": 1
+    },
+    {
+      "id": "H-19",
+      "concern": "public-api",
+      "rule": "APIs that have not shipped yet belong in PublicAPI.Unshipped.txt; changing unshipped API is not a breaking change.",
+      "sources": [
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1551",
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1743#issuecomment-1913286310"
+      ],
+      "times_cited": 2
+    },
+    {
+      "id": "H-20",
+      "concern": "maintainability",
+      "rule": "Prefer complete, maintainable fixes over minimal patches (e.g. a version bump or a partial package-ref suppression).",
+      "sources": [
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1636#issuecomment-1586427588",
+        "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1621#issuecomment-1555916472"
+      ],
+      "times_cited": 2
+    }
+  ],
+  "reverts_not_pursued": [
+    {
+      "commit": "75d85ec0",
+      "subject": "Revert \"Bump dotnet-coverage to 17.8.7\"",
+      "why": "Library.Template build-infrastructure merge (#230 from AArnott/sdkUpdate8), not project code review"
+    },
+    {
+      "commit": "ac247b85",
+      "subject": "Revert \"Add completions for dotnet-test-cloud script\"",
+      "why": "Library.Template infra; commit says it disallowed non-default config names"
+    },
+    {
+      "commit": "d3cb4c58",
+      "subject": "Revert \"Include README in nupkg\"",
+      "why": "Library.Template infra; due to NuGet/Home#10791"
+    },
+    {
+      "commit": "69a74f8c",
+      "subject": "Revert incremental install of SDKs/Runtimes",
+      "why": "Library.Template infra (buggy SDK install optimization)"
+    },
+    {
+      "commit": "cae9277e",
+      "subject": "Revert \"Use PowerShell Core in Azure Pipelines\"",
+      "why": "Library.Template infra"
+    },
+    {
+      "commit": "25ba6449, e1f7a71a, f86ec028, cf5038e4",
+      "subject": "match ^revert only incidentally",
+      "why": "not reverts of a PR (wording inside larger commits)"
+    }
+  ],
+  "skipped_no_maintainer_reason": [
+    2054,
+    1887,
+    1750,
+    1744,
+    1606,
+    1488,
+    895
+  ],
+  "fetch_failures": [
+    {
+      "what": "api.github.com and mcp github tools",
+      "why": "blocked by proxy / repo not configured for session; github.com HTML via curl returned 403, so all pages were read with WebFetch"
+    },
+    {
+      "what": "Comment anchors for issue #2040",
+      "why": "WebFetch summary did not expose comment ids; statements link the issue page"
+    },
+    {
+      "what": "Inline review text for PR #777 (pullrequestreview-343373132) and second half of long pages (#1551, #1634, #1884, #1743, #2139)",
+      "why": "not visible in fetched portion; not re-fetched to stay within budget"
+    }
+  ]
+}

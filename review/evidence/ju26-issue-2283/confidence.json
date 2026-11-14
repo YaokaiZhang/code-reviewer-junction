@@ -221,7 +221,7 @@
       }
     },
     "replayed": false,
-    "history_rules_available": 0
+    "history_rules_available": 20
   },
   "tool_versions": {
     "python": "3.13.18"

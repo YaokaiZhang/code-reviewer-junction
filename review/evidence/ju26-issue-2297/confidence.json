@@ -249,7 +249,32 @@
           ],
           "owner": "Andrew Arnott",
           "owner_basis": "most commits on the generated paths at base (31 commits)",
-          "rules": []
+          "rules": [
+            {
+              "id": "H-01",
+              "rule": "Do not take breaking changes (behavioral or binary) unless their value clearly outweighs the risk to existing users; justify any you propose.",
+              "sources": [
+                "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1074#pullrequestreview-511006338",
+                "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1074#issuecomment-711061875"
+              ]
+            },
+            {
+              "id": "H-02",
+              "rule": "Public API shape is frozen within a major version: e.g. changing a public field to a property is binary breaking and not allowed.",
+              "sources": [
+                "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/889#discussion_r410767424",
+                "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/645#issuecomment-555589493"
+              ]
+            },
+            {
+              "id": "H-04",
+              "rule": "Deserialization must not overwrite values the type itself set (constructor or initializer) when a member is missing from the data, and should fail loudly rather than quietly return null.",
+              "sources": [
+                "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1369#issuecomment-1002726721",
+                "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1137#pullrequestreview-537353863"
+              ]
+            }
+          ]
         },
         "depends_on": []
       },
@@ -307,7 +332,7 @@
       }
     },
     "replayed": false,
-    "history_rules_available": 0
+    "history_rules_available": 20
   },
   "tool_versions": {
     "python": "3.13.18"
