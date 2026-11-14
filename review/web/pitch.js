@@ -5,19 +5,23 @@
 
   /* kinds of evidence and their base score (the formula in the confidence check) */
   var KINDS = [
-    ['rebuild-compare', 'Old vs new, or rebuilt: same output', 90],
+    ['rebuild-compare', 'Rebuilt and compared: identical', 90],
     ['proof-model', 'Formal verification', 80],
     ['flip-test', 'Test first: fails before, passes after', 75],
     ['revert-test', 'Undo just this change: a test fails', 75],
+    ['old-vs-new-run', 'Old vs new: same output', 75, '≤75'],
     ['probe', 'Experiment on the real code', 60],
     ['count', 'A number from a tool', 40],
     ['none', 'Nothing backs it', 15]
   ];
   /* what each kind of evidence means, shown on hover: plain words, why it scores that, a real example */
   var KIND_HELP = {
-    'rebuild-compare': ['Run the old and the new version on the same real projects and compare the output. Or run the code generator again and compare with the files in the change.',
-      'A script compares every character, so no one has to trust the AI. Hard to fake, so it scores highest.',
-      'Used on all three fixes: 5 real projects, 139 generated files.'],
+    'rebuild-compare': ['Run the code generator again and compare its output with the files in the change.',
+      'A script compares every character of every file, so no one has to trust the AI. Hard to fake, so it scores highest.',
+      'On #2297, every generated file in the change was rebuilt and matched.'],
+    'old-vs-new-run': ['Run the old and the new version on the same real projects and compare the output.',
+      'Same output only counts for changed lines that actually ran. So the score is 30, plus up to 45 for the share of changed lines that ran. Any difference no rule explains drops it to 15.',
+      'On #2283 only 2 of 10 changed lines ran, so it scores 39. On #2297 all 22 ran: 75.'],
     'proof-model': ['Formal verification: write the rule as a small model. A prover (Dafny) checks it for every possible case, then the model is tested against the real C# code.',
       'Very strong, but the model is a copy of the code, not the code itself.',
       'On #2234 the prover found an input that still crashes the analyzer.'],
@@ -196,7 +200,7 @@
       var v = s.kinds[k[0]] != null ? +s.kinds[k[0]] : k[2];
       return '<li tabindex="0" data-help="' + k[0] + '"><span class="k">' + esc(k[1]) + '</span>' +
         '<span class="bar"><i class="b-' + band(v) + '" data-w="' + v + '"></i></span>' +
-        '<b>' + v + '</b></li>';
+        '<b>' + esc(k[3] || String(v)) + '</b></li>';
     }).join('');
     return '<section class="p-sec p-kinds">' +
       '<div class="p-grid2">' +
@@ -242,15 +246,20 @@
     var rows = [];
 
     var iso = s.ds.filter(function (d) { return d._isolation && d._isolation.coverage && +d._isolation.coverage.trackable; });
-    if (iso.length) rows.push({ c: 'high', g: 'Old vs new', v: 90, h: 'Old code still works.',
+    var ovn = function (d) { return conf(d).old_vs_new || null; };
+    var ovs = iso.map(function (d) { return ovn(d) ? +ovn(d).score : null; }).filter(function (v) { return v != null; });
+    var ovLo = Math.min.apply(null, ovs), ovHi = Math.max.apply(null, ovs);
+    if (iso.length && ovs.length) rows.push({ c: band(ovHi), g: 'Old vs new', v: ovLo === ovHi ? ovLo : ovLo + '–' + ovHi, h: 'Old code still works.',
       p: 'Run the old and the new version on the same real projects. Same output means nothing broke.',
       use: 'Most fixes come with no test for the bug. The old version is always there, so we can check any fix against it.',
-      why: 'This is the check from chapter 03. It needs no tests: the old version is the answer key.',
+      why: 'It needs no tests: the old version is the answer key. But its score follows how many changed lines ran, from 30 to 75.',
       lim: 'It only speaks for changed lines that ran. Lines that never ran go to the reviewer.',
       fig: '<div class="p-fig p-ran">' + iso.map(function (d) {
         var c = d._isolation.coverage, ran = +c.reached || 0, tot = +c.trackable, pc = Math.round(100 * ran / tot);
-        return '<div class="p-mbar' + (pc < 50 ? ' low' : '') + '"><span>#' + esc(issueOf(d)) + '</span><i data-w="' + pc + '"></i><b>' + ran + '/' + tot + '</b></div>';
-      }).join('') + '<p class="p-out">changed lines that ran, per fix</p></div>' });
+        var o = ovn(d);
+        return '<div class="p-mbar' + (pc < 50 ? ' low' : '') + '"><span>#' + esc(issueOf(d)) + '</span><i data-w="' + pc + '"></i><b>' + ran + '/' + tot + '</b>' +
+          (o ? '<em class="c-' + esc(o.band) + '">score ' + (+o.score) + '</em>' : '') + '</div>';
+      }).join('') + '<p class="p-out">changed lines that ran, and the score that gives, per fix</p></div>' });
 
     var nSnap = s.snap || 0;
     if (findEv(s, 'regeneration') && nSnap) rows.push({ c: 'high', g: 'Rebuilt and compared', v: 90, h: 'Rebuild the generated code.',
@@ -317,7 +326,7 @@
         '<div class="p-hows">' + rows.map(function (r, i) {
           return '<article class="p-how' + (i === 0 ? ' on' : '') + '">' +
             '<div class="p-how-t">' +
-              '<span class="g c-' + r.c + '">score <b>' + r.v + '</b></span>' +
+              '<span class="g c-' + r.c + '">score <b>' + esc(String(r.v)) + '</b></span>' +
               '<h3>' + esc(r.h) + '</h3>' +
               '<p>' + esc(r.p) + '</p>' +
               '<dl><dt>Why we use it</dt><dd>' + esc(r.use) + '</dd><dt>Why it counts</dt><dd>' + esc(r.why) + '</dd><dt>What it can’t tell</dt><dd>' + esc(r.lim) + '</dd></dl>' +

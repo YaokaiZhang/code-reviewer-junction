@@ -18,7 +18,7 @@
   };
   /* plain labels for confidence.json signal kinds */
   var KIND = {
-    'rebuild-compare': 'rebuilt and compared', 'proof-model': 'formal verification', 'flip-test': 'fails before, passes after',
+    'rebuild-compare': 'rebuilt and compared', 'old-vs-new-run': 'old and new code, same output', 'proof-model': 'formal verification', 'flip-test': 'fails before, passes after',
     'revert-test': 'fails when the fix is undone', probe: 'experiment on the real code', count: 'number from a tool', none: 'no check'
   };
   /* what a new test shows, from explain-check.json results/verdict */

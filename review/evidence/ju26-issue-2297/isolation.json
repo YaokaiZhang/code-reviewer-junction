@@ -5,7 +5,7 @@
   "command": "python3 review/scripts/isolation_check.py --repo $MP_REPO --branch ju26-issue-2297 --write  (coverage inside it: coverlet <copy of MessagePack.SourceGenerator.dll> --include-test-assembly --include '[MessagePack.SourceGenerator]*' --format json --target dotnet --targetargs '<IsolationHarness.dll> --generator <copy> --inputs <one project input> --out <dir>')",
   "result": "pass",
   "provides": [
-    "rebuild-compare",
+    "old-vs-new-run",
     "count"
   ],
   "summary": "5 real projects, 139 output units (generated files and diagnostics): 0 same, 139 differ, 139 explained by C-2297-01, 0 unexplained; coverage: 22 of 22 trackable changed lines reached, 27 not trackable; control group of 257 test inputs: 177 differ, 0 unexplained",

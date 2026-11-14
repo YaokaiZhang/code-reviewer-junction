@@ -13,7 +13,7 @@ Scripts take the path of a local clone of the target repo as `--repo` (or env `M
   "base": "32258fdb",
   "command": "the exact command that produced this",
   "result": "pass | fail | error",
-  "provides": ["rebuild-compare | proof-model | flip-test | revert-test | probe | count"],
+  "provides": ["rebuild-compare | proof-model | flip-test | revert-test | old-vs-new-run | probe | count"],
   "contract_changes": [{"contract": "diagnostics", "what": "...", "diff_parts": ["..."]}],
   "summary": "one line, every number in it comes from details",
   "details": {},
@@ -70,9 +70,16 @@ The agent does not pick a tier or a number. The script computes both from the ev
 | proof-model | 80 | model proved, and matched to the real code on every tested input |
 | flip-test | 75 | a test fails before the change and passes after |
 | revert-test | 75 | undo only this change: a test fails |
+| old-vs-new-run | 30–75 | old and new code on the same inputs: no unexplained difference (points below) |
 | probe | 60 | an experiment on the real code |
 | count | 40 | a number from a tool |
 | (none) | 15 | no check backs it |
+
+**old-vs-new-run** (`isolation.json`) has no fixed points. Same output only speaks for the changed
+lines that ran, so: 30 + 45 × (changed lines reached ÷ trackable changed lines), rounded; 30 when no
+changed line is trackable; 15 when any difference matches no rule. At most 75, below rebuild-compare,
+because it tries a corpus of inputs rather than every file. confidence.json also records this score
+per branch under `details.old_vs_new`, so pages can show it without a claim using it.
 
 Adjustments: run by hand −10 · an undo test also backs it +5 · re-run on a clean machine matched +5,
 did not match −30 · contradicting evidence caps the score at 25. `combine: any` takes the best

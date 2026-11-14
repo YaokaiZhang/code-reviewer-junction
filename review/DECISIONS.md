@@ -25,3 +25,4 @@ Running log, newest last.
 - A claim whose lines only partly overlap a changed promise (C-2234-01 shares the `continue` with C-2234-04) gets `shares_lines_with`, not the gate.
 - C-2283-04 scores 30 (low): its only evidence was run by hand. This settles the open relabel question.
 - Project rules come from upstream history (context/history.json): 37 PRs, 20 rules, each with a linked maintainer quote dated before base. No rule there is about analyzer diagnostics, so the diagnostics gates cite the owner and the probe, not a rule.
+- The old-vs-new run (isolation.json) no longer counts as rebuild-compare (90). Same output only speaks for changed lines that ran, so it is its own kind, `old-vs-new-run`, scored 30 + 45 × share of changed lines reached (max 75; 15 on any unexplained difference). Now: 2234 69, 2283 39 (2 of 10 lines ran), 2297 75. No claim used it as support, so no claim score changed.

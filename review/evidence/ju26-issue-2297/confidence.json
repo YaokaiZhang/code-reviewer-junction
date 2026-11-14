@@ -16,6 +16,13 @@
         "count": 40,
         "none": 15
       },
+      "old_vs_new": {
+        "floor": 30,
+        "span": 45,
+        "max": 75,
+        "unexplained": 15,
+        "rule": "floor + span x changed lines reached / trackable changed lines; any unexplained difference: unexplained"
+      },
       "hand": -10,
       "undo_bonus": 5,
       "replay_match": 5,
@@ -358,6 +365,14 @@
         "gate": null,
         "depends_on": []
       }
+    },
+    "old_vs_new": {
+      "file": "evidence/ju26-issue-2297/isolation.json",
+      "score": 75,
+      "band": "medium",
+      "label": "old and new code, every difference matches a rule; 22 of 22 changed lines ran",
+      "reached": 22,
+      "trackable": 22
     },
     "replayed": true,
     "history_rules_available": 20

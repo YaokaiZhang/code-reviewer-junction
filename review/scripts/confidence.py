@@ -14,6 +14,10 @@ Inputs, all in this repo:
 The formula (also printed into the output, so the page can show it):
   base      the kind of check: rebuilt-and-compared 90, model proof 80, flip test 75, undo test 75,
             experiment on the real code 60, number from a tool 40, no check 15
+  old vs new  run the old and new code on the same inputs (isolation.json). Same output only speaks for
+            changed lines that ran, so the points follow coverage: 30 + 45 x (changed lines reached /
+            trackable changed lines), at most 75; no trackable line: 30; any unexplained difference: 15.
+            It stays below rebuilt-and-compared because it tries a sample of inputs, not every file.
   hand      evidence a person or agent ran by hand: -10
   undo      a separate undo test backs the same claim: +5
   replay    the file was re-run on a clean machine and matched: +5; did not match: -30
@@ -48,15 +52,39 @@ KIND = {
     "revert-test": (75, "undo only this change: a test fails"),
     "probe": (60, "experiment on the real code"),
     "count": (40, "number from a tool"),
+    "old-vs-new-run": (None, "old and new code, same inputs: no unexplained difference"),  # points: old_vs_new_points()
 }
+OVN_FLOOR, OVN_SPAN, OVN_UNEXPLAINED = 30, 45, 15
 NONE = (15, "no check backs it")
 HAND, UNDO, REPLAY_OK, REPLAY_BAD, CONTRA_CAP = -10, 5, 5, -30, 25
 FORMULA = {
-    "kinds": {k: v[0] for k, v in KIND.items()} | {"none": NONE[0]},
+    "kinds": {k: v[0] for k, v in KIND.items() if v[0] is not None} | {"none": NONE[0]},
+    "old_vs_new": {"floor": OVN_FLOOR, "span": OVN_SPAN, "max": OVN_FLOOR + OVN_SPAN,
+                   "unexplained": OVN_UNEXPLAINED,
+                   "rule": "floor + span x changed lines reached / trackable changed lines; "
+                           "any unexplained difference: unexplained"},
     "hand": HAND, "undo_bonus": UNDO, "replay_match": REPLAY_OK, "replay_mismatch": REPLAY_BAD,
     "contradicted_cap": CONTRA_CAP, "bands": {"high": 80, "medium": 50},
     "combine": "any = best supporting file; all = weakest",
 }
+
+
+def old_vs_new_points(e):
+    """Points for an old-vs-new run, from its own coverage numbers: (points, label)."""
+    d = e.get("details") or {}
+    c = d.get("coverage") or {}
+    reached, trackable = int(c.get("reached") or 0), int(c.get("trackable") or 0)
+    if int(d.get("unexplained_total_items") or 0) or d.get("unexplained"):
+        return OVN_UNEXPLAINED, "old and new code differ where no rule expects it"
+    if not trackable:
+        return OVN_FLOOR, "old and new code, same output; no changed line could be tracked"
+    pts = OVN_FLOOR + round(OVN_SPAN * reached / trackable)
+    same = "every difference matches a rule" if d.get("explained") else "same output"
+    return pts, f"old and new code, {same}; {reached} of {trackable} changed lines ran"
+
+
+def kind_points(kind, e):
+    return old_vs_new_points(e) if kind == "old-vs-new-run" else KIND[kind]
 
 
 def band(s):
@@ -106,7 +134,7 @@ def score_branch(branch, project, history, errors):
             if kind not in e.get("provides", []):
                 errors.append(f"{cid}: uses {f} as {kind}, but the file provides only {e.get('provides')}")
                 continue
-            pts, label = KIND[kind]
+            pts, label = kind_points(kind, e)
             parts = [{"text": label, "delta": pts}]
             if e.get("produced_by") == "hand":
                 parts.append({"text": "run by hand, not by a script", "delta": HAND})
@@ -166,6 +194,14 @@ def score_branch(branch, project, history, errors):
             if not o["gate"] and out.get(d, {}).get("gate"):
                 o["gate"] = dict(out[d]["gate"], inherited_from=d)
 
+    # the old-vs-new run of this branch, scored on its own, so the page can show its score
+    iso, ovn = f"evidence/{branch}/isolation.json", None
+    if ev(iso):
+        pts, label = old_vs_new_points(ev(iso))
+        cov = (ev(iso).get("details") or {}).get("coverage") or {}
+        ovn = {"file": iso, "score": pts, "band": band(pts), "label": label,
+               "reached": cov.get("reached"), "trackable": cov.get("trackable")}
+
     counts = {b: sum(1 for o in out.values() if o["band"] == b) for b in ("high", "medium", "low")}
     gated = sorted(k for k, o in out.items() if o["gate"])
     return {
@@ -176,7 +212,7 @@ def score_branch(branch, project, history, errors):
         "result": "pass",
         "summary": f"{len(out)} claims: {counts['high']} high, {counts['medium']} medium, {counts['low']} low; "
                    f"{len(gated)} need an owner ({', '.join(gated) or 'none'})",
-        "details": {"formula": FORMULA, "claims": out, "replayed": bool(replay),
+        "details": {"formula": FORMULA, "claims": out, "old_vs_new": ovn, "replayed": bool(replay),
                     "history_rules_available": len(rules)},
         "tool_versions": {"python": sys.version.split()[0]},
         "produced_by": "script",

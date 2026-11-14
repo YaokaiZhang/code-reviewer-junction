@@ -843,7 +843,7 @@ def main():
         "base": args.base,
         "command": f"python3 review/scripts/isolation_check.py --repo $MP_REPO --branch {args.branch} --write  (coverage inside it: coverlet <copy of MessagePack.SourceGenerator.dll> --include-test-assembly --include '[MessagePack.SourceGenerator]*' --format json --target dotnet --targetargs '<IsolationHarness.dll> --generator <copy> --inputs <one project input> --out <dir>')",
         "result": result,
-        "provides": ["rebuild-compare", "count"],
+        "provides": ["old-vs-new-run", "count"],
         "summary": summary,
         "details": {
             "what": "Differential run: the base and branch builds of the source generator and analyzers get the same inputs; every difference in generated files or diagnostics must match a rule naming a claim.",
