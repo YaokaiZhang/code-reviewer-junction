@@ -81,6 +81,8 @@ def main():
         d["_receipt"] = receipt
         src = load(REVIEW / "source" / f"{branch}.json") if (REVIEW / "source" / f"{branch}.json").is_file() else None
         d["_source"] = src
+        cov = REVIEW / "evidence" / branch / "claim-coverage.json"
+        d["_coverage"] = load(cov) if cov.is_file() else None
         d["_requirements"] = {c["requirement"]: reqs[c["requirement"]] for c in d.get("claims") or [] if c.get("requirement") in reqs}
         d["sample"] = is_sample
         bundle[key] = d
