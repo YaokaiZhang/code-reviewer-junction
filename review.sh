@@ -25,6 +25,15 @@ render() {
 }
 
 cmd_dev() {
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      -p|--port) PORT=${2:?--port needs a number}; shift 2 ;;
+      --port=*) PORT=${1#--port=}; shift ;;
+      [0-9]*) PORT=$1; shift ;;
+      *) echo "dev: unknown option $1 (use --port N)"; exit 1 ;;
+    esac
+  done
+  case "$PORT" in ''|*[!0-9]*) echo "dev: port must be a number, got '$PORT'"; exit 1 ;; esac
   render
   local url="http://localhost:$PORT/web/"
   say "Owner view → $url   (Ctrl+C to stop)"
@@ -86,12 +95,13 @@ cmd_tests() {
 cmd_sign() { python3 review/scripts/sign_receipt.py "${1:-ju26-issue-2283}" "${@:2}"; render >/dev/null; }
 
 case "${1:-dev}" in
-  dev) cmd_dev ;;
+  dev) shift || true; cmd_dev "$@" ;;
+  -*|[0-9]*) cmd_dev "$@" ;;
   render) render ;;
   setup) cmd_setup ;;
   evidence) cmd_evidence ;;
   tests) cmd_tests ;;
   all) cmd_setup; cmd_evidence; cmd_tests ;;
   sign) shift; cmd_sign "$@" ;;
-  *) echo "usage: $0 dev|render|setup|evidence|tests|all|sign [branch]"; exit 1 ;;
+  *) echo "usage: $0 dev [--port N]|render|setup|evidence|tests|all|sign [branch]"; exit 1 ;;
 esac

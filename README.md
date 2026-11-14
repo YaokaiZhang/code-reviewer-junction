@@ -39,7 +39,7 @@ Needs Python 3, git and Node (for `npm run`; or call `./review.sh <command>` dir
 npm run dev
 ```
 
-Opens the owner view at http://localhost:5173/web/. No other setup needed.
+Opens the owner view at http://localhost:5173/web/. No other setup needed. Another port: `npm run dev -- --port 3001` (or `PORT=3001 npm run dev`).
 
 To reproduce the evidence:
 
