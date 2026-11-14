@@ -8,18 +8,26 @@
   var GLYPH = { Proved: '■', Tested: '▲', Measured: '●', Argued: '◆', Refused: '✕' };
   /* one-line meaning of each tier (CONVENTIONS.md, "Tier rules") */
   var DEF = {
-    Proved: 'A checker ran on the real code and passed with no gaps, for example by regenerating the output and getting the same text.',
-    Tested: 'A test that fails before the change passes after it.',
-    Measured: 'A tool produced a number, and the number is the evidence.',
-    Argued: 'No check settles it, so it rests on reasoning. A named owner decides.',
-    Refused: 'No machine may settle it: public API, wire format, silenced warnings or security. A person decides.'
+    Proved: 'A checker rebuilt the output from the code, and it matched exactly.',
+    Tested: 'A new test fails before the change and passes after it.',
+    Measured: 'A tool counted it. The number is the evidence.',
+    Argued: 'No check can settle it. It rests on reasoning.',
+    Refused: 'Public API, warnings or security: off-limits for machines.'
   };
   var SHORT = {
-    Proved: 'a checker passed on the real code',
+    Proved: 'rebuilt and matched',
     Tested: 'a test fails before, passes after',
     Measured: 'a tool counted it',
     Argued: 'no check settles it',
     Refused: 'off-limits for machines'
+  };
+  /* one short example claim per tier, in plain words (the full claim is in its dossier) */
+  var EXAMPLE = {
+    Proved: ['C-2297-02', 'Every changed test snapshot is exactly what the new code generates.'],
+    Tested: ['C-2283-01', 'The crash on generic structs from another project is fixed.'],
+    Measured: ['C-2234-06', 'The fix adds copy-pasted code.'],
+    Argued: ['C-2234-08', 'Types that skip code generation still serialise correctly.'],
+    Refused: ['C-2283-02', 'A new filter hides some warnings from developers.']
   };
   /* plain glosses for analyzer codes that appear in claim text */
   var GLOSS = { MsgPack003: 'a build warning', MsgPack005: 'a build error' };
@@ -132,22 +140,6 @@
   }
   function usesCheck(name) { return function (it) { return evOf(it).some(function (e) { return e.check === name; }); }; }
 
-  /* ---------- result lines in plain English, from evidence details ---------- */
-  function plainResult(e) {
-    var dt = (e && e.details) || {};
-    if (e.check === 'regeneration' && Array.isArray(dt.runs)) {
-      var br = dt.runs.filter(function (r) { return r.label === 'branch'; })[0];
-      if (br && br.total != null) return 'The checker regenerated every snapshot and compiled it: ' + br.passed + ' of ' + br.total + ' snapshot tests pass on the branch.';
-    }
-    if (e.check === 'old-vs-new-tests' && dt.counts && dt.counts.new_or_changed_methods != null) {
-      return plural(dt.counts.evidence, 'new test') + ' of ' + dt.counts.new_or_changed_methods + ' fail on the code before the change and pass after it.';
-    }
-    if (e.check === 'clone-complexity' && dt.base && dt.branch && dt.base.clones && dt.branch.clones) {
-      return 'Copy-pasted blocks in the changed file: ' + dt.base.clones.duplicated_blocks + ' before, ' + dt.branch.clones.duplicated_blocks + ' after.';
-    }
-    return e.summary || '';
-  }
-
   /* ---------- pieces ---------- */
   function transition(text, hot, ch, ctx) {
     var ws = text.split(' ');
@@ -173,12 +165,6 @@
       return '<i style="background:var(--t-' + lc(c.tier) + ')"' + (MACHINE[c.tier] ? '' : ' class="p-own"') + ' title="' + esc(c.tier) + '"></i>';
     }).join('') + '</span>';
   }
-  function cmdLine(e) {
-    if (!e || !e.command) return '';
-    var cmd = shortCmd(e.command);
-    return '<div class="p-term"><span class="p-lbl">' + (e.produced_by === 'hand' ? 'run by hand' : 'run by script') + '</span>' +
-      '<code title="' + esc(cmd) + '">$ ' + esc(cmd) + '</code></div>';
-  }
 
   /* ---------- sections ---------- */
   function secProblem(s) {
@@ -201,8 +187,6 @@
         '<div>' +
           '<div class="p-big" data-count="' + s.lines + '">0</div>' +
           '<h2 class="p-h2">' + words('lines changed.') + '<br>' + words('Who reads them?', 'hot', 160) + '</h2>' +
-          '<p class="p-ctx" data-rv>Lines added or removed by an AI agent on ' + plural(s.ds.length, 'branch', 'branches') +
-            ' of MessagePack-CSharp, a serialisation library for .NET.</p>' +
           '<ul class="p-bars" data-rv aria-label="Lines changed per branch">' + rows + '</ul>' +
           '<p class="p-cap">Lines changed per branch, named by its GitHub issue.</p>' +
           hook +
@@ -219,34 +203,29 @@
     '</section>';
   }
 
-  function ladderExamples(s, used) {
+  function ladderExamples(s) {
     var ex = {};
-    ex.Proved = pick(s, 'Proved', usesCheck('regeneration'));
-    ex.Tested = pick(s, 'Tested', null, used);
-    ex.Measured = pick(s, 'Measured', function (it) { return usesCheck('diff-classifier')(it) && /snapshot files/i.test(it.c.claim); }, used);
-    ex.Argued = pick(s, 'Argued', null, used);
-    ex.Refused = pick(s, 'Refused', function (it) { return !!it.c.owner_role; }, used);
+    TIERS.forEach(function (t) {
+      var id = EXAMPLE[t] && EXAMPLE[t][0];
+      ex[t] = s.byTier[t].filter(function (it) { return it.c.id === id; })[0] || pick(s, t);
+    });
     return ex;
   }
 
   function secLadder(s, used) {
-    var ex = ladderExamples(s, used);
+    var ex = ladderExamples(s);
     var rows = TIERS.map(function (t, i) {
       return (i === 3 ? '<li class="split"><span>Machines settle the top three. People decide the bottom two.</span></li>' : '') +
         '<li class="p-rung c-' + lc(t) + '" data-i="' + i + '" style="--c:var(--t-' + lc(t) + ')">' +
           '<b aria-hidden="true">' + GLYPH[t] + '</b><span class="t">' + t + '<small>' + SHORT[t] + '</small></span><span class="n">' + s.tiers[t] + '</span></li>';
     }).join('');
     var cards = TIERS.map(function (t, i) {
-      var it = ex[t];
+      var it = ex[t], short = it && EXAMPLE[t] && EXAMPLE[t][0] === it.c.id ? EXAMPLE[t][1] : (it ? it.c.claim : '');
       return '<article class="p-card" data-i="' + i + '" style="--c:var(--t-' + lc(t) + ')">' +
-        '<header><span class="g">' + GLYPH[t] + ' ' + t + '</span></header>' +
+        '<header><span class="g">' + GLYPH[t] + ' ' + t + '</span>' +
+          '<span class="p-who">' + (MACHINE[t] ? 'machine settles' : 'person decides') + '</span></header>' +
         '<p class="p-def">' + esc(DEF[t]) + '</p>' +
-        (it ? '<div class="p-ex"><span class="p-lbl">Example claim · #' + esc(issueOf(it.d)) + '</span>' +
-          '<p>' + rich(it.c.claim) + '</p>' +
-          (t === 'Refused' && it.c.why_this_tier ? '<p class="p-why"><b>Why a person:</b> ' + rich(it.c.why_this_tier) + '</p>' : '') +
-          '</div>' : '') +
-        (MACHINE[t] ? '<footer class="m">Settled by machine — no one needs to sign</footer>'
-          : '<footer>Waits for a named owner' + (it && it.c.owner_role ? ': ' + esc(it.c.owner_role) : '') + '</footer>') +
+        (it ? '<div class="p-ex"><span class="p-lbl">e.g. #' + esc(issueOf(it.d)) + '</span><p>“' + rich(short) + '”</p></div>' : '') +
       '</article>';
     }).join('');
     return '<section class="p-ladder" data-progress="ladder">' +
@@ -261,40 +240,67 @@
       '</div></section>';
   }
 
-  function machinePicks(s) {
-    var pr = pick(s, 'Proved', usesCheck('regeneration'));
-    var te = pick(s, 'Tested', function (it) {
-      return evOf(it).some(function (e) { return e.check === 'old-vs-new-tests' && e.produced_by !== 'hand' && lc(e.result) === 'pass'; });
-    });
-    var ms = pick(s, 'Measured', usesCheck('clone-complexity'));
-    function evFor(it, test) {
-      if (!it) return null;
-      var es = evOf(it);
-      return es.filter(test)[0] || es.filter(function (e) { return e.produced_by !== 'hand'; })[0] || es[0] || null;
+  /* first evidence anywhere with this check (optionally on a given branch) */
+  function findEv(s, check, branch) {
+    for (var k in s.evidence) {
+      var e = s.evidence[k];
+      if (e && e.check === check && e.produced_by !== 'hand' && (!branch || k.indexOf(branch) >= 0)) return e;
     }
-    return [
-      pr && { t: 'Proved', it: pr, e: evFor(pr, function (e) { return e.check === 'regeneration'; }) },
-      te && { t: 'Tested', it: te, e: evFor(te, function (e) { return e.check === 'old-vs-new-tests' && e.produced_by !== 'hand' && lc(e.result) === 'pass'; }) },
-      ms && { t: 'Measured', it: ms, e: evFor(ms, function (e) { return e.check === 'clone-complexity'; }) }
-    ].filter(Boolean);
+    return null;
+  }
+  function tool(e) {
+    var m = e && e.command && e.command.match(/review\/scripts\/([\w\/.-]+\.py)/);
+    return m ? m[1].replace(/\/run\.py$/, '') : '';
+  }
+  function squares(n, cls) {
+    var o = ''; for (var i = 0; i < n; i++) o += '<i></i>';
+    return '<span class="p-sq ' + (cls || '') + '">' + o + '</span>';
   }
 
-  function secMachine(s, mp) {
-    var cols = mp.map(function (x) {
-      return '<article class="p-ev" style="--c:var(--t-' + lc(x.t) + ')" data-rv>' +
-        '<header><b aria-hidden="true">' + GLYPH[x.t] + '</b> ' + x.t + ' <span>#' + esc(issueOf(x.it.d)) + '</span></header>' +
-        '<p class="p-def">' + esc(DEF[x.t]) + '</p>' +
-        '<span class="p-lbl">The claim</span>' +
-        '<p class="p-cl">' + rich(x.it.c.claim) + '</p>' +
-        (x.e ? '<span class="p-lbl">What the check found</span><p class="p-found">' + rich(plainResult(x.e)) + '</p>' : '') +
-        cmdLine(x.e) +
-      '</article>';
-    }).join('');
+  /* ch.03 — how a machine settles a claim, one diagram per tier */
+  function secMachine(s) {
+    var rows = [];
+    var rg = findEv(s, 'regeneration'), runs = (rg && rg.details && rg.details.runs) || [];
+    var br = runs.filter(function (r) { return r.label === 'branch'; })[0];
+    var nSnap = (s.snap && s.snap.files) || 0;
+    if (br && nSnap) rows.push({ t: 'Proved', h: 'Rebuild it. Compare.', e: rg,
+      fig: '<div class="p-fig p-fig-proved">' +
+        '<figure>' + squares(nSnap) + '<figcaption>' + fmt(nSnap) + ' files the agent committed</figcaption></figure>' +
+        '<b class="p-eq">=</b>' +
+        '<figure>' + squares(nSnap, 'regen') + '<figcaption>' + fmt(nSnap) + ' files rebuilt from the code</figcaption></figure>' +
+        '<p class="p-out">✓ identical · ' + br.passed + ' of ' + br.total + ' tests pass</p></div>' });
+
+    var ot = findEv(s, 'old-vs-new-tests', '2283') || findEv(s, 'old-vs-new-tests');
+    var nT = ot && ot.details && ot.details.counts ? +ot.details.counts.evidence : 0;
+    if (nT) {
+      var cells = '';
+      for (var i = 0; i < nT; i++) cells += '<span class="x">✗</span><span class="ok">✓</span>';
+      rows.push({ t: 'Tested', h: 'Run the new tests on the old code.', e: ot,
+        fig: '<div class="p-fig p-fig-tested"><div class="p-tgrid" style="--n:' + nT + '">' +
+          '<span class="hd">before the fix</span><span class="hd">after</span>' + cells + '</div>' +
+          '<p class="p-out">fails before, passes after</p></div>' });
+    }
+
+    var cc = findEv(s, 'clone-complexity'), cd = cc && cc.details;
+    if (cd && cd.base && cd.branch) {
+      var b0 = +cd.base.clones.duplicated_blocks, b1 = +cd.branch.clones.duplicated_blocks, mx = Math.max(b0, b1) || 1;
+      rows.push({ t: 'Measured', h: 'Count it.', e: cc,
+        fig: '<div class="p-fig p-fig-measured">' +
+          '<div class="p-mbar"><span>before</span><i data-w="' + (100 * b0 / mx).toFixed(1) + '"></i><b>' + b0 + '</b></div>' +
+          '<div class="p-mbar"><span>after</span><i data-w="' + (100 * b1 / mx).toFixed(1) + '"></i><b>' + b1 + '</b></div>' +
+          '<p class="p-out">copy-pasted blocks in ' + esc(String(cd.file || '').split('/').pop()) + '</p></div>' });
+    }
+
     var m = s.tiers.Proved + s.tiers.Tested + s.tiers.Measured;
     return '<section class="p-sec p-machine">' +
       '<h2 class="p-h2"><span class="p-num" data-count="' + m + '">0</span> ' + words('of ' + s.claims + ' settled') + '<br>' + words('by machine.', 'hot', 120) + '</h2>' +
-      '<p class="p-ctx" data-rv>Three of them, with what the check actually found:</p>' +
-      '<div class="p-evs">' + cols + '</div>' +
+      '<div class="p-hows">' + rows.map(function (r) {
+        return '<article class="p-how" style="--c:var(--t-' + lc(r.t) + ')" data-rv>' +
+          '<div class="p-how-t"><span class="g"><b aria-hidden="true">' + GLYPH[r.t] + '</b> ' + r.t + '</span>' +
+            '<h3>' + esc(r.h) + '</h3>' +
+            (tool(r.e) ? '<code class="p-tool">' + esc(tool(r.e)) + '</code>' : '') + '</div>' +
+          r.fig + '</article>';
+      }).join('') + '</div>' +
     '</section>';
   }
 
@@ -517,7 +523,7 @@
     var els = root.querySelectorAll('[data-rv], [data-count]');
     if (reduce || !('IntersectionObserver' in window)) {
       els.forEach(function (el) { el.classList.add('in'); if (el.dataset.count != null) el.textContent = fmt(+el.dataset.count); });
-      root.querySelectorAll('.p-bars i').forEach(function (i) { i.style.width = i.dataset.w + '%'; });
+      root.querySelectorAll('i[data-w]').forEach(function (i) { i.style.width = i.dataset.w + '%'; });
       return;
     }
     var io = new IntersectionObserver(function (es) {
@@ -554,8 +560,7 @@
     on(down, 'click', function (e) { e.preventDefault(); document.getElementById('ch-problem').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }); });
 
     /* ch.03 and ch.04 examples first, so the ladder can show different ones */
-    var mp = machinePicks(s), used = {};
-    mp.forEach(function (x) { if (x.t !== 'Proved') used[x.it.c.id] = 1; });
+    var used = {};
     var ownerHtml = secOwner(s, used);
 
     var wrap = document.createElement('div');
@@ -570,7 +575,7 @@
       secLadder(s, used) +
       transition('Whatever can be checked, a machine checks.', 3, 'ch-machine',
         'Proved, Tested and Measured claims are settled by running the real code, not by taking the agent’s word.') +
-      secMachine(s, mp) +
+      secMachine(s) +
       transition('The rest is a judgement call, and a named person signs for it.', 5, 'ch-owner',
         'No machine may settle these. The owner reads the evidence and decides each one.') +
       ownerHtml +
