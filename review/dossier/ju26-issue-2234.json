@@ -2,6 +2,7 @@
   "branch": "ju26-issue-2234",
   "issue": 2234,
   "title": "The analyzer does not work if SuppressSourceGeneration = true",
+  "summary": "The analyzer threw when a type's keys repeat or mix int and string. The AI changed TypeCollector.cs to keep the first member for each key and to skip a member of the wrong key kind once it is reported, so the analyzer reports MsgPack005 instead of crashing. It added analyzer tests, execution tests and a README section on opting out of source generation.",
   "base": "32258fdb",
   "head": "9007cee1",
   "diff": {

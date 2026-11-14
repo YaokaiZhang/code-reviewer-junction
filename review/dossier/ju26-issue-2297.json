@@ -2,6 +2,7 @@
   "branch": "ju26-issue-2297",
   "issue": 2297,
   "title": "Add ExcludeFromCodeCoverage attribute to generated code",
+  "summary": "The AI made the source generator put `[ExcludeFromCodeCoverage]` on every formatter and resolver it emits, inside `#if !NETSTANDARD2_0 && !NETFRAMEWORK`. It edited the 6 code templates and one helper (TransformUtilities.cs), re-recorded 222 test snapshots, and added a test file and a README note.",
   "base": "32258fdb",
   "head": "a0aa5ab2",
   "diff": {

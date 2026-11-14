@@ -2,6 +2,8 @@
 
 `32258fdb..a0aa5ab2` · 237 files +1383 −9
 
+**What the AI changed:** The AI made the source generator put `[ExcludeFromCodeCoverage]` on every formatter and resolver it emits, inside `#if !NETSTANDARD2_0 && !NETFRAMEWORK`. It edited the 6 code templates and one helper (TransformUtilities.cs), re-recorded 222 test snapshots, and added a test file and a README note.
+
 | ■ Proved | ▲ Tested | ● Measured | ◆ Argued | ✕ Refused |
 |:-:|:-:|:-:|:-:|:-:|
 | 2 | 2 | 3 | 2 | 1 |

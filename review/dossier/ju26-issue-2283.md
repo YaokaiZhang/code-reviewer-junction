@@ -2,6 +2,8 @@
 
 `32258fdb..9df83c38` · 4 files +225 −3
 
+**What the AI changed:** The generator and analyzer crashed on a closed generic struct from another assembly, because they looked up source locations that such a type does not have. The AI made those lookups safe and added a filter in TypeCollector.cs that drops every analyzer diagnostic located outside this project's source. It added 3 tests, plus README and MsgPack004 notes saying the defining assembly reports such diagnostics.
+
 | ■ Proved | ▲ Tested | ● Measured | ◆ Argued | ✕ Refused |
 |:-:|:-:|:-:|:-:|:-:|
 | · | 1 | 1 | · | 2 |

@@ -110,6 +110,8 @@ def render(d, md_dir=DOSSIER_DIR):
     if diff:
         line += f" · {diff.get('files', '?')} files +{diff.get('insertions', '?')} −{diff.get('deletions', '?')}"
     L += ["", line, ""]
+    if d.get("summary"):
+        L += [f"**What the AI changed:** {md_escape(d['summary'])}", ""]
 
     L.append("| " + " | ".join(f"{GLYPH[t]} {t}" for t in TIERS) + " |")
     L.append("|" + ":-:|" * len(TIERS))

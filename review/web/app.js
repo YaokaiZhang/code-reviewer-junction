@@ -5,6 +5,20 @@
   var TIERS = ['Proved', 'Tested', 'Measured', 'Argued', 'Refused'];
   var MACHINE = { Proved: 1, Tested: 1, Measured: 1 };
   var GLYPH = { Proved: '■', Tested: '▲', Measured: '●', Argued: '◆', Refused: '✕' };
+  /* What each tier means, from CONVENTIONS.md (tier rules). `long` on the landing page, `short` under the dossier counters. */
+  var DEF = {
+    Proved: { long: 'A checker confirmed it on the real code, with no gaps.', short: 'A checker confirmed it on the real code.' },
+    Tested: { long: 'A test fails before the change and passes after it.', short: 'A test fails before, passes after.' },
+    Measured: { long: 'A tool produced a number, and the number is the evidence.', short: 'A number from a tool.' },
+    Argued: { long: 'No check settles it; it rests on reasoning. You decide.', short: 'No check settles it. You decide.' },
+    Refused: { long: 'It touches public API, wire format, warnings or security, so the tool refuses to grade it. You decide.', short: 'Touches API, wire format, warnings or security. You decide.' }
+  };
+  var RESULT = {
+    pass: { w: 'PASS', t: 'The check ran and got its expected outcome. This is the check\u2019s own result, not a verdict on the claim.' },
+    fail: { w: 'FAIL', t: 'The check ran and did not get its expected outcome. Read the line beside it for what that shows.' },
+    error: { w: 'INCOMPLETE', t: 'The check could not run every case here.' }
+  };
+  var NUM = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
   var PICKS = [
     { v: 'accept', k: 'A', cls: 'accept' },
     { v: 'reject', k: 'R', cls: 'reject' },
@@ -87,14 +101,21 @@
       return (i === 3 ? '<span class="gap"></span>' : '') +
         '<div class="cap ' + lc(t) + '"><b aria-hidden="true">' + GLYPH[t] + '</b><i>' + t + '</i></div>';
     }).join('');
+    var defs = TIERS.map(function (t) {
+      return '<dt class="c-' + lc(t) + '"><span aria-hidden="true">' + GLYPH[t] + '</span> ' + t + '</dt><dd>' + esc(DEF[t].long) + '</dd>';
+    }).join('');
+    var real = ks.filter(function (k) { return !DATA[k].sample; }).length;
+    var nIssues = (NUM[real] || String(real)) + ' issue' + (real === 1 ? '' : 's');
 
     app.innerHTML =
       '<section class="landing">' +
         '<div class="hero">' +
           '<h1><span>Read the evidence,</span><em>not the diff.</em></h1>' +
+          '<p class="lede">An AI agent fixed ' + nIssues + ' in MessagePack-CSharp. Each fix is split into claims, and each claim is graded by the evidence behind it. Machines settle what they can; you decide the rest and sign.</p>' +
           '<div class="ladder">' + caps +
-            '<span class="bracket machine">machine</span><span class="bracket owner">owner</span>' +
+            '<span class="bracket machine">settled by machine</span><span class="bracket owner">you decide</span>' +
           '</div>' +
+          '<dl class="defs">' + defs + '</dl>' +
         '</div>' +
         '<div class="stage">' +
           '<div class="scene">' +
@@ -148,7 +169,7 @@
       var n = l[3].match(/^[ \t]*/)[0].length; return Math.min(m, n);
     }, 1e9);
     if (ind === 1e9) ind = 0;
-    return '<div class="hunk"><div class="hh">' + (h.file ? '<span>' + esc(h.file) + '</span>' : '') + '<span class="at">' + esc(h.head.replace(/^(@@[^@]*@@).*$/, '$1')) + '</span></div>' +
+    return '<div class="hunk">' + (h.file ? '<div class="hh"><span>' + esc(h.file) + '</span></div>' : '') +
       '<table><tbody>' + h.lines.map(function (l) {
         var cls = l[0] === '+' ? 'add' : l[0] === '-' ? 'del' : '';
         return '<tr class="' + cls + '"><td class="no">' + (l[1] == null ? '' : l[1]) + '</td><td class="no">' + (l[2] == null ? '' : l[2]) +
@@ -157,12 +178,13 @@
   }
   function sourceBlock(d, parts) {
     var src = d._source && d._source.parts || {};
-    return '<div class="srcs">' + parts.map(function (p) {
+    return '<div class="srcs"><div class="cap-l">Code this claim covers</div>' + parts.map(function (p) {
       var s = src[p];
       var gh = s ? '<a class="gh" href="' + esc(s.url) + '" target="_blank" rel="noopener">GitHub ↗</a>' : '';
-      if (!s || !s.shown.length) return '<div class="src none"><span class="sp">± ' + shortPath(p) + '</span>' + gh + '</div>';
-      var more = s.hunks > s.shown.length ? '<div class="more">' + (s.hunks - s.shown.length) + ' more hunks in ' + s.files + ' files · ' + gh + '</div>' : '';
-      return '<details class="src"><summary><span class="sp">± ' + shortPath(p) + '</span>' +
+      if (!s || !s.shown.length) return '<div class="src none"><span class="sp">' + shortPath(p) + '</span>' + gh + '</div>';
+      var nm = s.hunks - s.shown.length;
+      var more = nm > 0 ? '<div class="more">' + nm + ' more change' + (nm === 1 ? '' : 's') + ' in ' + s.files + ' files · ' + gh + '</div>' : '';
+      return '<details class="src"><summary><span class="sp">' + shortPath(p) + '</span>' +
         (s.files > 1 ? '<span class="cnt">' + s.files + ' files</span>' : '') + gh + '</summary>' +
         s.shown.map(function (h) { return hunkHtml(s.files > 1 ? h : { head: h.head, lines: h.lines, cut: h.cut }); }).join('') + more + '</details>';
     }).join('') + '</div>';
@@ -172,7 +194,7 @@
     Object.keys(ev).forEach(function (k) { if (['check', 'branch', 'result', 'summary', 'command', 'produced_by'].indexOf(k) < 0) x[k] = ev[k]; });
     return esc(JSON.stringify(x, null, 2));
   }
-  function evidenceBlock(d, c) {
+  function evidenceBlock(d, c, seen) {
     var out = '';
     var chain = Array.isArray(c.chain) ? c.chain : [];
     if (chain.length) {
@@ -182,36 +204,41 @@
     }
     (c.evidence || []).forEach(function (ref) {
       var ev = (d._evidence || {})[ref];
-      var name = String(ref).split('/').pop().replace(/\.json$/, '');
+      var name = String(ref).split('/').pop().replace(/\.json$/, '').replace(/[-_.]+/g, ' ');
       var res = ev ? lc(ev.result) || 'missing' : 'missing';
+      var rw = RESULT[res] || { w: ev ? String(ev.result || '?').toUpperCase() : 'MISSING', t: ev ? '' : 'No evidence file found.' };
+      var again = seen && seen[ref];
+      if (seen) seen[ref] = 1;
+      var sum = ev ? rich(ev.summary || '') : '';
       out += '<details class="evl"><summary>' +
-        '<span class="res ' + esc(res) + '">' + esc(ev ? String(ev.result || '?').toUpperCase() : 'MISSING') + '</span>' +
-        '<span class="evn">' + esc(name) + (ev && ev.produced_by === 'hand' ? ' <span class="hand">hand</span>' : '') + '</span>' +
-        '<span class="evs">' + (ev ? rich(ev.summary || '') : '') + '</span></summary>' +
+        '<span class="res ' + esc(res) + '" title="' + esc(rw.t) + '">' + esc(rw.w) + '</span>' +
+        '<span class="evn">' + esc(name) + (ev && ev.produced_by === 'hand' ? ' <span class="hand" title="A person or agent ran this by hand, not a script.">by hand</span>' : '') + '</span>' +
+        '<span class="evs">' + (again ? '<span class="again">Same check as above.</span>' : sum) + '</span></summary>' +
         '<div class="evb">' +
+          (again && sum ? '<p class="evs">' + sum + '</p>' : '') +
           (ev && ev.command ? '<div class="cmd"><code>' + esc(ev.command) + '</code></div>' : '') +
-          (ev ? '<pre class="evjson">' + evDetails(ev) + '</pre>' : '') +
+          (ev ? '<details class="rawout"><summary>Show raw output</summary><pre class="evjson">' + evDetails(ev) + '</pre></details>' : '') +
           '<a class="raw" href="../' + esc(ref) + '" target="_blank" rel="noopener">' + esc(ref) + ' ↗</a>' +
         '</div></details>';
     });
     if (c.requirement) {
       var rt = (d._requirements || {})[c.requirement];
-      out += '<div class="req"><span class="rid">' + esc(c.requirement) + (c.requirement_inferred ? ' <span class="inf">inferred</span>' : '') + '</span>' +
-        (rt ? '<span class="rt">' + rich(rt) + '</span>' : '') + '</div>';
+      out += '<div class="req"><span class="rid" title="' + esc(c.requirement) + '">Requirement' + (c.requirement_inferred ? ' <span class="inf" title="Our reading of the issue, not its text">· our reading</span>' : '') + '</span>' +
+        '<span class="rt">' + (rt ? rich(rt) : esc(c.requirement)) + '</span></div>';
     }
     if ((c.diff_parts || []).length) out += sourceBlock(d, c.diff_parts);
     return out ? '<div class="ev">' + out + '</div>' : '';
   }
 
-  function ownerRow(d, c) {
+  function ownerRow(d, c, seen) {
     var pick = state.picks[c.id];
     var name = 'pick-' + c.id;
     return '<article class="own c-' + lc(c.tier) + (pick ? ' picked' : '') + '" id="row-' + esc(c.id) + '" data-id="' + esc(c.id) + '" tabindex="-1">' +
       '<div class="own-h"><span class="tg">' + GLYPH[c.tier] + ' ' + esc(c.tier.toUpperCase()) + '</span><span class="id">' + esc(c.id) + '</span>' +
-        (c.owner_role ? '<span class="role">' + esc(c.owner_role) + '</span>' : '') + '</div>' +
+        (c.owner_role ? '<span class="role" title="Who should decide this claim">For: ' + esc(c.owner_role) + '</span>' : '') + '</div>' +
       '<p class="claim-t">' + rich(c.claim) + '</p>' +
       (c.why_this_tier ? '<p class="why">' + rich(c.why_this_tier) + '</p>' : '') +
-      evidenceBlock(d, c) +
+      evidenceBlock(d, c, seen) +
       '<fieldset class="keys"><legend>' + esc(c.id) + '</legend>' +
         PICKS.map(function (p) {
           var id = name + '-' + p.cls;
@@ -230,10 +257,12 @@
     '</details>';
   }
 
-  function list(title, items, fmt, hot) {
+  function list(title, gloss, items, fmt, hot, emptyText) {
     items = Array.isArray(items) ? items : [];
-    return '<section class="lst' + (hot && items.length ? ' hot' : '') + '"><h4><span class="inv">' + title + '</span><span class="k">' + items.length + '</span></h4><ul>' +
-      (items.length ? items.map(function (x) { return '<li>' + fmt(x) + '</li>'; }).join('') : '<li class="none"></li>') + '</ul></section>';
+    if (!items.length && !emptyText) return '';
+    return '<section class="lst' + (hot && items.length ? ' hot' : '') + '"><h4><span class="inv">' + title + '</span><span class="k">' + items.length + '</span></h4>' +
+      '<p class="gloss">' + esc(items.length ? gloss : emptyText) + '</p>' +
+      (items.length ? '<ul>' + items.map(function (x) { return '<li>' + fmt(x) + '</li>'; }).join('') + '</ul>' : '') + '</section>';
   }
 
   function renderDossier(key) {
@@ -263,9 +292,11 @@
           '<span class="n' + (n[t] ? '' : ' zero') + '">' + n[t] + '</span>' +
           '<span class="nm"><span aria-hidden="true">' + GLYPH[t] + '</span> ' + t + '</span>' +
           '<span class="bar"><b style="--p:' + (100 * n[t] / total).toFixed(1) + '%"></b></span>' +
+          '<span class="gl">' + esc(DEF[t].short) + '</span>' +
         '</button>';
     }).join('');
 
+    var seen = {};
     var leds = human.map(function (c) { return '<span class="led" data-led="' + esc(c.id) + '"></span>'; }).join('');
 
     app.innerHTML =
@@ -273,23 +304,25 @@
         '<aside class="side">' +
           '<div class="issue-no">' + issueNo + '</div>' +
           '<h1 class="issue-title">' + esc(d.title || d.branch) + '</h1>' +
+          (d.summary ? '<div class="changed"><h2>What the AI changed</h2><p>' + rich(d.summary) + '</p></div>' : '') +
           '<dl class="meta">' +
             '<dt>branch</dt><dd>' + esc(d.branch) + '</dd>' +
-            '<dt>head</dt><dd>' + (d._source && d._source.compare ? '<a href="' + esc(d._source.compare) + '" target="_blank" rel="noopener">' + esc(d.base || '?') + ' → ' + esc(d.head || '?') + ' ↗</a>' : esc(d.base || '?') + ' → ' + esc(d.head || '?')) + '</dd>' +
-            (diff.files != null ? '<dt>diff</dt><dd>' + esc(diff.files) + ' files <span class="add">+' + esc(diff.insertions) + '</span> <span class="del">−' + esc(diff.deletions) + '</span></dd>' : '') +
+            '<dt>commits</dt><dd>' + (d._source && d._source.compare ? '<a href="' + esc(d._source.compare) + '" target="_blank" rel="noopener">' + esc(d.base || '?') + ' → ' + esc(d.head || '?') + ' ↗</a>' : esc(d.base || '?') + ' → ' + esc(d.head || '?')) + '</dd>' +
+            (diff.files != null ? '<dt>changed</dt><dd>' + esc(diff.files) + ' files <span class="add">+' + esc(diff.insertions) + '</span> <span class="del">−' + esc(diff.deletions) + '</span></dd>' : '') +
           '</dl>' +
           '<div class="printer-zone" id="pzone">' +
             '<div class="feed" id="feed"></div>' +
             '<form class="printer" id="printer" autocomplete="off">' +
               '<span class="stub" id="stub" aria-hidden="true"></span>' +
-              '<div class="p-top"><div class="p-leds" aria-hidden="true">' + leds + '</div><div id="slip-tools"></div></div>' +
+              '<div class="p-top"><h2 class="p-h">Sign the receipt</h2><div class="p-leds" aria-hidden="true">' + leds + '</div><div id="slip-tools"></div></div>' +
+              '<p class="p-sub">Signing records your decisions, what machines settled and what nobody checked, for commit ' + esc(d.head || '') + '.</p>' +
               '<div class="p-row">' +
-                '<label class="sr" for="signer">Signed by</label>' +
-                '<input class="sigfield" id="signer" name="signer" placeholder="your name" maxlength="80" spellcheck="false">' +
+                '<label class="sr" for="signer">Your name</label>' +
+                '<input class="sigfield" id="signer" name="signer" placeholder="Your name" maxlength="80" spellcheck="false">' +
                 '<button class="btn" id="sign" type="submit">Sign</button>' +
               '</div>' +
               '<span class="mouth" aria-hidden="true"></span>' +
-              '<p class="sr" id="sign-status" aria-live="polite"></p>' +
+              '<p class="p-status" id="sign-status" aria-live="polite"></p>' +
             '</form>' +
           '</div>' +
         '</aside>' +
@@ -300,18 +333,20 @@
               '<div class="t-top"><span class="inv">' + esc(d.branch) + '</span><span id="sigstate" class="dim">' + esc(d.head || '') + '</span></div>' +
               '<div class="tiers">' + tiers + '</div>' +
               (human.length ?
-                '<div class="sec-h"><span class="inv" style="background:var(--t-argued)">DECIDE</span><span class="rule"></span><span id="pickcount"></span></div>' +
-                human.map(function (c) { return ownerRow(d, c); }).join('') : '') +
+                '<div class="sec-h"><span class="inv" style="background:var(--t-argued)">YOUR CALL</span><span class="rule"></span><span id="pickcount"></span></div>' +
+                '<p class="sec-g">No machine can settle these. Read the evidence, then accept, reject, or send the claim back to the AI to rework. PASS or FAIL is each check\u2019s own outcome, not a verdict on the claim.</p>' +
+                human.map(function (c) { return ownerRow(d, c, seen); }).join('') : '') +
               (machine.length ?
                 '<div class="sec-h"><span class="inv">SETTLED</span><span class="rule"></span><span class="dim">' + machine.length + '</span></div>' +
+                '<p class="sec-g">A machine check graded these. Open one to see its evidence.</p>' +
                 '<div>' + machine.map(function (c) { return machineRow(d, c); }).join('') + '</div>' : '') +
               '<div class="sec-h"><span class="inv">LEDGER</span><span class="rule"></span></div>' +
               '<div class="lists">' +
-                list('NOT CHECKED', d.not_checked, rich, true) +
-                list('NO CLAIM', d.uncovered_diff_parts, function (p) { return '<code>' + esc(p) + '</code>'; }, true) +
-                list('FOUND', d.found, rich) +
-                list('REFUSED', d.refused, function (r) { return r && typeof r === 'object' ? '<b>' + rich(r.what) + '</b> — ' + rich(r.why) : rich(r); }) +
-                list('SCOPE DRIFT', d.scope_drift, rich, true) +
+                list('NOT CHECKED', 'What we did not verify.', d.not_checked, rich, true) +
+                list('NO CLAIM', 'Changed code that no claim covers.', d.uncovered_diff_parts, function (p) { return '<code>' + esc(p) + '</code>'; }, true, 'Every changed line is covered by a claim.') +
+                list('FOUND', 'What the reviewer found.', d.found, rich) +
+                list('REFUSED', 'Why some claims are left to a person.', d.refused, function (r) { return r && typeof r === 'object' ? '<b>' + rich(r.what) + '</b> — ' + rich(r.why) : rich(r); }) +
+                list('SCOPE DRIFT', 'Changes the issue did not ask for.', d.scope_drift, rich, true) +
               '</div>' +
               '<div class="prompt" id="prompt"></div>' +
             '</div>' +
@@ -376,16 +411,21 @@
       btn.setAttribute('aria-describedby', 'sign-status');
     }
     var pc = document.getElementById('pickcount');
-    if (pc) pc.innerHTML = '<span style="color:' + (picked === human.length ? 'var(--ph)' : 'var(--t-argued)') + '">' + picked + '/' + human.length + '</span>';
+    if (pc) pc.innerHTML = '<span style="color:' + (picked === human.length ? 'var(--ph)' : 'var(--t-argued)') + '">' + picked + ' of ' + human.length + ' decided</span>';
     var st = document.getElementById('sign-status');
-    if (st) st.textContent = picked < human.length ? (human.length - picked) + ' still to pick' : (!ready ? 'type your name' : 'ready to sign');
+    if (st && !state.receipt) st.textContent = picked < human.length ? 'Decide all ' + human.length + ' claims to sign (' + (human.length - picked) + ' left).' : (!ready ? 'Type your name to sign.' : 'Ready to sign.');
+    if (st && state.receipt && !state.justSigned) st.textContent = 'Signed by ' + state.receipt.signed_by + '.';
+    var ph = app.querySelector('.p-h');
+    if (ph) ph.textContent = state.receipt ? 'Receipt' : 'Sign the receipt';
+    var psub = app.querySelector('.p-sub');
+    if (psub) psub.hidden = !!state.receipt;
     var ss = document.getElementById('sigstate');
     if (ss && state.receipt) { ss.className = 'state-signed'; ss.textContent = '✎ SIGNED · ' + state.receipt.signed_by; }
     var pr = document.getElementById('prompt');
     if (pr) {
       pr.innerHTML = state.justSigned || state.receipt
         ? '&gt; SIGNED <span class="dim">' + esc(state.receipt.signed_by) + ' · ' + esc(state.receipt.signed_at) + '</span>'
-        : picked < human.length ? '&gt; ' + (human.length - picked) + ' TO PICK <span class="cursor"></span>'
+        : picked < human.length ? '&gt; ' + (human.length - picked) + ' TO DECIDE <span class="cursor"></span>'
         : '&gt; ◂ SIGN <span class="cursor"></span>';
     }
   }
@@ -436,11 +476,11 @@
             '<div class="cl">' + esc(p.claim) + '</div>';
         }).join('') +
         '<hr class="rule">' +
-        (auto.length ? '<div class="auto"><span class="sub">AUTO</span>' + auto.map(function (a) {
+        (auto.length ? '<div class="sub">SETTLED BY MACHINE</div><div class="auto">' + auto.map(function (a) {
           return '<span title="' + esc(a.tier) + '">' + (GLYPH[a.tier] || '') + ' ' + esc(a.id) + '</span>';
         }).join('') + '</div><hr class="rule">' : '') +
         ((r.not_checked || []).length ? '<div class="sub">NOT CHECKED</div><ul>' + r.not_checked.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '') +
-        ((r.uncovered_diff_parts || []).length ? '<div class="sub" style="margin-top:6px">NO CLAIM</div><ul class="paths">' + r.uncovered_diff_parts.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '') +
+        ((r.uncovered_diff_parts || []).length ? '<div class="sub" style="margin-top:6px">UNCOVERED CODE</div><ul class="paths">' + r.uncovered_diff_parts.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '') +
         '<hr class="rule">' +
         '<div class="sig"><span class="sub">SIGNED</span><span class="who">' + esc(r.signed_by) + '</span>' +
         '<span class="sub">AT</span><span>' + esc(r.signed_at.replace('T', ' ').replace(/Z$/, ' UTC')) + '</span></div>' +
@@ -472,6 +512,9 @@
     if (!z || !pr) return;
     var y = z.getBoundingClientRect().bottom - pr.getBoundingClientRect().top - 14;
     z.style.setProperty('--slot-y', Math.round(y) + 'px');
+    /* the receipt grows up from the printer but stops below the issue title, which stays visible */
+    var t = document.querySelector('.side .issue-title');
+    if (t) z.style.setProperty('--feed-max', Math.max(160, Math.round(pr.getBoundingClientRect().top + 14 - t.getBoundingClientRect().bottom - 18)) + 'px');
   }
   window.addEventListener('resize', placeFeed);
 

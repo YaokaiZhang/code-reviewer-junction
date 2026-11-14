@@ -2,6 +2,7 @@
   "branch": "ju26-issue-2283",
   "issue": 2283,
   "title": "Generator and analyzer crash on a closed generic struct from a referenced assembly",
+  "summary": "The generator and analyzer crashed on a closed generic struct from another assembly, because they looked up source locations that such a type does not have. The AI made those lookups safe and added a filter in TypeCollector.cs that drops every analyzer diagnostic located outside this project's source. It added 3 tests, plus README and MsgPack004 notes saying the defining assembly reports such diagnostics.",
   "base": "32258fdb",
   "head": "9df83c38",
   "diff": {

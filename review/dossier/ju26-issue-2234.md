@@ -2,6 +2,8 @@
 
 `32258fdb..9007cee1` · 4 files +262 −4
 
+**What the AI changed:** The analyzer threw when a type's keys repeat or mix int and string. The AI changed TypeCollector.cs to keep the first member for each key and to skip a member of the wrong key kind once it is reported, so the analyzer reports MsgPack005 instead of crashing. It added analyzer tests, execution tests and a README section on opting out of source generation.
+
 | ■ Proved | ▲ Tested | ● Measured | ◆ Argued | ✕ Refused |
 |:-:|:-:|:-:|:-:|:-:|
 | · | 3 | 2 | 3 | 1 |

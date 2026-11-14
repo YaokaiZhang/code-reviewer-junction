@@ -27,6 +27,7 @@ Scripts take the path of a local clone of the target repo as `--repo` (or env `M
   "branch": "ju26-issue-2283",
   "issue": 2283,
   "title": "short title of the issue",
+  "summary": "what the AI changed, in two or three plain sentences",
   "base": "32258fdb",
   "head": "9df83c38",
   "diff": {"files": 4, "insertions": 225, "deletions": 3},
