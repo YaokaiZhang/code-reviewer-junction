@@ -114,10 +114,7 @@
 
     var caps = GROUPS.map(function (t, i) {
       return (i === 3 ? '<span class="gap"></span>' : '') +
-        '<div class="cap ' + t + '"><b aria-hidden="true">' + BAND[t].g + '</b><i>' + BAND[t].w + '</i></div>';
-    }).join('');
-    var defs = GROUPS.map(function (t) {
-      return '<dt class="bn-' + t + '"><span aria-hidden="true">' + BAND[t].g + '</span> ' + BAND[t].w + '</dt><dd>' + esc(BAND[t].long) + '</dd>';
+        '<div class="cap ' + t + '" title="' + esc(BAND[t].long) + '"><b aria-hidden="true">' + BAND[t].g + '</b><i>' + BAND[t].w + '</i><span class="sr">: ' + esc(BAND[t].long) + '</span></div>';
     }).join('');
     var real = ks.filter(function (k) { return !DATA[k].sample; }).length;
     var nIssues = (NUM[real] || String(real)) + ' issue' + (real === 1 ? '' : 's');
@@ -130,7 +127,6 @@
           '<div class="ladder">' + caps +
             '<span class="bracket machine">scored by evidence</span><span class="bracket owner">owner decides</span>' +
           '</div>' +
-          '<dl class="defs">' + defs + '</dl>' +
         '</div>' +
         '<div class="stage">' +
           '<div class="scene">' +
