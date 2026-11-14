@@ -498,9 +498,9 @@
           '<table class="p-vs"><thead><tr><th></th><th>New tests</th><th class="on">Old vs new</th></tr></thead><tbody>' +
             rowsT.map(function (r) { return '<tr><th>' + esc(r[0]) + '</th><td>' + esc(r[1]) + '</td><td class="on">' + esc(r[2]) + '</td></tr>'; }).join('') +
           '</tbody></table>' +
-          '<div class="p-next"><h4>Next</h4>' +
-            '<p><b>More inputs.</b> Vary existing types by machine: generics, nesting, partial classes, attributes. The hand-made probes that found #2283 and #2297, done every time.</p>' +
-            '<p><b>Which inputs ran the change.</b> “380 inputs never touch it, so they can’t break. 30 do, and here is how they differ.” No input runs a line? We say so.</p>' +
+          '<div class="p-next"><h4>The inputs</h4>' +
+            '<div class="p-nrow"><b class="n">18</b><p><b>Varied types.</b> Generics, nesting, a user’s own attribute. One break found in each fix.</p></div>' +
+            '<div class="p-nrow"><b class="n">4/5</b><p><b>Which inputs ran the change.</b> In #2234, 4 projects run the changed lines. The 5th never does, and its output matches.</p></div>' +
           '</div>' +
         '</div>' +
       '</div>' +
