@@ -8,7 +8,7 @@
   "provides": [
     "count"
   ],
-  "summary": "20 decisions explained in 58 steps; 58 of 58 steps match the cited code; 10 of 10 claims have a card",
+  "summary": "27 decisions explained in 74 steps; 74 of 74 steps match the cited code; 10 of 10 claims have a card; 7 of 7 readability flags have a card",
   "details": {
     "cards": [
       {
@@ -7638,6 +7638,1029 @@
                 61,
                 61,
                 "                return new DisposeAction(() =>"
+              ]
+            ],
+            "cut": 0
+          }
+        ],
+        "problems": [],
+        "verified": true
+      },
+      {
+        "id": "RD-2297-01",
+        "kind": "flag",
+        "title": "Three lines pasted into 9 places",
+        "steps": [
+          {
+            "op": "NOW",
+            "text": "the composite resolver template writes the target check and the mark (`#if !NETSTANDARD2_0 && !NETFRAMEWORK`, `ExcludeFromCodeCoverage`).",
+            "file": "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt",
+            "lines": [
+              7,
+              9
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          },
+          {
+            "op": "ALSO",
+            "text": "the resolver template repeats the same three lines for each class it writes (`#endif`).",
+            "file": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt",
+            "lines": [
+              31,
+              33
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          },
+          {
+            "op": "ALSO",
+            "text": "so does each formatter template (`ExcludeFromCodeCoverage`).",
+            "file": "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.tt",
+            "lines": [
+              10,
+              12
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          },
+          {
+            "op": "GIVEN",
+            "text": "the templates already call a shared helper for other repeated output (`TransformUtilities.EmitNestingTypesAndNamespaces`).",
+            "file": "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt",
+            "lines": [
+              5,
+              5
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          }
+        ],
+        "verdict": "The same three lines sit in 9 places across 6 templates. Changing the target check (see C-2297-08) means 9 matching edits; a shared helper would make it one.",
+        "because": [
+          {
+            "text": "The tool found this added three-line block 9 times across the templates.",
+            "evidence": "evidence/ju26-issue-2297/readability.json",
+            "result": "pass",
+            "summary": "7 flags (H-07 6, H-20 1); 4 touched methods measured; 2 test methods added in 1 test files; 2 of 10 claims have flip/revert-test support",
+            "produced_by": "script",
+            "check": "readability"
+          }
+        ],
+        "unsure": "Whether a helper is worth it for three lines is a style call for the owner.",
+        "code": [
+          {
+            "file": "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt",
+            "rows": [
+              [
+                " ",
+                4,
+                4,
+                ""
+              ],
+              [
+                " ",
+                5,
+                5,
+                "<# using (TransformUtilities.EmitNestingTypesAndNamespaces(this.ResolverName, this.Write)) { #>"
+              ],
+              [
+                " ",
+                6,
+                6,
+                ""
+              ],
+              [
+                "+",
+                null,
+                7,
+                "#if !NETSTANDARD2_0 && !NETFRAMEWORK"
+              ],
+              [
+                "+",
+                null,
+                8,
+                "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]"
+              ],
+              [
+                "+",
+                null,
+                9,
+                "#endif"
+              ],
+              [
+                " ",
+                7,
+                10,
+                "partial class <#= ResolverName.Name #> : MsgPack::IFormatterResolver"
+              ],
+              [
+                " ",
+                8,
+                11,
+                "{"
+              ],
+              [
+                " ",
+                9,
+                12,
+                "\tpublic static readonly <#= ResolverName.Name #> Instance = new <#= ResolverName.Name #>();"
+              ]
+            ],
+            "cut": 0
+          },
+          {
+            "file": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt",
+            "rows": [
+              [
+                " ",
+                25,
+                28,
+                "\t\treturn FormatterCache<T>.Formatter;"
+              ],
+              [
+                " ",
+                26,
+                29,
+                "\t}"
+              ],
+              [
+                " ",
+                27,
+                30,
+                ""
+              ],
+              [
+                "+",
+                null,
+                31,
+                "#if !NETSTANDARD2_0 && !NETFRAMEWORK"
+              ],
+              [
+                "+",
+                null,
+                32,
+                "\t[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]"
+              ],
+              [
+                "+",
+                null,
+                33,
+                "#endif"
+              ],
+              [
+                " ",
+                28,
+                34,
+                "\tprivate static class FormatterCache<T>"
+              ],
+              [
+                " ",
+                29,
+                35,
+                "\t{"
+              ],
+              [
+                " ",
+                30,
+                36,
+                "\t\tinternal static readonly MsgPack::Formatters.IMessagePackFormatter<T> Formatter;"
+              ]
+            ],
+            "cut": 0
+          },
+          {
+            "file": "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.tt",
+            "rows": [
+              [
+                " ",
+                7,
+                7,
+                "using MsgPack = global::MessagePack;"
+              ],
+              [
+                " ",
+                8,
+                8,
+                ""
+              ],
+              [
+                " ",
+                9,
+                9,
+                "<# using (this.EmitNestingTypesAndNamespaces(this.Write)) { #>"
+              ],
+              [
+                "+",
+                null,
+                10,
+                "#if !NETSTANDARD2_0 && !NETFRAMEWORK"
+              ],
+              [
+                "+",
+                null,
+                11,
+                "\t[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]"
+              ],
+              [
+                "+",
+                null,
+                12,
+                "#endif"
+              ],
+              [
+                " ",
+                10,
+                13,
+                "\tinternal sealed class <#= Info.Formatter.GetQualifiedName(Qualifiers.None) #>: MsgPack::Formatters.IMessagePackFormatter<<#= Info.DataType.GetQualifiedName() #>>"
+              ],
+              [
+                " ",
+                11,
+                14,
+                "\t{"
+              ],
+              [
+                " ",
+                12,
+                15,
+                "\t\tprivate readonly global::System.Collections.Generic.Dictionary<global::System.RuntimeTypeHandle, global::System.Collections.Generic.KeyValuePair<int, int>> typeToKeyAndJumpMap;"
+              ]
+            ],
+            "cut": 0
+          }
+        ],
+        "problems": [],
+        "verified": true
+      },
+      {
+        "id": "RD-2297-02",
+        "kind": "flag",
+        "title": "Target logic in CompositeResolverTemplate.tt",
+        "steps": [
+          {
+            "op": "NOW",
+            "text": "the template now writes a target check into every generated file (`#if !NETSTANDARD2_0 && !NETFRAMEWORK`).",
+            "file": "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt",
+            "lines": [
+              7,
+              7
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          },
+          {
+            "op": "ALSO",
+            "text": "it does so 2 times in this template, once per class (`#endif`).",
+            "file": "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt",
+            "lines": [
+              37,
+              37
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          }
+        ],
+        "verdict": "The template now makes a decision about targets, and passes it into users' generated code. Rule H-07 asks to keep logic out of templates. The logic is small, but its reason is disputed (see C-2297-08).",
+        "because": [
+          {
+            "text": "The tool counts the #if and #endif lines this template writes: 0 before, 4 after.",
+            "evidence": "evidence/ju26-issue-2297/readability.json",
+            "result": "pass",
+            "summary": "7 flags (H-07 6, H-20 1); 4 touched methods measured; 2 test methods added in 1 test files; 2 of 10 claims have flip/revert-test support",
+            "produced_by": "script",
+            "check": "readability"
+          }
+        ],
+        "code": [
+          {
+            "file": "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt",
+            "rows": [
+              [
+                " ",
+                4,
+                4,
+                ""
+              ],
+              [
+                " ",
+                5,
+                5,
+                "<# using (TransformUtilities.EmitNestingTypesAndNamespaces(this.ResolverName, this.Write)) { #>"
+              ],
+              [
+                " ",
+                6,
+                6,
+                ""
+              ],
+              [
+                "+",
+                null,
+                7,
+                "#if !NETSTANDARD2_0 && !NETFRAMEWORK"
+              ],
+              [
+                "+",
+                null,
+                8,
+                "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]"
+              ],
+              [
+                "+",
+                null,
+                9,
+                "#endif"
+              ],
+              [
+                " ",
+                7,
+                10,
+                "partial class <#= ResolverName.Name #> : MsgPack::IFormatterResolver"
+              ],
+              [
+                " ",
+                8,
+                11,
+                "{"
+              ],
+              [
+                " ",
+                9,
+                12,
+                "\tpublic static readonly <#= ResolverName.Name #> Instance = new <#= ResolverName.Name #>();"
+              ],
+              [
+                "gap",
+                null,
+                null,
+                ""
+              ],
+              [
+                " ",
+                29,
+                32,
+                "\t\treturn FormatterCache<T>.Formatter;"
+              ],
+              [
+                " ",
+                30,
+                33,
+                "\t}"
+              ],
+              [
+                " ",
+                31,
+                34,
+                ""
+              ],
+              [
+                "+",
+                null,
+                35,
+                "#if !NETSTANDARD2_0 && !NETFRAMEWORK"
+              ],
+              [
+                "+",
+                null,
+                36,
+                "\t[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]"
+              ],
+              [
+                "+",
+                null,
+                37,
+                "#endif"
+              ],
+              [
+                " ",
+                32,
+                38,
+                "\tstatic class FormatterCache<T>"
+              ],
+              [
+                " ",
+                33,
+                39,
+                "\t{"
+              ],
+              [
+                " ",
+                34,
+                40,
+                "\t\tinternal static readonly MsgPack::Formatters.IMessagePackFormatter<T> Formatter;"
+              ]
+            ],
+            "cut": 0
+          }
+        ],
+        "problems": [],
+        "verified": true
+      },
+      {
+        "id": "RD-2297-03",
+        "kind": "flag",
+        "title": "Target logic in EnumTemplate.tt",
+        "steps": [
+          {
+            "op": "NOW",
+            "text": "the template now writes a target check into every generated file (`#if !NETSTANDARD2_0 && !NETFRAMEWORK`).",
+            "file": "src/MessagePack.SourceGenerator/Transforms/EnumTemplate.tt",
+            "lines": [
+              8,
+              8
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          },
+          {
+            "op": "SO",
+            "text": "on older targets the mark between the lines is left out (`#endif`).",
+            "file": "src/MessagePack.SourceGenerator/Transforms/EnumTemplate.tt",
+            "lines": [
+              10,
+              10
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          }
+        ],
+        "verdict": "The template now makes a decision about targets, and passes it into users' generated code. Rule H-07 asks to keep logic out of templates. The logic is small, but its reason is disputed (see C-2297-08).",
+        "because": [
+          {
+            "text": "The tool counts the #if and #endif lines this template writes: 0 before, 2 after.",
+            "evidence": "evidence/ju26-issue-2297/readability.json",
+            "result": "pass",
+            "summary": "7 flags (H-07 6, H-20 1); 4 touched methods measured; 2 test methods added in 1 test files; 2 of 10 claims have flip/revert-test support",
+            "produced_by": "script",
+            "check": "readability"
+          }
+        ],
+        "code": [
+          {
+            "file": "src/MessagePack.SourceGenerator/Transforms/EnumTemplate.tt",
+            "rows": [
+              [
+                " ",
+                5,
+                5,
+                ""
+              ],
+              [
+                " ",
+                6,
+                6,
+                "<# using (this.EmitNestingTypesAndNamespaces(this.Write)) { #>"
+              ],
+              [
+                " ",
+                7,
+                7,
+                ""
+              ],
+              [
+                "+",
+                null,
+                8,
+                "#if !NETSTANDARD2_0 && !NETFRAMEWORK"
+              ],
+              [
+                "+",
+                null,
+                9,
+                "\t[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]"
+              ],
+              [
+                "+",
+                null,
+                10,
+                "#endif"
+              ],
+              [
+                " ",
+                8,
+                11,
+                "\tinternal sealed class <#= Info.Formatter.Name #> : MsgPack::Formatters.IMessagePackFormatter<<#= Info.DataType.GetQualifiedName() #>>"
+              ],
+              [
+                " ",
+                9,
+                12,
+                "\t{"
+              ],
+              [
+                " ",
+                10,
+                13,
+                "\t\tpublic void Serialize(ref MsgPack::MessagePackWriter writer, <#= Info.DataType.GetQualifiedName() #> value, MsgPack::MessagePackSerializerOptions options)"
+              ]
+            ],
+            "cut": 0
+          }
+        ],
+        "problems": [],
+        "verified": true
+      },
+      {
+        "id": "RD-2297-04",
+        "kind": "flag",
+        "title": "Target logic in FormatterTemplate.tt",
+        "steps": [
+          {
+            "op": "NOW",
+            "text": "the template now writes a target check into every generated file (`#if !NETSTANDARD2_0 && !NETFRAMEWORK`).",
+            "file": "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.tt",
+            "lines": [
+              14,
+              14
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          },
+          {
+            "op": "SO",
+            "text": "on older targets the mark between the lines is left out (`#endif`).",
+            "file": "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.tt",
+            "lines": [
+              16,
+              16
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          }
+        ],
+        "verdict": "The template now makes a decision about targets, and passes it into users' generated code. Rule H-07 asks to keep logic out of templates. The logic is small, but its reason is disputed (see C-2297-08).",
+        "because": [
+          {
+            "text": "The tool counts the #if and #endif lines this template writes: 0 before, 2 after.",
+            "evidence": "evidence/ju26-issue-2297/readability.json",
+            "result": "pass",
+            "summary": "7 flags (H-07 6, H-20 1); 4 touched methods measured; 2 test methods added in 1 test files; 2 of 10 claims have flip/revert-test support",
+            "produced_by": "script",
+            "check": "readability"
+          }
+        ],
+        "code": [
+          {
+            "file": "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.tt",
+            "rows": [
+              [
+                " ",
+                11,
+                11,
+                "<# using (this.EmitNestingTypesAndNamespaces(this.Write)) { #>"
+              ],
+              [
+                " ",
+                12,
+                12,
+                ""
+              ],
+              [
+                " ",
+                13,
+                13,
+                "<#  bool isFormatterResolverNecessary = GeneratorUtilities.ShouldUseFormatterResolver(Info.Members);#>"
+              ],
+              [
+                "+",
+                null,
+                14,
+                "#if !NETSTANDARD2_0 && !NETFRAMEWORK"
+              ],
+              [
+                "+",
+                null,
+                15,
+                "\t[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]"
+              ],
+              [
+                "+",
+                null,
+                16,
+                "#endif"
+              ],
+              [
+                " ",
+                14,
+                17,
+                "\tinternal sealed class <#= Info.Formatter.GetQualifiedName(Qualifiers.None) #> : MsgPack::Formatters.IMessagePackFormatter<<#= Info.DataType.GetQualifiedName(genericStyle: GenericParameterStyle.Identifiers) #>>"
+              ],
+              [
+                " ",
+                15,
+                18,
+                "<# TransformUtilities.EmitTypeConstraints(Info.Formatter, this.Write); #>"
+              ],
+              [
+                " ",
+                16,
+                19,
+                "\t{"
+              ]
+            ],
+            "cut": 0
+          }
+        ],
+        "problems": [],
+        "verified": true
+      },
+      {
+        "id": "RD-2297-05",
+        "kind": "flag",
+        "title": "Target logic in ResolverTemplate.tt",
+        "steps": [
+          {
+            "op": "NOW",
+            "text": "the template now writes a target check into every generated file (`#if !NETSTANDARD2_0 && !NETFRAMEWORK`).",
+            "file": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt",
+            "lines": [
+              14,
+              14
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          },
+          {
+            "op": "ALSO",
+            "text": "it does so 3 times in this template, once per class (`#endif`).",
+            "file": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt",
+            "lines": [
+              50,
+              50
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          }
+        ],
+        "verdict": "The template now makes a decision about targets, and passes it into users' generated code. Rule H-07 asks to keep logic out of templates. The logic is small, but its reason is disputed (see C-2297-08).",
+        "because": [
+          {
+            "text": "The tool counts the #if and #endif lines this template writes: 0 before, 6 after.",
+            "evidence": "evidence/ju26-issue-2297/readability.json",
+            "result": "pass",
+            "summary": "7 flags (H-07 6, H-20 1); 4 touched methods measured; 2 test methods added in 1 test files; 2 of 10 claims have flip/revert-test support",
+            "produced_by": "script",
+            "check": "readability"
+          }
+        ],
+        "code": [
+          {
+            "file": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt",
+            "rows": [
+              [
+                " ",
+                11,
+                11,
+                "<# using (TransformUtilities.EmitNestingTypesAndNamespaces(this.ResolverName, this.Write)) { #>"
+              ],
+              [
+                " ",
+                12,
+                12,
+                ""
+              ],
+              [
+                " ",
+                13,
+                13,
+                "/// <summary>A MessagePack resolver that uses generated formatters for types in this assembly.</summary>"
+              ],
+              [
+                "+",
+                null,
+                14,
+                "#if !NETSTANDARD2_0 && !NETFRAMEWORK"
+              ],
+              [
+                "+",
+                null,
+                15,
+                "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]"
+              ],
+              [
+                "+",
+                null,
+                16,
+                "#endif"
+              ],
+              [
+                " ",
+                14,
+                17,
+                "partial class <#= ResolverName.Name #> : MsgPack::IFormatterResolver"
+              ],
+              [
+                " ",
+                15,
+                18,
+                "{"
+              ],
+              [
+                " ",
+                16,
+                19,
+                "\t/// <summary>An instance of this resolver that only returns formatters specifically generated for types in this assembly.</summary>"
+              ],
+              [
+                "gap",
+                null,
+                null,
+                ""
+              ],
+              [
+                " ",
+                39,
+                45,
+                "\t\t}"
+              ],
+              [
+                " ",
+                40,
+                46,
+                "\t}"
+              ],
+              [
+                " ",
+                41,
+                47,
+                ""
+              ],
+              [
+                "+",
+                null,
+                48,
+                "#if !NETSTANDARD2_0 && !NETFRAMEWORK"
+              ],
+              [
+                "+",
+                null,
+                49,
+                "\t[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]"
+              ],
+              [
+                "+",
+                null,
+                50,
+                "#endif"
+              ],
+              [
+                " ",
+                42,
+                51,
+                "\tprivate static class <#= ResolverName.Name #>GetFormatterHelper"
+              ],
+              [
+                " ",
+                43,
+                52,
+                "\t{"
+              ],
+              [
+                " ",
+                44,
+                53,
+                "<#"
+              ]
+            ],
+            "cut": 0
+          }
+        ],
+        "problems": [],
+        "verified": true
+      },
+      {
+        "id": "RD-2297-06",
+        "kind": "flag",
+        "title": "Target logic in StringKeyFormatterTemplate.tt",
+        "steps": [
+          {
+            "op": "NOW",
+            "text": "the template now writes a target check into every generated file (`#if !NETSTANDARD2_0 && !NETFRAMEWORK`).",
+            "file": "src/MessagePack.SourceGenerator/Transforms/StringKey/StringKeyFormatterTemplate.tt",
+            "lines": [
+              18,
+              18
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          },
+          {
+            "op": "SO",
+            "text": "on older targets the mark between the lines is left out (`#endif`).",
+            "file": "src/MessagePack.SourceGenerator/Transforms/StringKey/StringKeyFormatterTemplate.tt",
+            "lines": [
+              20,
+              20
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          }
+        ],
+        "verdict": "The template now makes a decision about targets, and passes it into users' generated code. Rule H-07 asks to keep logic out of templates. The logic is small, but its reason is disputed (see C-2297-08).",
+        "because": [
+          {
+            "text": "The tool counts the #if and #endif lines this template writes: 0 before, 2 after.",
+            "evidence": "evidence/ju26-issue-2297/readability.json",
+            "result": "pass",
+            "summary": "7 flags (H-07 6, H-20 1); 4 touched methods measured; 2 test methods added in 1 test files; 2 of 10 claims have flip/revert-test support",
+            "produced_by": "script",
+            "check": "readability"
+          }
+        ],
+        "code": [
+          {
+            "file": "src/MessagePack.SourceGenerator/Transforms/StringKey/StringKeyFormatterTemplate.tt",
+            "rows": [
+              [
+                " ",
+                15,
+                15,
+                ""
+              ],
+              [
+                " ",
+                16,
+                16,
+                "\tbool isFormatterResolverNecessary = GeneratorUtilities.ShouldUseFormatterResolver(Info.Members); #>"
+              ],
+              [
+                " ",
+                17,
+                17,
+                "<# using (this.EmitNestingTypesAndNamespaces(this.Write)) { #>"
+              ],
+              [
+                "+",
+                null,
+                18,
+                "#if !NETSTANDARD2_0 && !NETFRAMEWORK"
+              ],
+              [
+                "+",
+                null,
+                19,
+                "\t[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]"
+              ],
+              [
+                "+",
+                null,
+                20,
+                "#endif"
+              ],
+              [
+                " ",
+                18,
+                21,
+                "\tinternal sealed class <#= Info.Formatter.GetQualifiedName(Qualifiers.None) #> : global::MessagePack.Formatters.IMessagePackFormatter<<#= Info.DataType.GetQualifiedName() #>>"
+              ],
+              [
+                " ",
+                19,
+                22,
+                "<# TransformUtilities.EmitTypeConstraints(Info.Formatter, this.Write); #>"
+              ],
+              [
+                " ",
+                20,
+                23,
+                "\t{"
+              ]
+            ],
+            "cut": 0
+          }
+        ],
+        "problems": [],
+        "verified": true
+      },
+      {
+        "id": "RD-2297-07",
+        "kind": "flag",
+        "title": "Target logic in UnionTemplate.tt",
+        "steps": [
+          {
+            "op": "NOW",
+            "text": "the template now writes a target check into every generated file (`#if !NETSTANDARD2_0 && !NETFRAMEWORK`).",
+            "file": "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.tt",
+            "lines": [
+              10,
+              10
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          },
+          {
+            "op": "SO",
+            "text": "on older targets the mark between the lines is left out (`#endif`).",
+            "file": "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.tt",
+            "lines": [
+              12,
+              12
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          }
+        ],
+        "verdict": "The template now makes a decision about targets, and passes it into users' generated code. Rule H-07 asks to keep logic out of templates. The logic is small, but its reason is disputed (see C-2297-08).",
+        "because": [
+          {
+            "text": "The tool counts the #if and #endif lines this template writes: 0 before, 2 after.",
+            "evidence": "evidence/ju26-issue-2297/readability.json",
+            "result": "pass",
+            "summary": "7 flags (H-07 6, H-20 1); 4 touched methods measured; 2 test methods added in 1 test files; 2 of 10 claims have flip/revert-test support",
+            "produced_by": "script",
+            "check": "readability"
+          }
+        ],
+        "code": [
+          {
+            "file": "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.tt",
+            "rows": [
+              [
+                " ",
+                7,
+                7,
+                "using MsgPack = global::MessagePack;"
+              ],
+              [
+                " ",
+                8,
+                8,
+                ""
+              ],
+              [
+                " ",
+                9,
+                9,
+                "<# using (this.EmitNestingTypesAndNamespaces(this.Write)) { #>"
+              ],
+              [
+                "+",
+                null,
+                10,
+                "#if !NETSTANDARD2_0 && !NETFRAMEWORK"
+              ],
+              [
+                "+",
+                null,
+                11,
+                "\t[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]"
+              ],
+              [
+                "+",
+                null,
+                12,
+                "#endif"
+              ],
+              [
+                " ",
+                10,
+                13,
+                "\tinternal sealed class <#= Info.Formatter.GetQualifiedName(Qualifiers.None) #>: MsgPack::Formatters.IMessagePackFormatter<<#= Info.DataType.GetQualifiedName() #>>"
+              ],
+              [
+                " ",
+                11,
+                14,
+                "\t{"
+              ],
+              [
+                " ",
+                12,
+                15,
+                "\t\tprivate readonly global::System.Collections.Generic.Dictionary<global::System.RuntimeTypeHandle, global::System.Collections.Generic.KeyValuePair<int, int>> typeToKeyAndJumpMap;"
               ]
             ],
             "cut": 0

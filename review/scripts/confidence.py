@@ -110,7 +110,7 @@ def score_branch(branch, project, history, errors):
     rp = os.path.join(REVIEW, f"evidence/{branch}/replay.json")
     replay = json.load(open(rp))["details"]["files"] if os.path.exists(rp) else {}
     maint = {c["id"]: c["maintainers"] for c in project["contracts"]}
-    rules = (history or {}).get("rules", [])
+    rules = [r for r in (history or {}).get("rules", []) if not r.get("off")]  # a person can turn a rule off
     ev_cache = {}
 
     def ev(path):

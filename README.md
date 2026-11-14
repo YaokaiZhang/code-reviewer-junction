@@ -42,6 +42,8 @@ npm run dev
 
 Opens the owner view at http://localhost:5173/web/. No other setup needed. Another port: `npm run dev -- --port 3001` (or `PORT=3001 npm run dev`).
 
+The learned maintainer rules are at http://localhost:5173/web/#/rules. Reword a rule, change its concern, turn it off or add one, then Save: the dev server writes `review/context/history.json`, records your name on each changed rule, and re-scores the dossiers.
+
 To reproduce the evidence:
 
 ```bash

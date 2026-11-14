@@ -8,7 +8,7 @@
   "provides": [
     "count"
   ],
-  "summary": "17 decisions explained in 60 steps; 60 of 60 steps match the cited code; 9 of 9 claims have a card",
+  "summary": "21 decisions explained in 70 steps; 70 of 70 steps match the cited code; 9 of 9 claims have a card; 4 of 4 readability flags have a card",
   "details": {
     "cards": [
       {
@@ -5169,6 +5169,1127 @@
                 1622,
                 1636,
                 "You can customize the generated source through properties on the `GeneratedMessagePackResolverAttribute`."
+              ]
+            ],
+            "cut": 0
+          }
+        ],
+        "problems": [],
+        "verified": true
+      },
+      {
+        "id": "RD-2234-01",
+        "kind": "flag",
+        "title": "The fix is made twice, in two copied loops",
+        "steps": [
+          {
+            "op": "GIVEN",
+            "text": "before the fix, the fields loop already repeated the properties loop line for line (`intMembers.Add(member.IntKey, (member, item.Type));`).",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              1155,
+              1155
+            ],
+            "side": "old",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          },
+          {
+            "op": "NOW",
+            "text": "the properties loop gets a skip (`continue`) and a guard before `intMembers.Add`.",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              1008,
+              1025
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          },
+          {
+            "op": "ALSO",
+            "text": "the fields loop gets the same edits (`continue`, `stringMembers.Add`).",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              1148,
+              1181
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          }
+        ],
+        "verdict": "We flag this as a maintenance cost, not a bug: the fix is typed into two loops that were already copies, so the next fix there must also be made twice.",
+        "because": [
+          {
+            "text": "The tool counts copied lines in this file: 244 before, 258 after. 6 of the 10 added code lines sit in copied blocks.",
+            "evidence": "evidence/ju26-issue-2234/readability.json",
+            "result": "pass",
+            "summary": "4 flags (H-20 4); 11 touched methods measured; 10 test methods added in 2 test files; 2 of 9 claims have flip/revert-test support",
+            "produced_by": "script",
+            "check": "readability"
+          },
+          {
+            "text": "Copied blocks in this file went from 10 to 12.",
+            "evidence": "evidence/ju26-issue-2234/clone-complexity.json",
+            "result": "pass",
+            "summary": "TypeCollector.cs: duplicated blocks 10 -> 12, duplicated normalised lines 244 -> 258 (window 6); 6 of 10 added code lines sit in duplicated blocks; method GetObjectInfo complexity estimate 162 -> 166",
+            "produced_by": "script",
+            "check": "clone-complexity"
+          }
+        ],
+        "unsure": "One shared helper for both loops would remove the copy, but it touches code the issue did not ask about. Rule H-20 favours the fuller fix; the owner decides.",
+        "code": [
+          {
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "rows": [
+              [
+                " ",
+                1005,
+                1005,
+                "                        if ((isIntKey && intKey == null) || (!isIntKey && stringKey == null))"
+              ],
+              [
+                " ",
+                1006,
+                1006,
+                "                        {"
+              ],
+              [
+                " ",
+                1007,
+                1007,
+                "                            this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.DoNotMixStringAndIntKeys, item.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation()));"
+              ],
+              [
+                "+",
+                null,
+                1008,
+                "                            continue; // The key kind does not match the other members; the diagnostic is reported, so skip this member."
+              ],
+              [
+                " ",
+                1008,
+                1009,
+                "                        }"
+              ],
+              [
+                " ",
+                1009,
+                1010,
+                "                    }"
+              ],
+              [
+                " ",
+                1010,
+                1011,
+                ""
+              ],
+              [
+                "gap",
+                null,
+                null,
+                ""
+              ],
+              [
+                " ",
+                1019,
+                1020,
+                "                        {"
+              ],
+              [
+                " ",
+                1020,
+                1021,
+                "                            DeclaringType = GetDeclaringTypeIfColliding(item),"
+              ],
+              [
+                " ",
+                1021,
+                1022,
+                "                        };"
+              ],
+              [
+                "-",
+                1022,
+                null,
+                "                        intMembers.Add(member.IntKey, (member, item.Type));"
+              ],
+              [
+                "+",
+                null,
+                1023,
+                "                        if (!intMembers.ContainsKey(member.IntKey))"
+              ],
+              [
+                "+",
+                null,
+                1024,
+                "                        {"
+              ],
+              [
+                "+",
+                null,
+                1025,
+                "                            intMembers.Add(member.IntKey, (member, item.Type));"
+              ],
+              [
+                "+",
+                null,
+                1026,
+                "                        }"
+              ],
+              [
+                " ",
+                1023,
+                1027,
+                "                    }"
+              ],
+              [
+                " ",
+                1024,
+                1028,
+                "                    else if (stringKey is not null)"
+              ],
+              [
+                " ",
+                1025,
+                1029,
+                "                    {"
+              ],
+              [
+                "gap",
+                null,
+                null,
+                ""
+              ],
+              [
+                " ",
+                1138,
+                1145,
+                "                        if ((isIntKey && intKey == null) || (!isIntKey && stringKey == null))"
+              ],
+              [
+                " ",
+                1139,
+                1146,
+                "                        {"
+              ],
+              [
+                " ",
+                1140,
+                1147,
+                "                            this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.DoNotMixStringAndIntKeys, item.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation()));"
+              ],
+              [
+                "+",
+                null,
+                1148,
+                "                            continue; // The key kind does not match the other members; the diagnostic is reported, so skip this member."
+              ],
+              [
+                " ",
+                1141,
+                1149,
+                "                        }"
+              ],
+              [
+                " ",
+                1142,
+                1150,
+                "                    }"
+              ],
+              [
+                " ",
+                1143,
+                1151,
+                ""
+              ],
+              [
+                "gap",
+                null,
+                null,
+                ""
+              ],
+              [
+                " ",
+                1152,
+                1160,
+                "                        {"
+              ],
+              [
+                " ",
+                1153,
+                1161,
+                "                            DeclaringType = GetDeclaringTypeIfColliding(item),"
+              ],
+              [
+                " ",
+                1154,
+                1162,
+                "                        };"
+              ],
+              [
+                "-",
+                1155,
+                null,
+                "                        intMembers.Add(member.IntKey, (member, item.Type));"
+              ],
+              [
+                "+",
+                null,
+                1163,
+                "                        if (!intMembers.ContainsKey(member.IntKey))"
+              ],
+              [
+                "+",
+                null,
+                1164,
+                "                        {"
+              ],
+              [
+                "+",
+                null,
+                1165,
+                "                            intMembers.Add(member.IntKey, (member, item.Type));"
+              ],
+              [
+                "+",
+                null,
+                1166,
+                "                        }"
+              ],
+              [
+                " ",
+                1156,
+                1167,
+                "                    }"
+              ],
+              [
+                " ",
+                1157,
+                1168,
+                "                    else"
+              ],
+              [
+                " ",
+                1158,
+                1169,
+                "                    {"
+              ],
+              [
+                "gap",
+                null,
+                null,
+                ""
+              ],
+              [
+                " ",
+                1165,
+                1176,
+                "                        {"
+              ],
+              [
+                " ",
+                1166,
+                1177,
+                "                            DeclaringType = GetDeclaringTypeIfColliding(item),"
+              ],
+              [
+                " ",
+                1167,
+                1178,
+                "                        };"
+              ],
+              [
+                "-",
+                1168,
+                null,
+                "                        stringMembers.Add(member.StringKey, (member, item.Type));"
+              ],
+              [
+                "+",
+                null,
+                1179,
+                "                        if (!stringMembers.ContainsKey(member.StringKey))"
+              ],
+              [
+                "+",
+                null,
+                1180,
+                "                        {"
+              ],
+              [
+                "+",
+                null,
+                1181,
+                "                            stringMembers.Add(member.StringKey, (member, item.Type));"
+              ],
+              [
+                "+",
+                null,
+                1182,
+                "                        }"
+              ],
+              [
+                " ",
+                1169,
+                1183,
+                "                    }"
+              ],
+              [
+                " ",
+                1170,
+                1184,
+                ""
+              ],
+              [
+                " ",
+                1171,
+                1185,
+                "                    var messagePackFormatter = item.GetAttributes().FirstOrDefault(x => x.AttributeClass.ApproximatelyEqual(this.typeReferences.FormatterAttribute))?.ConstructorArguments[0];"
+              ],
+              [
+                "gap",
+                null,
+                null,
+                ""
+              ],
+              [
+                " ",
+                null,
+                1012,
+                "                    if (isIntKey)"
+              ],
+              [
+                " ",
+                null,
+                1013,
+                "                    {"
+              ],
+              [
+                " ",
+                null,
+                1014,
+                "                        if (intMembers.ContainsKey(intKey!.Value))"
+              ],
+              [
+                " ",
+                null,
+                1015,
+                "                        {"
+              ],
+              [
+                " ",
+                null,
+                1016,
+                "                            this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.KeysMustBeUnique, item.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation()));"
+              ],
+              [
+                " ",
+                null,
+                1017,
+                "                        }"
+              ],
+              [
+                " ",
+                null,
+                1018,
+                ""
+              ],
+              [
+                " ",
+                null,
+                1019,
+                "                        var member = new MemberSerializationInfo(true, isWritable, isReadable, isInitOnly, item.IsRequired, intKey!.Value, item.Name, item.Name, item.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), item.Type.ToDisplayString(BinaryWriteFormat), specialFormatter)"
+              ],
+              [
+                "gap",
+                null,
+                null,
+                ""
+              ],
+              [
+                " ",
+                null,
+                1152,
+                "                    if (isIntKey)"
+              ],
+              [
+                " ",
+                null,
+                1153,
+                "                    {"
+              ],
+              [
+                " ",
+                null,
+                1154,
+                "                        if (intMembers.ContainsKey(intKey!.Value))"
+              ],
+              [
+                " ",
+                null,
+                1155,
+                "                        {"
+              ],
+              [
+                " ",
+                null,
+                1156,
+                "                            this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.KeysMustBeUnique, item.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation()));"
+              ],
+              [
+                " ",
+                null,
+                1157,
+                "                        }"
+              ],
+              [
+                " ",
+                null,
+                1158,
+                ""
+              ],
+              [
+                " ",
+                null,
+                1159,
+                "                        var member = new MemberSerializationInfo(true, IsWritable: !item.IsReadOnly, IsReadable: true, IsInitOnly: false, item.IsRequired, intKey!.Value, item.Name, item.Name, item.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), item.Type.ToDisplayString(BinaryWriteFormat), specialFormatter)"
+              ],
+              [
+                "gap",
+                null,
+                null,
+                ""
+              ],
+              [
+                " ",
+                null,
+                1170,
+                "                        if (stringMembers.ContainsKey(stringKey!))"
+              ],
+              [
+                " ",
+                null,
+                1171,
+                "                        {"
+              ],
+              [
+                " ",
+                null,
+                1172,
+                "                            this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.KeysMustBeUnique, item.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation()));"
+              ],
+              [
+                " ",
+                null,
+                1173,
+                "                        }"
+              ],
+              [
+                " ",
+                null,
+                1174,
+                ""
+              ],
+              [
+                " ",
+                null,
+                1175,
+                "                        var member = new MemberSerializationInfo(true, IsWritable: !item.IsReadOnly, IsReadable: true, IsInitOnly: false, item.IsRequired, hiddenIntKey++, stringKey!, item.Name, item.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), item.Type.ToDisplayString(BinaryWriteFormat), specialFormatter)"
+              ]
+            ],
+            "cut": 0
+          }
+        ],
+        "problems": [],
+        "verified": true
+      },
+      {
+        "id": "RD-2234-02",
+        "kind": "flag",
+        "title": "The same skip, added in both loops",
+        "steps": [
+          {
+            "op": "WHEN",
+            "text": "a property's key kind does not match the others, the properties loop now stops at `continue`.",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              1008,
+              1008
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          },
+          {
+            "op": "ALSO",
+            "text": "the fields loop gets the identical line (`continue`).",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              1148,
+              1148
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          }
+        ],
+        "verdict": "Two copies of one decision. If someone later changes one and not the other, properties and fields will treat a mixed key differently.",
+        "because": [
+          {
+            "text": "The tool found this added line twice in the same file.",
+            "evidence": "evidence/ju26-issue-2234/readability.json",
+            "result": "pass",
+            "summary": "4 flags (H-20 4); 11 touched methods measured; 10 test methods added in 2 test files; 2 of 9 claims have flip/revert-test support",
+            "produced_by": "script",
+            "check": "readability"
+          }
+        ],
+        "code": [
+          {
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "rows": [
+              [
+                " ",
+                1005,
+                1005,
+                "                        if ((isIntKey && intKey == null) || (!isIntKey && stringKey == null))"
+              ],
+              [
+                " ",
+                1006,
+                1006,
+                "                        {"
+              ],
+              [
+                " ",
+                1007,
+                1007,
+                "                            this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.DoNotMixStringAndIntKeys, item.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation()));"
+              ],
+              [
+                "+",
+                null,
+                1008,
+                "                            continue; // The key kind does not match the other members; the diagnostic is reported, so skip this member."
+              ],
+              [
+                " ",
+                1008,
+                1009,
+                "                        }"
+              ],
+              [
+                " ",
+                1009,
+                1010,
+                "                    }"
+              ],
+              [
+                " ",
+                1010,
+                1011,
+                ""
+              ],
+              [
+                "gap",
+                null,
+                null,
+                ""
+              ],
+              [
+                " ",
+                1138,
+                1145,
+                "                        if ((isIntKey && intKey == null) || (!isIntKey && stringKey == null))"
+              ],
+              [
+                " ",
+                1139,
+                1146,
+                "                        {"
+              ],
+              [
+                " ",
+                1140,
+                1147,
+                "                            this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.DoNotMixStringAndIntKeys, item.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation()));"
+              ],
+              [
+                "+",
+                null,
+                1148,
+                "                            continue; // The key kind does not match the other members; the diagnostic is reported, so skip this member."
+              ],
+              [
+                " ",
+                1141,
+                1149,
+                "                        }"
+              ],
+              [
+                " ",
+                1142,
+                1150,
+                "                    }"
+              ],
+              [
+                " ",
+                1143,
+                1151,
+                ""
+              ]
+            ],
+            "cut": 0
+          }
+        ],
+        "problems": [],
+        "verified": true
+      },
+      {
+        "id": "RD-2234-03",
+        "kind": "flag",
+        "title": "The number-key guard, added in both loops",
+        "steps": [
+          {
+            "op": "GIVEN",
+            "text": "a repeated number key is already reported a few lines up (`KeysMustBeUnique`).",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              1014,
+              1016
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          },
+          {
+            "op": "NOW",
+            "text": "the properties loop adds the member only if its number is new (`if (!intMembers.ContainsKey(member.IntKey))`).",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              1023,
+              1025
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          },
+          {
+            "op": "ALSO",
+            "text": "the fields loop adds the same two lines (`intMembers.Add(member.IntKey, (member, item.Type));`).",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              1163,
+              1165
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          }
+        ],
+        "verdict": "The guard is right, but it now lives in two places. A later change to how repeated keys are handled must find both.",
+        "because": [
+          {
+            "text": "The tool found this added two-line block twice in the same file.",
+            "evidence": "evidence/ju26-issue-2234/readability.json",
+            "result": "pass",
+            "summary": "4 flags (H-20 4); 11 touched methods measured; 10 test methods added in 2 test files; 2 of 9 claims have flip/revert-test support",
+            "produced_by": "script",
+            "check": "readability"
+          }
+        ],
+        "code": [
+          {
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "rows": [
+              [
+                " ",
+                1019,
+                1020,
+                "                        {"
+              ],
+              [
+                " ",
+                1020,
+                1021,
+                "                            DeclaringType = GetDeclaringTypeIfColliding(item),"
+              ],
+              [
+                " ",
+                1021,
+                1022,
+                "                        };"
+              ],
+              [
+                "-",
+                1022,
+                null,
+                "                        intMembers.Add(member.IntKey, (member, item.Type));"
+              ],
+              [
+                "+",
+                null,
+                1023,
+                "                        if (!intMembers.ContainsKey(member.IntKey))"
+              ],
+              [
+                "+",
+                null,
+                1024,
+                "                        {"
+              ],
+              [
+                "+",
+                null,
+                1025,
+                "                            intMembers.Add(member.IntKey, (member, item.Type));"
+              ],
+              [
+                "+",
+                null,
+                1026,
+                "                        }"
+              ],
+              [
+                " ",
+                1023,
+                1027,
+                "                    }"
+              ],
+              [
+                " ",
+                1024,
+                1028,
+                "                    else if (stringKey is not null)"
+              ],
+              [
+                " ",
+                1025,
+                1029,
+                "                    {"
+              ],
+              [
+                "gap",
+                null,
+                null,
+                ""
+              ],
+              [
+                " ",
+                1152,
+                1160,
+                "                        {"
+              ],
+              [
+                " ",
+                1153,
+                1161,
+                "                            DeclaringType = GetDeclaringTypeIfColliding(item),"
+              ],
+              [
+                " ",
+                1154,
+                1162,
+                "                        };"
+              ],
+              [
+                "-",
+                1155,
+                null,
+                "                        intMembers.Add(member.IntKey, (member, item.Type));"
+              ],
+              [
+                "+",
+                null,
+                1163,
+                "                        if (!intMembers.ContainsKey(member.IntKey))"
+              ],
+              [
+                "+",
+                null,
+                1164,
+                "                        {"
+              ],
+              [
+                "+",
+                null,
+                1165,
+                "                            intMembers.Add(member.IntKey, (member, item.Type));"
+              ],
+              [
+                "+",
+                null,
+                1166,
+                "                        }"
+              ],
+              [
+                " ",
+                1156,
+                1167,
+                "                    }"
+              ],
+              [
+                " ",
+                1157,
+                1168,
+                "                    else"
+              ],
+              [
+                " ",
+                1158,
+                1169,
+                "                    {"
+              ],
+              [
+                "gap",
+                null,
+                null,
+                ""
+              ],
+              [
+                " ",
+                null,
+                1012,
+                "                    if (isIntKey)"
+              ],
+              [
+                " ",
+                null,
+                1013,
+                "                    {"
+              ],
+              [
+                " ",
+                null,
+                1014,
+                "                        if (intMembers.ContainsKey(intKey!.Value))"
+              ],
+              [
+                " ",
+                null,
+                1015,
+                "                        {"
+              ],
+              [
+                " ",
+                null,
+                1016,
+                "                            this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.KeysMustBeUnique, item.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation()));"
+              ],
+              [
+                " ",
+                null,
+                1017,
+                "                        }"
+              ],
+              [
+                " ",
+                null,
+                1018,
+                ""
+              ]
+            ],
+            "cut": 0
+          }
+        ],
+        "problems": [],
+        "verified": true
+      },
+      {
+        "id": "RD-2234-04",
+        "kind": "flag",
+        "title": "The name-key guard, added in both loops",
+        "steps": [
+          {
+            "op": "NOW",
+            "text": "the properties loop adds the member only if its name key is new (`if (!stringMembers.ContainsKey(member.StringKey))`).",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              1039,
+              1041
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          },
+          {
+            "op": "ALSO",
+            "text": "the fields loop adds the same two lines (`stringMembers.Add(member.StringKey, (member, item.Type));`).",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              1179,
+              1181
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          }
+        ],
+        "verdict": "Same as the number-key guard: correct, but kept in two places that must change together.",
+        "because": [
+          {
+            "text": "The tool found this added two-line block twice in the same file.",
+            "evidence": "evidence/ju26-issue-2234/readability.json",
+            "result": "pass",
+            "summary": "4 flags (H-20 4); 11 touched methods measured; 10 test methods added in 2 test files; 2 of 9 claims have flip/revert-test support",
+            "produced_by": "script",
+            "check": "readability"
+          }
+        ],
+        "code": [
+          {
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "rows": [
+              [
+                " ",
+                1032,
+                1036,
+                "                        {"
+              ],
+              [
+                " ",
+                1033,
+                1037,
+                "                            DeclaringType = GetDeclaringTypeIfColliding(item),"
+              ],
+              [
+                " ",
+                1034,
+                1038,
+                "                        };"
+              ],
+              [
+                "-",
+                1035,
+                null,
+                "                        stringMembers.Add(member.StringKey, (member, item.Type));"
+              ],
+              [
+                "+",
+                null,
+                1039,
+                "                        if (!stringMembers.ContainsKey(member.StringKey))"
+              ],
+              [
+                "+",
+                null,
+                1040,
+                "                        {"
+              ],
+              [
+                "+",
+                null,
+                1041,
+                "                            stringMembers.Add(member.StringKey, (member, item.Type));"
+              ],
+              [
+                "+",
+                null,
+                1042,
+                "                        }"
+              ],
+              [
+                " ",
+                1036,
+                1043,
+                "                    }"
+              ],
+              [
+                " ",
+                1037,
+                1044,
+                ""
+              ],
+              [
+                " ",
+                1038,
+                1045,
+                "                    var messagePackFormatter = item.GetAttributes().FirstOrDefault(x => x.AttributeClass.ApproximatelyEqual(this.typeReferences.FormatterAttribute))?.ConstructorArguments[0];"
+              ],
+              [
+                "gap",
+                null,
+                null,
+                ""
+              ],
+              [
+                " ",
+                1165,
+                1176,
+                "                        {"
+              ],
+              [
+                " ",
+                1166,
+                1177,
+                "                            DeclaringType = GetDeclaringTypeIfColliding(item),"
+              ],
+              [
+                " ",
+                1167,
+                1178,
+                "                        };"
+              ],
+              [
+                "-",
+                1168,
+                null,
+                "                        stringMembers.Add(member.StringKey, (member, item.Type));"
+              ],
+              [
+                "+",
+                null,
+                1179,
+                "                        if (!stringMembers.ContainsKey(member.StringKey))"
+              ],
+              [
+                "+",
+                null,
+                1180,
+                "                        {"
+              ],
+              [
+                "+",
+                null,
+                1181,
+                "                            stringMembers.Add(member.StringKey, (member, item.Type));"
+              ],
+              [
+                "+",
+                null,
+                1182,
+                "                        }"
+              ],
+              [
+                " ",
+                1169,
+                1183,
+                "                    }"
+              ],
+              [
+                " ",
+                1170,
+                1184,
+                ""
+              ],
+              [
+                " ",
+                1171,
+                1185,
+                "                    var messagePackFormatter = item.GetAttributes().FirstOrDefault(x => x.AttributeClass.ApproximatelyEqual(this.typeReferences.FormatterAttribute))?.ConstructorArguments[0];"
               ]
             ],
             "cut": 0

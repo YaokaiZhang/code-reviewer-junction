@@ -879,6 +879,167 @@
           "evidence": "evidence/ju26-issue-2234/tripwires.json"
         }
       ]
+    },
+    {
+      "id": "RD-2234-01",
+      "kind": "flag",
+      "title": "The fix is made twice, in two copied loops",
+      "steps": [
+        {
+          "op": "GIVEN",
+          "text": "before the fix, the fields loop already repeated the properties loop line for line (`intMembers.Add(member.IntKey, (member, item.Type));`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1155,
+            1155
+          ],
+          "side": "old"
+        },
+        {
+          "op": "NOW",
+          "text": "the properties loop gets a skip (`continue`) and a guard before `intMembers.Add`.",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1008,
+            1025
+          ],
+          "side": "new"
+        },
+        {
+          "op": "ALSO",
+          "text": "the fields loop gets the same edits (`continue`, `stringMembers.Add`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1148,
+            1181
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "We flag this as a maintenance cost, not a bug: the fix is typed into two loops that were already copies, so the next fix there must also be made twice.",
+      "because": [
+        {
+          "text": "The tool counts copied lines in this file: 244 before, 258 after. 6 of the 10 added code lines sit in copied blocks.",
+          "evidence": "evidence/ju26-issue-2234/readability.json"
+        },
+        {
+          "text": "Copied blocks in this file went from 10 to 12.",
+          "evidence": "evidence/ju26-issue-2234/clone-complexity.json"
+        }
+      ],
+      "unsure": "One shared helper for both loops would remove the copy, but it touches code the issue did not ask about. Rule H-20 favours the fuller fix; the owner decides."
+    },
+    {
+      "id": "RD-2234-02",
+      "kind": "flag",
+      "title": "The same skip, added in both loops",
+      "steps": [
+        {
+          "op": "WHEN",
+          "text": "a property's key kind does not match the others, the properties loop now stops at `continue`.",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1008,
+            1008
+          ],
+          "side": "new"
+        },
+        {
+          "op": "ALSO",
+          "text": "the fields loop gets the identical line (`continue`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1148,
+            1148
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "Two copies of one decision. If someone later changes one and not the other, properties and fields will treat a mixed key differently.",
+      "because": [
+        {
+          "text": "The tool found this added line twice in the same file.",
+          "evidence": "evidence/ju26-issue-2234/readability.json"
+        }
+      ]
+    },
+    {
+      "id": "RD-2234-03",
+      "kind": "flag",
+      "title": "The number-key guard, added in both loops",
+      "steps": [
+        {
+          "op": "GIVEN",
+          "text": "a repeated number key is already reported a few lines up (`KeysMustBeUnique`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1014,
+            1016
+          ],
+          "side": "new"
+        },
+        {
+          "op": "NOW",
+          "text": "the properties loop adds the member only if its number is new (`if (!intMembers.ContainsKey(member.IntKey))`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1023,
+            1025
+          ],
+          "side": "new"
+        },
+        {
+          "op": "ALSO",
+          "text": "the fields loop adds the same two lines (`intMembers.Add(member.IntKey, (member, item.Type));`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1163,
+            1165
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "The guard is right, but it now lives in two places. A later change to how repeated keys are handled must find both.",
+      "because": [
+        {
+          "text": "The tool found this added two-line block twice in the same file.",
+          "evidence": "evidence/ju26-issue-2234/readability.json"
+        }
+      ]
+    },
+    {
+      "id": "RD-2234-04",
+      "kind": "flag",
+      "title": "The name-key guard, added in both loops",
+      "steps": [
+        {
+          "op": "NOW",
+          "text": "the properties loop adds the member only if its name key is new (`if (!stringMembers.ContainsKey(member.StringKey))`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1039,
+            1041
+          ],
+          "side": "new"
+        },
+        {
+          "op": "ALSO",
+          "text": "the fields loop adds the same two lines (`stringMembers.Add(member.StringKey, (member, item.Type));`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1179,
+            1181
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "Same as the number-key guard: correct, but kept in two places that must change together.",
+      "because": [
+        {
+          "text": "The tool found this added two-line block twice in the same file.",
+          "evidence": "evidence/ju26-issue-2234/readability.json"
+        }
+      ]
     }
   ]
 }
