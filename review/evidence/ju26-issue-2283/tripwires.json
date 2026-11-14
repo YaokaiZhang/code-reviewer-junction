@@ -1,0 +1,88 @@
+{
+  "check": "tripwires",
+  "branch": "ju26-issue-2283",
+  "base": "32258fdb",
+  "command": "python3 review/scripts/tripwires.py --repo $MP_REPO --branch ju26-issue-2283 --write",
+  "result": "pass",
+  "summary": "7 contract trips over 9 hunks (diagnostics 5; user-docs 2); 0 trips no claim answers",
+  "details": {
+    "hunks_total": 9,
+    "contracts_tripped": [
+      "diagnostics",
+      "user-docs"
+    ],
+    "contracts_clear": [
+      "generated",
+      "public-api",
+      "security",
+      "targets",
+      "wire-format"
+    ],
+    "trips": {
+      "diagnostics": [
+        {
+          "hunk": "doc/analyzers/MsgPack004.md:48-52",
+          "why": "path",
+          "claims": [
+            "C-2283-03"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:239-239",
+          "why": "path",
+          "claims": [
+            "C-2283-02",
+            "C-2283-04"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:985-985",
+          "why": "path",
+          "claims": [
+            "C-2283-01",
+            "C-2283-04"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1077-1077",
+          "why": "path",
+          "claims": [
+            "C-2283-01",
+            "C-2283-04"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1429-1451",
+          "why": "path",
+          "claims": [
+            "C-2283-01",
+            "C-2283-02"
+          ]
+        }
+      ],
+      "user-docs": [
+        {
+          "hunk": "README.md:1639-1643",
+          "why": "path",
+          "claims": [
+            "C-2283-03"
+          ]
+        },
+        {
+          "hunk": "doc/analyzers/MsgPack004.md:48-52",
+          "why": "path",
+          "claims": [
+            "C-2283-03"
+          ]
+        }
+      ]
+    },
+    "unanswered": [],
+    "context": "review/context/project.json"
+  },
+  "tool_versions": {
+    "git": "git version 2.43.0",
+    "python": "3.13.18"
+  },
+  "produced_by": "script"
+}

@@ -1,0 +1,33 @@
+{
+  "check": "issue-context",
+  "command": "read by hand on github.com/MessagePack-CSharp/MessagePack-CSharp/issues/<n>, 2026-11-14",
+  "produced_by": "hand",
+  "summary": "3 upstream issues read; 0 maintainer statements on intended behaviour",
+  "issues": {
+    "ju26-issue-2234": {
+      "number": 2234,
+      "title": "The analyzer does not work if SuppressSourceGeneration = true",
+      "state": "open",
+      "body": "The analyzer does not work if SuppressSourceGeneration = true. This has happened since version 3.1.1. It still worked in 3.1.0.",
+      "maintainer_statements": [],
+      "comments": 0
+    },
+    "ju26-issue-2283": {
+      "number": 2283,
+      "title": "Generator and analyzer crash with IndexOutOfRangeException on a closed generic struct from a referenced assembly",
+      "state": "open",
+      "body_key": "the compiling assembly silently ends up with no generated resolver at all",
+      "maintainer_statements": [],
+      "comments": 0
+    },
+    "ju26-issue-2297": {
+      "number": 2297,
+      "title": "Add ExcludeFromCodeCoverage attribute to generated code.",
+      "state": "open",
+      "body_key": "I would like all generated code to be decorated with ExcludeFromCodeCoverage attribute.",
+      "maintainer_statements": [],
+      "comments": 2,
+      "open_question_to_maintainer": "would you accept that, or would you rather keep generated code coverage-neutral (unanswered)"
+    }
+  }
+}

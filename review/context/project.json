@@ -1,0 +1,387 @@
+{
+  "check": "project-context",
+  "repo": "te-industry-tech-office/junction26-messagepack-csharp",
+  "base": "32258fdb",
+  "base_describe": "v3.0.238-rc.1-66-g32258fdb",
+  "command": "python3 review/scripts/project_context.py --repo $MP_REPO --write",
+  "release": {
+    "version": "3.0-rc.1",
+    "prerelease": true,
+    "semver": 2,
+    "released_tags": 81,
+    "latest_released_tag": "v3.1.12",
+    "source": "version.json"
+  },
+  "contracts": [
+    {
+      "id": "diagnostics",
+      "promise": "18 documented analyzer rules; a user's build reports them",
+      "rules": [
+        {
+          "id": "MsgPack001",
+          "category": "Reliability",
+          "severity": "Disabled",
+          "tracked_in": "src/MessagePack.SourceGenerator/AnalyzerReleases.Unshipped.md:8",
+          "doc": "doc/analyzers/MsgPack001.md",
+          "first_released_tag_with_doc": "v2.1.80"
+        },
+        {
+          "id": "MsgPack002",
+          "category": "Reliability",
+          "severity": "Disabled",
+          "tracked_in": "src/MessagePack.SourceGenerator/AnalyzerReleases.Unshipped.md:9",
+          "doc": "doc/analyzers/MsgPack002.md",
+          "first_released_tag_with_doc": "v2.1.80"
+        },
+        {
+          "id": "MsgPack003",
+          "category": "Usage",
+          "severity": "Error",
+          "tracked_in": "src/MessagePack.SourceGenerator/AnalyzerReleases.Unshipped.md:10",
+          "doc": "doc/analyzers/MsgPack003.md",
+          "first_released_tag_with_doc": "v2.1.80"
+        },
+        {
+          "id": "MsgPack004",
+          "category": "Usage",
+          "severity": "Error",
+          "tracked_in": "src/MessagePack.SourceGenerator/AnalyzerReleases.Unshipped.md:11",
+          "doc": "doc/analyzers/MsgPack004.md",
+          "first_released_tag_with_doc": "v2.1.80"
+        },
+        {
+          "id": "MsgPack005",
+          "category": "Usage",
+          "severity": "Error",
+          "tracked_in": "src/MessagePack.SourceGenerator/AnalyzerReleases.Unshipped.md:12",
+          "doc": "doc/analyzers/MsgPack005.md",
+          "first_released_tag_with_doc": "v2.1.80"
+        },
+        {
+          "id": "MsgPack006",
+          "category": "Usage",
+          "severity": "Error",
+          "tracked_in": "src/MessagePack.SourceGenerator/AnalyzerReleases.Unshipped.md:13",
+          "doc": "doc/analyzers/MsgPack006.md",
+          "first_released_tag_with_doc": "v3.0.3"
+        },
+        {
+          "id": "MsgPack007",
+          "category": "Usage",
+          "severity": "Error",
+          "tracked_in": "src/MessagePack.SourceGenerator/AnalyzerReleases.Unshipped.md:14",
+          "doc": "doc/analyzers/MsgPack007.md",
+          "first_released_tag_with_doc": "v3.0.3"
+        },
+        {
+          "id": "MsgPack008",
+          "category": "Usage",
+          "severity": "Error",
+          "tracked_in": "src/MessagePack.SourceGenerator/AnalyzerReleases.Unshipped.md:15",
+          "doc": "doc/analyzers/MsgPack008.md",
+          "first_released_tag_with_doc": "v3.0.3"
+        },
+        {
+          "id": "MsgPack009",
+          "category": "Usage",
+          "severity": "Error",
+          "tracked_in": "src/MessagePack.SourceGenerator/AnalyzerReleases.Unshipped.md:16",
+          "doc": "doc/analyzers/MsgPack009.md",
+          "first_released_tag_with_doc": "v3.0.3"
+        },
+        {
+          "id": "MsgPack010",
+          "category": "Usage",
+          "severity": "Warning",
+          "tracked_in": "src/MessagePack.SourceGenerator/AnalyzerReleases.Unshipped.md:17",
+          "doc": "doc/analyzers/MsgPack010.md",
+          "first_released_tag_with_doc": "v3.0.3"
+        },
+        {
+          "id": "MsgPack011",
+          "category": "Usage",
+          "severity": "Error",
+          "tracked_in": "src/MessagePack.SourceGenerator/AnalyzerReleases.Unshipped.md:18",
+          "doc": "doc/analyzers/MsgPack011.md",
+          "first_released_tag_with_doc": "v3.0.3"
+        },
+        {
+          "id": "MsgPack012",
+          "category": "Usage",
+          "severity": "Error",
+          "tracked_in": "src/MessagePack.SourceGenerator/AnalyzerReleases.Unshipped.md:19",
+          "doc": "doc/analyzers/MsgPack012.md",
+          "first_released_tag_with_doc": "v3.0.3"
+        },
+        {
+          "id": "MsgPack013",
+          "category": "Usage",
+          "severity": "Warning",
+          "tracked_in": "src/MessagePack.SourceGenerator/AnalyzerReleases.Unshipped.md:20",
+          "doc": "doc/analyzers/MsgPack013.md",
+          "first_released_tag_with_doc": "v3.0.3"
+        },
+        {
+          "id": "MsgPack014",
+          "category": "Usage",
+          "severity": "Warning",
+          "tracked_in": "src/MessagePack.SourceGenerator/AnalyzerReleases.Unshipped.md:21",
+          "doc": "doc/analyzers/MsgPack014.md",
+          "first_released_tag_with_doc": "v3.0.3"
+        },
+        {
+          "id": "MsgPack015",
+          "category": "Usage",
+          "severity": "Warning",
+          "tracked_in": "src/MessagePack.SourceGenerator/AnalyzerReleases.Unshipped.md:22",
+          "doc": "doc/analyzers/MsgPack015.md",
+          "first_released_tag_with_doc": "v3.0.3"
+        },
+        {
+          "id": "MsgPack016",
+          "category": "Usage",
+          "severity": "Error",
+          "tracked_in": "src/MessagePack.SourceGenerator/AnalyzerReleases.Unshipped.md:23",
+          "doc": "doc/analyzers/MsgPack016.md",
+          "first_released_tag_with_doc": "v3.0.3"
+        },
+        {
+          "id": "MsgPack017",
+          "category": "Usage",
+          "severity": "Warning",
+          "tracked_in": "src/MessagePack.SourceGenerator/AnalyzerReleases.Unshipped.md:24",
+          "doc": "doc/analyzers/MsgPack017.md",
+          "first_released_tag_with_doc": "v3.0.3"
+        },
+        {
+          "id": "MsgPack018",
+          "category": "Usage",
+          "severity": "Error",
+          "tracked_in": "src/MessagePack.SourceGenerator/AnalyzerReleases.Unshipped.md:25",
+          "doc": "doc/analyzers/MsgPack018.md",
+          "first_released_tag_with_doc": "v3.0.3"
+        }
+      ],
+      "paths": [
+        "src/MessagePack.SourceGenerator/Analyzers/",
+        "src/MessagePack.SourceGenerator/CodeAnalysis/",
+        "src/MessagePack.SourceGenerator/AnalyzerReleases.Shipped.md",
+        "src/MessagePack.SourceGenerator/AnalyzerReleases.Unshipped.md",
+        "doc/analyzers/"
+      ],
+      "line_patterns": [
+        "reportDiagnostic",
+        "Diagnostic\\.Create",
+        "ReportDiagnostic"
+      ],
+      "maintainers": {
+        "commits": 85,
+        "top": [
+          {
+            "name": "Andrew Arnott",
+            "commits": 68
+          },
+          {
+            "name": "Alan Liu",
+            "commits": 15
+          },
+          {
+            "name": "AlanLiu90",
+            "commits": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "public-api",
+      "promise": "public surface tracked per target in 8 PublicAPI files",
+      "entries": {
+        "src/MessagePack/net472/PublicAPI.Shipped.txt": 1185,
+        "src/MessagePack/net472/PublicAPI.Unshipped.txt": 113,
+        "src/MessagePack/net8.0/PublicAPI.Shipped.txt": 1199,
+        "src/MessagePack/net8.0/PublicAPI.Unshipped.txt": 176,
+        "src/MessagePack/netstandard2.0/PublicAPI.Shipped.txt": 1185,
+        "src/MessagePack/netstandard2.0/PublicAPI.Unshipped.txt": 113,
+        "src/MessagePack/netstandard2.1/PublicAPI.Shipped.txt": 1185,
+        "src/MessagePack/netstandard2.1/PublicAPI.Unshipped.txt": 113
+      },
+      "paths": [
+        "src/MessagePack/net472/PublicAPI.Shipped.txt",
+        "src/MessagePack/net472/PublicAPI.Unshipped.txt",
+        "src/MessagePack/net8.0/PublicAPI.Shipped.txt",
+        "src/MessagePack/net8.0/PublicAPI.Unshipped.txt",
+        "src/MessagePack/netstandard2.0/PublicAPI.Shipped.txt",
+        "src/MessagePack/netstandard2.0/PublicAPI.Unshipped.txt",
+        "src/MessagePack/netstandard2.1/PublicAPI.Shipped.txt",
+        "src/MessagePack/netstandard2.1/PublicAPI.Unshipped.txt"
+      ],
+      "line_patterns": [],
+      "maintainers": {
+        "commits": 56,
+        "top": [
+          {
+            "name": "Andrew Arnott",
+            "commits": 43
+          },
+          {
+            "name": "pCYSl5EDgo",
+            "commits": 5
+          },
+          {
+            "name": "neuecc",
+            "commits": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "generated",
+      "promise": "generated code compiles into the consumer's own assembly; the resolver may be a partial class the user declares",
+      "sources": [
+        "README.md:1611",
+        "README.md:1612",
+        "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt:14"
+      ],
+      "paths": [
+        "src/MessagePack.SourceGenerator/Transforms/"
+      ],
+      "line_patterns": [],
+      "maintainers": {
+        "commits": 31,
+        "top": [
+          {
+            "name": "Andrew Arnott",
+            "commits": 28
+          },
+          {
+            "name": "Alan Liu",
+            "commits": 2
+          },
+          {
+            "name": "pCYSl5EDgo",
+            "commits": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "targets",
+      "promise": "the library builds for netstandard2.0, netstandard2.1, net8.0, net472",
+      "targets": [
+        "netstandard2.0",
+        "netstandard2.1",
+        "net8.0",
+        "net472"
+      ],
+      "sources": [
+        "src/MessagePack/MessagePack.csproj:4"
+      ],
+      "paths": [],
+      "line_patterns": [
+        "^\\s*#if\\b.*\\bNET(STANDARD|FRAMEWORK|COREAPP)"
+      ],
+      "maintainers": {
+        "commits": 112,
+        "top": [
+          {
+            "name": "Andrew Arnott",
+            "commits": 70
+          },
+          {
+            "name": "neuecc",
+            "commits": 33
+          },
+          {
+            "name": "Yoshifumi Kawai",
+            "commits": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "wire-format",
+      "promise": "bytes written by one version read back in another",
+      "paths": [
+        "src/MessagePack/MessagePackReader.cs",
+        "src/MessagePack/MessagePackWriter.cs",
+        "src/MessagePack/MessagePackCode.cs",
+        "src/MessagePack/Formatters/"
+      ],
+      "line_patterns": [],
+      "maintainers": {
+        "commits": 146,
+        "top": [
+          {
+            "name": "neuecc",
+            "commits": 60
+          },
+          {
+            "name": "Andrew Arnott",
+            "commits": 54
+          },
+          {
+            "name": "pCYSl5EDgo",
+            "commits": 10
+          }
+        ]
+      }
+    },
+    {
+      "id": "security",
+      "promise": "supported majors get security fixes; reports go to the named maintainers",
+      "sources": [
+        "SECURITY.md:3"
+      ],
+      "paths": [
+        "SECURITY.md",
+        "src/MessagePack/MessagePackSecurity.cs"
+      ],
+      "line_patterns": [],
+      "maintainers": {
+        "commits": 12,
+        "top": [
+          {
+            "name": "Andrew Arnott",
+            "commits": 10
+          },
+          {
+            "name": "neuecc",
+            "commits": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "user-docs",
+      "promise": "README and doc/ describe behaviour users rely on",
+      "paths": [
+        "README.md",
+        "doc/"
+      ],
+      "line_patterns": [],
+      "maintainers": {
+        "commits": 248,
+        "top": [
+          {
+            "name": "Andrew Arnott",
+            "commits": 113
+          },
+          {
+            "name": "neuecc",
+            "commits": 79
+          },
+          {
+            "name": "Yoshifumi Kawai",
+            "commits": 35
+          }
+        ]
+      }
+    }
+  ],
+  "summary": "7 contracts; 18 documented rules (18 documented in a released tag); 8 PublicAPI files; targets netstandard2.0, netstandard2.1, net8.0, net472",
+  "tool_versions": {
+    "git": "git version 2.43.0",
+    "python": "3.13.18"
+  },
+  "produced_by": "script"
+}

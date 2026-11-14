@@ -1,0 +1,104 @@
+{
+  "check": "tripwires",
+  "branch": "ju26-issue-2234",
+  "base": "32258fdb",
+  "command": "python3 review/scripts/tripwires.py --repo $MP_REPO --branch ju26-issue-2234 --write",
+  "result": "pass",
+  "summary": "7 contract trips over 9 hunks (diagnostics 6; user-docs 1); 0 trips no claim answers",
+  "details": {
+    "hunks_total": 9,
+    "contracts_tripped": [
+      "diagnostics",
+      "user-docs"
+    ],
+    "contracts_clear": [
+      "generated",
+      "public-api",
+      "security",
+      "targets",
+      "wire-format"
+    ],
+    "trips": {
+      "diagnostics": [
+        {
+          "hunk": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1008-1008",
+          "why": "path",
+          "claims": [
+            "C-2234-01",
+            "C-2234-02",
+            "C-2234-04",
+            "C-2234-06"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1023-1026",
+          "why": "path",
+          "claims": [
+            "C-2234-01",
+            "C-2234-02",
+            "C-2234-05",
+            "C-2234-06"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1039-1042",
+          "why": "path",
+          "claims": [
+            "C-2234-01",
+            "C-2234-02",
+            "C-2234-05",
+            "C-2234-06"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1148-1148",
+          "why": "path",
+          "claims": [
+            "C-2234-01",
+            "C-2234-02",
+            "C-2234-03",
+            "C-2234-04",
+            "C-2234-06"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1163-1166",
+          "why": "path",
+          "claims": [
+            "C-2234-01",
+            "C-2234-02",
+            "C-2234-05",
+            "C-2234-06"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1179-1182",
+          "why": "path",
+          "claims": [
+            "C-2234-01",
+            "C-2234-02",
+            "C-2234-03",
+            "C-2234-05",
+            "C-2234-06"
+          ]
+        }
+      ],
+      "user-docs": [
+        {
+          "hunk": "README.md:1620-1633",
+          "why": "path",
+          "claims": [
+            "C-2234-09"
+          ]
+        }
+      ]
+    },
+    "unanswered": [],
+    "context": "review/context/project.json"
+  },
+  "tool_versions": {
+    "git": "git version 2.43.0",
+    "python": "3.13.18"
+  },
+  "produced_by": "script"
+}

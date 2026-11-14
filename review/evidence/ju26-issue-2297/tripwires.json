@@ -1,0 +1,319 @@
+{
+  "check": "tripwires",
+  "branch": "ju26-issue-2297",
+  "base": "32258fdb",
+  "command": "python3 review/scripts/tripwires.py --repo $MP_REPO --branch ju26-issue-2297 --write",
+  "result": "pass",
+  "summary": "31 contract trips over 423 hunks (generated 19; targets 11; user-docs 1); 0 trips no claim answers",
+  "details": {
+    "hunks_total": 423,
+    "contracts_tripped": [
+      "generated",
+      "targets",
+      "user-docs"
+    ],
+    "contracts_clear": [
+      "diagnostics",
+      "public-api",
+      "security",
+      "wire-format"
+    ],
+    "trips": {
+      "generated": [
+        {
+          "hunk": "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.cs:27-27",
+          "why": "path",
+          "claims": [
+            "C-2297-03",
+            "C-2297-04",
+            "C-2297-07",
+            "C-2297-08"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.cs:56-58",
+          "why": "path",
+          "claims": [
+            "C-2297-03",
+            "C-2297-04",
+            "C-2297-08"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt:7-9",
+          "why": "path",
+          "claims": [
+            "C-2297-03",
+            "C-2297-04",
+            "C-2297-07",
+            "C-2297-08"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt:35-37",
+          "why": "path",
+          "claims": [
+            "C-2297-03",
+            "C-2297-04",
+            "C-2297-08"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/Transforms/EnumTemplate.cs:27-27",
+          "why": "path",
+          "claims": [
+            "C-2297-03",
+            "C-2297-04",
+            "C-2297-08"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/Transforms/EnumTemplate.tt:8-10",
+          "why": "path",
+          "claims": [
+            "C-2297-03",
+            "C-2297-04",
+            "C-2297-08"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.cs:33-33",
+          "why": "path",
+          "claims": [
+            "C-2297-03",
+            "C-2297-04",
+            "C-2297-08"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.tt:14-16",
+          "why": "path",
+          "claims": [
+            "C-2297-03",
+            "C-2297-04",
+            "C-2297-08"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:38-38",
+          "why": "path",
+          "claims": [
+            "C-2297-03",
+            "C-2297-04",
+            "C-2297-07",
+            "C-2297-08"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:55-57",
+          "why": "path",
+          "claims": [
+            "C-2297-03",
+            "C-2297-04",
+            "C-2297-08"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:67-67",
+          "why": "path",
+          "claims": [
+            "C-2297-03",
+            "C-2297-04",
+            "C-2297-08"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt:14-16",
+          "why": "path",
+          "claims": [
+            "C-2297-03",
+            "C-2297-04",
+            "C-2297-07",
+            "C-2297-08"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt:31-33",
+          "why": "path",
+          "claims": [
+            "C-2297-03",
+            "C-2297-04",
+            "C-2297-08"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt:48-50",
+          "why": "path",
+          "claims": [
+            "C-2297-03",
+            "C-2297-04",
+            "C-2297-08"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/Transforms/StringKey/StringKeyFormatterTemplate.cs:37-37",
+          "why": "path",
+          "claims": [
+            "C-2297-03",
+            "C-2297-04",
+            "C-2297-08"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/Transforms/StringKey/StringKeyFormatterTemplate.tt:18-20",
+          "why": "path",
+          "claims": [
+            "C-2297-03",
+            "C-2297-04",
+            "C-2297-08"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/Transforms/TransformUtilities.cs:58-58",
+          "why": "path",
+          "claims": [
+            "C-2297-05",
+            "C-2297-06"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.cs:30-30",
+          "why": "path",
+          "claims": [
+            "C-2297-03",
+            "C-2297-04",
+            "C-2297-08"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.tt:10-12",
+          "why": "path",
+          "claims": [
+            "C-2297-03",
+            "C-2297-04",
+            "C-2297-08"
+          ]
+        }
+      ],
+      "targets": [
+        {
+          "hunk": "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.cs:56-58",
+          "why": "line: +#if !NETSTANDARD2_0 && !NETFRAMEWORK",
+          "claims": [
+            "C-2297-03",
+            "C-2297-04",
+            "C-2297-08"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt:7-9",
+          "why": "line: +#if !NETSTANDARD2_0 && !NETFRAMEWORK",
+          "claims": [
+            "C-2297-03",
+            "C-2297-04",
+            "C-2297-07",
+            "C-2297-08"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt:35-37",
+          "why": "line: +#if !NETSTANDARD2_0 && !NETFRAMEWORK",
+          "claims": [
+            "C-2297-03",
+            "C-2297-04",
+            "C-2297-08"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/Transforms/EnumTemplate.tt:8-10",
+          "why": "line: +#if !NETSTANDARD2_0 && !NETFRAMEWORK",
+          "claims": [
+            "C-2297-03",
+            "C-2297-04",
+            "C-2297-08"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.tt:14-16",
+          "why": "line: +#if !NETSTANDARD2_0 && !NETFRAMEWORK",
+          "claims": [
+            "C-2297-03",
+            "C-2297-04",
+            "C-2297-08"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:55-57",
+          "why": "line: +#if !NETSTANDARD2_0 && !NETFRAMEWORK",
+          "claims": [
+            "C-2297-03",
+            "C-2297-04",
+            "C-2297-08"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt:14-16",
+          "why": "line: +#if !NETSTANDARD2_0 && !NETFRAMEWORK",
+          "claims": [
+            "C-2297-03",
+            "C-2297-04",
+            "C-2297-07",
+            "C-2297-08"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt:31-33",
+          "why": "line: +#if !NETSTANDARD2_0 && !NETFRAMEWORK",
+          "claims": [
+            "C-2297-03",
+            "C-2297-04",
+            "C-2297-08"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt:48-50",
+          "why": "line: +#if !NETSTANDARD2_0 && !NETFRAMEWORK",
+          "claims": [
+            "C-2297-03",
+            "C-2297-04",
+            "C-2297-08"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/Transforms/StringKey/StringKeyFormatterTemplate.tt:18-20",
+          "why": "line: +#if !NETSTANDARD2_0 && !NETFRAMEWORK",
+          "claims": [
+            "C-2297-03",
+            "C-2297-04",
+            "C-2297-08"
+          ]
+        },
+        {
+          "hunk": "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.tt:10-12",
+          "why": "line: +#if !NETSTANDARD2_0 && !NETFRAMEWORK",
+          "claims": [
+            "C-2297-03",
+            "C-2297-04",
+            "C-2297-08"
+          ]
+        }
+      ],
+      "user-docs": [
+        {
+          "hunk": "README.md:1639-1641",
+          "why": "path",
+          "claims": [
+            "C-2297-09"
+          ]
+        }
+      ]
+    },
+    "unanswered": [],
+    "context": "review/context/project.json"
+  },
+  "tool_versions": {
+    "git": "git version 2.43.0",
+    "python": "3.13.18"
+  },
+  "produced_by": "script"
+}
