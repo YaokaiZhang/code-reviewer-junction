@@ -1,0 +1,522 @@
+{
+  "check": "explain-check",
+  "branch": "ju26-issue-2297",
+  "base": "32258fdb",
+  "head": "a0aa5ab2",
+  "command": "python3 review/scripts/explain_check.py --repo $MP_REPO --branch ju26-issue-2297 --write",
+  "result": "pass",
+  "provides": [
+    "count"
+  ],
+  "summary": "2 new tests explained in 11 steps; 11 of 11 steps match the cited code; 2 of 2 tests fail before the change and pass after",
+  "details": {
+    "cards": [
+      {
+        "id": "T-2297-01",
+        "test": "AllGeneratedTypesAreExcludedFromCodeCoverage",
+        "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+        "span": [
+          64,
+          79
+        ],
+        "helpers": [
+          {
+            "name": "ExcludeAttribute",
+            "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+            "span": [
+              16,
+              16
+            ]
+          },
+          {
+            "name": "TestSource",
+            "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+            "span": [
+              21,
+              62
+            ]
+          },
+          {
+            "name": "RunGeneratorAsync",
+            "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+            "span": [
+              112,
+              129
+            ]
+          }
+        ],
+        "claims": [
+          "C-2297-04",
+          "C-2297-09"
+        ],
+        "steps": [
+          {
+            "op": "GIVEN",
+            "text": "a shared sample `TestSource` with an int-keyed `MyObject`, a string-keyed `MyStringKeyObject`, an enum `MyEnum`, a union `IMyUnion` with member `MyUnionMember`, and a resolver `GeneratedMessagePackResolver`",
+            "lines": [
+              21,
+              58
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "TestSource",
+              "MyObject",
+              "MyStringKeyObject",
+              "MyEnum",
+              "IMyUnion",
+              "MyUnionMember",
+              "GeneratedMessagePackResolver"
+            ]
+          },
+          {
+            "op": "AND",
+            "text": "`ExcludeAttribute` is the exact text `[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]`",
+            "lines": [
+              16,
+              16
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "ExcludeAttribute",
+              "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]"
+            ]
+          },
+          {
+            "op": "WHEN",
+            "text": "`RunGeneratorAsync` runs the source generator once on that sample and returns each generated file's path and text",
+            "lines": [
+              67,
+              67
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "RunGeneratorAsync"
+            ]
+          },
+          {
+            "op": "AND",
+            "text": "the helper throws away the generator's diagnostics and the updated compilation (`out _, out _`)",
+            "lines": [
+              122,
+              128
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "out _, out _"
+            ]
+          },
+          {
+            "op": "THEN",
+            "text": "it asserts at least five files came out (`generated.Count >= 5`)",
+            "lines": [
+              71,
+              71
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "generated.Count >= 5"
+            ]
+          },
+          {
+            "op": "AND",
+            "text": "it asserts every generated file's text contains the attribute (`text.Contains(ExcludeAttribute)`)",
+            "lines": [
+              73,
+              77
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "text.Contains(ExcludeAttribute)"
+            ]
+          }
+        ],
+        "results_from": [
+          "evidence/ju26-issue-2297/new-tests-on-base.json",
+          "evidence/ju26-issue-2297/regeneration.json"
+        ],
+        "does_not_check": [
+          "It checks the attribute appears at least once per file, not that every type in the file carries it.",
+          "It does not compile the generated code, and generator errors would go unnoticed."
+        ],
+        "notes": [
+          "Fails on base (the resolver file has no attribute) and passes on the branch."
+        ],
+        "method_found": true,
+        "results": [
+          {
+            "run": "before the change (new test copied onto base)",
+            "outcome": "fail",
+            "message": "Generated file 'MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs' is missing [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage].",
+            "source": "evidence/ju26-issue-2297/new-tests-on-base.json",
+            "produced_by": "script"
+          },
+          {
+            "run": "after the change",
+            "outcome": "pass",
+            "message": "",
+            "source": "evidence/ju26-issue-2297/regeneration.json",
+            "produced_by": "script"
+          }
+        ],
+        "flips": true,
+        "verdict": "fails before, passes after: it tests the change",
+        "code": {
+          "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs": {
+            "64": "    [Fact]",
+            "65": "    public async Task AllGeneratedTypesAreExcludedFromCodeCoverage()",
+            "66": "    {",
+            "67": "        IReadOnlyList<(string Path, string Text)> generated = await RunGeneratorAsync(TestSource);",
+            "68": "",
+            "69": "        // Formatters for objects (both integer and string keyed), the enum and union, plus the resolver.",
+            "70": "        string paths = string.Join(Environment.NewLine, generated.Select(g => g.Path));",
+            "71": "        Assert.True(generated.Count >= 5, $\"Expected generated formatters and resolver, got:{Environment.NewLine}{paths}\");",
+            "72": "",
+            "73": "        foreach ((string path, string text) in generated)",
+            "74": "        {",
+            "75": "            Assert.True(",
+            "76": "                text.Contains(ExcludeAttribute),",
+            "77": "                $\"Generated file '{path}' is missing {ExcludeAttribute}.\");",
+            "78": "        }",
+            "79": "    }",
+            "16": "    private const string ExcludeAttribute = \"[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]\";",
+            "21": "    private const string TestSource = \"\"\"",
+            "22": "        using MessagePack;",
+            "23": "",
+            "24": "        [MessagePackObject]",
+            "25": "        public class MyObject",
+            "26": "        {",
+            "27": "            [Key(0)]",
+            "28": "            public int Value { get; set; }",
+            "29": "        }",
+            "30": "",
+            "31": "        [MessagePackObject(keyAsPropertyName: true)]",
+            "32": "        public class MyStringKeyObject",
+            "33": "        {",
+            "34": "            public string Name { get; set; }",
+            "35": "        }",
+            "36": "",
+            "37": "        public enum MyEnum",
+            "38": "        {",
+            "39": "            A,",
+            "40": "            B,",
+            "41": "        }",
+            "42": "",
+            "43": "        [Union(0, typeof(MyUnionMember))]",
+            "44": "        public interface IMyUnion",
+            "45": "        {",
+            "46": "        }",
+            "47": "",
+            "48": "        [MessagePackObject]",
+            "49": "        public class MyUnionMember : IMyUnion",
+            "50": "        {",
+            "51": "            [Key(0)]",
+            "52": "            public int Value { get; set; }",
+            "53": "        }",
+            "54": "",
+            "55": "        namespace MessagePack",
+            "56": "        {",
+            "57": "            [GeneratedMessagePackResolver]",
+            "58": "            partial class GeneratedMessagePackResolver",
+            "59": "            {",
+            "60": "            }",
+            "61": "        }",
+            "62": "        \"\"\";",
+            "112": "    private static async Task<IReadOnlyList<(string Path, string Text)>> RunGeneratorAsync(string source)",
+            "113": "    {",
+            "114": "        ImmutableArray<MetadataReference> frameworkReferences = await ReferencesHelper.DefaultTargetFrameworkReferences.ResolveAsync(LanguageNames.CSharp, CancellationToken.None);",
+            "115": "",
+            "116": "        CSharpCompilation compilation = CSharpCompilation.Create(",
+            "117": "            assemblyName: \"CodeCoverageExclusionTests\",",
+            "118": "            syntaxTrees: [CSharpSyntaxTree.ParseText(source, new CSharpParseOptions(LanguageVersion.Latest))],",
+            "119": "            references: frameworkReferences.Concat(ReferencesHelper.GetReferences(ReferencesSet.MessagePack)),",
+            "120": "            options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));",
+            "121": "",
+            "122": "        var driver = CSharpGeneratorDriver.Create(new MessagePackGenerator());",
+            "123": "        driver = (CSharpGeneratorDriver)driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out _);",
+            "124": "        GeneratorDriverRunResult result = driver.GetRunResult();",
+            "125": "",
+            "126": "        return result.GeneratedTrees",
+            "127": "            .Select(tree => (tree.FilePath, tree.GetText().ToString()))",
+            "128": "            .ToList();",
+            "129": "    }"
+          }
+        }
+      },
+      {
+        "id": "T-2297-02",
+        "test": "ExcludeAttributeIsGuardedForTargetsWhereItIsUnavailable",
+        "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+        "span": [
+          81,
+          97
+        ],
+        "helpers": [
+          {
+            "name": "ExcludeAttribute",
+            "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+            "span": [
+              16,
+              16
+            ]
+          },
+          {
+            "name": "Guard",
+            "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+            "span": [
+              18,
+              19
+            ]
+          },
+          {
+            "name": "TestSource",
+            "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+            "span": [
+              21,
+              62
+            ]
+          },
+          {
+            "name": "CountOccurrences",
+            "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+            "span": [
+              99,
+              110
+            ]
+          },
+          {
+            "name": "RunGeneratorAsync",
+            "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+            "span": [
+              112,
+              129
+            ]
+          }
+        ],
+        "claims": [
+          "C-2297-04",
+          "C-2297-08"
+        ],
+        "steps": [
+          {
+            "op": "GIVEN",
+            "text": "`Guard` is the line `#if !NETSTANDARD2_0 && !NETFRAMEWORK`, meant to hide the attribute from targets said not to have it",
+            "lines": [
+              18,
+              19
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "Guard",
+              "#if !NETSTANDARD2_0 && !NETFRAMEWORK"
+            ]
+          },
+          {
+            "op": "WHEN",
+            "text": "`RunGeneratorAsync(TestSource)` runs the generator on the shared sample",
+            "lines": [
+              84,
+              84
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "RunGeneratorAsync(TestSource)"
+            ]
+          },
+          {
+            "op": "AND",
+            "text": "for each generated file, Windows line endings are turned into plain newlines (`text.Replace(\"\\r\\n\", \"\\n\")`)",
+            "lines": [
+              88,
+              88
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "text.Replace(\"\\r\\n\", \"\\n\")"
+            ]
+          },
+          {
+            "op": "AND",
+            "text": "it counts all occurrences of the attribute, and separately the occurrences that sit in the exact block: guard line, attribute line (indented by one tab or not at all), `#endif`",
+            "lines": [
+              91,
+              93
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "#endif"
+            ]
+          },
+          {
+            "op": "THEN",
+            "text": "it asserts the file has at least one attribute (`attributeCount > 0`) and that every one is guarded (`Assert.Equal(attributeCount, guardedCount)`)",
+            "lines": [
+              94,
+              95
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "attributeCount > 0",
+              "Assert.Equal(attributeCount, guardedCount)"
+            ]
+          }
+        ],
+        "results_from": [
+          "evidence/ju26-issue-2297/new-tests-on-base.json",
+          "evidence/ju26-issue-2297/regeneration.json"
+        ],
+        "does_not_check": [
+          "It does not compile the generated code for netstandard2.0 or .NET Framework, so it does not show those consumers still build.",
+          "It does not check that the guard is needed; our evidence says the attribute exists on both targets (C-2297-08)."
+        ],
+        "notes": [
+          "Fails on base (no attribute in the resolver file) and passes on the branch."
+        ],
+        "method_found": true,
+        "results": [
+          {
+            "run": "before the change (new test copied onto base)",
+            "outcome": "fail",
+            "message": "Generated file 'MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs' has no [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage].",
+            "source": "evidence/ju26-issue-2297/new-tests-on-base.json",
+            "produced_by": "script"
+          },
+          {
+            "run": "after the change",
+            "outcome": "pass",
+            "message": "",
+            "source": "evidence/ju26-issue-2297/regeneration.json",
+            "produced_by": "script"
+          }
+        ],
+        "flips": true,
+        "verdict": "fails before, passes after: it tests the change",
+        "code": {
+          "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs": {
+            "81": "    [Fact]",
+            "82": "    public async Task ExcludeAttributeIsGuardedForTargetsWhereItIsUnavailable()",
+            "83": "    {",
+            "84": "        IReadOnlyList<(string Path, string Text)> generated = await RunGeneratorAsync(TestSource);",
+            "85": "",
+            "86": "        foreach ((string path, string text) in generated)",
+            "87": "        {",
+            "88": "            string normalized = text.Replace(\"\\r\\n\", \"\\n\");",
+            "89": "",
+            "90": "            // Every occurrence of the attribute must be wrapped by the guard, so netstandard2.0 consumers still compile.",
+            "91": "            int attributeCount = CountOccurrences(normalized, ExcludeAttribute);",
+            "92": "            int guardedCount = CountOccurrences(normalized, $\"{Guard}\\n\\t{ExcludeAttribute}\\n#endif\\n\")",
+            "93": "                + CountOccurrences(normalized, $\"{Guard}\\n{ExcludeAttribute}\\n#endif\\n\");",
+            "94": "            Assert.True(attributeCount > 0, $\"Generated file '{path}' has no {ExcludeAttribute}.\");",
+            "95": "            Assert.Equal(attributeCount, guardedCount);",
+            "96": "        }",
+            "97": "    }",
+            "16": "    private const string ExcludeAttribute = \"[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]\";",
+            "18": "    // The attribute is not available on netstandard2.0 or .NET Framework, so it is only emitted where it exists.",
+            "19": "    private const string Guard = \"#if !NETSTANDARD2_0 && !NETFRAMEWORK\";",
+            "21": "    private const string TestSource = \"\"\"",
+            "22": "        using MessagePack;",
+            "23": "",
+            "24": "        [MessagePackObject]",
+            "25": "        public class MyObject",
+            "26": "        {",
+            "27": "            [Key(0)]",
+            "28": "            public int Value { get; set; }",
+            "29": "        }",
+            "30": "",
+            "31": "        [MessagePackObject(keyAsPropertyName: true)]",
+            "32": "        public class MyStringKeyObject",
+            "33": "        {",
+            "34": "            public string Name { get; set; }",
+            "35": "        }",
+            "36": "",
+            "37": "        public enum MyEnum",
+            "38": "        {",
+            "39": "            A,",
+            "40": "            B,",
+            "41": "        }",
+            "42": "",
+            "43": "        [Union(0, typeof(MyUnionMember))]",
+            "44": "        public interface IMyUnion",
+            "45": "        {",
+            "46": "        }",
+            "47": "",
+            "48": "        [MessagePackObject]",
+            "49": "        public class MyUnionMember : IMyUnion",
+            "50": "        {",
+            "51": "            [Key(0)]",
+            "52": "            public int Value { get; set; }",
+            "53": "        }",
+            "54": "",
+            "55": "        namespace MessagePack",
+            "56": "        {",
+            "57": "            [GeneratedMessagePackResolver]",
+            "58": "            partial class GeneratedMessagePackResolver",
+            "59": "            {",
+            "60": "            }",
+            "61": "        }",
+            "62": "        \"\"\";",
+            "99": "    private static int CountOccurrences(string text, string value)",
+            "100": "    {",
+            "101": "        int count = 0;",
+            "102": "        int index = 0;",
+            "103": "        while ((index = text.IndexOf(value, index, StringComparison.Ordinal)) >= 0)",
+            "104": "        {",
+            "105": "            count++;",
+            "106": "            index += value.Length;",
+            "107": "        }",
+            "108": "",
+            "109": "        return count;",
+            "110": "    }",
+            "112": "    private static async Task<IReadOnlyList<(string Path, string Text)>> RunGeneratorAsync(string source)",
+            "113": "    {",
+            "114": "        ImmutableArray<MetadataReference> frameworkReferences = await ReferencesHelper.DefaultTargetFrameworkReferences.ResolveAsync(LanguageNames.CSharp, CancellationToken.None);",
+            "115": "",
+            "116": "        CSharpCompilation compilation = CSharpCompilation.Create(",
+            "117": "            assemblyName: \"CodeCoverageExclusionTests\",",
+            "118": "            syntaxTrees: [CSharpSyntaxTree.ParseText(source, new CSharpParseOptions(LanguageVersion.Latest))],",
+            "119": "            references: frameworkReferences.Concat(ReferencesHelper.GetReferences(ReferencesSet.MessagePack)),",
+            "120": "            options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));",
+            "121": "",
+            "122": "        var driver = CSharpGeneratorDriver.Create(new MessagePackGenerator());",
+            "123": "        driver = (CSharpGeneratorDriver)driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out _);",
+            "124": "        GeneratorDriverRunResult result = driver.GetRunResult();",
+            "125": "",
+            "126": "        return result.GeneratedTrees",
+            "127": "            .Select(tree => (tree.FilePath, tree.GetText().ToString()))",
+            "128": "            .ToList();",
+            "129": "    }"
+          }
+        }
+      }
+    ],
+    "unverified_steps": [],
+    "pseudo_code_by": "agent",
+    "spec": "explain/ju26-issue-2297.json"
+  },
+  "tool_versions": {
+    "git": "git version 2.43.0",
+    "python": "3.13.18"
+  },
+  "produced_by": "script"
+}

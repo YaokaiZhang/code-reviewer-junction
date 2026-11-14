@@ -1,0 +1,1347 @@
+{
+  "check": "explain-check",
+  "branch": "ju26-issue-2234",
+  "base": "32258fdb",
+  "head": "9007cee1",
+  "command": "python3 review/scripts/explain_check.py --repo $MP_REPO --branch ju26-issue-2234 --write",
+  "result": "pass",
+  "provides": [
+    "count"
+  ],
+  "summary": "10 new tests explained in 40 steps; 40 of 40 steps match the cited code; 4 of 10 tests fail before the change and pass after",
+  "details": {
+    "cards": [
+      {
+        "id": "T-2234-01",
+        "test": "MemberWithoutKeyIsReported",
+        "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+        "span": [
+          20,
+          36
+        ],
+        "helpers": [],
+        "claims": [
+          "C-2234-07",
+          "C-2234-09"
+        ],
+        "steps": [
+          {
+            "op": "GIVEN",
+            "text": "a class `Foo` marked `[MessagePackObject(SuppressSourceGeneration = true)]`",
+            "lines": [
+              24,
+              25
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "Foo",
+              "[MessagePackObject(SuppressSourceGeneration = true)]"
+            ]
+          },
+          {
+            "op": "AND",
+            "text": "it has a public property `Member` with no key attribute",
+            "lines": [
+              27,
+              27
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "Member"
+            ]
+          },
+          {
+            "op": "WHEN",
+            "text": "the MessagePack analyzer runs on this code through `VerifyCS.Test`",
+            "lines": [
+              31,
+              35
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "VerifyCS.Test"
+            ]
+          },
+          {
+            "op": "THEN",
+            "text": "exactly one diagnostic is expected: `MsgPack004` on the property name `Member`; any missing or extra diagnostic fails the test",
+            "lines": [
+              27,
+              35
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "MsgPack004",
+              "Member"
+            ]
+          }
+        ],
+        "results_from": [
+          "evidence/ju26-issue-2234/old-vs-new-tests.json"
+        ],
+        "does_not_check": [
+          "It does not compare the diagnostic's message text; the markup only fixes the id and the location.",
+          "It does not check that the suppressed type still serializes at run time."
+        ],
+        "notes": [
+          "Also passes on base (old-vs-new-tests.json), so it pins existing behaviour and is not evidence for the fix (C-2234-07)."
+        ],
+        "method_found": true,
+        "results": [
+          {
+            "run": "before the change",
+            "outcome": "pass",
+            "message": "",
+            "source": "evidence/ju26-issue-2234/old-vs-new-tests.json",
+            "produced_by": "script"
+          },
+          {
+            "run": "after the change",
+            "outcome": "pass",
+            "message": "",
+            "source": "evidence/ju26-issue-2234/old-vs-new-tests.json",
+            "produced_by": "script"
+          }
+        ],
+        "flips": false,
+        "verdict": "passes before the change too: it does not test the change",
+        "code": {
+          "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs": {
+            "20": "    [Fact]",
+            "21": "    public async Task MemberWithoutKeyIsReported()",
+            "22": "    {",
+            "23": "        string input = Preamble + @\"",
+            "24": "[MessagePackObject(SuppressSourceGeneration = true)]",
+            "25": "public class Foo",
+            "26": "{",
+            "27": "    public string {|MsgPack004:Member|} { get; set; }",
+            "28": "}",
+            "29": "\";",
+            "30": "",
+            "31": "        await new VerifyCS.Test",
+            "32": "        {",
+            "33": "            TestCode = input,",
+            "34": "            MarkupOptions = MarkupOptions.UseFirstDescriptor,",
+            "35": "        }.RunAsync();",
+            "36": "    }"
+          }
+        }
+      },
+      {
+        "id": "T-2234-02",
+        "test": "AllowPrivateRequiredIsReported",
+        "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+        "span": [
+          38,
+          55
+        ],
+        "helpers": [],
+        "claims": [
+          "C-2234-07",
+          "C-2234-09"
+        ],
+        "steps": [
+          {
+            "op": "GIVEN",
+            "text": "a class `Foo` marked `MessagePackObject(SuppressSourceGeneration = true)`, which does not allow private members",
+            "lines": [
+              42,
+              43
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "Foo",
+              "MessagePackObject(SuppressSourceGeneration = true)"
+            ]
+          },
+          {
+            "op": "AND",
+            "text": "it has a private field `member` with `[Key(0)]`",
+            "lines": [
+              45,
+              46
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "member",
+              "[Key(0)]"
+            ]
+          },
+          {
+            "op": "WHEN",
+            "text": "the MessagePack analyzer runs on this code through `VerifyCS.Test`",
+            "lines": [
+              50,
+              54
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "VerifyCS.Test"
+            ]
+          },
+          {
+            "op": "THEN",
+            "text": "exactly one diagnostic is expected: `MsgPack015` on the `MessagePackObject(SuppressSourceGeneration = true)` attribute; any missing or extra diagnostic fails the test",
+            "lines": [
+              42,
+              54
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "MsgPack015",
+              "MessagePackObject(SuppressSourceGeneration = true)"
+            ]
+          }
+        ],
+        "results_from": [
+          "evidence/ju26-issue-2234/old-vs-new-tests.json"
+        ],
+        "does_not_check": [
+          "It does not compare the diagnostic's message text; the markup only fixes the id and the location.",
+          "It does not check the code fix that the diagnostic offers."
+        ],
+        "notes": [
+          "Also passes on base (old-vs-new-tests.json), so it pins existing behaviour and is not evidence for the fix (C-2234-07)."
+        ],
+        "method_found": true,
+        "results": [
+          {
+            "run": "before the change",
+            "outcome": "pass",
+            "message": "",
+            "source": "evidence/ju26-issue-2234/old-vs-new-tests.json",
+            "produced_by": "script"
+          },
+          {
+            "run": "after the change",
+            "outcome": "pass",
+            "message": "",
+            "source": "evidence/ju26-issue-2234/old-vs-new-tests.json",
+            "produced_by": "script"
+          }
+        ],
+        "flips": false,
+        "verdict": "passes before the change too: it does not test the change",
+        "code": {
+          "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs": {
+            "38": "    [Fact]",
+            "39": "    public async Task AllowPrivateRequiredIsReported()",
+            "40": "    {",
+            "41": "        string input = Preamble + @\"",
+            "42": "[{|MsgPack015:MessagePackObject(SuppressSourceGeneration = true)|}]",
+            "43": "public class Foo",
+            "44": "{",
+            "45": "    [Key(0)]",
+            "46": "    private string member;",
+            "47": "}",
+            "48": "\";",
+            "49": "",
+            "50": "        await new VerifyCS.Test",
+            "51": "        {",
+            "52": "            TestCode = input,",
+            "53": "            MarkupOptions = MarkupOptions.UseFirstDescriptor,",
+            "54": "        }.RunAsync();",
+            "55": "    }"
+          }
+        }
+      },
+      {
+        "id": "T-2234-03",
+        "test": "MemberTypeMustBeMessagePackObjectIsReported",
+        "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+        "span": [
+          57,
+          78
+        ],
+        "helpers": [],
+        "claims": [
+          "C-2234-07",
+          "C-2234-09"
+        ],
+        "steps": [
+          {
+            "op": "GIVEN",
+            "text": "a plain class `Other` with no MessagePack attribute",
+            "lines": [
+              61,
+              63
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "Other"
+            ]
+          },
+          {
+            "op": "AND",
+            "text": "a class `Foo` marked `[MessagePackObject(SuppressSourceGeneration = true)]` with a `[Key(0)]` property `Member` of type `Other`",
+            "lines": [
+              65,
+              69
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "Foo",
+              "[MessagePackObject(SuppressSourceGeneration = true)]",
+              "[Key(0)]",
+              "Member",
+              "Other"
+            ]
+          },
+          {
+            "op": "WHEN",
+            "text": "the MessagePack analyzer runs on this code through `VerifyCS.Test`",
+            "lines": [
+              73,
+              77
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "VerifyCS.Test"
+            ]
+          },
+          {
+            "op": "THEN",
+            "text": "exactly one diagnostic is expected: `MsgPack003` on the property name `Member`; any missing or extra diagnostic fails the test",
+            "lines": [
+              69,
+              77
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "MsgPack003",
+              "Member"
+            ]
+          }
+        ],
+        "results_from": [
+          "evidence/ju26-issue-2234/old-vs-new-tests.json"
+        ],
+        "does_not_check": [
+          "It does not compare the diagnostic's message text; the markup only fixes the id and the location.",
+          "It does not combine an unserializable member type with a duplicate or mixed key, the case where the branch drops this diagnostic (C-2234-04)."
+        ],
+        "notes": [
+          "Also passes on base (old-vs-new-tests.json), so it pins existing behaviour and is not evidence for the fix (C-2234-07)."
+        ],
+        "method_found": true,
+        "results": [
+          {
+            "run": "before the change",
+            "outcome": "pass",
+            "message": "",
+            "source": "evidence/ju26-issue-2234/old-vs-new-tests.json",
+            "produced_by": "script"
+          },
+          {
+            "run": "after the change",
+            "outcome": "pass",
+            "message": "",
+            "source": "evidence/ju26-issue-2234/old-vs-new-tests.json",
+            "produced_by": "script"
+          }
+        ],
+        "flips": false,
+        "verdict": "passes before the change too: it does not test the change",
+        "code": {
+          "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs": {
+            "57": "    [Fact]",
+            "58": "    public async Task MemberTypeMustBeMessagePackObjectIsReported()",
+            "59": "    {",
+            "60": "        string input = Preamble + @\"",
+            "61": "public class Other",
+            "62": "{",
+            "63": "}",
+            "64": "",
+            "65": "[MessagePackObject(SuppressSourceGeneration = true)]",
+            "66": "public class Foo",
+            "67": "{",
+            "68": "    [Key(0)]",
+            "69": "    public Other {|MsgPack003:Member|} { get; set; }",
+            "70": "}",
+            "71": "\";",
+            "72": "",
+            "73": "        await new VerifyCS.Test",
+            "74": "        {",
+            "75": "            TestCode = input,",
+            "76": "            MarkupOptions = MarkupOptions.UseFirstDescriptor,",
+            "77": "        }.RunAsync();",
+            "78": "    }"
+          }
+        }
+      },
+      {
+        "id": "T-2234-04",
+        "test": "DuplicateIntKeysAreReportedWithoutAnalyzerFailure",
+        "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+        "span": [
+          80,
+          100
+        ],
+        "helpers": [],
+        "claims": [
+          "C-2234-01",
+          "C-2234-05"
+        ],
+        "steps": [
+          {
+            "op": "GIVEN",
+            "text": "a class `Foo` marked `[MessagePackObject(SuppressSourceGeneration = true)]`",
+            "lines": [
+              84,
+              85
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "Foo",
+              "[MessagePackObject(SuppressSourceGeneration = true)]"
+            ]
+          },
+          {
+            "op": "AND",
+            "text": "two properties `Member1` and `Member2` that both carry `[Key(0)]`",
+            "lines": [
+              87,
+              91
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "Member1",
+              "Member2",
+              "[Key(0)]"
+            ]
+          },
+          {
+            "op": "WHEN",
+            "text": "the MessagePack analyzer runs on this code through `VerifyCS.Test`",
+            "lines": [
+              95,
+              99
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "VerifyCS.Test"
+            ]
+          },
+          {
+            "op": "THEN",
+            "text": "exactly one diagnostic is expected: `MsgPack005` covering the second member (its `[Key(0)]` and declaration); any extra diagnostic, such as an analyzer crash report, fails the test",
+            "lines": [
+              90,
+              99
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "MsgPack005",
+              "[Key(0)]"
+            ]
+          }
+        ],
+        "results_from": [
+          "evidence/ju26-issue-2234/old-vs-new-tests.json"
+        ],
+        "does_not_check": [
+          "It does not compare the diagnostic's message text; the markup only fixes the id and the location. So it does not show the message is 'must be unique'.",
+          "It does not cover a `[Key(null)]` member, where the analyzer still crashes on the branch (C-2234-03)."
+        ],
+        "notes": [
+          "Fails on base with 2 diagnostics instead of the expected 1 (the analyzer also threw) and passes on the branch."
+        ],
+        "method_found": true,
+        "results": [
+          {
+            "run": "before the change",
+            "outcome": "fail",
+            "message": "System.InvalidOperationException : Context: Diagnostics of test state\nMismatch between number of diagnostics returned, expected \"1\" actual \"2\"\r\n\r\nDiagnostics:\r\n// /0/Test0.cs(10,5): error MsgPack005: All KeyAttribute arguments must be unique\nVerifyCS.Diagnostic(MsgPack00xMessagePackAnalyzer.MsgPack0",
+            "source": "evidence/ju26-issue-2234/old-vs-new-tests.json",
+            "produced_by": "script"
+          },
+          {
+            "run": "after the change",
+            "outcome": "pass",
+            "message": "",
+            "source": "evidence/ju26-issue-2234/old-vs-new-tests.json",
+            "produced_by": "script"
+          }
+        ],
+        "flips": true,
+        "verdict": "fails before, passes after: it tests the change",
+        "code": {
+          "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs": {
+            "80": "    [Fact]",
+            "81": "    public async Task DuplicateIntKeysAreReportedWithoutAnalyzerFailure()",
+            "82": "    {",
+            "83": "        string input = Preamble + @\"",
+            "84": "[MessagePackObject(SuppressSourceGeneration = true)]",
+            "85": "public class Foo",
+            "86": "{",
+            "87": "    [Key(0)]",
+            "88": "    public string Member1 { get; set; }",
+            "89": "",
+            "90": "    {|MsgPack005:[Key(0)]",
+            "91": "    public string Member2 { get; set; }|}",
+            "92": "}",
+            "93": "\";",
+            "94": "",
+            "95": "        await new VerifyCS.Test",
+            "96": "        {",
+            "97": "            TestCode = input,",
+            "98": "            MarkupOptions = MarkupOptions.UseFirstDescriptor,",
+            "99": "        }.RunAsync();",
+            "100": "    }"
+          }
+        }
+      },
+      {
+        "id": "T-2234-05",
+        "test": "DuplicateStringKeysAreReportedWithoutAnalyzerFailure",
+        "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+        "span": [
+          102,
+          122
+        ],
+        "helpers": [],
+        "claims": [
+          "C-2234-01",
+          "C-2234-05"
+        ],
+        "steps": [
+          {
+            "op": "GIVEN",
+            "text": "a class `Foo` marked `[MessagePackObject(SuppressSourceGeneration = true)]`",
+            "lines": [
+              106,
+              107
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "Foo",
+              "[MessagePackObject(SuppressSourceGeneration = true)]"
+            ]
+          },
+          {
+            "op": "AND",
+            "text": "two properties `Member1` and `Member2` that both carry the same string key `[Key(\"\"a\"\")]` (the doubled quotes are escaping inside the test's source string)",
+            "lines": [
+              109,
+              113
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "Member1",
+              "Member2",
+              "[Key(\"\"a\"\")]"
+            ]
+          },
+          {
+            "op": "WHEN",
+            "text": "the MessagePack analyzer runs on this code through `VerifyCS.Test`",
+            "lines": [
+              117,
+              121
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "VerifyCS.Test"
+            ]
+          },
+          {
+            "op": "THEN",
+            "text": "exactly one diagnostic is expected: `MsgPack005` covering the second member (its `[Key(\"\"a\"\")]` and declaration); any extra diagnostic, such as an analyzer crash report, fails the test",
+            "lines": [
+              112,
+              121
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "MsgPack005",
+              "[Key(\"\"a\"\")]"
+            ]
+          }
+        ],
+        "results_from": [
+          "evidence/ju26-issue-2234/old-vs-new-tests.json"
+        ],
+        "does_not_check": [
+          "It does not compare the diagnostic's message text; the markup only fixes the id and the location. So it does not show the message is 'must be unique'.",
+          "It does not check fields; only properties are used, although the fix was pasted into the fields loop too (C-2234-06)."
+        ],
+        "notes": [
+          "Fails on base with 2 diagnostics instead of the expected 1 (the analyzer also threw) and passes on the branch."
+        ],
+        "method_found": true,
+        "results": [
+          {
+            "run": "before the change",
+            "outcome": "fail",
+            "message": "System.InvalidOperationException : Context: Diagnostics of test state\nMismatch between number of diagnostics returned, expected \"1\" actual \"2\"\r\n\r\nDiagnostics:\r\n// /0/Test0.cs(10,5): error MsgPack005: All KeyAttribute arguments must be unique\nVerifyCS.Diagnostic(MsgPack00xMessagePackAnalyzer.MsgPack0",
+            "source": "evidence/ju26-issue-2234/old-vs-new-tests.json",
+            "produced_by": "script"
+          },
+          {
+            "run": "after the change",
+            "outcome": "pass",
+            "message": "",
+            "source": "evidence/ju26-issue-2234/old-vs-new-tests.json",
+            "produced_by": "script"
+          }
+        ],
+        "flips": true,
+        "verdict": "fails before, passes after: it tests the change",
+        "code": {
+          "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs": {
+            "102": "    [Fact]",
+            "103": "    public async Task DuplicateStringKeysAreReportedWithoutAnalyzerFailure()",
+            "104": "    {",
+            "105": "        string input = Preamble + @\"",
+            "106": "[MessagePackObject(SuppressSourceGeneration = true)]",
+            "107": "public class Foo",
+            "108": "{",
+            "109": "    [Key(\"\"a\"\")]",
+            "110": "    public string Member1 { get; set; }",
+            "111": "",
+            "112": "    {|MsgPack005:[Key(\"\"a\"\")]",
+            "113": "    public string Member2 { get; set; }|}",
+            "114": "}",
+            "115": "\";",
+            "116": "",
+            "117": "        await new VerifyCS.Test",
+            "118": "        {",
+            "119": "            TestCode = input,",
+            "120": "            MarkupOptions = MarkupOptions.UseFirstDescriptor,",
+            "121": "        }.RunAsync();",
+            "122": "    }"
+          }
+        }
+      },
+      {
+        "id": "T-2234-06",
+        "test": "MixedKeyKindsAreReportedWithoutAnalyzerFailure",
+        "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+        "span": [
+          124,
+          144
+        ],
+        "helpers": [],
+        "claims": [
+          "C-2234-01"
+        ],
+        "steps": [
+          {
+            "op": "GIVEN",
+            "text": "a class `Foo` marked `[MessagePackObject(SuppressSourceGeneration = true)]`",
+            "lines": [
+              128,
+              129
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "Foo",
+              "[MessagePackObject(SuppressSourceGeneration = true)]"
+            ]
+          },
+          {
+            "op": "AND",
+            "text": "two properties `Member1` and `Member2` that use different key kinds: `[Key(0)]` (a number) and `[Key(\"\"Member2\"\")]` (a string)",
+            "lines": [
+              131,
+              135
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "Member1",
+              "Member2",
+              "[Key(0)]",
+              "[Key(\"\"Member2\"\")]"
+            ]
+          },
+          {
+            "op": "WHEN",
+            "text": "the MessagePack analyzer runs on this code through `VerifyCS.Test`",
+            "lines": [
+              139,
+              143
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "VerifyCS.Test"
+            ]
+          },
+          {
+            "op": "THEN",
+            "text": "exactly one diagnostic is expected: `MsgPack005` covering the second member (its `[Key(\"\"Member2\"\")]` and declaration); any extra diagnostic, such as an analyzer crash report, fails the test",
+            "lines": [
+              134,
+              143
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "MsgPack005",
+              "[Key(\"\"Member2\"\")]"
+            ]
+          }
+        ],
+        "results_from": [
+          "evidence/ju26-issue-2234/old-vs-new-tests.json"
+        ],
+        "does_not_check": [
+          "It does not compare the diagnostic's message text; the markup only fixes the id and the location. So it cannot tell 'must be of the same type' from 'must be unique'; both share this id.",
+          "It does not try a string key first and a number key second, nor a member whose type is also unserializable (C-2234-04)."
+        ],
+        "notes": [
+          "Fails on base with 2 diagnostics instead of the expected 1 (the analyzer also threw) and passes on the branch."
+        ],
+        "method_found": true,
+        "results": [
+          {
+            "run": "before the change",
+            "outcome": "fail",
+            "message": "System.InvalidOperationException : Context: Diagnostics of test state\nMismatch between number of diagnostics returned, expected \"1\" actual \"2\"\r\n\r\nDiagnostics:\r\n// /0/Test0.cs(10,5): error MsgPack005: All KeyAttribute arguments must be of the same type (either string or int)\nVerifyCS.Diagnostic(MsgPa",
+            "source": "evidence/ju26-issue-2234/old-vs-new-tests.json",
+            "produced_by": "script"
+          },
+          {
+            "run": "after the change",
+            "outcome": "pass",
+            "message": "",
+            "source": "evidence/ju26-issue-2234/old-vs-new-tests.json",
+            "produced_by": "script"
+          }
+        ],
+        "flips": true,
+        "verdict": "fails before, passes after: it tests the change",
+        "code": {
+          "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs": {
+            "124": "    [Fact]",
+            "125": "    public async Task MixedKeyKindsAreReportedWithoutAnalyzerFailure()",
+            "126": "    {",
+            "127": "        string input = Preamble + @\"",
+            "128": "[MessagePackObject(SuppressSourceGeneration = true)]",
+            "129": "public class Foo",
+            "130": "{",
+            "131": "    [Key(0)]",
+            "132": "    public string Member1 { get; set; }",
+            "133": "",
+            "134": "    {|MsgPack005:[Key(\"\"Member2\"\")]",
+            "135": "    public string Member2 { get; set; }|}",
+            "136": "}",
+            "137": "\";",
+            "138": "",
+            "139": "        await new VerifyCS.Test",
+            "140": "        {",
+            "141": "            TestCode = input,",
+            "142": "            MarkupOptions = MarkupOptions.UseFirstDescriptor,",
+            "143": "        }.RunAsync();",
+            "144": "    }"
+          }
+        }
+      },
+      {
+        "id": "T-2234-07",
+        "test": "DuplicateKeysAreReportedWithoutAnalyzerFailureForGeneratedTypes",
+        "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+        "span": [
+          146,
+          166
+        ],
+        "helpers": [],
+        "claims": [
+          "C-2234-01",
+          "C-2234-05"
+        ],
+        "steps": [
+          {
+            "op": "GIVEN",
+            "text": "a class `Foo` marked plain `[MessagePackObject]`, so source generation is NOT suppressed",
+            "lines": [
+              150,
+              151
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "Foo",
+              "[MessagePackObject]"
+            ]
+          },
+          {
+            "op": "AND",
+            "text": "two properties `Member1` and `Member2` that both carry `[Key(0)]`",
+            "lines": [
+              153,
+              157
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "Member1",
+              "Member2",
+              "[Key(0)]"
+            ]
+          },
+          {
+            "op": "WHEN",
+            "text": "the MessagePack analyzer runs on this code through `VerifyCS.Test`",
+            "lines": [
+              161,
+              165
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "VerifyCS.Test"
+            ]
+          },
+          {
+            "op": "THEN",
+            "text": "exactly one diagnostic is expected: `MsgPack005` covering the second member (its `[Key(0)]` and declaration); any extra diagnostic, such as an analyzer crash report, fails the test",
+            "lines": [
+              156,
+              165
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "MsgPack005",
+              "[Key(0)]"
+            ]
+          }
+        ],
+        "results_from": [
+          "evidence/ju26-issue-2234/old-vs-new-tests.json"
+        ],
+        "does_not_check": [
+          "It does not compare the diagnostic's message text; the markup only fixes the id and the location.",
+          "It runs only the analyzer, not the source generator, so it does not check what the generator emits for this type."
+        ],
+        "notes": [
+          "Fails on base with 2 diagnostics instead of the expected 1 (the analyzer also threw) and passes on the branch."
+        ],
+        "method_found": true,
+        "results": [
+          {
+            "run": "before the change",
+            "outcome": "fail",
+            "message": "System.InvalidOperationException : Context: Diagnostics of test state\nMismatch between number of diagnostics returned, expected \"1\" actual \"2\"\r\n\r\nDiagnostics:\r\n// /0/Test0.cs(10,5): error MsgPack005: All KeyAttribute arguments must be unique\nVerifyCS.Diagnostic(MsgPack00xMessagePackAnalyzer.MsgPack0",
+            "source": "evidence/ju26-issue-2234/old-vs-new-tests.json",
+            "produced_by": "script"
+          },
+          {
+            "run": "after the change",
+            "outcome": "pass",
+            "message": "",
+            "source": "evidence/ju26-issue-2234/old-vs-new-tests.json",
+            "produced_by": "script"
+          }
+        ],
+        "flips": true,
+        "verdict": "fails before, passes after: it tests the change",
+        "code": {
+          "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs": {
+            "146": "    [Fact]",
+            "147": "    public async Task DuplicateKeysAreReportedWithoutAnalyzerFailureForGeneratedTypes()",
+            "148": "    {",
+            "149": "        string input = Preamble + @\"",
+            "150": "[MessagePackObject]",
+            "151": "public class Foo",
+            "152": "{",
+            "153": "    [Key(0)]",
+            "154": "    public string Member1 { get; set; }",
+            "155": "",
+            "156": "    {|MsgPack005:[Key(0)]",
+            "157": "    public string Member2 { get; set; }|}",
+            "158": "}",
+            "159": "\";",
+            "160": "",
+            "161": "        await new VerifyCS.Test",
+            "162": "        {",
+            "163": "            TestCode = input,",
+            "164": "            MarkupOptions = MarkupOptions.UseFirstDescriptor,",
+            "165": "        }.RunAsync();",
+            "166": "    }"
+          }
+        }
+      },
+      {
+        "id": "T-2234-08",
+        "test": "SourceGenerationOnlyDiagnosticsAreNotReportedWhenSuppressed",
+        "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+        "span": [
+          168,
+          192
+        ],
+        "helpers": [],
+        "claims": [
+          "C-2234-07",
+          "C-2234-09"
+        ],
+        "steps": [
+          {
+            "op": "GIVEN",
+            "text": "(per the test's comment) `MsgPack011`, `MsgPack016` and `MsgPack017` only matter when a formatter is generated",
+            "lines": [
+              171,
+              172
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "MsgPack011",
+              "MsgPack016",
+              "MsgPack017"
+            ]
+          },
+          {
+            "op": "AND",
+            "text": "a non-partial class `Foo` marked `[MessagePackObject(AllowPrivate = true, SuppressSourceGeneration = true)]`",
+            "lines": [
+              174,
+              175
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "Foo",
+              "[MessagePackObject(AllowPrivate = true, SuppressSourceGeneration = true)]"
+            ]
+          },
+          {
+            "op": "AND",
+            "text": "it has a private field `member`, an init-only property `Prop1` with a default value, and a plain property `Prop2`, keyed `[Key(0)]`, `[Key(1)]`, `[Key(2)]`",
+            "lines": [
+              177,
+              184
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "member",
+              "Prop1",
+              "Prop2",
+              "[Key(0)]",
+              "[Key(1)]",
+              "[Key(2)]"
+            ]
+          },
+          {
+            "op": "WHEN",
+            "text": "the MessagePack analyzer runs on this code through `VerifyCS.Test` with no expected-diagnostic markup",
+            "lines": [
+              188,
+              191
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "VerifyCS.Test"
+            ]
+          },
+          {
+            "op": "THEN",
+            "text": "`RunAsync()` passes only if no diagnostic at all is reported, because `TestCode = input` carries no expected-diagnostic markup; there is no explicit assert",
+            "lines": [
+              188,
+              191
+            ],
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "RunAsync()",
+              "TestCode = input"
+            ]
+          }
+        ],
+        "results_from": [
+          "evidence/ju26-issue-2234/old-vs-new-tests.json"
+        ],
+        "does_not_check": [
+          "It has no control case: it does not show these diagnostics would appear for the same type without `SuppressSourceGeneration`.",
+          "It does not say which member is meant to trigger which of the three skipped diagnostics."
+        ],
+        "notes": [
+          "Also passes on base (old-vs-new-tests.json), so it pins existing behaviour and is not evidence for the fix (C-2234-07)."
+        ],
+        "method_found": true,
+        "results": [
+          {
+            "run": "before the change",
+            "outcome": "pass",
+            "message": "",
+            "source": "evidence/ju26-issue-2234/old-vs-new-tests.json",
+            "produced_by": "script"
+          },
+          {
+            "run": "after the change",
+            "outcome": "pass",
+            "message": "",
+            "source": "evidence/ju26-issue-2234/old-vs-new-tests.json",
+            "produced_by": "script"
+          }
+        ],
+        "flips": false,
+        "verdict": "passes before the change too: it does not test the change",
+        "code": {
+          "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs": {
+            "168": "    [Fact]",
+            "169": "    public async Task SourceGenerationOnlyDiagnosticsAreNotReportedWhenSuppressed()",
+            "170": "    {",
+            "171": "        // The partial-class requirement (MsgPack011) and the AOT-only checks (MsgPack016, MsgPack017)",
+            "172": "        // only matter when a formatter is generated, so they are not reported for a suppressed type.",
+            "173": "        string input = Preamble + @\"",
+            "174": "[MessagePackObject(AllowPrivate = true, SuppressSourceGeneration = true)]",
+            "175": "public class Foo",
+            "176": "{",
+            "177": "    [Key(0)]",
+            "178": "    private string member;",
+            "179": "",
+            "180": "    [Key(1)]",
+            "181": "    public string Prop1 { get; init; } = \"\"some default\"\";",
+            "182": "",
+            "183": "    [Key(2)]",
+            "184": "    public string Prop2 { get; set; }",
+            "185": "}",
+            "186": "\";",
+            "187": "",
+            "188": "        await new VerifyCS.Test",
+            "189": "        {",
+            "190": "            TestCode = input,",
+            "191": "        }.RunAsync();",
+            "192": "    }"
+          }
+        }
+      },
+      {
+        "id": "T-2234-09",
+        "test": "NoFormatterIsGeneratedForSuppressedType",
+        "file": "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs",
+        "span": [
+          20,
+          24
+        ],
+        "helpers": [
+          {
+            "name": "SuppressedSourceGenerationType",
+            "file": "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs",
+            "span": [
+              4,
+              16
+            ]
+          }
+        ],
+        "claims": [
+          "C-2234-08"
+        ],
+        "steps": [
+          {
+            "op": "GIVEN",
+            "text": "a type `SuppressedSourceGenerationType` marked `[MessagePackObject(SuppressSourceGeneration = true)]` with `Id` under `[Key(0)]` and `Name` under `[Key(1)]`",
+            "lines": [
+              8,
+              15
+            ],
+            "file": "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "SuppressedSourceGenerationType",
+              "[MessagePackObject(SuppressSourceGeneration = true)]",
+              "Id",
+              "[Key(0)]",
+              "Name",
+              "[Key(1)]"
+            ]
+          },
+          {
+            "op": "WHEN",
+            "text": "the test asks the source-generated resolver `GeneratedMessagePackResolver.Instance` for a formatter for that type",
+            "lines": [
+              23,
+              23
+            ],
+            "file": "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "GeneratedMessagePackResolver.Instance"
+            ]
+          },
+          {
+            "op": "THEN",
+            "text": "it asserts the answer is null (`Assert.Null`)",
+            "lines": [
+              23,
+              23
+            ],
+            "file": "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "Assert.Null"
+            ]
+          }
+        ],
+        "results_from": [
+          "evidence/ju26-issue-2234/old-vs-new-tests.json",
+          "evidence/ju26-issue-2234/execution-tests-build.json"
+        ],
+        "does_not_check": [
+          "It does not look at the generated files; it only asks the resolver at run time.",
+          "It does not check that the analyzer still validates the type."
+        ],
+        "notes": [
+          "Never ran here: the execution test project does not build on base or branch (CS9057, generator not loaded), so the result is unknown (C-2234-08)."
+        ],
+        "method_found": true,
+        "results": [
+          {
+            "run": "before the change",
+            "outcome": "build_failed",
+            "message": "",
+            "source": "evidence/ju26-issue-2234/old-vs-new-tests.json",
+            "produced_by": "script"
+          },
+          {
+            "run": "after the change",
+            "outcome": "build_failed",
+            "message": "",
+            "source": "evidence/ju26-issue-2234/old-vs-new-tests.json",
+            "produced_by": "script"
+          }
+        ],
+        "flips": false,
+        "verdict": "did not run here",
+        "code": {
+          "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs": {
+            "20": "    [Fact]",
+            "21": "    public void NoFormatterIsGeneratedForSuppressedType()",
+            "22": "    {",
+            "23": "        Assert.Null(GeneratedMessagePackResolver.Instance.GetFormatter<SuppressedSourceGenerationType>());",
+            "24": "    }",
+            "4": "/// <summary>",
+            "5": "/// A type that opts out of source generation (https://github.com/MessagePack-CSharp/MessagePack-CSharp/issues/2234).",
+            "6": "/// It must still serialize correctly through the run-time (dynamic) resolver.",
+            "7": "/// </summary>",
+            "8": "[MessagePackObject(SuppressSourceGeneration = true)]",
+            "9": "public class SuppressedSourceGenerationType",
+            "10": "{",
+            "11": "    [Key(0)]",
+            "12": "    public int Id { get; set; }",
+            "13": "",
+            "14": "    [Key(1)]",
+            "15": "    public string Name { get; set; } = string.Empty;",
+            "16": "}"
+          }
+        }
+      },
+      {
+        "id": "T-2234-10",
+        "test": "SuppressedTypeRoundTripsThroughDynamicResolver",
+        "file": "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs",
+        "span": [
+          26,
+          36
+        ],
+        "helpers": [
+          {
+            "name": "SuppressedSourceGenerationType",
+            "file": "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs",
+            "span": [
+              4,
+              16
+            ]
+          }
+        ],
+        "claims": [
+          "C-2234-08"
+        ],
+        "steps": [
+          {
+            "op": "GIVEN",
+            "text": "a type `SuppressedSourceGenerationType` marked `[MessagePackObject(SuppressSourceGeneration = true)]` with `Id` under `[Key(0)]` and `Name` under `[Key(1)]`",
+            "lines": [
+              8,
+              15
+            ],
+            "file": "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "SuppressedSourceGenerationType",
+              "[MessagePackObject(SuppressSourceGeneration = true)]",
+              "Id",
+              "[Key(0)]",
+              "Name",
+              "[Key(1)]"
+            ]
+          },
+          {
+            "op": "AND",
+            "text": "a value with `Id = 7` and `Name = \"seven\"`",
+            "lines": [
+              29,
+              29
+            ],
+            "file": "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "Id = 7",
+              "Name = \"seven\""
+            ]
+          },
+          {
+            "op": "WHEN",
+            "text": "it is serialized to bytes and deserialized back, both with `MessagePackSerializerOptions.Standard`",
+            "lines": [
+              31,
+              32
+            ],
+            "file": "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "MessagePackSerializerOptions.Standard"
+            ]
+          },
+          {
+            "op": "THEN",
+            "text": "it asserts `Assert.Equal(7, result.Id)` and `Assert.Equal(\"seven\", result.Name)`",
+            "lines": [
+              34,
+              35
+            ],
+            "file": "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs",
+            "verified": true,
+            "problems": [],
+            "tokens": [
+              "Assert.Equal(7, result.Id)",
+              "Assert.Equal(\"seven\", result.Name)"
+            ]
+          }
+        ],
+        "results_from": [
+          "evidence/ju26-issue-2234/old-vs-new-tests.json",
+          "evidence/ju26-issue-2234/execution-tests-build.json"
+        ],
+        "does_not_check": [
+          "Despite its name, it does not check which resolver handled the type; it only uses the standard options.",
+          "It does not check the serialized bytes, only that the value survives a round trip."
+        ],
+        "notes": [
+          "Never ran here: the execution test project does not build on base or branch (CS9057, generator not loaded), so the result is unknown (C-2234-08)."
+        ],
+        "method_found": true,
+        "results": [
+          {
+            "run": "before the change",
+            "outcome": "build_failed",
+            "message": "",
+            "source": "evidence/ju26-issue-2234/old-vs-new-tests.json",
+            "produced_by": "script"
+          },
+          {
+            "run": "after the change",
+            "outcome": "build_failed",
+            "message": "",
+            "source": "evidence/ju26-issue-2234/old-vs-new-tests.json",
+            "produced_by": "script"
+          }
+        ],
+        "flips": false,
+        "verdict": "did not run here",
+        "code": {
+          "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs": {
+            "26": "    [Fact]",
+            "27": "    public void SuppressedTypeRoundTripsThroughDynamicResolver()",
+            "28": "    {",
+            "29": "        var value = new SuppressedSourceGenerationType { Id = 7, Name = \"seven\" };",
+            "30": "",
+            "31": "        byte[] bytes = MessagePackSerializer.Serialize(value, MessagePackSerializerOptions.Standard);",
+            "32": "        SuppressedSourceGenerationType result = MessagePackSerializer.Deserialize<SuppressedSourceGenerationType>(bytes, MessagePackSerializerOptions.Standard);",
+            "33": "",
+            "34": "        Assert.Equal(7, result.Id);",
+            "35": "        Assert.Equal(\"seven\", result.Name);",
+            "36": "    }",
+            "4": "/// <summary>",
+            "5": "/// A type that opts out of source generation (https://github.com/MessagePack-CSharp/MessagePack-CSharp/issues/2234).",
+            "6": "/// It must still serialize correctly through the run-time (dynamic) resolver.",
+            "7": "/// </summary>",
+            "8": "[MessagePackObject(SuppressSourceGeneration = true)]",
+            "9": "public class SuppressedSourceGenerationType",
+            "10": "{",
+            "11": "    [Key(0)]",
+            "12": "    public int Id { get; set; }",
+            "13": "",
+            "14": "    [Key(1)]",
+            "15": "    public string Name { get; set; } = string.Empty;",
+            "16": "}"
+          }
+        }
+      }
+    ],
+    "unverified_steps": [],
+    "pseudo_code_by": "agent",
+    "spec": "explain/ju26-issue-2234.json"
+  },
+  "tool_versions": {
+    "git": "git version 2.43.0",
+    "python": "3.13.18"
+  },
+  "produced_by": "script"
+}
