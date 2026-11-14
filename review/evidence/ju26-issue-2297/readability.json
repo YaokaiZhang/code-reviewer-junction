@@ -1,0 +1,641 @@
+{
+  "check": "readability",
+  "branch": "ju26-issue-2297",
+  "base": "32258fdb",
+  "head": "a0aa5ab2",
+  "command": "python3 review/scripts/readability.py --repo $MP_REPO --branch ju26-issue-2297 --write",
+  "result": "pass",
+  "provides": [
+    "count"
+  ],
+  "summary": "7 flags (H-07 6, H-20 1); 4 touched methods measured; 2 test methods added in 1 test files; 2 of 10 claims have flip/revert-test support",
+  "details": {
+    "result_means": "the script ran on every in-scope file; flags are signals tied to a cited rule, not verdicts",
+    "diff": "git diff 32258fdb...origin/ju26-issue-2297 (old side 32258fdb)",
+    "thresholds": "none from the maintainers; ours: clone window 6 normalised lines (from clone_complexity.py), repeated added block = same normalised hunk text 2+ times, a flag fires on any increase",
+    "method_parser_limits": [
+      "light brace matcher over text with strings, chars, comments and preprocessor lines blanked; not a C# parser",
+      "a method is a { block whose header sits directly in a type and has name( after attributes, with no = before (; property accessors count as Prop.get etc.; expression-bodied members count; local functions, lambdas, operators and indexers are not separated from their container",
+      "depth counts braces only (method body = 1); braceless if/else adds none",
+      "#if arms are not evaluated; both are parsed",
+      "a method's line span starts at its first attribute line (e.g. [Fact]) and ends at its closing brace",
+      "if/else/case/&&/|| are token counts on blanked text; `else if` counts as one else and one if",
+      "base and branch methods are matched by type, name and parameter text; a changed signature shows as removed + added",
+      "interpolation holes in non-raw interpolated strings: nested quotes tracked one level deep"
+    ],
+    "flags": [
+      {
+        "id": "RD-2297-01",
+        "measure": "identical added block repeated in src (normalised lines of one hunk; '2+ times' is ours)",
+        "value_base": 0,
+        "value_branch": 9,
+        "where": "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt:7-9,35-37; src/MessagePack.SourceGenerator/Transforms/EnumTemplate.tt:8-10; src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.tt:14-16; src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt:14-16,31-33,48-50; src/MessagePack.SourceGenerator/Transforms/StringKey/StringKeyFormatterTemplate.tt:18-20; src/MessagePack.SourceGenerator/Transforms/UnionTemplate.tt:10-12",
+        "rule": "H-20",
+        "rule_text": "Prefer complete, maintainable fixes over minimal patches (e.g. a version bump or a partial package-ref suppression).",
+        "sources": [
+          "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1636#issuecomment-1586427588",
+          "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1621#issuecomment-1555916472"
+        ],
+        "claims": [
+          "C-2297-03",
+          "C-2297-04",
+          "C-2297-07",
+          "C-2297-08"
+        ],
+        "detail": "3 normalised line(s), added 9 times: #if !NETSTANDARD2_0 && !NETFRAMEWORK | [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage] | #endif"
+      },
+      {
+        "id": "RD-2297-02",
+        "measure": "preprocessor lines the template emits into generated code (#if/#elif/#else/#endif)",
+        "value_base": 0,
+        "value_branch": 4,
+        "where": "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt:7,9,35,37",
+        "rule": "H-07",
+        "rule_text": "Keep logic out of T4 templates and do not add unnecessary dependencies to the generator; a clean code base outranks micro-savings in tooling.",
+        "sources": [
+          "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1374#issuecomment-1004707810",
+          "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1374#issuecomment-1005567533",
+          "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1374#issuecomment-1004119890"
+        ],
+        "claims": [
+          "C-2297-03",
+          "C-2297-04",
+          "C-2297-07",
+          "C-2297-08"
+        ]
+      },
+      {
+        "id": "RD-2297-03",
+        "measure": "preprocessor lines the template emits into generated code (#if/#elif/#else/#endif)",
+        "value_base": 0,
+        "value_branch": 2,
+        "where": "src/MessagePack.SourceGenerator/Transforms/EnumTemplate.tt:8,10",
+        "rule": "H-07",
+        "rule_text": "Keep logic out of T4 templates and do not add unnecessary dependencies to the generator; a clean code base outranks micro-savings in tooling.",
+        "sources": [
+          "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1374#issuecomment-1004707810",
+          "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1374#issuecomment-1005567533",
+          "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1374#issuecomment-1004119890"
+        ],
+        "claims": [
+          "C-2297-03",
+          "C-2297-04",
+          "C-2297-08"
+        ]
+      },
+      {
+        "id": "RD-2297-04",
+        "measure": "preprocessor lines the template emits into generated code (#if/#elif/#else/#endif)",
+        "value_base": 0,
+        "value_branch": 2,
+        "where": "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.tt:14,16",
+        "rule": "H-07",
+        "rule_text": "Keep logic out of T4 templates and do not add unnecessary dependencies to the generator; a clean code base outranks micro-savings in tooling.",
+        "sources": [
+          "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1374#issuecomment-1004707810",
+          "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1374#issuecomment-1005567533",
+          "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1374#issuecomment-1004119890"
+        ],
+        "claims": [
+          "C-2297-03",
+          "C-2297-04",
+          "C-2297-08"
+        ]
+      },
+      {
+        "id": "RD-2297-05",
+        "measure": "preprocessor lines the template emits into generated code (#if/#elif/#else/#endif)",
+        "value_base": 0,
+        "value_branch": 6,
+        "where": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt:14,16,31,33,48,50",
+        "rule": "H-07",
+        "rule_text": "Keep logic out of T4 templates and do not add unnecessary dependencies to the generator; a clean code base outranks micro-savings in tooling.",
+        "sources": [
+          "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1374#issuecomment-1004707810",
+          "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1374#issuecomment-1005567533",
+          "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1374#issuecomment-1004119890"
+        ],
+        "claims": [
+          "C-2297-03",
+          "C-2297-04",
+          "C-2297-07",
+          "C-2297-08"
+        ]
+      },
+      {
+        "id": "RD-2297-06",
+        "measure": "preprocessor lines the template emits into generated code (#if/#elif/#else/#endif)",
+        "value_base": 0,
+        "value_branch": 2,
+        "where": "src/MessagePack.SourceGenerator/Transforms/StringKey/StringKeyFormatterTemplate.tt:18,20",
+        "rule": "H-07",
+        "rule_text": "Keep logic out of T4 templates and do not add unnecessary dependencies to the generator; a clean code base outranks micro-savings in tooling.",
+        "sources": [
+          "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1374#issuecomment-1004707810",
+          "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1374#issuecomment-1005567533",
+          "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1374#issuecomment-1004119890"
+        ],
+        "claims": [
+          "C-2297-03",
+          "C-2297-04",
+          "C-2297-08"
+        ]
+      },
+      {
+        "id": "RD-2297-07",
+        "measure": "preprocessor lines the template emits into generated code (#if/#elif/#else/#endif)",
+        "value_base": 0,
+        "value_branch": 2,
+        "where": "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.tt:10,12",
+        "rule": "H-07",
+        "rule_text": "Keep logic out of T4 templates and do not add unnecessary dependencies to the generator; a clean code base outranks micro-savings in tooling.",
+        "sources": [
+          "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1374#issuecomment-1004707810",
+          "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1374#issuecomment-1005567533",
+          "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1374#issuecomment-1004119890"
+        ],
+        "claims": [
+          "C-2297-03",
+          "C-2297-04",
+          "C-2297-08"
+        ]
+      }
+    ],
+    "measures": {
+      "files": {
+        "in_scope": {
+          "README.md": "other (not measured)",
+          "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.cs": "generated",
+          "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt": "template",
+          "src/MessagePack.SourceGenerator/Transforms/EnumTemplate.cs": "generated",
+          "src/MessagePack.SourceGenerator/Transforms/EnumTemplate.tt": "template",
+          "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.cs": "generated",
+          "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.tt": "template",
+          "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs": "generated",
+          "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt": "template",
+          "src/MessagePack.SourceGenerator/Transforms/StringKey/StringKeyFormatterTemplate.cs": "generated",
+          "src/MessagePack.SourceGenerator/Transforms/StringKey/StringKeyFormatterTemplate.tt": "template",
+          "src/MessagePack.SourceGenerator/Transforms/TransformUtilities.cs": "source",
+          "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.cs": "generated",
+          "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.tt": "template",
+          "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs": "test"
+        },
+        "skipped_snapshots": 222
+      },
+      "methods_touched": {
+        "rule": null,
+        "note": "no maintainer rule in history.json covers method size, nesting or branch count, so these are measures, not flags",
+        "methods": [
+          {
+            "method": "TransformUtilities.EmitNestingTypesAndNamespaces(TypeContainer container, Action<string> writer)",
+            "file": "src/MessagePack.SourceGenerator/Transforms/TransformUtilities.cs",
+            "base": {
+              "lines": 56,
+              "where": "src/MessagePack.SourceGenerator/Transforms/TransformUtilities.cs:16-71",
+              "max_brace_depth": 4,
+              "if_else_case_and_or": 4,
+              "by_token": {
+                "if": 2,
+                "else": 0,
+                "case": 2,
+                "&&": 0,
+                "||": 0
+              },
+              "clone_complexity_estimate": 7
+            },
+            "branch": {
+              "lines": 56,
+              "where": "src/MessagePack.SourceGenerator/Transforms/TransformUtilities.cs:16-71",
+              "max_brace_depth": 4,
+              "if_else_case_and_or": 4,
+              "by_token": {
+                "if": 2,
+                "else": 0,
+                "case": 2,
+                "&&": 0,
+                "||": 0
+              },
+              "clone_complexity_estimate": 7
+            },
+            "delta": {
+              "lines": 0,
+              "max_brace_depth": 0,
+              "if_else_case_and_or": 0
+            },
+            "claims": [
+              "C-2297-05",
+              "C-2297-06"
+            ]
+          },
+          {
+            "method": "CodeCoverageExclusionTests.AllGeneratedTypesAreExcludedFromCodeCoverage()",
+            "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+            "base": null,
+            "branch": {
+              "lines": 16,
+              "where": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs:64-79",
+              "max_brace_depth": 2,
+              "if_else_case_and_or": 0,
+              "by_token": {
+                "if": 0,
+                "else": 0,
+                "case": 0,
+                "&&": 0,
+                "||": 0
+              },
+              "clone_complexity_estimate": 2
+            },
+            "claims": [
+              "C-2297-04"
+            ]
+          },
+          {
+            "method": "CodeCoverageExclusionTests.ExcludeAttributeIsGuardedForTargetsWhereItIsUnavailable()",
+            "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+            "base": null,
+            "branch": {
+              "lines": 17,
+              "where": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs:81-97",
+              "max_brace_depth": 2,
+              "if_else_case_and_or": 0,
+              "by_token": {
+                "if": 0,
+                "else": 0,
+                "case": 0,
+                "&&": 0,
+                "||": 0
+              },
+              "clone_complexity_estimate": 2
+            },
+            "claims": [
+              "C-2297-04"
+            ]
+          },
+          {
+            "method": "CodeCoverageExclusionTests.CountOccurrences(string text, string value)",
+            "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+            "base": null,
+            "branch": {
+              "lines": 12,
+              "where": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs:99-110",
+              "max_brace_depth": 2,
+              "if_else_case_and_or": 0,
+              "by_token": {
+                "if": 0,
+                "else": 0,
+                "case": 0,
+                "&&": 0,
+                "||": 0
+              },
+              "clone_complexity_estimate": 2
+            },
+            "claims": [
+              "C-2297-04"
+            ]
+          }
+        ]
+      },
+      "duplication_window": [
+        {
+          "file": "src/MessagePack.SourceGenerator/Transforms/TransformUtilities.cs",
+          "kind": "source",
+          "window": 6,
+          "duplicated_normalised_lines": {
+            "base": 0,
+            "branch": 0
+          },
+          "duplicated_blocks": {
+            "base": 0,
+            "branch": 0
+          },
+          "added_code_lines": 1,
+          "added_code_lines_in_duplicated_blocks": []
+        },
+        {
+          "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+          "kind": "test",
+          "window": 6,
+          "duplicated_normalised_lines": {
+            "base": 0,
+            "branch": 0
+          },
+          "duplicated_blocks": {
+            "base": 0,
+            "branch": 0
+          },
+          "added_code_lines": 69,
+          "added_code_lines_in_duplicated_blocks": []
+        }
+      ],
+      "repeated_added_blocks": [
+        {
+          "block": [
+            "#if !NETSTANDARD2_0 && !NETFRAMEWORK",
+            "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]",
+            "#endif"
+          ],
+          "normalised_lines": 3,
+          "occurrences": 9,
+          "where": [
+            "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt:7-9",
+            "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt:35-37",
+            "src/MessagePack.SourceGenerator/Transforms/EnumTemplate.tt:8-10",
+            "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.tt:14-16",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt:14-16",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt:31-33",
+            "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt:48-50",
+            "src/MessagePack.SourceGenerator/Transforms/StringKey/StringKeyFormatterTemplate.tt:18-20",
+            "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.tt:10-12"
+          ]
+        }
+      ],
+      "if_directives": [
+        {
+          "file": "src/MessagePack.SourceGenerator/Transforms/TransformUtilities.cs",
+          "kind": "source",
+          "if_directives": {
+            "base": 0,
+            "branch": 0
+          },
+          "added_at": []
+        },
+        {
+          "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+          "kind": "test",
+          "if_directives": {
+            "base": 0,
+            "branch": 0
+          },
+          "added_at": []
+        }
+      ],
+      "t4_templates": [
+        {
+          "file": "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt",
+          "control_block_lines": {
+            "base": 2,
+            "branch": 2,
+            "added": 0
+          },
+          "code_block_lines_added": 0,
+          "emitted_preprocessor_lines": {
+            "base": 0,
+            "branch": 4,
+            "added": 4,
+            "added_text": [
+              "#endif",
+              "#if !NETSTANDARD2_0 && !NETFRAMEWORK"
+            ]
+          }
+        },
+        {
+          "file": "src/MessagePack.SourceGenerator/Transforms/EnumTemplate.tt",
+          "control_block_lines": {
+            "base": 0,
+            "branch": 0,
+            "added": 0
+          },
+          "code_block_lines_added": 0,
+          "emitted_preprocessor_lines": {
+            "base": 0,
+            "branch": 2,
+            "added": 2,
+            "added_text": [
+              "#endif",
+              "#if !NETSTANDARD2_0 && !NETFRAMEWORK"
+            ]
+          }
+        },
+        {
+          "file": "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.tt",
+          "control_block_lines": {
+            "base": 44,
+            "branch": 44,
+            "added": 0
+          },
+          "code_block_lines_added": 0,
+          "emitted_preprocessor_lines": {
+            "base": 0,
+            "branch": 2,
+            "added": 2,
+            "added_text": [
+              "#endif",
+              "#if !NETSTANDARD2_0 && !NETFRAMEWORK"
+            ]
+          }
+        },
+        {
+          "file": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt",
+          "control_block_lines": {
+            "base": 14,
+            "branch": 14,
+            "added": 0
+          },
+          "code_block_lines_added": 0,
+          "emitted_preprocessor_lines": {
+            "base": 0,
+            "branch": 6,
+            "added": 6,
+            "added_text": [
+              "#endif",
+              "#if !NETSTANDARD2_0 && !NETFRAMEWORK"
+            ]
+          }
+        },
+        {
+          "file": "src/MessagePack.SourceGenerator/Transforms/StringKey/StringKeyFormatterTemplate.tt",
+          "control_block_lines": {
+            "base": 41,
+            "branch": 41,
+            "added": 0
+          },
+          "code_block_lines_added": 0,
+          "emitted_preprocessor_lines": {
+            "base": 0,
+            "branch": 2,
+            "added": 2,
+            "added_text": [
+              "#endif",
+              "#if !NETSTANDARD2_0 && !NETFRAMEWORK"
+            ]
+          }
+        },
+        {
+          "file": "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.tt",
+          "control_block_lines": {
+            "base": 4,
+            "branch": 4,
+            "added": 0
+          },
+          "code_block_lines_added": 0,
+          "emitted_preprocessor_lines": {
+            "base": 0,
+            "branch": 2,
+            "added": 2,
+            "added_text": [
+              "#endif",
+              "#if !NETSTANDARD2_0 && !NETFRAMEWORK"
+            ]
+          }
+        }
+      ],
+      "generated_files": [
+        {
+          "file": "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.cs",
+          "template": "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt",
+          "status": "template and output changed together",
+          "evidence": "evidence/ju26-issue-2297/template-regeneration.json",
+          "evidence_summary": "dotnet-t4 regeneration of 6 templates, TransformText() compared after normalising layout: base 6 of 6 match, branch 6 of 6 match, 0 t4 errors; negative control: branch regeneration differs from base .cs for 6 of 6"
+        },
+        {
+          "file": "src/MessagePack.SourceGenerator/Transforms/EnumTemplate.cs",
+          "template": "src/MessagePack.SourceGenerator/Transforms/EnumTemplate.tt",
+          "status": "template and output changed together",
+          "evidence": "evidence/ju26-issue-2297/template-regeneration.json",
+          "evidence_summary": "dotnet-t4 regeneration of 6 templates, TransformText() compared after normalising layout: base 6 of 6 match, branch 6 of 6 match, 0 t4 errors; negative control: branch regeneration differs from base .cs for 6 of 6"
+        },
+        {
+          "file": "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.cs",
+          "template": "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.tt",
+          "status": "template and output changed together",
+          "evidence": "evidence/ju26-issue-2297/template-regeneration.json",
+          "evidence_summary": "dotnet-t4 regeneration of 6 templates, TransformText() compared after normalising layout: base 6 of 6 match, branch 6 of 6 match, 0 t4 errors; negative control: branch regeneration differs from base .cs for 6 of 6"
+        },
+        {
+          "file": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs",
+          "template": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt",
+          "status": "template and output changed together",
+          "evidence": "evidence/ju26-issue-2297/template-regeneration.json",
+          "evidence_summary": "dotnet-t4 regeneration of 6 templates, TransformText() compared after normalising layout: base 6 of 6 match, branch 6 of 6 match, 0 t4 errors; negative control: branch regeneration differs from base .cs for 6 of 6"
+        },
+        {
+          "file": "src/MessagePack.SourceGenerator/Transforms/StringKey/StringKeyFormatterTemplate.cs",
+          "template": "src/MessagePack.SourceGenerator/Transforms/StringKey/StringKeyFormatterTemplate.tt",
+          "status": "template and output changed together",
+          "evidence": "evidence/ju26-issue-2297/template-regeneration.json",
+          "evidence_summary": "dotnet-t4 regeneration of 6 templates, TransformText() compared after normalising layout: base 6 of 6 match, branch 6 of 6 match, 0 t4 errors; negative control: branch regeneration differs from base .cs for 6 of 6"
+        },
+        {
+          "file": "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.cs",
+          "template": "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.tt",
+          "status": "template and output changed together",
+          "evidence": "evidence/ju26-issue-2297/template-regeneration.json",
+          "evidence_summary": "dotnet-t4 regeneration of 6 templates, TransformText() compared after normalising layout: base 6 of 6 match, branch 6 of 6 match, 0 t4 errors; negative control: branch regeneration differs from base .cs for 6 of 6"
+        }
+      ],
+      "tests": {
+        "test_files_changed": [
+          "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs"
+        ],
+        "snapshot_files_changed": 222,
+        "test_methods_added": 2,
+        "test_method_attributes_at": [
+          "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs:64",
+          "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs:81"
+        ],
+        "src_files_changed": [
+          "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.cs",
+          "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt",
+          "src/MessagePack.SourceGenerator/Transforms/EnumTemplate.cs",
+          "src/MessagePack.SourceGenerator/Transforms/EnumTemplate.tt",
+          "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.cs",
+          "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.tt",
+          "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs",
+          "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt",
+          "src/MessagePack.SourceGenerator/Transforms/StringKey/StringKeyFormatterTemplate.cs",
+          "src/MessagePack.SourceGenerator/Transforms/StringKey/StringKeyFormatterTemplate.tt",
+          "src/MessagePack.SourceGenerator/Transforms/TransformUtilities.cs",
+          "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.cs",
+          "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.tt"
+        ],
+        "claims": {
+          "C-2297-01": {
+            "tier": "Measured",
+            "support_kinds": [
+              "count"
+            ],
+            "flip_or_revert_test": false,
+            "covers_src": false
+          },
+          "C-2297-02": {
+            "tier": "Proved",
+            "support_kinds": [
+              "rebuild-compare"
+            ],
+            "flip_or_revert_test": false,
+            "covers_src": false
+          },
+          "C-2297-03": {
+            "tier": "Proved",
+            "support_kinds": [
+              "rebuild-compare"
+            ],
+            "flip_or_revert_test": false,
+            "covers_src": true
+          },
+          "C-2297-04": {
+            "tier": "Tested",
+            "support_kinds": [
+              "flip-test"
+            ],
+            "flip_or_revert_test": true,
+            "covers_src": true
+          },
+          "C-2297-05": {
+            "tier": "Tested",
+            "support_kinds": [
+              "revert-test",
+              "probe"
+            ],
+            "flip_or_revert_test": true,
+            "covers_src": true
+          },
+          "C-2297-06": {
+            "tier": "Measured",
+            "support_kinds": [
+              "count",
+              "probe"
+            ],
+            "flip_or_revert_test": false,
+            "covers_src": true
+          },
+          "C-2297-07": {
+            "tier": "Refused",
+            "support_kinds": [
+              "probe"
+            ],
+            "flip_or_revert_test": false,
+            "covers_src": true
+          },
+          "C-2297-08": {
+            "tier": "Argued",
+            "support_kinds": [],
+            "flip_or_revert_test": false,
+            "covers_src": true
+          },
+          "C-2297-09": {
+            "tier": "Argued",
+            "support_kinds": [],
+            "flip_or_revert_test": false,
+            "covers_src": false
+          },
+          "C-2297-10": {
+            "tier": "Measured",
+            "support_kinds": [
+              "probe"
+            ],
+            "flip_or_revert_test": false,
+            "covers_src": false
+          }
+        },
+        "confidence_file": "evidence/ju26-issue-2297/confidence.json"
+      }
+    },
+    "rules_used": "context/history.json"
+  },
+  "tool_versions": {
+    "git": "git version 2.43.0",
+    "python": "3.13.18"
+  },
+  "produced_by": "script"
+}

@@ -1,0 +1,2494 @@
+{
+  "check": "tripwire-backtest",
+  "branch": null,
+  "base": "32258fdb",
+  "command": "python3 review/scripts/backtest.py --repo $MP_REPO --fetch --write",
+  "result": "pass",
+  "summary": "Generalised tripwires caught 10 of 16 promise-concern PRs (missed 6; any contract tripped on 14); 35 of 60 ordinary merged PRs tripped a promise contract (noise 58%); strict 2025 paths: caught 4, noise 18 of 60",
+  "details": {
+    "headline_matcher": "generalised",
+    "generalised": {
+      "positives_evaluated": 16,
+      "caught": 10,
+      "missed": 6,
+      "caught_prs": [
+        1124,
+        1755,
+        1542,
+        1369,
+        1074,
+        645,
+        1551,
+        1743,
+        2139,
+        1355
+      ],
+      "missed_prs": [
+        2013,
+        1895,
+        1828,
+        1697,
+        889,
+        1137
+      ],
+      "positives_any_contract_tripped": 14,
+      "controls": 60,
+      "controls_tripping_a_promise": 35,
+      "noise_rate": 0.583,
+      "noisy_control_prs": [
+        32,
+        27,
+        496,
+        595,
+        626,
+        644,
+        830,
+        946,
+        978,
+        1022,
+        1078,
+        1192,
+        1252,
+        1346,
+        1427,
+        1455,
+        1457,
+        1486,
+        1499,
+        1547,
+        1597,
+        1602,
+        1605,
+        1667,
+        1729,
+        1749,
+        1824,
+        1890,
+        1921,
+        1962,
+        1982,
+        2006,
+        2029,
+        2043,
+        2119
+      ],
+      "controls_tripping_user_docs": 5,
+      "controls_trips_per_contract": {
+        "diagnostics": 13,
+        "generated": 5,
+        "public-api": 6,
+        "targets": 7,
+        "user-docs": 5,
+        "wire-format": 14
+      }
+    },
+    "strict": {
+      "positives_evaluated": 16,
+      "caught": 4,
+      "missed": 12,
+      "caught_prs": [
+        1755,
+        1551,
+        1743,
+        2139
+      ],
+      "missed_prs": [
+        2013,
+        1124,
+        1895,
+        1828,
+        1697,
+        1542,
+        1369,
+        1074,
+        889,
+        645,
+        1137,
+        1355
+      ],
+      "positives_any_contract_tripped": 7,
+      "controls": 60,
+      "controls_tripping_a_promise": 18,
+      "noise_rate": 0.3,
+      "noisy_control_prs": [
+        27,
+        626,
+        1346,
+        1457,
+        1597,
+        1605,
+        1667,
+        1729,
+        1749,
+        1824,
+        1890,
+        1921,
+        1962,
+        1982,
+        2006,
+        2029,
+        2043,
+        2119
+      ],
+      "controls_tripping_user_docs": 5,
+      "controls_trips_per_contract": {
+        "diagnostics": 7,
+        "generated": 3,
+        "public-api": 4,
+        "targets": 3,
+        "user-docs": 5,
+        "wire-format": 4
+      }
+    },
+    "missed": [
+      {
+        "pr": 2013,
+        "title": "Secure by default",
+        "concern": "compat-breaking",
+        "expected_contracts": [
+          "public-api",
+          "wire-format",
+          "generated",
+          "diagnostics"
+        ],
+        "tripped_instead": [
+          "user-docs"
+        ],
+        "files": 5,
+        "why": "Behavioural default flip (MessagePackSecurity.TrustedData -> UntrustedData as the options default) lives in MessagePackSerializerOptions.cs; no contract path or pattern covers options defaults, and the security contract only names SECURITY.md and MessagePackSecurity.cs."
+      },
+      {
+        "pr": 1895,
+        "title": "Performance/1807 force method inline",
+        "concern": "generated",
+        "expected_contracts": [
+          "generated"
+        ],
+        "tripped_instead": [
+          "wire-format"
+        ],
+        "files": 4,
+        "why": "Edits generated .cs / .tt for library formatters, not consumer-generated code."
+      },
+      {
+        "pr": 1828,
+        "title": "Move BuildTypeName() from TypelessFormatter to MessagePackSerializerOptions",
+        "concern": "public-api",
+        "expected_contracts": [
+          "public-api"
+        ],
+        "tripped_instead": [
+          "wire-format"
+        ],
+        "files": 2,
+        "why": "Moving a public member between classes; the PR did not touch PublicAPI.*.txt (it did not even compile/analyzer-update), so nothing records the surface change."
+      },
+      {
+        "pr": 1697,
+        "title": "Handle DataContract(Order=N) across class hierarchies?",
+        "concern": "wire-format",
+        "expected_contracts": [
+          "wire-format"
+        ],
+        "tripped_instead": [],
+        "files": 2,
+        "why": "Wire compat break via member-order logic in the dynamic resolver (DynamicObjectResolver / reflection), not in the reader/writer/formatter files the wire-format contract names."
+      },
+      {
+        "pr": 889,
+        "title": "Enable support for platforms (e.g. Blazor WASM) where System.Reflection.Emit is not supported.",
+        "concern": "public-api",
+        "expected_contracts": [
+          "public-api"
+        ],
+        "tripped_instead": [],
+        "files": 1,
+        "why": "Field -> property is binary breaking; 2020 tree had no PublicAPI tracking files in that project, so a plain .cs edit is invisible to path rules."
+      },
+      {
+        "pr": 1137,
+        "title": "Avoid `MissingMethodException` on generic classes with `init` property setters",
+        "concern": "compat-breaking",
+        "expected_contracts": [
+          "public-api",
+          "wire-format",
+          "generated",
+          "diagnostics"
+        ],
+        "tripped_instead": [
+          "user-docs"
+        ],
+        "files": 5,
+        "why": "Behavioural compat change in DynamicObjectResolver (throw instead of quietly returning null); not under reader/writer/formatters."
+      }
+    ],
+    "method": {
+      "positives": "history.json PRs with concern in public-api, wire-format, generated, targets, diagnostics, security, compat-breaking; head = refs/pr/N fetched from https://github.com/MessagePack-CSharp/MessagePack-CSharp pull/N/head (final PR head, i.e. after any review changes).",
+      "positive_base": "Merged PR with a merge commit on record: merge-base with that merge's first parent (the\nbranch it landed on). Otherwise: merge-base with whichever upstream line in BASE_CANDIDATES\nis closest to the head (fewest head-only commits). A line that already contains the head\n(PR merged there but no merge commit recorded) is resolved to the first merge on that line's\nfirst-parent history that brought the head in, and that merge's first parent is used.",
+      "reverted_cross_check": "for reverted PRs the original commit recorded in history.json is also diffed against its first parent (generalised matcher) and reported beside the PR-head result; the PR-head result is the one scored.",
+      "controls": "`git log --merges --first-parent 32258fdb`, subjects 'Merge pull request #N from <branch>' only; drop PRs whose number appears anywhere in history.json; drop by branch regex /dependabot/|libtemplate|Library\\.Template|renovate// or title (first body line) regex /^\\s*(bump|merge\\b|update .*(dependenc|packages?|sdk))|dependabot|renovate|library\\.template|\\bdependenc(y|ies)\\b|\\bci\\b|github actions|azure pipelines?|pipelines?\\b|\\bcodecov\\b|\\b(master|develop|v\\d(\\.\\w+)*)\\s+(to|into)\\s+(master|develop|v\\d)|\\bsdk\\b|\\bnuget\\b|\\bbuild\\b/ (case-insensitive); keep only the years the positives span; 60 picked with an equal share per year (a year with too few PRs passes its unused share on), evenly spaced by date within a year. Diff = <merge>^1..<merge>.",
+      "controls_pool_per_year": {
+        "2019": 110,
+        "2020": 96,
+        "2021": 20,
+        "2022": 15,
+        "2023": 14,
+        "2024": 84,
+        "2025": 1
+      },
+      "controls_quota_per_year": {
+        "2025": 1,
+        "2023": 9,
+        "2022": 10,
+        "2021": 10,
+        "2024": 10,
+        "2020": 10,
+        "2019": 10
+      },
+      "controls_dropped": {
+        "build/CI/dependency/branch-sync by title or branch": 70,
+        "PR in history.json": 9,
+        "not a PR merge": 66,
+        "outside positive years": 26,
+        "duplicate PR number": 1
+      },
+      "diff": "git diff -U0 --no-renames (a moved file counts as delete + add). Deleted files are matched on their old path; tripwires.py currently drops deleted files (it keys hunks on the +++ path), so a pure deletion of a contract file would not trip there.",
+      "strict_rule": "exactly tripwires.py: hunk file under a contract path (prefix for dirs, equality for files), or a changed (+/-) line in a file not under tests/ matching a contract line pattern.",
+      "generalised_rule": [
+        "A hunk trips contract C when any of these holds:",
+        "(1) strict path match;",
+        "otherwise only for product files, i.e. no directory segment named sandbox/benchmark(s)/perf/sample(s) or containing a 'test'/'tests'/'unittests' dotted component (e.g. tests/, MessagePack.Tests/):",
+        "(2) a directory segment equals the last segment of one of C's directory paths (Formatters, Transforms, Analyzers, CodeAnalysis, analyzers);",
+        "(3) the file name equals the file name of one of C's file paths (PublicAPI.Shipped.txt, PublicAPI.Unshipped.txt, MessagePackReader.cs, SECURITY.md, ...) or of a file inside one of C's directory paths at base, counting only file names that are unique in the base tree and not dotfiles (so FormatterTemplate.tt or StandardClassLibraryFormatter.cs match in any layout, .editorconfig does not);",
+        "(4) a changed line matches one of C's line patterns, plus, for each csproj/props line C cites in `sources`, the XML element on that line in singular or plural form (targets: <TargetFrameworks?>), in any file.",
+        "No per-era path is listed by hand; everything comes from project.json and the base tree."
+      ],
+      "generalised_rules_derived": {
+        "diagnostics": {
+          "dir_segments": [
+            "Analyzers",
+            "CodeAnalysis",
+            "analyzers"
+          ],
+          "file_names": [
+            "AnalyzerOptions.cs",
+            "AnalyzerReleases.Shipped.md",
+            "AnalyzerReleases.Unshipped.md",
+            "CodeAnalysisUtilities.cs",
+            "CustomFormatterRegisterInfo.cs",
+            "EnumSerializationInfo.cs",
+            "FullModel.cs",
+            "GenericSerializationInfo.cs",
+            "GenericTypeParameterInfo.cs",
+            "MemberSerializationInfo.cs",
+            "MsgPack001.md",
+            "MsgPack001SpecifyOptionsAnalyzer.cs",
+            "MsgPack002.md",
+            "MsgPack002UseConstantOptionsAnalyzer.cs",
+            "MsgPack003.md",
+            "MsgPack004.md",
+            "MsgPack005.md",
+            "MsgPack006.md",
+            "MsgPack007.md",
+            "MsgPack008.md",
+            "MsgPack009.md",
+            "MsgPack00xMessagePackAnalyzer.cs",
+            "MsgPack010.md",
+            "MsgPack011.md",
+            "MsgPack012.md",
+            "MsgPack013.md",
+            "MsgPack014.md",
+            "MsgPack015.md",
+            "MsgPack016.md",
+            "MsgPack017.md",
+            "MsgPack018.md",
+            "ObjectSerializationInfo.cs",
+            "QualifiedArrayTypeName.cs",
+            "QualifiedNamedTypeName.cs",
+            "QualifiedTypeName.cs",
+            "ReferenceSymbols.cs",
+            "ResolverRegisterInfo.cs",
+            "ResolverRegisterInfoComparer.cs",
+            "TypeCollector.cs",
+            "TypeParameter.cs",
+            "UnionSerializationInfo.cs",
+            "UnionSubTypeInfo.cs",
+            "index.md"
+          ],
+          "line_patterns": [
+            "reportDiagnostic",
+            "Diagnostic\\.Create",
+            "ReportDiagnostic"
+          ]
+        },
+        "public-api": {
+          "dir_segments": [],
+          "file_names": [
+            "PublicAPI.Shipped.txt",
+            "PublicAPI.Unshipped.txt"
+          ],
+          "line_patterns": []
+        },
+        "generated": {
+          "dir_segments": [
+            "Transforms"
+          ],
+          "file_names": [
+            "CompositeResolverTemplate.cs",
+            "CompositeResolverTemplate.tt",
+            "EmbedStringHelper.cs",
+            "EnumTemplate.cs",
+            "EnumTemplate.tt",
+            "FormatterTemplate.cs",
+            "FormatterTemplate.tt",
+            "IFormatterTemplate.cs",
+            "ResolverTemplate.cs",
+            "ResolverTemplate.tt",
+            "StringKeyFormatterDeserializeHelper.cs",
+            "StringKeyFormatterTemplate.cs",
+            "StringKeyFormatterTemplate.tt",
+            "TemplatePartials.cs",
+            "TransformUtilities.cs",
+            "UnionTemplate.cs",
+            "UnionTemplate.tt"
+          ],
+          "line_patterns": []
+        },
+        "targets": {
+          "dir_segments": [],
+          "file_names": [],
+          "line_patterns": [
+            "^\\s*#if\\b.*\\bNET(STANDARD|FRAMEWORK|COREAPP)",
+            "<TargetFrameworks?>"
+          ]
+        },
+        "wire-format": {
+          "dir_segments": [
+            "Formatters"
+          ],
+          "file_names": [
+            "CollectionFormatter.cs",
+            "CollectionHelpers`2.cs",
+            "DateTimeFormatters.cs",
+            "DictionaryFormatter.cs",
+            "DynamicObjectTypeFallbackFormatter.cs",
+            "EnumAsStringFormatter`1.cs",
+            "ExpandoObjectFormatter.cs",
+            "ForceSizePrimitiveFormatter.cs",
+            "ForceSizePrimitiveFormatter.tt",
+            "FrozenCollectionFormatters.cs",
+            "GenericEnumFormatter`1.cs",
+            "IMessagePackFormatter`1.cs",
+            "IgnoreFormatter`1.cs",
+            "ImmutableCollectionFormatters.cs",
+            "MessagePackCode.cs",
+            "MessagePackReader.cs",
+            "MessagePackWriter.cs",
+            "MultiDimensionalArrayFormatter.cs",
+            "NilFormatter.cs",
+            "NullableFormatter.cs",
+            "PrimitiveFormatter.cs",
+            "PrimitiveFormatter.tt",
+            "PrimitiveObjectFormatter.cs",
+            "StandardClassLibraryFormatter.cs",
+            "StringInterningFormatter.cs",
+            "TupleFormatter.cs",
+            "TupleFormatter.tt",
+            "TypelessFormatter.cs",
+            "UnsafeBinaryFormatters.cs",
+            "ValueTupleFormatter.cs",
+            "ValueTupleFormatter.tt"
+          ],
+          "line_patterns": []
+        },
+        "security": {
+          "dir_segments": [],
+          "file_names": [
+            "MessagePackSecurity.cs",
+            "SECURITY.md"
+          ],
+          "line_patterns": []
+        },
+        "user-docs": {
+          "dir_segments": [
+            "doc"
+          ],
+          "file_names": [
+            "ExpandoObject.md",
+            "MsgPack001.md",
+            "MsgPack002.md",
+            "MsgPack003.md",
+            "MsgPack004.md",
+            "MsgPack005.md",
+            "MsgPack006.md",
+            "MsgPack007.md",
+            "MsgPack008.md",
+            "MsgPack009.md",
+            "MsgPack010.md",
+            "MsgPack011.md",
+            "MsgPack012.md",
+            "MsgPack013.md",
+            "MsgPack014.md",
+            "MsgPack015.md",
+            "MsgPack016.md",
+            "MsgPack017.md",
+            "MsgPack018.md",
+            "README.md",
+            "consume_ci.md",
+            "index.md",
+            "mark_of_the_web.png",
+            "migrating_v1-v2.md",
+            "migrating_v2-v3.md",
+            "migration.md"
+          ],
+          "line_patterns": []
+        }
+      },
+      "concern_to_contracts": {
+        "public-api": [
+          "public-api"
+        ],
+        "wire-format": [
+          "wire-format"
+        ],
+        "generated": [
+          "generated"
+        ],
+        "targets": [
+          "targets"
+        ],
+        "diagnostics": [
+          "diagnostics"
+        ],
+        "security": [
+          "security"
+        ],
+        "compat-breaking": [
+          "public-api",
+          "wire-format",
+          "generated",
+          "diagnostics"
+        ]
+      },
+      "caught_definition": "caught = the generalised tripped set includes at least one contract mapped from the PR's concern; missed otherwise.",
+      "noise_definition": "noise = share of control PRs whose tripped set includes any of public-api, wire-format, generated, targets, diagnostics, security; user-docs is reported separately and not counted as noise."
+    },
+    "limits": [
+      "Tripping is not a verdict. The real gate also needs a check that the promise actually changed (PublicAPI diff, byte round-trip, regenerated output, TFM list). A trip only says 'show the owner'; a high trip rate on controls means owner time, not wrong answers.",
+      "Small sample: 16 positives and 60 controls. One PR moves the catch rate by about 6 points.",
+      "Concern labels came from an agent reading maintainer comments via WebFetch (history.json, produced_by hand); some quotes are fragments and some PR pages were only partly read. A wrong label moves a PR between caught and missed.",
+      "Positives are diffed at the final PR head. For merged-after-changes PRs that is after the maintainer's requested fixes, which can remove (or add) the very change that drew the concern.",
+      "Controls are merged PRs with no recorded pushback in history.json, but history.json was built from targeted searches, so some controls may also have had review pushback we could not see (api.github.com is blocked). Noise is therefore an upper bound on 'trips nobody needed'.",
+      "Controls come from the develop first-parent line only; PRs that landed on master/v1.x/v2.x are not sampled.",
+      "Older layouts (Unity client shared sources, mpc GeneratorCore, MessagePackAnalyzer) only match where a base-tree file name or directory name survived; renamed files and directories are invisible to the rule by design.",
+      "The contracts are the 2025 ones; promises the project made in 2019-2021 (e.g. v1 binary compatibility, mpc tool targets) are only covered as far as the 2025 contracts happen to describe them."
+    ],
+    "positives": [
+      {
+        "pr": 2013,
+        "title": "Secure by default",
+        "date": "2024-10-18",
+        "outcome": "reverted",
+        "concern": "compat-breaking",
+        "expected_contracts": [
+          "public-api",
+          "wire-format",
+          "generated",
+          "diagnostics"
+        ],
+        "head": "e710178f",
+        "merge_base": "9be35840",
+        "base_rule": "merge-base with c1585ad7^1 (branch it merged into)",
+        "hunks": 9,
+        "files": 5,
+        "trips": {
+          "strict": {
+            "user-docs": {
+              "hunks": 4,
+              "examples": [
+                "README.md:668 (path)",
+                "README.md:677 (path)",
+                "README.md:686 (path)"
+              ]
+            }
+          },
+          "generalised": {
+            "user-docs": {
+              "hunks": 4,
+              "examples": [
+                "README.md:668 (path)",
+                "README.md:677 (path)",
+                "README.md:686 (path)"
+              ]
+            }
+          }
+        },
+        "cross_check_original_commit": {
+          "commit": "c1585ad7",
+          "diff": "c1585ad7^1..c1585ad7",
+          "generalised_tripped": [
+            "user-docs"
+          ]
+        }
+      },
+      {
+        "pr": 1124,
+        "title": "Target .NET Core 3.1 and 5.0 SDKs in mpc tool (re-land of reverted 'Multiple Target Frameworks')",
+        "date": "2020-11-19",
+        "outcome": "reverted",
+        "concern": "targets",
+        "expected_contracts": [
+          "targets"
+        ],
+        "head": "146d6759",
+        "merge_base": "e3db213d",
+        "base_rule": "merge-base with e03abbb6^1 (branch it merged into)",
+        "hunks": 5,
+        "files": 5,
+        "trips": {
+          "strict": {},
+          "generalised": {
+            "targets": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack.Generator/MessagePack.Generator.csproj:6 (line: -    <TargetFramework>netcoreapp3.1</TargetFramework>)"
+              ]
+            }
+          }
+        },
+        "cross_check_original_commit": {
+          "commit": "cd7b4341",
+          "diff": "cd7b4341^1..cd7b4341",
+          "generalised_tripped": [
+            "targets"
+          ]
+        }
+      },
+      {
+        "pr": 1895,
+        "title": "Performance/1807 force method inline",
+        "date": "2024-12-10",
+        "outcome": "closed-unmerged",
+        "concern": "generated",
+        "expected_contracts": [
+          "generated"
+        ],
+        "head": "f5a6588e",
+        "merge_base": "e29def3d",
+        "base_rule": "merge-base with 32258fdb (closest of 32258fdb, origin/master, origin/v2.x, origin/v1.x; 3 PR-only commits)",
+        "hunks": 14,
+        "files": 4,
+        "trips": {
+          "strict": {},
+          "generalised": {
+            "wire-format": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack.UnityClient/Assets/Scripts/MessagePack/MessagePackReader.cs:952 (file-name)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 1828,
+        "title": "Move BuildTypeName() from TypelessFormatter to MessagePackSerializerOptions",
+        "date": "2024-05-27",
+        "outcome": "closed-unmerged",
+        "concern": "public-api",
+        "expected_contracts": [
+          "public-api"
+        ],
+        "head": "bff79687",
+        "merge_base": "db2320b3",
+        "base_rule": "merge-base with 32258fdb (closest of 32258fdb, origin/master, origin/v2.x, origin/v1.x; 1 PR-only commits)",
+        "hunks": 3,
+        "files": 2,
+        "trips": {
+          "strict": {},
+          "generalised": {
+            "wire-format": {
+              "hunks": 2,
+              "examples": [
+                "src/MessagePack.UnityClient/Assets/Scripts/MessagePack/Formatters/TypelessFormatter.cs:117 (path-segment)",
+                "src/MessagePack.UnityClient/Assets/Scripts/MessagePack/Formatters/TypelessFormatter.cs:138 (path-segment)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 1755,
+        "title": "Add TargetFramework netstandard2.1 for Unity",
+        "date": "2024-01-30",
+        "outcome": "closed-unmerged",
+        "concern": "targets",
+        "expected_contracts": [
+          "targets"
+        ],
+        "head": "6a1b78ff",
+        "merge_base": "7527806b",
+        "base_rule": "merge-base with 32258fdb (closest of 32258fdb, origin/master, origin/v2.x, origin/v1.x; 2 PR-only commits)",
+        "hunks": 28,
+        "files": 11,
+        "trips": {
+          "strict": {
+            "targets": {
+              "hunks": 8,
+              "examples": [
+                "src/MessagePack.AspNetCoreMvcFormatter/MessagePackOutputFormatter.cs:30 (line: -#if NETSTANDARD2_0)",
+                "src/MessagePack.AspNetCoreMvcFormatter/MessagePackOutputFormatter.cs:50 (line: -#if NETSTANDARD2_0)",
+                "src/MessagePack.UnityClient/Assets/Scripts/MessagePack/HashCode.cs:45 (line: -#if !(NETCOREAPP || UNITY_2021_2_OR_NEWER))"
+              ]
+            },
+            "public-api": {
+              "hunks": 2,
+              "examples": [
+                "src/MessagePack/netstandard2.1/PublicAPI.Shipped.txt:1 (path)",
+                "src/MessagePack/netstandard2.1/PublicAPI.Unshipped.txt:1 (path)"
+              ]
+            }
+          },
+          "generalised": {
+            "targets": {
+              "hunks": 10,
+              "examples": [
+                "src/MessagePack.AspNetCoreMvcFormatter/MessagePack.AspNetCoreMvcFormatter.csproj:3 (line: -    <TargetFrameworks>netstandard2.0;net6.0;net8.0</TargetFrameworks>)",
+                "src/MessagePack.AspNetCoreMvcFormatter/MessagePackOutputFormatter.cs:30 (line: -#if NETSTANDARD2_0)",
+                "src/MessagePack.AspNetCoreMvcFormatter/MessagePackOutputFormatter.cs:50 (line: -#if NETSTANDARD2_0)"
+              ]
+            },
+            "public-api": {
+              "hunks": 2,
+              "examples": [
+                "src/MessagePack/netstandard2.1/PublicAPI.Shipped.txt:1 (path)",
+                "src/MessagePack/netstandard2.1/PublicAPI.Unshipped.txt:1 (path)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 1697,
+        "title": "Handle DataContract(Order=N) across class hierarchies?",
+        "date": "2023-11-10",
+        "outcome": "closed-unmerged",
+        "concern": "wire-format",
+        "expected_contracts": [
+          "wire-format"
+        ],
+        "head": "fa20e874",
+        "merge_base": "d10d7f93",
+        "base_rule": "merge-base with 32258fdb (closest of 32258fdb, origin/master, origin/v2.x, origin/v1.x; 1 PR-only commits)",
+        "hunks": 21,
+        "files": 2,
+        "trips": {
+          "strict": {},
+          "generalised": {}
+        }
+      },
+      {
+        "pr": 1542,
+        "title": "MessagePack.Generator.csproj target to net7.0",
+        "date": "2023-03-11",
+        "outcome": "closed-unmerged",
+        "concern": "targets",
+        "expected_contracts": [
+          "targets"
+        ],
+        "head": "ccafe2e4",
+        "merge_base": "92f230bc",
+        "base_rule": "merge-base with 32258fdb (closest of 32258fdb, origin/master, origin/v2.x, origin/v1.x; 2 PR-only commits)",
+        "hunks": 2,
+        "files": 2,
+        "trips": {
+          "strict": {
+            "user-docs": {
+              "hunks": 1,
+              "examples": [
+                "README.md:1698 (path)"
+              ]
+            }
+          },
+          "generalised": {
+            "user-docs": {
+              "hunks": 1,
+              "examples": [
+                "README.md:1698 (path)"
+              ]
+            },
+            "targets": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack.Generator/MessagePack.Generator.csproj:6 (line: -    <TargetFrameworks>netcoreapp3.1;net6.0</TargetFrameworks>)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 1369,
+        "title": "Code generator supports init only setter",
+        "date": "2022-04-06",
+        "outcome": "closed-unmerged",
+        "concern": "compat-breaking",
+        "expected_contracts": [
+          "public-api",
+          "wire-format",
+          "generated",
+          "diagnostics"
+        ],
+        "head": "95260e50",
+        "merge_base": "3e624b94",
+        "base_rule": "merge-base with 32258fdb (closest of 32258fdb, origin/master, origin/v2.x, origin/v1.x; 6 PR-only commits)",
+        "hunks": 244,
+        "files": 11,
+        "trips": {
+          "strict": {},
+          "generalised": {
+            "diagnostics": {
+              "hunks": 7,
+              "examples": [
+                "src/MessagePack.GeneratorCore/CodeAnalysis/Definitions.cs:55 (path-segment)",
+                "src/MessagePack.GeneratorCore/CodeAnalysis/Definitions.cs:95 (path-segment)",
+                "src/MessagePack.GeneratorCore/CodeAnalysis/Definitions.cs:109 (path-segment)"
+              ]
+            },
+            "generated": {
+              "hunks": 145,
+              "examples": [
+                "src/MessagePack.GeneratorCore/Generator/FormatterTemplate.cs:4 (file-name)",
+                "src/MessagePack.GeneratorCore/Generator/FormatterTemplate.cs:20 (file-name)",
+                "src/MessagePack.GeneratorCore/Generator/FormatterTemplate.cs:48 (file-name)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 1074,
+        "title": "Beautify T4 of mpc.exe and reduce local variables of the deserialization",
+        "date": "2020-10-17",
+        "outcome": "closed-unmerged",
+        "concern": "compat-breaking",
+        "expected_contracts": [
+          "public-api",
+          "wire-format",
+          "generated",
+          "diagnostics"
+        ],
+        "head": "081445b7",
+        "merge_base": "533802a8",
+        "base_rule": "merge-base with 32258fdb (closest of 32258fdb, origin/master, origin/v2.x, origin/v1.x; 8 PR-only commits)",
+        "hunks": 583,
+        "files": 9,
+        "trips": {
+          "strict": {},
+          "generalised": {
+            "diagnostics": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack.GeneratorCore/CodeAnalysis/Definitions.cs:55 (path-segment)"
+              ]
+            },
+            "generated": {
+              "hunks": 104,
+              "examples": [
+                "src/MessagePack.GeneratorCore/Generator/FormatterTemplate.cs:46 (file-name)",
+                "src/MessagePack.GeneratorCore/Generator/FormatterTemplate.cs:51 (file-name)",
+                "src/MessagePack.GeneratorCore/Generator/FormatterTemplate.cs:53 (file-name)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 889,
+        "title": "Enable support for platforms (e.g. Blazor WASM) where System.Reflection.Emit is not supported.",
+        "date": "2020-04-19",
+        "outcome": "closed-unmerged",
+        "concern": "public-api",
+        "expected_contracts": [
+          "public-api"
+        ],
+        "head": "cc067fa6",
+        "merge_base": "2bfe2621",
+        "base_rule": "merge-base with 32258fdb (closest of 32258fdb, origin/master, origin/v2.x, origin/v1.x; 5 PR-only commits)",
+        "hunks": 1,
+        "files": 1,
+        "trips": {
+          "strict": {},
+          "generalised": {}
+        }
+      },
+      {
+        "pr": 645,
+        "title": "Bring back binary compatability with version 1.8.74",
+        "date": "2019-11-19",
+        "outcome": "closed-unmerged",
+        "concern": "compat-breaking",
+        "expected_contracts": [
+          "public-api",
+          "wire-format",
+          "generated",
+          "diagnostics"
+        ],
+        "head": "48b142df",
+        "merge_base": "f8299450",
+        "base_rule": "merge-base with 32258fdb (closest of 32258fdb, origin/master, origin/v2.x, origin/v1.x; 1 PR-only commits)",
+        "hunks": 10,
+        "files": 2,
+        "trips": {
+          "strict": {},
+          "generalised": {
+            "public-api": {
+              "hunks": 5,
+              "examples": [
+                "src/MessagePack/PublicAPI.Unshipped.txt:826 (file-name)",
+                "src/MessagePack/PublicAPI.Unshipped.txt:831 (file-name)",
+                "src/MessagePack/PublicAPI.Unshipped.txt:835 (file-name)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 1551,
+        "title": "Fix wrong data length written in `UnsafeBlitFormatter`",
+        "date": "2023-03-12",
+        "outcome": "merged-after-changes",
+        "concern": "public-api",
+        "expected_contracts": [
+          "public-api"
+        ],
+        "head": "2a4ca219",
+        "merge_base": "71ec1c9a",
+        "base_rule": "merge-base with 58c4d3cc^1 (branch it merged into)",
+        "hunks": 15,
+        "files": 6,
+        "trips": {
+          "strict": {
+            "public-api": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack/netstandard2.0/PublicAPI.Unshipped.txt:9 (path)"
+              ]
+            }
+          },
+          "generalised": {
+            "wire-format": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack.UnityClient/Assets/Scripts/MessagePack/MessagePackWriter.cs:1293 (file-name)"
+              ]
+            },
+            "public-api": {
+              "hunks": 2,
+              "examples": [
+                "src/MessagePack/net6.0/PublicAPI.Unshipped.txt:15 (file-name)",
+                "src/MessagePack/netstandard2.0/PublicAPI.Unshipped.txt:9 (path)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 1137,
+        "title": "Avoid `MissingMethodException` on generic classes with `init` property setters",
+        "date": "2021-01-29",
+        "outcome": "merged-after-changes",
+        "concern": "compat-breaking",
+        "expected_contracts": [
+          "public-api",
+          "wire-format",
+          "generated",
+          "diagnostics"
+        ],
+        "head": "ad473187",
+        "merge_base": "4ca7e42c",
+        "base_rule": "merge-base with 2ec0f139^1 (branch it merged into)",
+        "hunks": 28,
+        "files": 5,
+        "trips": {
+          "strict": {
+            "user-docs": {
+              "hunks": 3,
+              "examples": [
+                "README.md:407 (path)",
+                "README.md:417 (path)",
+                "README.md:430 (path)"
+              ]
+            }
+          },
+          "generalised": {
+            "user-docs": {
+              "hunks": 3,
+              "examples": [
+                "README.md:407 (path)",
+                "README.md:417 (path)",
+                "README.md:430 (path)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 1743,
+        "title": "AOT by default",
+        "date": "2024-01-30",
+        "outcome": "merged-after-changes",
+        "concern": "compat-breaking",
+        "expected_contracts": [
+          "public-api",
+          "wire-format",
+          "generated",
+          "diagnostics"
+        ],
+        "head": "e7fdce5c",
+        "merge_base": "54a7143b",
+        "base_rule": "merge-base with 9c804613^1 (branch it merged into)",
+        "hunks": 285,
+        "files": 85,
+        "trips": {
+          "strict": {
+            "user-docs": {
+              "hunks": 3,
+              "examples": [
+                "README.md:1620 (path)",
+                "README.md:1626 (path)",
+                "README.md:1634 (path)"
+              ]
+            },
+            "diagnostics": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1079 (path)"
+              ]
+            },
+            "generated": {
+              "hunks": 8,
+              "examples": [
+                "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:28 (path)",
+                "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:41 (path)",
+                "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:48 (path)"
+              ]
+            },
+            "public-api": {
+              "hunks": 4,
+              "examples": [
+                "src/MessagePack/net8.0/PublicAPI.Unshipped.txt:38 (path)",
+                "src/MessagePack/net8.0/PublicAPI.Unshipped.txt:51 (path)",
+                "src/MessagePack/netstandard2.0/PublicAPI.Unshipped.txt:23 (path)"
+              ]
+            }
+          },
+          "generalised": {
+            "user-docs": {
+              "hunks": 3,
+              "examples": [
+                "README.md:1620 (path)",
+                "README.md:1626 (path)",
+                "README.md:1634 (path)"
+              ]
+            },
+            "diagnostics": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1079 (path)"
+              ]
+            },
+            "generated": {
+              "hunks": 8,
+              "examples": [
+                "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:28 (path)",
+                "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:41 (path)",
+                "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs:48 (path)"
+              ]
+            },
+            "public-api": {
+              "hunks": 6,
+              "examples": [
+                "src/MessagePack/net6.0/PublicAPI.Unshipped.txt:28 (file-name)",
+                "src/MessagePack/net6.0/PublicAPI.Unshipped.txt:41 (file-name)",
+                "src/MessagePack/net8.0/PublicAPI.Unshipped.txt:38 (path)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 2139,
+        "title": "Change ByteListFormatter behaviour to keep binary compatibility for List<byte>",
+        "date": "2025-01-27",
+        "outcome": "merged",
+        "concern": "wire-format",
+        "expected_contracts": [
+          "wire-format"
+        ],
+        "head": "ca95d843",
+        "merge_base": "c52c51d7",
+        "base_rule": "merge-base with e823ea1f^1 (head already merged into origin/master by e823ea1f)",
+        "hunks": 21,
+        "files": 5,
+        "trips": {
+          "strict": {
+            "wire-format": {
+              "hunks": 15,
+              "examples": [
+                "src/MessagePack/Formatters/CollectionFormatter.cs:163 (path)",
+                "src/MessagePack/Formatters/PrimitiveFormatter.cs:176 (path)",
+                "src/MessagePack/Formatters/PrimitiveFormatter.cs:333 (path)"
+              ]
+            }
+          },
+          "generalised": {
+            "wire-format": {
+              "hunks": 15,
+              "examples": [
+                "src/MessagePack/Formatters/CollectionFormatter.cs:163 (path)",
+                "src/MessagePack/Formatters/PrimitiveFormatter.cs:176 (path)",
+                "src/MessagePack/Formatters/PrimitiveFormatter.cs:333 (path)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 1355,
+        "title": ".NET 6 Update",
+        "date": "2021-12-25",
+        "outcome": "merged-after-changes",
+        "concern": "targets",
+        "expected_contracts": [
+          "targets"
+        ],
+        "head": "b4c8f2af",
+        "merge_base": "5e3b1073",
+        "base_rule": "merge-base with 32258fdb (closest of 32258fdb, origin/master, origin/v2.x, origin/v1.x; 36 PR-only commits)",
+        "hunks": 35,
+        "files": 19,
+        "trips": {
+          "strict": {},
+          "generalised": {
+            "targets": {
+              "hunks": 2,
+              "examples": [
+                "src/MessagePack.Generator/MessagePack.Generator.csproj:6 (line: -    <TargetFrameworks>netcoreapp3.1;net5.0</TargetFrameworks>)",
+                "src/MessagePack/MessagePack.csproj:4 (line: -    <TargetFrameworks>netstandard2.0;netcoreapp3.1;net5.0</TargetFrameworks>)"
+              ]
+            },
+            "generated": {
+              "hunks": 2,
+              "examples": [
+                "src/MessagePack.GeneratorCore/Generator/EnumTemplate.cs:3 (file-name)",
+                "src/MessagePack.GeneratorCore/Generator/EnumTemplate.cs:6 (file-name)"
+              ]
+            },
+            "security": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack.UnityClient/Assets/Scripts/MessagePack/MessagePackSecurity.cs:337 (file-name)"
+              ]
+            },
+            "public-api": {
+              "hunks": 4,
+              "examples": [
+                "src/MessagePack/net6.0/PublicAPI.Shipped.txt:1 (file-name)",
+                "src/MessagePack/net6.0/PublicAPI.Unshipped.txt:1 (file-name)",
+                "src/MessagePack/netcoreapp2.1/PublicAPI.Shipped.txt:0 (file-name)"
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "controls": [
+      {
+        "pr": 32,
+        "merge": "7e2c5b52",
+        "date": "2019-01-30",
+        "title": "Move attributes to separate project",
+        "branch": "alphacloud/feature/annotations-package",
+        "hunks": 16,
+        "files": 13,
+        "trips": {
+          "strict": {},
+          "generalised": {
+            "targets": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack.Annotations/MessagePack.Annotations.csproj:1 (line: +    <TargetFrameworks>netstandard1.0</TargetFrameworks>)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 27,
+        "merge": "059ff6f9",
+        "date": "2019-03-07",
+        "title": "Add support for IBufferWriter<byte>",
+        "branch": "AArnott/fix9",
+        "hunks": 312,
+        "files": 28,
+        "trips": {
+          "strict": {
+            "wire-format": {
+              "hunks": 65,
+              "examples": [
+                "src/MessagePack/Formatters/CollectionFormatter.cs:231 (path)",
+                "src/MessagePack/Formatters/CollectionFormatter.cs:233 (path)",
+                "src/MessagePack/Formatters/CollectionFormatter.cs:238 (path)"
+              ]
+            },
+            "targets": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack/StringEncoding.cs:13 (line: +#if !NETCOREAPP2_1 // Define the extension method only where an instance method does not already ex)"
+              ]
+            }
+          },
+          "generalised": {
+            "wire-format": {
+              "hunks": 65,
+              "examples": [
+                "src/MessagePack/Formatters/CollectionFormatter.cs:231 (path)",
+                "src/MessagePack/Formatters/CollectionFormatter.cs:233 (path)",
+                "src/MessagePack/Formatters/CollectionFormatter.cs:238 (path)"
+              ]
+            },
+            "targets": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack/StringEncoding.cs:13 (line: +#if !NETCOREAPP2_1 // Define the extension method only where an instance method does not already ex)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 463,
+        "merge": "6f259fd6",
+        "date": "2019-06-10",
+        "title": "Allows use of IL2CPP on Unsafe implementation on Android armv7",
+        "branch": "capyvara/fix-unsafe-il2cpp",
+        "hunks": 13,
+        "files": 3,
+        "trips": {
+          "strict": {},
+          "generalised": {}
+        }
+      },
+      {
+        "pr": 496,
+        "merge": "339c6244",
+        "date": "2019-07-15",
+        "title": "Move attributes into their own isolated package",
+        "branch": "AArnott/fix486",
+        "hunks": 17,
+        "files": 14,
+        "trips": {
+          "strict": {},
+          "generalised": {
+            "targets": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack.Annotations/MessagePack.Annotations.csproj:1 (line: +    <TargetFrameworks>netstandard2.0</TargetFrameworks>)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 526,
+        "merge": "109f98d8",
+        "date": "2019-07-26",
+        "title": "Optimize for MemoryStream Deserialize",
+        "branch": "neuecc/optimize_ms",
+        "hunks": 2,
+        "files": 1,
+        "trips": {
+          "strict": {},
+          "generalised": {}
+        }
+      },
+      {
+        "pr": 575,
+        "merge": "42ede957",
+        "date": "2019-09-08",
+        "title": "Remove unused ToArray() copy",
+        "branch": "AArnott/fix574",
+        "hunks": 1,
+        "files": 1,
+        "trips": {
+          "strict": {},
+          "generalised": {}
+        }
+      },
+      {
+        "pr": 595,
+        "merge": "480dd85f",
+        "date": "2019-10-22",
+        "title": "Apply vs-threading analyzers and fix issues they found",
+        "branch": "AArnott/threadingAnalyzers",
+        "hunks": 28,
+        "files": 11,
+        "trips": {
+          "strict": {},
+          "generalised": {
+            "diagnostics": {
+              "hunks": 4,
+              "examples": [
+                "src/MessagePack.UniversalCodeGenerator/CodeAnalysis/TypeCollector.cs:7 (path-segment)",
+                "src/MessagePack.UniversalCodeGenerator/CodeAnalysis/TypeCollector.cs:184 (path-segment)",
+                "src/MessagePack.UniversalCodeGenerator/CodeAnalysis/TypeCollector.cs:186 (path-segment)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 626,
+        "merge": "b6bcd273",
+        "date": "2019-11-07",
+        "title": "Fix T4 generation in tests",
+        "branch": "AArnott/fixT4",
+        "hunks": 165,
+        "files": 38,
+        "trips": {
+          "strict": {
+            "wire-format": {
+              "hunks": 8,
+              "examples": [
+                "src/MessagePack/Formatters/ForceSizePrimitiveFormatter.cs:4 (path)",
+                "src/MessagePack/Formatters/ForceSizePrimitiveFormatter.tt:23 (path)",
+                "src/MessagePack/Formatters/PrimitiveFormatter.cs:4 (path)"
+              ]
+            }
+          },
+          "generalised": {
+            "generated": {
+              "hunks": 142,
+              "examples": [
+                "src/MessagePack.GeneratorCore/Generator/EnumTemplate.cs:3 (file-name)",
+                "src/MessagePack.GeneratorCore/Generator/EnumTemplate.cs:6 (file-name)",
+                "src/MessagePack.GeneratorCore/Generator/EnumTemplate.cs:28 (file-name)"
+              ]
+            },
+            "wire-format": {
+              "hunks": 12,
+              "examples": [
+                "src/MessagePack.UnityClient/Assets/Scripts/MessagePack/T4/ForceSizePrimitiveFormatter.cs:4 (file-name)",
+                "src/MessagePack.UnityClient/Assets/Scripts/MessagePack/T4/PrimitiveFormatter.cs:4 (file-name)",
+                "src/MessagePack.UnityClient/Assets/Scripts/MessagePack/T4/TupleFormatter.cs:4 (file-name)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 644,
+        "merge": "226357e8",
+        "date": "2019-11-18",
+        "title": "Move MessagePack.Internal from src to sandbox",
+        "branch": "AArnott/moveMsgPkgInternal",
+        "hunks": 7,
+        "files": 6,
+        "trips": {
+          "strict": {},
+          "generalised": {
+            "targets": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack.Internal/MessagePack.Internal.csproj:0 (line: -    <TargetFrameworks>netcoreapp2.2</TargetFrameworks>)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 667,
+        "merge": "c1bfa19c",
+        "date": "2019-11-25",
+        "title": "Improve Readme",
+        "branch": "neuecc/improve-readme",
+        "hunks": 35,
+        "files": 1,
+        "trips": {
+          "strict": {
+            "user-docs": {
+              "hunks": 35,
+              "examples": [
+                "README.md:129 (path)",
+                "README.md:252 (path)",
+                "README.md:504 (path)"
+              ]
+            }
+          },
+          "generalised": {
+            "user-docs": {
+              "hunks": 35,
+              "examples": [
+                "README.md:129 (path)",
+                "README.md:252 (path)",
+                "README.md:504 (path)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 754,
+        "merge": "9ed868e3",
+        "date": "2020-01-04",
+        "title": "Simplify CompositeResolver.Create",
+        "branch": "neuecc/improve-compositeresolver",
+        "hunks": 25,
+        "files": 2,
+        "trips": {
+          "strict": {},
+          "generalised": {}
+        }
+      },
+      {
+        "pr": 779,
+        "merge": "9de03c0b",
+        "date": "2020-01-17",
+        "title": "mpc, does not load does't exists metadata",
+        "branch": "neuecc/mpc-improv-metadatahandling",
+        "hunks": 11,
+        "files": 1,
+        "trips": {
+          "strict": {},
+          "generalised": {}
+        }
+      },
+      {
+        "pr": 795,
+        "merge": "ff8ae645",
+        "date": "2020-01-30",
+        "title": "avoid ReadUnaligned on long, ulong, double in Android device",
+        "branch": "neuecc/android-armv7-32bit",
+        "hunks": 2,
+        "files": 1,
+        "trips": {
+          "strict": {},
+          "generalised": {}
+        }
+      },
+      {
+        "pr": 830,
+        "merge": "eed05edc",
+        "date": "2020-03-18",
+        "title": "Generics in mpc 2 simpler faster",
+        "branch": "opsidjflksdf/generics-in-mpc-2-simpler-faster",
+        "hunks": 20,
+        "files": 6,
+        "trips": {
+          "strict": {},
+          "generalised": {
+            "diagnostics": {
+              "hunks": 11,
+              "examples": [
+                "src/MessagePack.GeneratorCore/CodeAnalysis/Definitions.cs:27 (path-segment)",
+                "src/MessagePack.GeneratorCore/CodeAnalysis/TypeCollector.cs:9 (path-segment)",
+                "src/MessagePack.GeneratorCore/CodeAnalysis/TypeCollector.cs:273 (path-segment)"
+              ]
+            },
+            "generated": {
+              "hunks": 5,
+              "examples": [
+                "src/MessagePack.GeneratorCore/Generator/FormatterTemplate.cs:50 (file-name)",
+                "src/MessagePack.GeneratorCore/Generator/FormatterTemplate.tt:29 (file-name)",
+                "src/MessagePack.GeneratorCore/Generator/ResolverTemplate.cs:3 (file-name)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 882,
+        "merge": "275eb96c",
+        "date": "2020-04-13",
+        "title": "Normalize End-of-Lines",
+        "branch": "neuecc/NormalizeEOL",
+        "hunks": 2,
+        "files": 1,
+        "trips": {
+          "strict": {},
+          "generalised": {}
+        }
+      },
+      {
+        "pr": 946,
+        "merge": "c2ee6bca",
+        "date": "2020-06-12",
+        "title": "Fix MessagePackStreamReader reading when string or binary headers are incomplete",
+        "branch": "AArnott/fix924",
+        "hunks": 24,
+        "files": 2,
+        "trips": {
+          "strict": {},
+          "generalised": {
+            "wire-format": {
+              "hunks": 22,
+              "examples": [
+                "src/MessagePack.UnityClient/Assets/Scripts/MessagePack/MessagePackReader.cs:152 (file-name)",
+                "src/MessagePack.UnityClient/Assets/Scripts/MessagePack/MessagePackReader.cs:191 (file-name)",
+                "src/MessagePack.UnityClient/Assets/Scripts/MessagePack/MessagePackReader.cs:195 (file-name)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 978,
+        "merge": "cb246217",
+        "date": "2020-08-06",
+        "title": "warning disable 0162 for unity",
+        "branch": "neuecc/disable-warning-unity",
+        "hunks": 2,
+        "files": 1,
+        "trips": {
+          "strict": {},
+          "generalised": {
+            "wire-format": {
+              "hunks": 2,
+              "examples": [
+                "src/MessagePack.UnityClient/Assets/Scripts/MessagePack/MessagePackWriter.cs:1298 (file-name)",
+                "src/MessagePack.UnityClient/Assets/Scripts/MessagePack/MessagePackWriter.cs:1322 (file-name)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 1022,
+        "merge": "0cb71cf5",
+        "date": "2020-09-02",
+        "title": "Remove dead code",
+        "branch": "AArnott/removeDeadCode",
+        "hunks": 1,
+        "files": 1,
+        "trips": {
+          "strict": {},
+          "generalised": {
+            "wire-format": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack.UnityClient/Assets/Scripts/MessagePack/MessagePackWriter.cs:1246 (file-name)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 1040,
+        "merge": "ebdb29c6",
+        "date": "2020-09-14",
+        "title": "Create MonoProtection.cs.meta",
+        "branch": "hikarin522/patch-1",
+        "hunks": 1,
+        "files": 1,
+        "trips": {
+          "strict": {},
+          "generalised": {}
+        }
+      },
+      {
+        "pr": 1078,
+        "merge": "09af596e",
+        "date": "2020-10-26",
+        "title": "Typeless supports interface and abstract",
+        "branch": "neuecc/improve-typeless",
+        "hunks": 14,
+        "files": 6,
+        "trips": {
+          "strict": {},
+          "generalised": {
+            "wire-format": {
+              "hunks": 2,
+              "examples": [
+                "src/MessagePack.UnityClient/Assets/Scripts/MessagePack/Formatters/ExpandoObjectFormatter.cs:54 (path-segment)",
+                "src/MessagePack.UnityClient/Assets/Scripts/MessagePack/Formatters/TypelessFormatter.cs:19 (path-segment)"
+              ]
+            },
+            "public-api": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack/PublicAPI.Unshipped.txt:13 (file-name)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 1155,
+        "merge": "289bb446",
+        "date": "2021-01-02",
+        "title": "Add test to document ctor+property setter behavior",
+        "branch": "AArnott/docCtorPlusSetter",
+        "hunks": 2,
+        "files": 1,
+        "trips": {
+          "strict": {},
+          "generalised": {}
+        }
+      },
+      {
+        "pr": 1177,
+        "merge": "43e2aefe",
+        "date": "2021-01-30",
+        "title": "Fix break in master",
+        "branch": "AArnott/fixBreak",
+        "hunks": 2,
+        "files": 2,
+        "trips": {
+          "strict": {},
+          "generalised": {}
+        }
+      },
+      {
+        "pr": 1215,
+        "merge": "9f897b33",
+        "date": "2021-03-19",
+        "title": "Add `prepare_release.ps1` script",
+        "branch": "AArnott/fix1195",
+        "hunks": 1,
+        "files": 1,
+        "trips": {
+          "strict": {},
+          "generalised": {}
+        }
+      },
+      {
+        "pr": 1192,
+        "merge": "ffc18319",
+        "date": "2021-03-21",
+        "title": "Fix mpc ignore generic type defined in out side target",
+        "branch": "gsino/fix_mpc_ignore_generic_type_defined_in_out_side_target",
+        "hunks": 31,
+        "files": 5,
+        "trips": {
+          "strict": {},
+          "generalised": {
+            "diagnostics": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack.GeneratorCore/CodeAnalysis/TypeCollector.cs:596 (path-segment)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 1252,
+        "merge": "3878cd3a",
+        "date": "2021-06-05",
+        "title": "Allow deserializing `byte[]` from a msgpack array",
+        "branch": "AArnott/fix1251",
+        "hunks": 7,
+        "files": 3,
+        "trips": {
+          "strict": {},
+          "generalised": {
+            "wire-format": {
+              "hunks": 2,
+              "examples": [
+                "src/MessagePack.UnityClient/Assets/Scripts/MessagePack/Formatters/StandardClassLibraryFormatter.cs:18 (path-segment)",
+                "src/MessagePack.UnityClient/Assets/Scripts/MessagePack/Formatters/StandardClassLibraryFormatter.cs:37 (path-segment)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 1264,
+        "merge": "15d6851f",
+        "date": "2021-06-20",
+        "title": "Clearly document unity scenarios that require AOT",
+        "branch": "neuecc/fix471",
+        "hunks": 2,
+        "files": 1,
+        "trips": {
+          "strict": {
+            "user-docs": {
+              "hunks": 2,
+              "examples": [
+                "README.md:1461 (path)",
+                "README.md:1509 (path)"
+              ]
+            }
+          },
+          "generalised": {
+            "user-docs": {
+              "hunks": 2,
+              "examples": [
+                "README.md:1461 (path)",
+                "README.md:1509 (path)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 1302,
+        "merge": "14556ae3",
+        "date": "2021-08-21",
+        "title": "Refactory ObjectSerializationInfo.CreateOrNull",
+        "branch": "fredliex/refactory-ObjectSerializationInfo.CreateOrNull",
+        "hunks": 41,
+        "files": 1,
+        "trips": {
+          "strict": {},
+          "generalised": {}
+        }
+      },
+      {
+        "pr": 1303,
+        "merge": "aa998e6d",
+        "date": "2021-08-21",
+        "title": "add unittest for DataContractSerializer compatibility",
+        "branch": "fredliex/DataContractSerializer-compatibility-unittest",
+        "hunks": 3,
+        "files": 1,
+        "trips": {
+          "strict": {},
+          "generalised": {}
+        }
+      },
+      {
+        "pr": 1330,
+        "merge": "b4fb2ed7",
+        "date": "2021-11-05",
+        "title": "Fix MessagePackFormatterAttribute for many built-in formatter types",
+        "branch": "AArnott/fix1328",
+        "hunks": 29,
+        "files": 9,
+        "trips": {
+          "strict": {},
+          "generalised": {}
+        }
+      },
+      {
+        "pr": 1346,
+        "merge": "d374efaf",
+        "date": "2021-11-09",
+        "title": "Support Unity netstandard21",
+        "branch": "neuecc/unity-netstandard21",
+        "hunks": 9,
+        "files": 5,
+        "trips": {
+          "strict": {
+            "targets": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack.UnityClient/Assets/Scripts/MessagePack/HashCode.cs:45 (line: -#if !NETCOREAPP)"
+              ]
+            }
+          },
+          "generalised": {
+            "targets": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack.UnityClient/Assets/Scripts/MessagePack/HashCode.cs:45 (line: -#if !NETCOREAPP)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 1427,
+        "merge": "623aaf27",
+        "date": "2022-05-24",
+        "title": "Add built-in support for .NET 6 `DateOnly` and `TimeOnly` types",
+        "branch": "AArnott/fix1240_dateonly",
+        "hunks": 41,
+        "files": 14,
+        "trips": {
+          "strict": {
+            "user-docs": {
+              "hunks": 2,
+              "examples": [
+                "README.md:1502 (path)",
+                "README.md:1517 (path)"
+              ]
+            }
+          },
+          "generalised": {
+            "user-docs": {
+              "hunks": 2,
+              "examples": [
+                "README.md:1502 (path)",
+                "README.md:1517 (path)"
+              ]
+            },
+            "wire-format": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack.UnityClient/Assets/Scripts/MessagePack/Formatters/DateTimeFormatters.cs:73 (path-segment)"
+              ]
+            },
+            "public-api": {
+              "hunks": 3,
+              "examples": [
+                "src/MessagePack/net6.0/PublicAPI.Unshipped.txt:1 (file-name)",
+                "src/MessagePack/net6.0/PublicAPI.Unshipped.txt:8 (file-name)",
+                "src/MessagePack/net6.0/PublicAPI.Unshipped.txt:13 (file-name)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 1445,
+        "merge": "f1b42c07",
+        "date": "2022-06-14",
+        "title": "MessagePack.Generator RollForward to Major",
+        "branch": "neuecc/generator-rollforward-major",
+        "hunks": 1,
+        "files": 1,
+        "trips": {
+          "strict": {},
+          "generalised": {}
+        }
+      },
+      {
+        "pr": 1455,
+        "merge": "f94fbf59",
+        "date": "2022-06-23",
+        "title": "Add StringInterningFormatter.cs.meta for Unity",
+        "branch": "neuecc/unity-meta",
+        "hunks": 2,
+        "files": 2,
+        "trips": {
+          "strict": {},
+          "generalised": {
+            "wire-format": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack.UnityClient/Assets/Scripts/MessagePack/Formatters/StringInterningFormatter.cs.meta:1 (path-segment)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 1457,
+        "merge": "64ee45cd",
+        "date": "2022-06-27",
+        "title": "Add option to avoid large buffer allocations",
+        "branch": "AArnott/reduceLOHimpact",
+        "hunks": 19,
+        "files": 6,
+        "trips": {
+          "strict": {
+            "public-api": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack/netstandard2.0/PublicAPI.Unshipped.txt:6 (path)"
+              ]
+            }
+          },
+          "generalised": {
+            "public-api": {
+              "hunks": 5,
+              "examples": [
+                "src/MessagePack/net6.0/PublicAPI.Unshipped.txt:12 (file-name)",
+                "src/MessagePack/net6.0/PublicAPI.Unshipped.txt:14 (file-name)",
+                "src/MessagePack/netcoreapp3.1/PublicAPI.Unshipped.txt:6 (file-name)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 1478,
+        "merge": "10955cc1",
+        "date": "2022-08-02",
+        "title": "Add non-generic serialize/deserialize perf tests",
+        "branch": "AArnott/nongenericperftests",
+        "hunks": 4,
+        "files": 2,
+        "trips": {
+          "strict": {},
+          "generalised": {}
+        }
+      },
+      {
+        "pr": 1461,
+        "merge": "541ad7c6",
+        "date": "2022-08-02",
+        "title": "Fix for \"System.NotImplementedException: byref delegate\" (second attempt)",
+        "branch": "LineSmarts/master",
+        "hunks": 7,
+        "files": 2,
+        "trips": {
+          "strict": {},
+          "generalised": {}
+        }
+      },
+      {
+        "pr": 1486,
+        "merge": "a07a2b2c",
+        "date": "2022-08-25",
+        "title": "Enable SPAN_BUILTIN code for Unity 2021.2+",
+        "branch": "MichalPetryka/span-unity",
+        "hunks": 2,
+        "files": 2,
+        "trips": {
+          "strict": {},
+          "generalised": {
+            "wire-format": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack.UnityClient/Assets/Scripts/MessagePack/Formatters/StringInterningFormatter.cs:34 (path-segment)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 1490,
+        "merge": "31aaad3e",
+        "date": "2022-08-25",
+        "title": "removing extra double quotation mark",
+        "branch": "ImanNavidi/Fixing-ToJson-of-UnityClient-project",
+        "hunks": 1,
+        "files": 1,
+        "trips": {
+          "strict": {},
+          "generalised": {}
+        }
+      },
+      {
+        "pr": 1529,
+        "merge": "92f230bc",
+        "date": "2022-11-19",
+        "title": "Remove dead constant",
+        "branch": "AArnott/fix1526",
+        "hunks": 1,
+        "files": 1,
+        "trips": {
+          "strict": {},
+          "generalised": {}
+        }
+      },
+      {
+        "pr": 1499,
+        "merge": "3bc35e36",
+        "date": "2022-11-19",
+        "title": "Improve error messages in exceptions thrown from `PrimitiveObjectFormatter`",
+        "branch": "AArnott/improveErrorMessages",
+        "hunks": 8,
+        "files": 1,
+        "trips": {
+          "strict": {},
+          "generalised": {
+            "wire-format": {
+              "hunks": 8,
+              "examples": [
+                "src/MessagePack.UnityClient/Assets/Scripts/MessagePack/Formatters/PrimitiveObjectFormatter.cs:7 (path-segment)",
+                "src/MessagePack.UnityClient/Assets/Scripts/MessagePack/Formatters/PrimitiveObjectFormatter.cs:205 (path-segment)",
+                "src/MessagePack.UnityClient/Assets/Scripts/MessagePack/Formatters/PrimitiveObjectFormatter.cs:250 (path-segment)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 1547,
+        "merge": "b869a52f",
+        "date": "2023-01-04",
+        "title": "Fixes Typo \"paramterType\" -> \"parameterType\"",
+        "branch": "gfs/patch-1",
+        "hunks": 7,
+        "files": 3,
+        "trips": {
+          "strict": {},
+          "generalised": {
+            "diagnostics": {
+              "hunks": 3,
+              "examples": [
+                "src/MessagePack.GeneratorCore/CodeAnalysis/TypeCollector.cs:865 (path-segment)",
+                "src/MessagePack.GeneratorCore/CodeAnalysis/TypeCollector.cs:904 (path-segment)",
+                "src/MessagePack.GeneratorCore/CodeAnalysis/TypeCollector.cs:920 (path-segment)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 1548,
+        "merge": "594ec079",
+        "date": "2023-01-06",
+        "title": "Fix unity+android code for reading an Int64 from memory",
+        "branch": "AArnott/fix1546",
+        "hunks": 2,
+        "files": 1,
+        "trips": {
+          "strict": {},
+          "generalised": {}
+        }
+      },
+      {
+        "pr": 1561,
+        "merge": "ba396dee",
+        "date": "2023-03-11",
+        "title": "Fix MessagePack CodeGen Unity spelling/grammar",
+        "branch": "Valerionn/patch-1",
+        "hunks": 1,
+        "files": 1,
+        "trips": {
+          "strict": {},
+          "generalised": {}
+        }
+      },
+      {
+        "pr": 1558,
+        "merge": "80481cd0",
+        "date": "2023-03-11",
+        "title": "Show details of errors occurred when the generator opens a project",
+        "branch": "mayuki/ShowErrorDetailsOnGeneratorProjectLoading",
+        "hunks": 2,
+        "files": 1,
+        "trips": {
+          "strict": {},
+          "generalised": {}
+        }
+      },
+      {
+        "pr": 1597,
+        "merge": "09f0a48e",
+        "date": "2023-04-06",
+        "title": "Add built-in formatters for several more System.Numerics types",
+        "branch": "AArnott/fix1593",
+        "hunks": 22,
+        "files": 4,
+        "trips": {
+          "strict": {
+            "public-api": {
+              "hunks": 3,
+              "examples": [
+                "src/MessagePack/netstandard2.0/PublicAPI.Unshipped.txt:1 (path)",
+                "src/MessagePack/netstandard2.0/PublicAPI.Unshipped.txt:14 (path)",
+                "src/MessagePack/netstandard2.0/PublicAPI.Unshipped.txt:29 (path)"
+              ]
+            }
+          },
+          "generalised": {
+            "wire-format": {
+              "hunks": 14,
+              "examples": [
+                "src/MessagePack.UnityClient/Assets/Scripts/MessagePack/Formatters/StandardClassLibraryFormatter.cs:9 (path-segment)",
+                "src/MessagePack.UnityClient/Assets/Scripts/MessagePack/Formatters/StandardClassLibraryFormatter.cs:492 (path-segment)",
+                "src/MessagePack.UnityClient/Assets/Scripts/MessagePack/Formatters/StandardClassLibraryFormatter.cs:494 (path-segment)"
+              ]
+            },
+            "public-api": {
+              "hunks": 7,
+              "examples": [
+                "src/MessagePack/net6.0/PublicAPI.Unshipped.txt:4 (file-name)",
+                "src/MessagePack/net6.0/PublicAPI.Unshipped.txt:20 (file-name)",
+                "src/MessagePack/net6.0/PublicAPI.Unshipped.txt:36 (file-name)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 1602,
+        "merge": "5b1ab286",
+        "date": "2023-04-12",
+        "title": "Bring back support for the additional allow types",
+        "branch": "AArnott/sourceGeneratorImprovements",
+        "hunks": 23,
+        "files": 7,
+        "trips": {
+          "strict": {},
+          "generalised": {
+            "diagnostics": {
+              "hunks": 11,
+              "examples": [
+                "src/MessagePack.Analyzers/CodeAnalysis/AnalyzerOptions.cs:17 (path-segment)",
+                "src/MessagePack.Analyzers/CodeAnalysis/AnalyzerOptions.cs:24 (path-segment)",
+                "src/MessagePack.Analyzers/CodeAnalysis/AnalyzerOptions.cs:30 (path-segment)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 1604,
+        "merge": "d1b45b00",
+        "date": "2023-04-13",
+        "title": "Enable P2P generic test",
+        "branch": "neuecc/sourceGeneratorImprovements",
+        "hunks": 31,
+        "files": 13,
+        "trips": {
+          "strict": {},
+          "generalised": {}
+        }
+      },
+      {
+        "pr": 1605,
+        "merge": "654dd8cd",
+        "date": "2023-04-13",
+        "title": "Report diagnostics instead of throw from TypeCollector",
+        "branch": "neuecc/reportDiagnosticsInsteadOfThrow",
+        "hunks": 30,
+        "files": 6,
+        "trips": {
+          "strict": {
+            "diagnostics": {
+              "hunks": 17,
+              "examples": [
+                "src/MessagePack.Analyzers/CodeAnalysis/TypeCollector.cs:391 (line: +            this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.UnionAttr)",
+                "src/MessagePack.Analyzers/CodeAnalysis/TypeCollector.cs:399 (line: +                this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.AotUn)",
+                "src/MessagePack.Analyzers/CodeAnalysis/TypeCollector.cs:464 (line: +                ////this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.A)"
+              ]
+            }
+          },
+          "generalised": {
+            "diagnostics": {
+              "hunks": 28,
+              "examples": [
+                "src/MessagePack.Analyzers/AnalyzerReleases.Unshipped.md:10 (file-name)",
+                "src/MessagePack.Analyzers/CodeAnalysis/AnalyzerOptions.cs:30 (path-segment)",
+                "src/MessagePack.Analyzers/CodeAnalysis/TypeCollector.cs:12 (path-segment)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 1667,
+        "merge": "3b8428ee",
+        "date": "2023-08-15",
+        "title": "Switch from MSBuild properties to an AdditionalFiles json file",
+        "branch": "MessagePack-CSharp/fix1650",
+        "hunks": 57,
+        "files": 24,
+        "trips": {
+          "strict": {
+            "user-docs": {
+              "hunks": 8,
+              "examples": [
+                "README.md:171 (path)",
+                "README.md:177 (path)",
+                "README.md:1634 (path)"
+              ]
+            },
+            "generated": {
+              "hunks": 4,
+              "examples": [
+                "src/MessagePack.SourceGenerator/Transforms/TemplatePartials.cs:56 (path)",
+                "src/MessagePack.SourceGenerator/Transforms/TemplatePartials.cs:60 (path)",
+                "src/MessagePack.SourceGenerator/Transforms/TemplatePartials.cs:62 (path)"
+              ]
+            }
+          },
+          "generalised": {
+            "user-docs": {
+              "hunks": 8,
+              "examples": [
+                "README.md:171 (path)",
+                "README.md:177 (path)",
+                "README.md:1634 (path)"
+              ]
+            },
+            "diagnostics": {
+              "hunks": 21,
+              "examples": [
+                "src/MessagePack.Analyzers/CodeAnalysis/AnalyzerOptions.cs:6 (path-segment)",
+                "src/MessagePack.Analyzers/CodeAnalysis/AnalyzerOptions.cs:12 (path-segment)",
+                "src/MessagePack.Analyzers/CodeAnalysis/AnalyzerOptions.cs:17 (path-segment)"
+              ]
+            },
+            "generated": {
+              "hunks": 4,
+              "examples": [
+                "src/MessagePack.SourceGenerator/Transforms/TemplatePartials.cs:56 (path)",
+                "src/MessagePack.SourceGenerator/Transforms/TemplatePartials.cs:60 (path)",
+                "src/MessagePack.SourceGenerator/Transforms/TemplatePartials.cs:62 (path)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 1729,
+        "merge": "17db68c6",
+        "date": "2024-01-10",
+        "title": ".Net 8 Update(3): Microsoft.CodeAnalysis.Analyzers v3.3.4",
+        "branch": "pCYSl5EDgo/net8-3.3.4",
+        "hunks": 4,
+        "files": 3,
+        "trips": {
+          "strict": {
+            "generated": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack.SourceGenerator/Transforms/.editorconfig:4 (path)"
+              ]
+            }
+          },
+          "generalised": {
+            "generated": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack.SourceGenerator/Transforms/.editorconfig:4 (path)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 1749,
+        "merge": "76afcdb3",
+        "date": "2024-01-27",
+        "title": "Drop support for roslyn 3.8",
+        "branch": "AArnott/dropRoslyn3.8",
+        "hunks": 24,
+        "files": 11,
+        "trips": {
+          "strict": {
+            "diagnostics": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack.SourceGenerator.Unity/MessagePackGenerator.cs:0 (line: -        public void ReportDiagnostic(Diagnostic diagnostic) => context.ReportDiagnostic(diagnostic))"
+              ]
+            }
+          },
+          "generalised": {
+            "targets": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack.Analyzers.CodeFixes.Unity/MessagePack.Analyzers.CodeFixes.Unity.csproj:0 (line: -    <TargetFramework>netstandard2.0</TargetFramework>)"
+              ]
+            },
+            "diagnostics": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack.SourceGenerator.Unity/MessagePackGenerator.cs:0 (line: -        public void ReportDiagnostic(Diagnostic diagnostic) => context.ReportDiagnostic(diagnostic))"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 1824,
+        "merge": "9794c755",
+        "date": "2024-05-22",
+        "title": "Add `ExcludeFormatterFromSourceGeneratedResolverAttribute`",
+        "branch": "MessagePack-CSharp/fix1823",
+        "hunks": 7,
+        "files": 6,
+        "trips": {
+          "strict": {
+            "diagnostics": {
+              "hunks": 2,
+              "examples": [
+                "src/MessagePack.SourceGenerator/CodeAnalysis/AnalyzerOptions.cs:192 (path)",
+                "src/MessagePack.SourceGenerator/CodeAnalysis/AnalyzerOptions.cs:201 (path)"
+              ]
+            }
+          },
+          "generalised": {
+            "diagnostics": {
+              "hunks": 2,
+              "examples": [
+                "src/MessagePack.SourceGenerator/CodeAnalysis/AnalyzerOptions.cs:192 (path)",
+                "src/MessagePack.SourceGenerator/CodeAnalysis/AnalyzerOptions.cs:201 (path)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 1890,
+        "merge": "73cd88e3",
+        "date": "2024-07-19",
+        "title": "Simd Accelerated bool[] deserialize",
+        "branch": "pCYSl5EDgo:faster-multi-element-deserialization",
+        "hunks": 12,
+        "files": 4,
+        "trips": {
+          "strict": {
+            "wire-format": {
+              "hunks": 8,
+              "examples": [
+                "src/MessagePack/Formatters/PrimitiveFormatter.cs:10 (path)",
+                "src/MessagePack/Formatters/PrimitiveFormatter.cs:1361 (path)",
+                "src/MessagePack/Formatters/PrimitiveFormatter.cs:1365 (path)"
+              ]
+            }
+          },
+          "generalised": {
+            "wire-format": {
+              "hunks": 8,
+              "examples": [
+                "src/MessagePack/Formatters/PrimitiveFormatter.cs:10 (path)",
+                "src/MessagePack/Formatters/PrimitiveFormatter.cs:1361 (path)",
+                "src/MessagePack/Formatters/PrimitiveFormatter.cs:1365 (path)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 1921,
+        "merge": "3ea9234f",
+        "date": "2024-08-06",
+        "title": "Fix some source generator issues",
+        "branch": "AlanLiu90:Branch_develop_FixSGIssues2",
+        "hunks": 11,
+        "files": 6,
+        "trips": {
+          "strict": {
+            "diagnostics": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:458 (path)"
+              ]
+            }
+          },
+          "generalised": {
+            "diagnostics": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:458 (path)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 1962,
+        "merge": "d774a395",
+        "date": "2024-09-25",
+        "title": "Honor key name overrides in source-generated formatters",
+        "branch": "MessagePack-CSharp/fix1955",
+        "hunks": 14,
+        "files": 3,
+        "trips": {
+          "strict": {
+            "diagnostics": {
+              "hunks": 6,
+              "examples": [
+                "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:724 (path)",
+                "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:741 (path)",
+                "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:747 (path)"
+              ]
+            }
+          },
+          "generalised": {
+            "diagnostics": {
+              "hunks": 6,
+              "examples": [
+                "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:724 (path)",
+                "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:741 (path)",
+                "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:747 (path)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 1982,
+        "merge": "8d291e42",
+        "date": "2024-10-03",
+        "title": "Fix analyzers to not mis-interpret source generated formatters as user-defined",
+        "branch": "MessagePack-CSharp/fixAnalyzers",
+        "hunks": 1,
+        "files": 1,
+        "trips": {
+          "strict": {
+            "diagnostics": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack.SourceGenerator/Analyzers/MsgPack00xMessagePackAnalyzer.cs:402 (path)"
+              ]
+            }
+          },
+          "generalised": {
+            "diagnostics": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack.SourceGenerator/Analyzers/MsgPack00xMessagePackAnalyzer.cs:402 (path)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 2006,
+        "merge": "ea9b25fe",
+        "date": "2024-10-15",
+        "title": "Fix handling of name collisions in type hierarchies",
+        "branch": "MessagePack-CSharp/fix1995",
+        "hunks": 51,
+        "files": 20,
+        "trips": {
+          "strict": {
+            "diagnostics": {
+              "hunks": 29,
+              "examples": [
+                "doc/analyzers/MsgPack018.md:1 (path)",
+                "doc/analyzers/index.md:25 (path)",
+                "src/MessagePack.SourceGenerator/AnalyzerReleases.Unshipped.md:25 (path)"
+              ]
+            },
+            "user-docs": {
+              "hunks": 2,
+              "examples": [
+                "doc/analyzers/MsgPack018.md:1 (path)",
+                "doc/analyzers/index.md:25 (path)"
+              ]
+            },
+            "generated": {
+              "hunks": 11,
+              "examples": [
+                "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.cs:138 (path)",
+                "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.cs:161 (path)",
+                "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.tt:98 (path)"
+              ]
+            }
+          },
+          "generalised": {
+            "diagnostics": {
+              "hunks": 29,
+              "examples": [
+                "doc/analyzers/MsgPack018.md:1 (path)",
+                "doc/analyzers/index.md:25 (path)",
+                "src/MessagePack.SourceGenerator/AnalyzerReleases.Unshipped.md:25 (path)"
+              ]
+            },
+            "user-docs": {
+              "hunks": 2,
+              "examples": [
+                "doc/analyzers/MsgPack018.md:1 (path)",
+                "doc/analyzers/index.md:25 (path)"
+              ]
+            },
+            "generated": {
+              "hunks": 11,
+              "examples": [
+                "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.cs:138 (path)",
+                "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.cs:161 (path)",
+                "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.tt:98 (path)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 2029,
+        "merge": "4a804d22",
+        "date": "2024-10-21",
+        "title": "Apply scoped in more places",
+        "branch": "jaredpar/scoped",
+        "hunks": 11,
+        "files": 6,
+        "trips": {
+          "strict": {
+            "wire-format": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack/MessagePackReader.cs:120 (path)"
+              ]
+            },
+            "public-api": {
+              "hunks": 8,
+              "examples": [
+                "src/MessagePack/net472/PublicAPI.Shipped.txt:510 (path)",
+                "src/MessagePack/net472/PublicAPI.Shipped.txt:756 (path)",
+                "src/MessagePack/net8.0/PublicAPI.Shipped.txt:510 (path)"
+              ]
+            }
+          },
+          "generalised": {
+            "wire-format": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack/MessagePackReader.cs:120 (path)"
+              ]
+            },
+            "public-api": {
+              "hunks": 8,
+              "examples": [
+                "src/MessagePack/net472/PublicAPI.Shipped.txt:510 (path)",
+                "src/MessagePack/net472/PublicAPI.Shipped.txt:756 (path)",
+                "src/MessagePack/net8.0/PublicAPI.Shipped.txt:510 (path)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 2043,
+        "merge": "c54ab0ab",
+        "date": "2024-10-25",
+        "title": "Allow SequencePool to Clear self",
+        "branch": "nmi-relewise/feature/2042-allow-sequencePool-to-be-emptied",
+        "hunks": 5,
+        "files": 5,
+        "trips": {
+          "strict": {
+            "public-api": {
+              "hunks": 4,
+              "examples": [
+                "src/MessagePack/net472/PublicAPI.Unshipped.txt:51 (path)",
+                "src/MessagePack/net8.0/PublicAPI.Unshipped.txt:102 (path)",
+                "src/MessagePack/netstandard2.0/PublicAPI.Unshipped.txt:51 (path)"
+              ]
+            }
+          },
+          "generalised": {
+            "public-api": {
+              "hunks": 4,
+              "examples": [
+                "src/MessagePack/net472/PublicAPI.Unshipped.txt:51 (path)",
+                "src/MessagePack/net8.0/PublicAPI.Unshipped.txt:102 (path)",
+                "src/MessagePack/netstandard2.0/PublicAPI.Unshipped.txt:51 (path)"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "pr": 2119,
+        "merge": "524fd55e",
+        "date": "2025-01-27",
+        "title": "Consolidation of AssemblyBuilderAccess when generating dynamic assemblies",
+        "branch": "MarcusChr/develop",
+        "hunks": 3,
+        "files": 1,
+        "trips": {
+          "strict": {
+            "targets": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack/Internal/DynamicAssembly.cs:36 (line: -#if NETFRAMEWORK // We don't ship a net472 target, but we might add one for debugging purposes)"
+              ]
+            }
+          },
+          "generalised": {
+            "targets": {
+              "hunks": 1,
+              "examples": [
+                "src/MessagePack/Internal/DynamicAssembly.cs:36 (line: -#if NETFRAMEWORK // We don't ship a net472 target, but we might add one for debugging purposes)"
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "tool_versions": {
+    "git": "git version 2.43.0",
+    "python": "3.13.18"
+  },
+  "produced_by": "script"
+}

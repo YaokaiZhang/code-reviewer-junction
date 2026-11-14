@@ -1,0 +1,674 @@
+{
+  "check": "readability",
+  "branch": "ju26-issue-2234",
+  "base": "32258fdb",
+  "head": "9007cee1",
+  "command": "python3 review/scripts/readability.py --repo $MP_REPO --branch ju26-issue-2234 --write",
+  "result": "pass",
+  "provides": [
+    "count"
+  ],
+  "summary": "4 flags (H-20 4); 11 touched methods measured; 10 test methods added in 2 test files; 2 of 9 claims have flip/revert-test support",
+  "details": {
+    "result_means": "the script ran on every in-scope file; flags are signals tied to a cited rule, not verdicts",
+    "diff": "git diff 32258fdb...origin/ju26-issue-2234 (old side 32258fdb)",
+    "thresholds": "none from the maintainers; ours: clone window 6 normalised lines (from clone_complexity.py), repeated added block = same normalised hunk text 2+ times, a flag fires on any increase",
+    "method_parser_limits": [
+      "light brace matcher over text with strings, chars, comments and preprocessor lines blanked; not a C# parser",
+      "a method is a { block whose header sits directly in a type and has name( after attributes, with no = before (; property accessors count as Prop.get etc.; expression-bodied members count; local functions, lambdas, operators and indexers are not separated from their container",
+      "depth counts braces only (method body = 1); braceless if/else adds none",
+      "#if arms are not evaluated; both are parsed",
+      "a method's line span starts at its first attribute line (e.g. [Fact]) and ends at its closing brace",
+      "if/else/case/&&/|| are token counts on blanked text; `else if` counts as one else and one if",
+      "base and branch methods are matched by type, name and parameter text; a changed signature shows as removed + added",
+      "interpolation holes in non-raw interpolated strings: nested quotes tracked one level deep"
+    ],
+    "flags": [
+      {
+        "id": "RD-2234-01",
+        "measure": "duplicated normalised lines (clone_complexity.py line-window detector, window 6; window is ours)",
+        "value_base": 244,
+        "value_branch": 258,
+        "where": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1008,1039,1041,1148,1179,1181",
+        "rule": "H-20",
+        "rule_text": "Prefer complete, maintainable fixes over minimal patches (e.g. a version bump or a partial package-ref suppression).",
+        "sources": [
+          "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1636#issuecomment-1586427588",
+          "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1621#issuecomment-1555916472"
+        ],
+        "claims": [
+          "C-2234-01",
+          "C-2234-02",
+          "C-2234-03",
+          "C-2234-04",
+          "C-2234-05",
+          "C-2234-06"
+        ],
+        "detail": "6 of 10 added code lines sit in duplicated blocks; duplicated blocks 10 -> 12"
+      },
+      {
+        "id": "RD-2234-02",
+        "measure": "identical added block repeated in src (normalised lines of one hunk; '2+ times' is ours)",
+        "value_base": 0,
+        "value_branch": 2,
+        "where": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1008,1148",
+        "rule": "H-20",
+        "rule_text": "Prefer complete, maintainable fixes over minimal patches (e.g. a version bump or a partial package-ref suppression).",
+        "sources": [
+          "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1636#issuecomment-1586427588",
+          "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1621#issuecomment-1555916472"
+        ],
+        "claims": [
+          "C-2234-01",
+          "C-2234-02",
+          "C-2234-03",
+          "C-2234-04",
+          "C-2234-06"
+        ],
+        "detail": "1 normalised line(s), added 2 times: continue;"
+      },
+      {
+        "id": "RD-2234-03",
+        "measure": "identical added block repeated in src (normalised lines of one hunk; '2+ times' is ours)",
+        "value_base": 0,
+        "value_branch": 2,
+        "where": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1023-1025,1163-1165",
+        "rule": "H-20",
+        "rule_text": "Prefer complete, maintainable fixes over minimal patches (e.g. a version bump or a partial package-ref suppression).",
+        "sources": [
+          "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1636#issuecomment-1586427588",
+          "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1621#issuecomment-1555916472"
+        ],
+        "claims": [
+          "C-2234-01",
+          "C-2234-02",
+          "C-2234-05",
+          "C-2234-06"
+        ],
+        "detail": "2 normalised line(s), added 2 times: if (!intMembers.ContainsKey(member.IntKey)) | intMembers.Add(member.IntKey, (member, item.Type));"
+      },
+      {
+        "id": "RD-2234-04",
+        "measure": "identical added block repeated in src (normalised lines of one hunk; '2+ times' is ours)",
+        "value_base": 0,
+        "value_branch": 2,
+        "where": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1039-1041,1179-1181",
+        "rule": "H-20",
+        "rule_text": "Prefer complete, maintainable fixes over minimal patches (e.g. a version bump or a partial package-ref suppression).",
+        "sources": [
+          "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1636#issuecomment-1586427588",
+          "https://github.com/MessagePack-CSharp/MessagePack-CSharp/pull/1621#issuecomment-1555916472"
+        ],
+        "claims": [
+          "C-2234-01",
+          "C-2234-02",
+          "C-2234-03",
+          "C-2234-05",
+          "C-2234-06"
+        ],
+        "detail": "2 normalised line(s), added 2 times: if (!stringMembers.ContainsKey(member.StringKey)) | stringMembers.Add(member.StringKey, (member, item.Type));"
+      }
+    ],
+    "measures": {
+      "files": {
+        "in_scope": {
+          "README.md": "other (not measured)",
+          "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs": "source",
+          "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs": "test",
+          "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs": "test"
+        },
+        "skipped_snapshots": 0
+      },
+      "methods_touched": {
+        "rule": null,
+        "note": "no maintainer rule in history.json covers method size, nesting or branch count, so these are measures, not flags",
+        "methods": [
+          {
+            "method": "TypeCollector.GetObjectInfo(INamedTypeSymbol formattedType, ISymbol? callerSymbol)",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "base": {
+              "lines": 719,
+              "where": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:700-1418",
+              "max_brace_depth": 10,
+              "if_else_case_and_or": 152,
+              "by_token": {
+                "if": 81,
+                "else": 20,
+                "case": 2,
+                "&&": 29,
+                "||": 20
+              },
+              "clone_complexity_estimate": 162
+            },
+            "branch": {
+              "lines": 733,
+              "where": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:700-1432",
+              "max_brace_depth": 10,
+              "if_else_case_and_or": 156,
+              "by_token": {
+                "if": 85,
+                "else": 20,
+                "case": 2,
+                "&&": 29,
+                "||": 20
+              },
+              "clone_complexity_estimate": 166
+            },
+            "delta": {
+              "lines": 14,
+              "max_brace_depth": 0,
+              "if_else_case_and_or": 4
+            },
+            "claims": [
+              "C-2234-01",
+              "C-2234-02",
+              "C-2234-03",
+              "C-2234-04",
+              "C-2234-05",
+              "C-2234-06"
+            ]
+          },
+          {
+            "method": "SuppressedSourceGenerationTests.NoFormatterIsGeneratedForSuppressedType()",
+            "file": "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs",
+            "base": null,
+            "branch": {
+              "lines": 5,
+              "where": "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs:20-24",
+              "max_brace_depth": 1,
+              "if_else_case_and_or": 0,
+              "by_token": {
+                "if": 0,
+                "else": 0,
+                "case": 0,
+                "&&": 0,
+                "||": 0
+              },
+              "clone_complexity_estimate": 1
+            },
+            "claims": [
+              "C-2234-08"
+            ]
+          },
+          {
+            "method": "SuppressedSourceGenerationTests.SuppressedTypeRoundTripsThroughDynamicResolver()",
+            "file": "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs",
+            "base": null,
+            "branch": {
+              "lines": 11,
+              "where": "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs:26-36",
+              "max_brace_depth": 2,
+              "if_else_case_and_or": 0,
+              "by_token": {
+                "if": 0,
+                "else": 0,
+                "case": 0,
+                "&&": 0,
+                "||": 0
+              },
+              "clone_complexity_estimate": 1
+            },
+            "claims": [
+              "C-2234-08"
+            ]
+          },
+          {
+            "method": "SuppressSourceGenerationAnalyzerTests.MemberWithoutKeyIsReported()",
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "base": null,
+            "branch": {
+              "lines": 17,
+              "where": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs:20-36",
+              "max_brace_depth": 2,
+              "if_else_case_and_or": 0,
+              "by_token": {
+                "if": 0,
+                "else": 0,
+                "case": 0,
+                "&&": 0,
+                "||": 0
+              },
+              "clone_complexity_estimate": 1
+            },
+            "claims": [
+              "C-2234-07"
+            ]
+          },
+          {
+            "method": "SuppressSourceGenerationAnalyzerTests.AllowPrivateRequiredIsReported()",
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "base": null,
+            "branch": {
+              "lines": 18,
+              "where": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs:38-55",
+              "max_brace_depth": 2,
+              "if_else_case_and_or": 0,
+              "by_token": {
+                "if": 0,
+                "else": 0,
+                "case": 0,
+                "&&": 0,
+                "||": 0
+              },
+              "clone_complexity_estimate": 1
+            },
+            "claims": [
+              "C-2234-07"
+            ]
+          },
+          {
+            "method": "SuppressSourceGenerationAnalyzerTests.MemberTypeMustBeMessagePackObjectIsReported()",
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "base": null,
+            "branch": {
+              "lines": 22,
+              "where": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs:57-78",
+              "max_brace_depth": 2,
+              "if_else_case_and_or": 0,
+              "by_token": {
+                "if": 0,
+                "else": 0,
+                "case": 0,
+                "&&": 0,
+                "||": 0
+              },
+              "clone_complexity_estimate": 1
+            },
+            "claims": [
+              "C-2234-07"
+            ]
+          },
+          {
+            "method": "SuppressSourceGenerationAnalyzerTests.DuplicateIntKeysAreReportedWithoutAnalyzerFailure()",
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "base": null,
+            "branch": {
+              "lines": 21,
+              "where": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs:80-100",
+              "max_brace_depth": 2,
+              "if_else_case_and_or": 0,
+              "by_token": {
+                "if": 0,
+                "else": 0,
+                "case": 0,
+                "&&": 0,
+                "||": 0
+              },
+              "clone_complexity_estimate": 1
+            },
+            "claims": [
+              "C-2234-01"
+            ]
+          },
+          {
+            "method": "SuppressSourceGenerationAnalyzerTests.DuplicateStringKeysAreReportedWithoutAnalyzerFailure()",
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "base": null,
+            "branch": {
+              "lines": 21,
+              "where": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs:102-122",
+              "max_brace_depth": 2,
+              "if_else_case_and_or": 0,
+              "by_token": {
+                "if": 0,
+                "else": 0,
+                "case": 0,
+                "&&": 0,
+                "||": 0
+              },
+              "clone_complexity_estimate": 1
+            },
+            "claims": [
+              "C-2234-01"
+            ]
+          },
+          {
+            "method": "SuppressSourceGenerationAnalyzerTests.MixedKeyKindsAreReportedWithoutAnalyzerFailure()",
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "base": null,
+            "branch": {
+              "lines": 21,
+              "where": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs:124-144",
+              "max_brace_depth": 2,
+              "if_else_case_and_or": 0,
+              "by_token": {
+                "if": 0,
+                "else": 0,
+                "case": 0,
+                "&&": 0,
+                "||": 0
+              },
+              "clone_complexity_estimate": 1
+            },
+            "claims": [
+              "C-2234-01"
+            ]
+          },
+          {
+            "method": "SuppressSourceGenerationAnalyzerTests.DuplicateKeysAreReportedWithoutAnalyzerFailureForGeneratedTypes()",
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "base": null,
+            "branch": {
+              "lines": 21,
+              "where": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs:146-166",
+              "max_brace_depth": 2,
+              "if_else_case_and_or": 0,
+              "by_token": {
+                "if": 0,
+                "else": 0,
+                "case": 0,
+                "&&": 0,
+                "||": 0
+              },
+              "clone_complexity_estimate": 1
+            },
+            "claims": [
+              "C-2234-01"
+            ]
+          },
+          {
+            "method": "SuppressSourceGenerationAnalyzerTests.SourceGenerationOnlyDiagnosticsAreNotReportedWhenSuppressed()",
+            "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+            "base": null,
+            "branch": {
+              "lines": 25,
+              "where": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs:168-192",
+              "max_brace_depth": 2,
+              "if_else_case_and_or": 0,
+              "by_token": {
+                "if": 0,
+                "else": 0,
+                "case": 0,
+                "&&": 0,
+                "||": 0
+              },
+              "clone_complexity_estimate": 1
+            },
+            "claims": [
+              "C-2234-07"
+            ]
+          }
+        ]
+      },
+      "duplication_window": [
+        {
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "kind": "source",
+          "window": 6,
+          "duplicated_normalised_lines": {
+            "base": 244,
+            "branch": 258
+          },
+          "duplicated_blocks": {
+            "base": 10,
+            "branch": 12
+          },
+          "added_code_lines": 10,
+          "added_code_lines_in_duplicated_blocks": [
+            1008,
+            1039,
+            1041,
+            1148,
+            1179,
+            1181
+          ]
+        },
+        {
+          "file": "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs",
+          "kind": "test",
+          "window": 6,
+          "duplicated_normalised_lines": {
+            "base": 0,
+            "branch": 0
+          },
+          "duplicated_blocks": {
+            "base": 0,
+            "branch": 0
+          },
+          "added_code_lines": 17,
+          "added_code_lines_in_duplicated_blocks": []
+        },
+        {
+          "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+          "kind": "test",
+          "window": 6,
+          "duplicated_normalised_lines": {
+            "base": 0,
+            "branch": 54
+          },
+          "duplicated_blocks": {
+            "base": 0,
+            "branch": 7
+          },
+          "added_code_lines": 115,
+          "added_code_lines_in_duplicated_blocks": [
+            29,
+            31,
+            33,
+            34,
+            35,
+            38,
+            48,
+            50,
+            52,
+            53,
+            54,
+            57,
+            71,
+            73,
+            75,
+            76,
+            77,
+            80,
+            85,
+            87,
+            88,
+            90,
+            91,
+            93,
+            95,
+            97,
+            98,
+            99,
+            102,
+            113,
+            115,
+            117,
+            119,
+            120,
+            121,
+            124,
+            135,
+            137,
+            139,
+            141,
+            142,
+            143,
+            146,
+            151,
+            153,
+            154,
+            156,
+            157,
+            159,
+            161,
+            163,
+            164,
+            165,
+            168
+          ]
+        }
+      ],
+      "repeated_added_blocks": [
+        {
+          "block": [
+            "continue;"
+          ],
+          "normalised_lines": 1,
+          "occurrences": 2,
+          "where": [
+            "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1008-1008",
+            "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1148-1148"
+          ]
+        },
+        {
+          "block": [
+            "if (!intMembers.ContainsKey(member.IntKey))",
+            "intMembers.Add(member.IntKey, (member, item.Type));"
+          ],
+          "normalised_lines": 2,
+          "occurrences": 2,
+          "where": [
+            "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1023-1025",
+            "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1163-1165"
+          ]
+        },
+        {
+          "block": [
+            "if (!stringMembers.ContainsKey(member.StringKey))",
+            "stringMembers.Add(member.StringKey, (member, item.Type));"
+          ],
+          "normalised_lines": 2,
+          "occurrences": 2,
+          "where": [
+            "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1039-1041",
+            "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1179-1181"
+          ]
+        }
+      ],
+      "if_directives": [
+        {
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "kind": "source",
+          "if_directives": {
+            "base": 0,
+            "branch": 0
+          },
+          "added_at": []
+        },
+        {
+          "file": "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs",
+          "kind": "test",
+          "if_directives": {
+            "base": 0,
+            "branch": 0
+          },
+          "added_at": []
+        },
+        {
+          "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+          "kind": "test",
+          "if_directives": {
+            "base": 0,
+            "branch": 0
+          },
+          "added_at": []
+        }
+      ],
+      "t4_templates": [],
+      "generated_files": [],
+      "tests": {
+        "test_files_changed": [
+          "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs",
+          "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs"
+        ],
+        "snapshot_files_changed": 0,
+        "test_methods_added": 10,
+        "test_method_attributes_at": [
+          "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs:20",
+          "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs:26",
+          "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs:20",
+          "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs:38",
+          "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs:57",
+          "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs:80",
+          "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs:102",
+          "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs:124",
+          "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs:146",
+          "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs:168"
+        ],
+        "src_files_changed": [
+          "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs"
+        ],
+        "claims": {
+          "C-2234-01": {
+            "tier": "Tested",
+            "support_kinds": [
+              "flip-test",
+              "probe"
+            ],
+            "flip_or_revert_test": true,
+            "covers_src": true
+          },
+          "C-2234-02": {
+            "tier": "Tested",
+            "support_kinds": [
+              "proof-model"
+            ],
+            "flip_or_revert_test": false,
+            "covers_src": true
+          },
+          "C-2234-03": {
+            "tier": "Argued",
+            "support_kinds": [
+              "probe"
+            ],
+            "flip_or_revert_test": false,
+            "covers_src": true
+          },
+          "C-2234-04": {
+            "tier": "Refused",
+            "support_kinds": [
+              "probe"
+            ],
+            "flip_or_revert_test": false,
+            "covers_src": true
+          },
+          "C-2234-05": {
+            "tier": "Tested",
+            "support_kinds": [
+              "flip-test",
+              "proof-model"
+            ],
+            "flip_or_revert_test": true,
+            "covers_src": true
+          },
+          "C-2234-06": {
+            "tier": "Measured",
+            "support_kinds": [
+              "count"
+            ],
+            "flip_or_revert_test": false,
+            "covers_src": true
+          },
+          "C-2234-07": {
+            "tier": "Measured",
+            "support_kinds": [
+              "count"
+            ],
+            "flip_or_revert_test": false,
+            "covers_src": false
+          },
+          "C-2234-08": {
+            "tier": "Argued",
+            "support_kinds": [],
+            "flip_or_revert_test": false,
+            "covers_src": false
+          },
+          "C-2234-09": {
+            "tier": "Argued",
+            "support_kinds": [],
+            "flip_or_revert_test": false,
+            "covers_src": false
+          }
+        },
+        "confidence_file": "evidence/ju26-issue-2234/confidence.json"
+      }
+    },
+    "rules_used": "context/history.json"
+  },
+  "tool_versions": {
+    "git": "git version 2.43.0",
+    "python": "3.13.18"
+  },
+  "produced_by": "script"
+}
