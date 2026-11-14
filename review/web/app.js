@@ -302,16 +302,26 @@
       '<span class="bd">' + esc(x.band || '') + '</span></span>';
   }
   function needsBadge(x) { return x && x.gate ? '<span class="needs" title="A promise to users changed; its owner decides">needs owner</span>' : ''; }
+  /* the promise that changed, in plain words */
+  var CONTRACT_WORDS = { diagnostics: 'warnings', generated: 'generated code', 'public-api': 'public API', 'compat-breaking': 'compatibility' };
   function gateBlock(x, role) {
     var g = x && x.gate;
     if (!g) return '';
-    var rules = g.rules || [];
+    var rules = g.rules || [], area = CONTRACT_WORDS[g.contract] || g.contract;
+    var m = /most commits on the (.+?) paths at base \((\d+) commits\)/.exec(g.owner_basis || '');
+    var why = m ? esc(g.owner || 'This person') + ' has the most commits on the ' + esc(String(CONTRACT_WORDS[m[1]] || m[1]).replace(/ code$/, '')) + ' code (' + esc(m[2]) + ' commits), counted at the commit this change starts from.'
+      : esc(g.owner_basis || 'Owner picked from commit history.');
+    var ev = g.shown_by ? ' <a class="sf" href="../' + esc(g.shown_by) + '" target="_blank" rel="noopener">' + esc(base(g.shown_by)) + ' ↗</a>' : '';
     return '<details class="gate"><summary>' +
-        '<span class="who"' + (role ? ' title="For: ' + esc(role) + '"' : '') + '>✎ ' + esc(g.owner || 'owner unknown') + '</span><span class="ctr">' + esc(g.contract) + '</span>' +
-        rules.map(function (r) { return '<span class="rid">' + esc(r.id) + '</span>'; }).join('') + '<span class="tw" aria-hidden="true">▸</span></summary>' +
-      '<div class="gb"><p>' + rich(plain(g.change)) + '</p>' +
-        (rules.length ? '<ul class="rules">' + rules.map(function (r) { return '<li><span>' + ruleLink(r.id, r.sources) + '</span><span>' + rich(r.rule) + '</span></li>'; }).join('') + '</ul>' : '') +
-        '<p class="fine">' + esc(g.owner_basis || '') + (g.inherited_from ? ' · same change as ' + goto(g.inherited_from) : '') + '</p></div></details>';
+        '<span class="nd">Needs an owner:</span><span class="who"' + (role ? ' title="For: ' + esc(role) + '"' : '') + '>' + esc(g.owner || 'owner unknown') + '</span>' +
+        '<span class="ctr">' + esc(area) + '</span><span class="tw" aria-hidden="true">▸</span></summary>' +
+      '<div class="gb">' +
+        '<div class="gq"><h6>Why</h6><p>A real check showed: ' + rich(plain(String(g.change || '').replace(/\(base reported it\)/, '(it was reported before the change)').replace(/\(base compiles\)/, '(it compiled before the change)'))) + '.' + ev + '</p>' +
+          (g.inherited_from ? '<p>This decision depends on ' + goto(g.inherited_from) + ', which needs an owner, so it does too.</p>' : '') + '</div>' +
+        '<div class="gq"><h6>Who decided</h6><p>A fixed rule, not the AI. When a check shows something users would notice has changed, and these are the lines that changed it, a person must decide. A high score never clears it, and the AI can’t either.</p></div>' +
+        '<div class="gq"><h6>Why this person</h6><p>' + why + '</p></div>' +
+        (rules.length ? '<div class="gq"><h6>What maintainers said before</h6><ul class="rules">' + rules.map(function (r) { return '<li><span>' + ruleLink(r.id, r.sources) + '</span><span>' + rich(r.rule) + '</span></li>'; }).join('') + '</ul></div>' : '') +
+      '</div></details>';
   }
   function delta(n) { return (n < 0 ? '−' : '+') + Math.abs(n); }
   function receiptBlock(d, x) {

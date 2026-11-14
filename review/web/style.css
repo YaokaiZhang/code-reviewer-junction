@@ -761,6 +761,13 @@ main:focus, main:focus-visible { outline: none; }
 .evd[open] > summary .tw, .gate[open] .tw, .rcpt[open] .tw, .more[open] .tw, .rd details[open] .tw { transform: rotate(90deg); }
 .gate .who { font-family: var(--sans); font-size: 15px; color: var(--txt-hi); text-shadow: none; }
 .gate .ctr { font-size: 19px; color: var(--ph-dim); }
+.gate > summary { font-size: 18px; }
+.gate .nd { font-size: 19px; letter-spacing: 1px; color: var(--t-refused); }
+.gate .ctr::before { content: "· "; }
+.gate .gb { border-left: 3px solid var(--t-refused); background: rgba(255,90,60,.05); padding: 10px 12px; margin-top: 8px; gap: 12px; }
+.gq h6 { font-weight: 400; font-size: 16px; letter-spacing: 2px; text-transform: uppercase; color: var(--t-refused); margin-bottom: 2px; }
+.gq p + p { margin-top: 6px; }
+.gq .sf { margin-left: 6px; font-size: 12.5px; white-space: nowrap; }
 .rid { font-family: var(--vt); font-size: 18px; line-height: 1.1; color: var(--t-argued); border: 1px solid currentColor; padding: 0 5px; text-decoration: none; white-space: nowrap; }
 a.rid:hover, a.rid:focus-visible { background: var(--t-argued); color: var(--bg); outline: none; }
 .srcn { font-family: var(--mono); font-size: 11px; color: var(--ph-dim); margin-left: 4px; vertical-align: super; }

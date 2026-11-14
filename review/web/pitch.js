@@ -102,6 +102,8 @@
         s.claims++;
         if (s.bands[x.band] != null) s.bands[x.band]++;
         if (x.owner) s.owner++;
+        var g = ((conf(d).claims || {})[c.id] || {}).gate;
+        if (g && g.owner && !s.ownerEx) s.ownerEx = { name: g.owner, n: (String(g.owner_basis || '').match(/\((\d+) commits\)/) || [])[1] };
       });
       var f = conf(d).formula;
       if (f && f.kinds) s.kinds = f.kinds;
@@ -277,11 +279,19 @@
     '</section>';
   }
 
-  /* needs owner: a printed slip with a generic example */
+  /* needs owner: who does what, then a printed slip with a generic example */
   function secOwner(s) {
     var opts = ['accept', 'send back', 'reject'];
     var t = s.asks.length >= 2 ? s.asks : ['A warning users relied on is gone', 'The docs now promise something new'];
     var lines = [[t[0], 'send back'], [t[1], 'accept']];
+    var ex = s.ownerEx;
+    var who = ex ? ' (here: ' + esc(ex.name) + (ex.n ? ', ' + esc(ex.n) + ' commits' : '') + ')' : '';
+    var chain = [
+      ['AI', 'The AI writes the trace and the question. It can be wrong.'],
+      ['Tools', 'Real tools test the old and the new code. A script checks every AI step against the lines it cites.'],
+      ['Rule', 'A fixed rule, not the AI, flags any change users would notice. The owner is the person with the most commits on that code' + who + '.'],
+      ['You', 'The owner answers the question. The reviewer signs.']
+    ];
     var slip = '<div class="p-slip"><div class="p-slip-in">' +
       '<h4>NEEDS OWNER</h4>' +
       '<div class="p-ex">EXAMPLE</div><hr>' +
@@ -297,7 +307,10 @@
       '<div class="p-sticky p-owner-in">' +
         '<div class="p-owner-l">' +
           '<h2 class="p-h2"><span class="p-num hot" data-count="' + s.owner + '">0</span> ' + words('decisions') + '<br>' + words('need an owner.', 'hot', 120) + '</h2>' +
-          '<p class="p-ctx" data-rv>Users would notice them. So the trace ends with a question, and a named maintainer answers it.</p>' +
+          '<ol class="p-chain" data-rv>' + chain.map(function (c) {
+            return '<li><b>' + c[0] + '</b><span>' + c[1] + '</span></li>';
+          }).join('') + '</ol>' +
+          '<p class="p-cant" data-rv>The AI can’t pick the score, clear the flag, or mark its own steps as checked.</p>' +
           '<p class="p-rule" data-rv>A high score never clears it.</p>' +
         '</div>' +
         '<div class="p-owner-r"><div class="p-printer" aria-hidden="true"><span class="mouth"></span></div>' + slip + '</div>' +
@@ -508,7 +521,9 @@
     var slip = sec.querySelector('.p-slip'), inner = sec.querySelector('.p-slip-in');
     if (!slip) return;
     progressFns.push(function () {
-      var p = reduce ? 1 : clamp((progressOf(sec) - 0.05) / 0.5, 0, 1);
+      /* print while the chapter scrolls in; fully printed once it fills the screen */
+      var top = sec.getBoundingClientRect().top;
+      var p = reduce ? 1 : clamp((0.6 * innerHeight - top) / (0.6 * innerHeight), 0, 1);
       slip.style.height = (p * inner.offsetHeight).toFixed(1) + 'px';
       sec.classList.toggle('signed', p >= 0.98);
     });

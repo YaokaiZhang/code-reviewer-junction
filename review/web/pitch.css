@@ -174,10 +174,17 @@
 .p-mbar b { font-family: var(--serif); font-weight: 400; font-size: 2rem; color: #fff3d6; }
 
 /* ---------- 04 needs owner ---------- */
-.p-owner { position: relative; height: 190vh; }
+.p-owner { position: relative; height: 150vh; }
 .p-owner-in { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: clamp(2rem, 5vw, 5rem); align-items: center; padding: 0 var(--gut) 0 calc(var(--gut) + 2vw); max-width: 1500px; margin: 0 auto; }
-.p-owner .p-h2 { font-size: clamp(2.6rem, 5.4vw, 5.2rem); }
-.p-rule { display: inline-block; margin-top: 1.6rem; padding: 8px 16px; border-radius: 10px; background: var(--bg); font-family: var(--vt); font-size: 1.7rem; letter-spacing: .04em; color: var(--ph); }
+.p-owner .p-h2 { font-size: clamp(2.4rem, min(4.6vw, 7.4vh), 4.6rem); }
+/* who does what, in order */
+.p-chain { list-style: none; counter-reset: pc; margin-top: clamp(.9rem, 2.4vh, 1.6rem); max-width: 36rem; display: grid; gap: clamp(6px, 1.2vh, 12px); }
+.p-chain li { counter-increment: pc; display: grid; grid-template-columns: 5.2em minmax(0, 1fr); gap: 12px; align-items: baseline; font-family: var(--sans); font-size: clamp(14px, min(1.15vw, 2vh), 17px); line-height: 1.4; color: var(--ink); }
+.p-chain li b { display: inline-flex; align-items: baseline; gap: 6px; padding: 2px 8px; border-radius: 6px; background: var(--bg); color: var(--ph); font-family: var(--vt); font-weight: 400; font-size: 1.15em; letter-spacing: .04em; }
+.p-chain li b::before { content: counter(pc); opacity: .6; }
+.p-chain li:nth-child(3) b { color: var(--hot); }
+.p-cant { margin-top: clamp(.7rem, 1.8vh, 1.2rem); max-width: 36rem; font-family: var(--serif); font-size: clamp(1rem, min(1.4vw, 2.4vh), 1.25rem); line-height: 1.35; color: var(--ink); }
+.p-rule { display: inline-block; margin-top: clamp(.7rem, 2vh, 1.6rem); padding: 8px 16px; border-radius: 10px; background: var(--bg); font-family: var(--vt); font-size: 1.7rem; letter-spacing: .04em; color: var(--ph); }
 .p-owner-r { position: relative; display: flex; flex-direction: column; align-items: center; }
 .p-printer { position: relative; z-index: 2; width: min(360px, 90%); height: 64px; border-radius: 14px 14px 10px 10px; background: linear-gradient(180deg, var(--beige-light), var(--beige)); box-shadow: inset 2px 2px 4px rgba(255,255,255,.9), inset -4px -4px 10px rgba(0,0,0,.1), 0 12px 24px -10px rgba(0,0,0,.35); }
 .p-printer .mouth { position: absolute; left: 10%; right: 10%; bottom: 14px; height: 7px; border-radius: 4px; background: #1b1a17; box-shadow: inset 0 2px 3px #000; }
@@ -271,8 +278,19 @@
   .p-stack span { padding: 0 8px; font-size: 13px; }
   .p-stack span b { font-size: 2rem; }
   .p-owner { height: auto; }
-  .p-owner .p-sticky { position: relative; height: auto; overflow: visible; padding: 10vh 16px; }
-  .p-owner-r { margin-top: 4vh; }
+  .p-owner .p-sticky { position: relative; height: auto; overflow: visible; padding: 4vh 16px; gap: 2vh; }
+  .p-owner .p-h2 { font-size: 2.3rem; }
+  .p-chain li { grid-template-columns: 4.6em minmax(0, 1fr); gap: 10px; font-size: 14px; line-height: 1.35; }
+  .p-cant { font-size: 1rem; }
+  .p-rule { font-size: 1.25rem; padding: 6px 12px; }
+  .p-owner-r { margin-top: 0; }
+  .p-printer { height: 48px; }
+  .p-printer .mouth { bottom: 10px; }
+  .p-slip-in { padding: 22px 16px 12px; font-size: 17px; }
+  .p-slip h4 { font-size: 24px; }
+  .p-slip hr { margin: 6px 0; }
+  .p-slip .ln { margin-bottom: 6px; }
+  .p-slip .p-q { font-size: 18px; }
   .p-slip { height: auto !important; width: 100%; }
   .p-slip-in { position: relative; }
   .p-door { min-height: 240px; }
