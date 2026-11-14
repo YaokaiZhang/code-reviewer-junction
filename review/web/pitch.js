@@ -219,10 +219,11 @@
     if (cd && cd.base && cd.branch) {
       var b0 = +cd.base.clones.duplicated_blocks, b1 = +cd.branch.clones.duplicated_blocks, mx = Math.max(b0, b1) || 1;
       rows.push({ c: 'low', g: 'A number from a tool', v: 40, h: 'Count it.',
+        p: 'Fix #2234 added copy-pasted code. More copies means more to keep in sync, but a count alone cannot say if the fix is right.',
         fig: '<div class="p-fig">' +
           '<div class="p-mbar"><span>before</span><i data-w="' + (100 * b0 / mx).toFixed(1) + '"></i><b>' + b0 + '</b></div>' +
           '<div class="p-mbar"><span>after</span><i data-w="' + (100 * b1 / mx).toFixed(1) + '"></i><b>' + b1 + '</b></div>' +
-          '<p class="p-out">copy-pasted blocks</p></div>' });
+          '<p class="p-out">copy-pasted blocks in one file (fewer is better)</p></div>' });
     }
 
     return '<section class="p-sec p-machine">' +
