@@ -48,7 +48,7 @@
     { id: 'ch-problem', n: '01', title: 'The problem' },
     { id: 'ch-trace', n: '02', title: 'The trace' },
     { id: 'ch-check', n: '03', title: 'Checked' },
-    { id: 'ch-same', n: '04', title: 'Nothing else broke' },
+    { id: 'ch-same', n: '04', title: 'Old code safe' },
     { id: 'ch-score', n: '05', title: 'The score' },
     { id: 'ch-owner', n: '06', title: 'Needs owner' },
     { id: 'ch-learn', n: '07', title: 'Readable' }
@@ -472,7 +472,8 @@
     return '<section class="p-sec p-same">' +
       '<div class="p-grid2">' +
         '<div>' +
-          '<h2 class="p-h2">' + words('Same code in.') + '<br>' + words('Compare what comes out.', 'hot', 140) + '</h2>' +
+          '<h2 class="p-h2">' + words('Did it break') + '<br>' + words('old code?', 'hot', 140) + '</h2>' +
+          '<p class="p-cap p-same-lede" data-rv>Old projects often have weak tests, and new tests only check what someone thought of. This check needs no tests: the old version is the answer key.</p>' +
           '<ul class="p-rules" data-rv>' +
             '<li><b>1</b>Build the old version and the new one.</li>' +
             '<li><b>2</b>Give both the same ' + nproj + ' real projects. They were written before the change: ' + files + ' generated files.</li>' +
@@ -732,8 +733,8 @@
       transition('The AI writes the trace. A script checks it.', 3, 'ch-check',
         'Nothing is taken on the AI’s word.') +
       secChecked(s) +
-      transition('Weak tests? Run the old and the new on the same code.', 4, 'ch-same',
-        'Tests only check what someone thought of. So we compare all the output instead.') +
+      transition('A fix must not break old code.', 3, 'ch-same',
+        'Even when the tests are weak. So we run the old and the new version on the same code, and compare.') +
       secSame(s) +
       transition('Every reason points to a real check.', 3, 'ch-score',
         'The kind of check sets the score, by a fixed formula.') +
