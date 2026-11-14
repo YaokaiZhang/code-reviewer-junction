@@ -83,12 +83,22 @@ def main():
         d["_source"] = src
         cov = REVIEW / "evidence" / branch / "claim-coverage.json"
         d["_coverage"] = load(cov) if cov.is_file() else None
+        for name, fn in (("_confidence", "confidence.json"), ("_tests", "explain-check.json"),
+                         ("_readability", "readability.json"), ("_replay", "replay.json")):
+            f = REVIEW / "evidence" / branch / fn
+            d[name] = load(f) if f.is_file() else None
         d["_requirements"] = {c["requirement"]: reqs[c["requirement"]] for c in d.get("claims") or [] if c.get("requirement") in reqs}
         d["sample"] = is_sample
         bundle[key] = d
         print(f"{p.relative_to(REVIEW)}  claims={len(d.get('claims') or [])}  evidence={sum(v is not None for v in evidence.values())}/{len(evidence)}  receipt={'yes' if receipt else 'no'}")
 
-    body = f"window.DOSSIERS = {json.dumps(bundle, ensure_ascii=False, indent=1)};\n"
+    project = {}
+    for name, rel in (("history", "context/history.json"), ("backtest", "evidence/backtest.json"),
+                      ("context", "context/project.json")):
+        f = REVIEW / rel
+        project[name] = load(f) if f.is_file() else None
+    body = (f"window.DOSSIERS = {json.dumps(bundle, ensure_ascii=False, indent=1)};\n"
+            f"window.PROJECT = {json.dumps(project, ensure_ascii=False, indent=1)};\n")
     # Rewrite only when the data changed, so re-rendering leaves the tree clean.
     old = OUT.read_text(encoding="utf-8") if OUT.is_file() else ""
     if old.endswith(body):
