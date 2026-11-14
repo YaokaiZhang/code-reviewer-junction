@@ -45,9 +45,10 @@ CONCERN_TO_CONTRACTS = {
 BASE_CANDIDATES = [BASE, "origin/master", "origin/v2.x", "origin/v1.x"]
 CONTROLS_TARGET = 60
 EXCLUDE_TITLE = re.compile(
-    r"^\s*(bump|merge\b|update .*(dependenc|packages?|sdk))|dependabot|renovate|library\.template|"
-    r"\bdependenc(y|ies)\b|\bci\b|github actions|azure pipelines?|pipelines?\b|\bcodecov\b|"
-    r"\b(master|develop|v\d(\.\w+)*)\s+(to|into)\s+(master|develop|v\d)|\bsdk\b|\bnuget\b|\bbuild\b",
+    r"^\s*(bump|dependency updates)\b|^\s*merge\b(.*\b(to|into)\s+(master|develop|v\d\S*)\s*$|\s+latest\b)|^\s*update\b.*\b(sdk|packages?|dependenc(y|ies)|references)\b|"
+    r"dependabot|renovate|library\.template|\bsdk\b|\bci\b|github actions|azure pipelines?|codecov|"
+    r"\b(master|develop)\s+(to|into)\s+(master|develop)\b|^\s*build\b|\bbuild (script|tasks?|artifact)|"
+    r"\bunity build\b|\bpackage dependenc",
     re.I)
 EXCLUDE_BRANCH = re.compile(r"dependabot/|libtemplate|Library\.Template|renovate/", re.I)
 NON_PRODUCT_SEG = re.compile(r"^(sandbox|benchmarks?|perf|samples?)$|(^|\.)(unit)?tests?(\.|$)", re.I)
@@ -322,45 +323,45 @@ def main():
 
     def score(mname):
         ok = [r for r in positives if "error" not in r]
-        caught, missed, any_trip = [], [], []
+        caught, missed, any_trip, any_promise = [], [], [], []
         for r in ok:
             t = set(r["trips"][mname])
             hit = sorted(t & set(r["expected_contracts"]))
             (caught if hit else missed).append(r["pr"])
             if t:
                 any_trip.append(r["pr"])
+            if t & set(PROMISES):
+                any_promise.append(r["pr"])
         noisy = [c["pr"] for c in controls if set(c["trips"][mname]) & set(PROMISES)]
         docs = [c["pr"] for c in controls if "user-docs" in c["trips"][mname]]
         per = Counter(k for c in controls for k in c["trips"][mname])
+        by_year = defaultdict(lambda: [0, 0])
+        for c in controls:
+            by_year[c["date"][:4]][1] += 1
+            by_year[c["date"][:4]][0] += c["pr"] in noisy
         return {"positives_evaluated": len(ok), "caught": len(caught), "missed": len(missed),
                 "caught_prs": caught, "missed_prs": missed,
                 "positives_any_contract_tripped": len(any_trip),
+                "positives_any_promise_contract_tripped": len(any_promise),
+                "positives_no_promise_contract_tripped": sorted(set(r["pr"] for r in ok) - set(any_promise)),
                 "controls": len(controls), "controls_tripping_a_promise": len(noisy),
                 "noise_rate": round(len(noisy) / len(controls), 3) if controls else None,
                 "noisy_control_prs": noisy,
                 "controls_tripping_user_docs": len(docs),
-                "controls_trips_per_contract": dict(sorted(per.items()))}
+                "controls_trips_per_contract": dict(sorted(per.items())),
+                "noise_by_year": {y: f"{a} of {b}" for y, (a, b) in sorted(by_year.items())}}
 
     S, G = score("strict"), score("generalised")
 
     # why each generalised miss was missed: what it did touch, and the reason class
+    # Hand-written after reading each miss's diff (git diff --stat <merge_base> <head>); they explain, they do not score.
     MISS_REASON = {
-        2013: "Behavioural default flip (MessagePackSecurity.TrustedData -> UntrustedData as the options default) lives in MessagePackSerializerOptions.cs; no contract path or pattern covers options defaults, and the security contract only names SECURITY.md and MessagePackSecurity.cs.",
-        1369: "Behaviour change in generated deserializer (setter now called with default(T)); in the mpc era the template edits sit under src/MessagePack.GeneratorCore/Generator/ and unless a base-tree template file name matches, nothing trips.",
-        1074: "Same as 1369: T4 template behaviour change in the mpc-era generator.",
-        645: "Re-adding v1 APIs is a public-api/compat concern, but the 2019 tree had no PublicAPI.*.txt files, so the change is plain new public types in non-contract files.",
-        889: "Field -> property is binary breaking; 2020 tree had no PublicAPI tracking files in that project, so a plain .cs edit is invisible to path rules.",
-        1828: "Moving a public member between classes; the PR did not touch PublicAPI.*.txt (it did not even compile/analyzer-update), so nothing records the surface change.",
-        1697: "Wire compat break via member-order logic in the dynamic resolver (DynamicObjectResolver / reflection), not in the reader/writer/formatter files the wire-format contract names.",
-        1743: "Switching the default resolver to AOT is a behavioural default; the generalised rule may see generator paths but not the matching compat contract if PublicAPI files were not edited.",
-        1137: "Behavioural compat change in DynamicObjectResolver (throw instead of quietly returning null); not under reader/writer/formatters.",
-        1124: "mpc tool target change via csproj TargetFrameworks.",
-        1542: "mpc tool target change via csproj TargetFramework.",
-        1355: "Target framework update.",
-        1755: "Adds a TFM.",
-        1895: "Edits generated .cs / .tt for library formatters, not consumer-generated code.",
-        2139: "ByteListFormatter behaviour change.",
-        1551: "UnsafeBlitFormatter fix plus PublicAPI move.",
+        2013: "Behavioural default flip: one line in src/MessagePack/MessagePackSerializerOptions.cs makes UntrustedData the default security policy. No contract path or pattern covers option defaults; the security contract names only SECURITY.md and MessagePackSecurity.cs. Only README/doc (user-docs) tripped.",
+        1137: "Behavioural compat change (throw instead of quietly returning null for init-only setters on generic types) inside Resolvers/DynamicObjectResolver.cs, which no contract names. Only README (user-docs) tripped.",
+        1697: "Wire compatibility break through member-ordering logic in Resolvers/DynamicObjectResolver.cs (DataContract Order across a hierarchy). The wire-format contract names reader/writer/code/formatter files, not the dynamic resolver that decides key order. Nothing tripped.",
+        889: "Field-to-property change on MessagePackSerializerOptions is binary breaking, but the PR edits only MessagePackSerializerOptions.cs and does not touch PublicAPI.*.txt; a one-line .cs change is invisible to paths and patterns. Nothing tripped.",
+        1828: "Moves a member from TypelessFormatter to MessagePackSerializerOptions without updating PublicAPI.*.txt, so public-api cannot see it; it did trip wire-format (Formatters/TypelessFormatter.cs), so the owner would still have been shown it, under the wrong contract.",
+        1895: "Labelled 'generated' because the maintainer said to edit the .tt and regenerate, but the files are the library's own T4 output (MessagePackReader.Integers.cs etc.), not code generated into the consumer's assembly. It tripped wire-format (MessagePackReader.cs by file name), so it would have been shown; the miss is a label/contract mismatch.",
     }
     missed_list = []
     for r in positives:
