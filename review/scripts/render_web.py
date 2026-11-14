@@ -56,6 +56,7 @@ def slim_isolation(e):
         "explained": [{"claim": x.get("claim"), "what": x.get("what"), "inputs": x.get("inputs")} for x in t.get("explained") or []],
         "unexplained": t.get("unexplained") or [],
         "control_inputs": ((t.get("control") or {}).get("totals") or {}).get("inputs"),
+        "control_differ": ((t.get("control") or {}).get("totals") or {}).get("differ"),
         "coverage": {
             "tool": c.get("tool"), "trackable": c.get("trackable"), "reached": c.get("reached"),
             "reached_any": (c.get("trackable") or 0) - sum(1 for u in c.get("unreached") or [] if not u.get("reached_by_control_group")),

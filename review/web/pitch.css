@@ -479,3 +479,12 @@
   .p-how-t dt { margin-top: 6px; }
   .p-how-t dd { line-height: 1.4; }
 }
+
+.p-keys { list-style: none; display: grid; gap: 14px; }
+.p-keys li { padding: 14px 16px; border-radius: 12px; box-shadow: inset 0 0 0 1px rgba(255,231,160,.18); font-family: var(--sans); font-size: 14px; line-height: 1.4; color: #d9c08a; }
+.p-keys li.on { box-shadow: inset 0 0 0 2px var(--ph); background: rgba(255,200,80,.06); }
+.p-keys h4 { margin: 0 0 6px; font-family: var(--vt); font-size: 1.3rem; font-weight: 400; letter-spacing: .06em; text-transform: uppercase; color: #fff3d6; }
+.p-keys li.on h4 { color: var(--ph); }
+.p-keys p { margin: 2px 0; }
+.p-keys p span { display: inline-block; min-width: 92px; color: #b39a6a; }
+.p-keys p.ex { margin-top: 6px; color: #fff3d6; }
