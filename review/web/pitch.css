@@ -276,7 +276,8 @@
 .p-reduce .p-trans .p-sticky { position: relative; height: auto; padding-top: 14vh; padding-bottom: 10vh; }
 
 /* ---------- 02 the trace ---------- */
-.p-trace { position: relative; height: 330vh; height: 330svh; }
+.p-trace { position: relative; }
+.p-trace .p-sticky { position: relative; height: auto; min-height: 100vh; min-height: 100svh; overflow: visible; padding-top: 6vh; padding-bottom: 6vh; }
 .p-trace-in { display: flex; flex-direction: column; justify-content: center; gap: 3vh; padding: 0 var(--gut) 0 calc(var(--gut) + 2vw); max-width: 1500px; margin: 0 auto; }
 .p-trace .p-h2 { font-size: clamp(2.2rem, min(4.6vw, 8vh), 4.6rem); }
 .p-trace-hd .p-cap b { font-weight: 500; color: var(--ink); }
@@ -291,7 +292,7 @@
   font-family: var(--serif); font-size: 1.05rem; line-height: 1.35; color: #efdcb0; opacity: .38; transition: opacity .35s, background .35s; }
 .p-pane-s li b { font-family: var(--vt); font-weight: 400; font-size: 1.35rem; letter-spacing: .05em; text-transform: uppercase; color: var(--ph); }
 .p-pane-s li em { font-style: normal; font-family: var(--sans); font-size: 14px; color: var(--b-high); opacity: 0; transition: opacity .3s; }
-.p-pane-s li.done { opacity: .85; }
+.p-pane-s li.done { opacity: 1; }
 .p-pane-s li.done em, .p-pane-s li.on em { opacity: 1; }
 .p-pane-s li.on { opacity: 1; background: rgba(255,179,0,.14); box-shadow: inset 3px 0 0 var(--ph); }
 .p-trace code, .p-checked code { font-family: var(--mono); font-size: .82em; color: #ffe7a0; background: rgba(255,231,160,.08); padding: 0 4px; border-radius: 4px; overflow-wrap: anywhere; }

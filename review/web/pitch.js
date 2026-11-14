@@ -487,7 +487,7 @@
     });
   }
 
-  /* scroll walks through the steps; hover or focus picks one by hand */
+  /* all steps shown; hover or focus on a step lights its code lines */
   function setupTrace(root) {
     var sec = root.querySelector('[data-progress="trace"]');
     if (!sec) return;
@@ -513,13 +513,7 @@
       on(li, 'mouseleave', function () { pick = -1; tick(); });
       on(li, 'blur', function () { pick = -1; tick(); });
     });
-    var still = function () { return reduce || getComputedStyle(sec.querySelector('.p-sticky')).position !== 'sticky'; };
-    progressFns.push(function () {
-      if (pick >= 0) return;
-      if (still()) { show(n); return; }
-      var p = clamp((progressOf(sec) - 0.04) / 0.86, 0, 1);
-      show(Math.min(n, Math.floor(p * (n + 1))));
-    });
+    progressFns.push(function () { if (pick < 0) show(n); });
   }
 
   function setupRail(root) {
