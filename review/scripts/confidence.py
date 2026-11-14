@@ -13,7 +13,7 @@ Inputs, all in this repo:
 
 The formula (also printed into the output, so the page can show it):
   base      the kind of check: rebuilt-and-compared 90, model proof 80, flip test 75, undo test 75,
-            experiment on the real code 60, number from a tool 40, no check 15
+            experiment on the real code 60, code metric before vs after 40, no check 15
   old vs new  run the old and new code on the same inputs (isolation.json). Same output only speaks for
             changed lines that ran, so the points follow coverage: 30 + 45 x (changed lines reached /
             trackable changed lines), at most 75; no trackable line: 30; any unexplained difference: 15.
@@ -61,7 +61,7 @@ KIND = {
     "flip-test": (75, "test fails before the change, passes after"),
     "revert-test": (75, "undo only this change: a test fails"),
     "probe": (60, "experiment on the real code"),
-    "count": (40, "number from a tool"),
+    "count": (40, "code metric, before vs after"),
     "old-vs-new-run": (None, "old and new code, same inputs: no unexplained difference"),  # points: old_vs_new_points()
 }
 OVN_FLOOR, OVN_SPAN, OVN_UNEXPLAINED = 30, 45, 15

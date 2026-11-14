@@ -11,7 +11,7 @@
     ['revert-test', 'Undo just this change: a test fails', 75],
     ['old-vs-new-run', 'Old vs new: same output', 75, '≤75'],
     ['probe', 'Experiment on the real code', 60],
-    ['count', 'A number from a tool', 40],
+    ['count', 'Code metrics: before vs after', 40],
     ['none', 'Nothing backs it', 15]
   ];
   /* what each kind of evidence means, shown on hover: plain words, why it scores that, a real example */
@@ -34,8 +34,8 @@
     'probe': ['Write a tiny throwaway app that hits the case, then run the real compiler or analyzer on the old and new code.',
       'It shows real behaviour, but only for the cases someone thought to try.',
       'On #2234 it showed that one warning is no longer reported.'],
-    'count': ['A tool measures something, for example how much code is copy-pasted.',
-      'Useful context, but a number alone cannot say the fix is right.',
+    'count': ['A script measures the code before and after the fix: how many blocks are copy-pasted, and how complex a function is.',
+      'It shows the code got harder to maintain, but a metric cannot say whether the fix is right. So it scores low.',
       'On #2234, copy-pasted blocks in one file went from 10 to 12.'],
     'none': ['The AI says so, and nothing checks it yet.',
       'Shown so you know where to look, not as a reason to trust it.',
@@ -304,15 +304,15 @@
     var cc = findEv(s, 'clone-complexity'), cd = cc && cc.details;
     if (cd && cd.base && cd.branch) {
       var b0 = +cd.base.clones.duplicated_blocks, b1 = +cd.branch.clones.duplicated_blocks, mx = Math.max(b0, b1) || 1;
-      rows.push({ c: 'low', g: 'A number from a tool', v: 40, h: 'Count it.',
-        p: 'A tool measures something, like copy-pasted code, before and after.',
+      rows.push({ c: 'low', g: 'Code metrics', v: 40, h: 'Measure the code.',
+        p: 'A script counts copy-pasted blocks and how complex a function is, before and after the fix.',
         use: 'Code can get worse without breaking.',
         why: 'It shows costs that never fail a test.',
-        lim: 'If the fix is right. So it scores low.',
+        lim: 'Whether the fix is right. So it scores low.',
         fig: '<div class="p-fig">' +
           '<div class="p-mbar"><span>before</span><i data-w="' + (100 * b0 / mx).toFixed(1) + '"></i><b>' + b0 + '</b></div>' +
           '<div class="p-mbar"><span>after</span><i data-w="' + (100 * b1 / mx).toFixed(1) + '"></i><b>' + b1 + '</b></div>' +
-          '<p class="p-out">copy-pasted blocks in one file, fix #2234: a cost, not a failure</p></div>' });
+          '<p class="p-out">copy-pasted blocks in TypeCollector.cs, fix #2234: more copying, nothing broken</p></div>' });
     }
 
     return '<section class="p-machine" data-progress="machine" style="--n:' + rows.length + '">' +

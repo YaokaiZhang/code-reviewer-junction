@@ -72,7 +72,7 @@ The agent does not pick a tier or a number. The script computes both from the ev
 | revert-test | 75 | undo only this change: a test fails |
 | old-vs-new-run | 30–75 | old and new code on the same inputs: no unexplained difference (points below) |
 | probe | 60 | an experiment on the real code |
-| count | 40 | a number from a tool |
+| count | 40 | code metric, before vs after (e.g. copy-pasted blocks, complexity) |
 | (none) | 15 | no check backs it |
 
 **old-vs-new-run** (`isolation.json`) has no fixed points. Same output only speaks for the changed

@@ -19,7 +19,7 @@
   /* plain labels for confidence.json signal kinds */
   var KIND = {
     'rebuild-compare': 'rebuilt and compared', 'old-vs-new-run': 'old and new code, same output', 'proof-model': 'formal verification', 'flip-test': 'fails before, passes after',
-    'revert-test': 'fails when the fix is undone', probe: 'experiment on the real code', count: 'number from a tool', none: 'no check'
+    'revert-test': 'fails when the fix is undone', probe: 'experiment on the real code', count: 'code metric, before vs after', none: 'no check'
   };
   /* what a new test shows, from explain-check.json results/verdict */
   var TK = {
@@ -122,8 +122,8 @@
     app.innerHTML =
       '<section class="landing">' +
         '<div class="hero">' +
-          '<h1><span>Trace decisions,</span><em>not lines.</em></h1>' +
-          '<p class="lede">An AI agent fixed ' + nIssues + ' in MessagePack-CSharp. A script checks every decision. Where users would notice, the owner decides.</p>' +
+          '<h1><span>Review the evidence,</span><em>not the lines.</em></h1>' +
+          '<p class="lede">An AI agent fixed ' + nIssues + ' in MessagePack-CSharp. Every decision it made is traced to the evidence behind it: tests, old versus new runs, and code metrics. The evidence sets the score. Rules learned from past reviews flag code that will be hard to maintain. Where users would notice, the owner decides.</p>' +
           '<div class="ladder">' + caps +
             '<span class="bracket machine">scored by evidence</span><span class="bracket owner">owner decides</span>' +
           '</div>' +

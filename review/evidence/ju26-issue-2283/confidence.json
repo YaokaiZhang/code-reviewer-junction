@@ -138,7 +138,7 @@
             "replay": "match",
             "parts": [
               {
-                "text": "number from a tool",
+                "text": "code metric, before vs after",
                 "delta": 40
               },
               {
@@ -221,7 +221,7 @@
             "replay": "not re-run",
             "parts": [
               {
-                "text": "number from a tool",
+                "text": "code metric, before vs after",
                 "delta": 40
               },
               {
