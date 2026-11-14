@@ -47,11 +47,10 @@
   var CHAPTERS = [
     { id: 'ch-problem', n: '01', title: 'The problem' },
     { id: 'ch-trace', n: '02', title: 'The trace' },
-    { id: 'ch-check', n: '03', title: 'Checked' },
-    { id: 'ch-same', n: '04', title: 'Old code safe' },
-    { id: 'ch-score', n: '05', title: 'The score' },
-    { id: 'ch-owner', n: '06', title: 'Needs owner' },
-    { id: 'ch-learn', n: '07', title: 'Readable' }
+    { id: 'ch-same', n: '03', title: 'Old code safe' },
+    { id: 'ch-score', n: '04', title: 'The score' },
+    { id: 'ch-owner', n: '05', title: 'Needs owner' },
+    { id: 'ch-learn', n: '06', title: 'Readable' }
   ];
 
   var cleanup = [];
@@ -417,36 +416,6 @@
       '</div></section>';
   }
 
-  /* ---------- checked: the script never takes the AI's word ---------- */
-  function secChecked(s) {
-    var demo = s.demo && s.demo.card, st = demo && demo.steps.filter(function (x) { return x.side === 'new' && /`/.test(x.text); })[0];
-    var row = null;
-    if (st) (demo.code || []).forEach(function (g) { g.rows.forEach(function (r) { if (!row && r[2] === st.lines[0]) row = r; }); });
-    var tok = st && (st.text.match(/`([^`]+)`/) || [])[1];
-    var line = row ? esc(row[3].trim()).replace(esc(tok), '<mark>' + esc(tok) + '</mark>') : '';
-    var demoBox = st && row ? '<div class="p-chk">' +
-        '<div class="p-chk-r"><span class="p-chk-l">The AI says</span><p>' + (OPWORD[st.op] || '') + ' ' + tokHtml(st.text).replace('<code>' + esc(tok) + '</code>', '<code><mark>' + esc(tok) + '</mark></code>') + '</p></div>' +
-        '<div class="p-chk-r"><span class="p-chk-l">Line ' + row[2] + '</span><p class="p-chk-code"><code>' + line + '</code></p></div>' +
-        '<div class="p-chk-v ok">✓ the word is there. The step stands.</div>' +
-        '<div class="p-chk-v x">If it were not, the step is marked “doesn’t match the code”.</div>' +
-      '</div>' : '';
-    var big = s.decSteps ? '<div class="p-big p-sm"><span data-count="' + s.decOk + '">0</span><small>/' + s.decSteps + '</small></div>' +
-      '<h2 class="p-h3">steps match the real code</h2>' : '';
-    return '<section class="p-sec p-checked">' +
-      '<div class="p-grid2">' +
-        '<div>' + big +
-          '<ul class="p-rules" data-rv>' +
-            '<li><b>1</b>The lines a step points to must exist.</li>' +
-            '<li><b>2</b>Every code word in the step must be in those lines.</li>' +
-            '<li><b>3</b>Each result comes from the check itself, never from the AI’s words.</li>' +
-          '</ul>' +
-          (s.steps ? '<p class="p-cap" data-rv>The ' + s.tests + ' new tests are traced the same way: ' + s.stepsOk + ' of ' + s.steps + ' steps match.</p>' : '') +
-        '</div>' +
-        '<div class="p-panel" data-rv>' + demoBox + replayLine(s) + '</div>' +
-      '</div>' +
-    '</section>';
-  }
-
   /* ---------- same code in: old vs new output, and which changed lines ran ---------- */
   function secSame(s) {
     var rows = s.ds.filter(function (d) { return d._isolation && d._isolation.totals && d._isolation.totals.compared; });
@@ -491,15 +460,6 @@
         '</div>' +
       '</div>' +
     '</section>';
-  }
-
-  /* replay on a clean machine */
-  function replayLine(s) {
-    if (!s.replayTotal) return '';
-    return '<div class="p-replay">' +
-      '<div class="p-replay-sq">' + squares(s.replayTotal, 'regen') + '</div>' +
-      '<p class="p-cap"><b class="p-num hot">' + s.replayMatch + ' of ' + s.replayTotal + '</b> evidence files re-run on a clean machine: identical</p>' +
-    '</div>';
   }
 
   function strip(d) {
@@ -732,9 +692,6 @@
       transition('So every decision leaves a trace.', 3, 'ch-trace',
         'What the code does, in plain steps. The real code. And why.') +
       secTrace(s) +
-      transition('The AI writes the trace. A script checks it.', 3, 'ch-check',
-        'Nothing is taken on the AI’s word.') +
-      secChecked(s) +
       transition('A fix must not break old code.', 3, 'ch-same',
         'Even when the tests are weak. So we run the old and the new version on the same code, and compare.') +
       secSame(s) +
