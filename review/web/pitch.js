@@ -472,12 +472,12 @@
   function secSame(s) {
     var rows = s.ds.filter(function (d) { return d._isolation && d._isolation.totals && d._isolation.totals.compared; });
     if (!rows.length) return '';
-    /* real examples, each shown only if the data has it */
-    var exOld = s.snap ? '#2297 edited ' + fmt(s.snap) + ' answers. The tests still pass.' : '';
-    var card = function (cls, name, line, ex) {
-      return '<li class="' + cls + '"><h4>' + esc(name) + '</h4><p>' + esc(line) + '</p>' +
-        (ex ? '<p class="ex">' + esc(ex) + '</p>' : '') + '</li>';
-    };
+    var rowsT = [
+      ['Right answer', 'The author writes it', 'The old code’s output'],
+      ['Checks', 'What the author thought of', 'Everything it outputs'],
+      ['Written by', 'Often the AI that made the change', 'No one'],
+      ['Catches', 'Breaks someone predicted', 'Breaks nobody predicted']
+    ];
     return '<section class="p-sec p-same">' +
       '<div class="p-grid2">' +
         '<div>' +
@@ -490,11 +490,9 @@
           '</ul>' +
         '</div>' +
         '<div class="p-panel" data-rv>' +
-          '<p class="p-same-here">Who writes the right answer?</p>' +
-          '<ul class="p-keys">' +
-            card('', 'Tests', 'A person. The change can edit it.', exOld) +
-            card('on', 'Old vs new', 'The old code. The change can’t edit it.', '') +
-          '</ul>' +
+          '<table class="p-vs"><thead><tr><th></th><th>New tests</th><th class="on">Old vs new</th></tr></thead><tbody>' +
+            rowsT.map(function (r) { return '<tr><th>' + esc(r[0]) + '</th><td>' + esc(r[1]) + '</td><td class="on">' + esc(r[2]) + '</td></tr>'; }).join('') +
+          '</tbody></table>' +
         '</div>' +
       '</div>' +
     '</section>';
