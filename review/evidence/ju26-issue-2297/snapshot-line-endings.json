@@ -1,0 +1,484 @@
+{
+  "check": "snapshot-line-endings",
+  "branch": "ju26-issue-2297",
+  "base": "32258fdb",
+  "command": "python3 review/scripts/regen_check.py --repo $MP_REPO --branch ju26-issue-2297 --run 'branch-lf=origin/ju26-issue-2297+lf-snapshots' --out snapshot-line-endings --write",
+  "result": "fail",
+  "summary": "branch-lf: 80 passed, 89 failed of 169",
+  "details": {
+    "test_project": "tests/MessagePack.SourceGenerator.Tests",
+    "runs": [
+      {
+        "label": "branch-lf",
+        "rev": "origin/ju26-issue-2297",
+        "head": "a0aa5ab2",
+        "worktree": "/tmp/claude-0/-home-user-code-reviewer-junction/9d458cbc-0a76-5977-90e9-3a92e45aab20/scratchpad/wt-2297-branch-lf",
+        "modifiers": [
+          {
+            "modifier": "lf-snapshots",
+            "files_converted_crlf_to_lf": 225
+          }
+        ],
+        "snapshot_eol_in_worktree": {
+          "i/lf w/lf": 226
+        },
+        "build_exit_code": 0,
+        "build_seconds": 9.0,
+        "test_exit_code": 1,
+        "test_seconds": 7.3,
+        "total": 169,
+        "passed": 80,
+        "failed": 89,
+        "skipped": 0,
+        "failures": [
+          {
+            "test": "CompositeResolverGeneratorTests.CompositeResolver_MixedResolverTypes",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\ncontent of 'MessagePack.SourceGenerator/MessagePack.SourceGenerator.CompositeResolverGenerator/MyResolver.g.cs' did not match. Diff shown with expected as baseline:\n-<LF>\n-using MsgPack = global::MessagePack;<LF>\n-<LF><LF>\n-#if !NETSTANDARD2_0 && !NETFRAMEWORK<LF>\n-[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]<LF>\n-#endif<LF>\n-partial class MyResolver : MsgPack::IFormatterResolver<LF>\n-{<LF>\n-\tpublic static readonly MyResolver Instance = new MyResolver();<LF>\n-<LF>\tprivate static readonly MsgPack::Formatters.IMessagePackFormatter[] formatterList = new MsgPack::Formatters.IMessagePackFormatter[]<LF>\n-\t{<LF>\n-\t};<LF>\n-<LF>\tprivate static readonly MsgPack::IFormatterResolver[] resolverList = new MsgPack::IFormatterResolver[]<LF>\n-\t{<LF>\n-\t\tglobal::MessagePack.Resolvers.NativeGuidResolver.Instance,<LF>\n-\t\tnew global::ResolverWithCtor(),<LF>\n-\t};<LF>\n-<LF>\tprivate MyResolver() { }<LF>\n-<LF>\tpublic MsgPack::Formatters.IMessagePackFormatter<T> GetFormatter<T>()<LF>\n-\t{<LF>\n-\t\treturn FormatterCache<T>.Formatter;<LF>\n-\t}<LF>\n-<LF>#if !NETSTANDARD2_0 && !NETFRAMEWORK<LF>\n-\t[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]<LF>\n-#endif<LF>\n-\tstatic class FormatterCache<T><LF>\n-\t{<LF>\n-\t\tinternal static readonly MsgPack::Formatters.IMessagePackFormatter<T> Formatter;<LF>\n-<LF>\t\tstatic FormatterCache()<LF>\n-\t\t{<LF>\n-\t\t\tforeach (var formatter in formatterList)<LF>\n-\t\t\t{<LF>\n-\t\t\t\tif (formatter is MsgPack::Formatters.IMessagePackFormatter<T> f)<LF>\n-\t\t\t\t{<LF>\n-\t\t\t\t\tFormatter = f;<LF>\n-\t\t\t\t\treturn;<LF>\n-\t\t\t\t}<LF>\n-\t\t\t}<LF>\n-<LF>\t\t\tforeach (var resolver in resolverList)<LF>\n-\t\t\t{<LF>\n-\t\t\t\tvar f = resolver.GetFormatter<T>();<LF>\n-\t\t\t\tif (f != null)<LF>\n-\t\t\t\t{<LF>\n-\t\t\t\t\tFormatter = f;<LF>\n-\t\t\t\t\treturn;<LF>\n-\t\t\t\t}<LF>\n-\t\t\t}<LF>\n-\t\t}<LF>\n-\t}<LF>\n-}<LF>\n-<LF>\n+<CR><LF>\n+using MsgPack = global::MessagePack;<CR><LF>\n+<CR><LF>\n+<CR><LF>\n+#if !NETSTANDARD2_0 && !NETFRAMEWORK<CR><LF>\n+[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]<CR><LF>\n+#endif<CR><LF>\n+partial class MyResolver : MsgPack::IFormatterResolver<CR><LF>\n+{<CR><LF>\n+\tpublic static readonly MyResolver Instance = new MyResolver();<CR><LF>\n+<CR><LF>\n+\tprivate static readonly MsgPack::Formatters.IMessagePackFormatter[] formatterList = new MsgPack::Formatters.IMessagePackFormatter[]<CR><LF>\n+\t{<CR><LF>\n+\t};<CR><LF>\n+<CR><LF>\n+\tprivate static readonly MsgPack::"
+          },
+          {
+            "test": "CompositeResolverGeneratorTests.CompositeResolver_Nested",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\ncontent of 'MessagePack.SourceGenerator/MessagePack.SourceGenerator.CompositeResolverGenerator/MyResolver.g.cs' did not match. Diff shown with expected as baseline:\n-<LF>\n-using MsgPack = global::MessagePack;<LF>\n-<LF>partial class Test {<LF>\n-<LF>#if !NETSTANDARD2_0 && !NETFRAMEWORK<LF>\n-[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]<LF>\n-#endif<LF>\n-partial class MyResolver : MsgPack::IFormatterResolver<LF>\n-{<LF>\n-\tpublic static readonly MyResolver Instance = new MyResolver();<LF>\n-<LF>\tprivate static readonly MsgPack::Formatters.IMessagePackFormatter[] formatterList = new MsgPack::Formatters.IMessagePackFormatter[]<LF>\n-\t{<LF>\n-\t};<LF>\n-<LF>\tprivate static readonly MsgPack::IFormatterResolver[] resolverList = new MsgPack::IFormatterResolver[]<LF>\n-\t{<LF>\n-\t};<LF>\n-<LF>\tprivate MyResolver() { }<LF>\n-<LF>\tpublic MsgPack::Formatters.IMessagePackFormatter<T> GetFormatter<T>()<LF>\n-\t{<LF>\n-\t\treturn FormatterCache<T>.Formatter;<LF>\n-\t}<LF>\n-<LF>#if !NETSTANDARD2_0 && !NETFRAMEWORK<LF>\n-\t[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]<LF>\n-#endif<LF>\n-\tstatic class FormatterCache<T><LF>\n-\t{<LF>\n-\t\tinternal static readonly MsgPack::Formatters.IMessagePackFormatter<T> Formatter;<LF>\n-<LF>\t\tstatic FormatterCache()<LF>\n-\t\t{<LF>\n-\t\t\tforeach (var formatter in formatterList)<LF>\n-\t\t\t{<LF>\n-\t\t\t\tif (formatter is MsgPack::Formatters.IMessagePackFormatter<T> f)<LF>\n-\t\t\t\t{<LF>\n-\t\t\t\t\tFormatter = f;<LF>\n-\t\t\t\t\treturn;<LF>\n-\t\t\t\t}<LF>\n-\t\t\t}<LF>\n-<LF>\t\t\tforeach (var resolver in resolverList)<LF>\n-\t\t\t{<LF>\n-\t\t\t\tvar f = resolver.GetFormatter<T>();<LF>\n-\t\t\t\tif (f != null)<LF>\n-\t\t\t\t{<LF>\n-\t\t\t\t\tFormatter = f;<LF>\n-\t\t\t\t\treturn;<LF>\n-\t\t\t\t}<LF>\n-\t\t\t}<LF>\n-\t\t}<LF>\n-\t}<LF>\n-}<LF>\n-<LF>}<LF>\n+<CR><LF>\n+using MsgPack = global::MessagePack;<CR><LF>\n+<CR><LF>\n+partial class Test {<CR><LF>\n+<CR><LF>\n+#if !NETSTANDARD2_0 && !NETFRAMEWORK<CR><LF>\n+[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]<CR><LF>\n+#endif<CR><LF>\n+partial class MyResolver : MsgPack::IFormatterResolver<CR><LF>\n+{<CR><LF>\n+\tpublic static readonly MyResolver Instance = new MyResolver();<CR><LF>\n+<CR><LF>\n+\tprivate static readonly MsgPack::Formatters.IMessagePackFormatter[] formatterList = new MsgPack::Formatters.IMessagePackFormatter[]<CR><LF>\n+\t{<CR><LF>\n+\t};<CR><LF>\n+<CR><LF>\n+\tprivate static readonly MsgPack::IFormatterResolver[] resolverList = new MsgPac"
+          },
+          {
+            "test": "CustomStringKeyFormatterTests.RecordWithPrimaryConstructor",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyMessagePackObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "CustomStringKeyFormatterTests.RecordWithWithInitOnlyProps",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyMessagePackObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.AdditionalAllowTypes",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TypeWithAutoGeneratedFormatterFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.AdditionalFormatterTypes",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TypeWithAutoGeneratedFormatterFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.AdditionalFormatterTypes_RedundantAttribute",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TypeWithAutoGeneratedFormatterFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.Array2DJaggedProperty",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.ContainerObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.ArrayTypedProperty",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.ContainerObjectFormatter.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.SubObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.CustomFormatterForGenericWithConstraints",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.SampleObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.CustomFormatterViaAttributeOnField(usesMapMode: False)",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.HasFieldWithCustomFormatterAttributeFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.CustomFormatterViaAttributeOnField(usesMapMode: True)",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.HasFieldWithCustomFormatterAttributeFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.CustomFormatterViaAttributeOnProperty(usesMapMode: False)",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.HasPropertyWithCustomFormatterAttributeFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.CustomFormatterViaAttributeOnProperty(usesMapMode: True)",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.HasPropertyWithCustomFormatterAttributeFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.CustomFormatterWithSingletonPattern",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.GFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.DeserializingConstructorParameterMemberTypeAssignability_Incompatible",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\ncontent of 'MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs' did not match. Diff shown with expected as baseline:\n-// <auto-generated /><LF>\n-<LF>#pragma warning disable 618, 612, 414, 168, CS1591, SA1129, SA1309, SA1312, SA1403, SA1649<LF>\n-<LF>using MsgPack = global::MessagePack;<LF>\n-<LF>[assembly: MsgPack::Internal.GeneratedAssemblyMessagePackResolverAttribute(typeof(MessagePack.GeneratedMessagePackResolver), 3, 0)]<LF>\n-<LF>namespace MessagePack {<LF>\n-<LF>/// <summary>A MessagePack resolver that uses generated formatters for types in this assembly.</summary><LF>\n-#if !NETSTANDARD2_0 && !NETFRAMEWORK<LF>\n-[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]<LF>\n-#endif<LF>\n-partial class GeneratedMessagePackResolver : MsgPack::IFormatterResolver<LF>\n-{<LF>\n-\t/// <summary>An instance of this resolver that only returns formatters specifically generated for types in this assembly.</summary><LF>\n-\tpublic static readonly MsgPack::IFormatterResolver Instance = new GeneratedMessagePackResolver();<LF>\n-<LF>\tprivate GeneratedMessagePackResolver()<LF>\n-\t{<LF>\n-\t}<LF>\n-<LF>\tpublic MsgPack::Formatters.IMessagePackFormatter<T> GetFormatter<T>()<LF>\n-\t{<LF>\n-\t\treturn FormatterCache<T>.Formatter;<LF>\n-\t}<LF>\n-<LF>#if !NETSTANDARD2_0 && !NETFRAMEWORK<LF>\n-\t[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]<LF>\n-#endif<LF>\n-\tprivate static class FormatterCache<T><LF>\n-\t{<LF>\n-\t\tinternal static readonly MsgPack::Formatters.IMessagePackFormatter<T> Formatter;<LF>\n-<LF>\t\tstatic FormatterCache()<LF>\n-\t\t{<LF>\n-\t\t\tvar f = GeneratedMessagePackResolverGetFormatterHelper.GetFormatter(typeof(T));<LF>\n-\t\t\tif (f != null)<LF>\n-\t\t\t{<LF>\n-\t\t\t\tFormatter = (MsgPack::Formatters.IMessagePackFormatter<T>)f;<LF>\n-\t\t\t}<LF>\n-\t\t}<LF>\n-\t}<LF>\n-<LF>#if !NETSTANDARD2_0 && !NETFRAMEWORK<LF>\n-\t[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]<LF>\n-#endif<LF>\n-\tprivate static class GeneratedMessagePackResolverGetFormatterHelper<LF>\n-\t{<LF>\n-\t\tprivate static readonly global::System.Collections.Generic.Dictionary<global::System.Type, int> closedTypeLookup = new global::System.Collections.Generic.Dictionary<global::System.Type, int>(1)<LF>\n-\t\t{<LF>\n-\t\t\t{ typeof(global::System.Collections.Generic.List<int?>), 0 },<LF>\n-\t\t};<LF>\n-<LF>\t\tinternal static object GetFormatter(g"
+          },
+          {
+            "test": "GenerationTests.DeserializingConstructorParameterMemberTypeAssignability_MemberAssignsToParamType",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.AFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.EmbeddedTypes",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.AFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.EnumFormatter(container: Namespace, usesMapMode: False)",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.MyTestNamespace.MyMessagePackObjectFormatter.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.MyTestNamespace.MyEnumFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.MyTestNamespace.MyMessagePackObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.EnumFormatter(container: Namespace, usesMapMode: True)",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.MyTestNamespace.MyMessagePackObjectFormatter.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.MyTestNamespace.MyEnumFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.MyTestNamespace.MyMessagePackObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.EnumFormatter(container: NestingClass, usesMapMode: False)",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.ContainingClass.MyMessagePackObjectFormatter.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.ContainingClass.MyEnumFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.ContainingClass.MyMessagePackObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.EnumFormatter(container: NestingClass, usesMapMode: True)",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.ContainingClass.MyMessagePackObjectFormatter.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.ContainingClass.MyEnumFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.ContainingClass.MyMessagePackObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.EnumFormatter(container: None, usesMapMode: False)",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.MyMessagePackObjectFormatter.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.MyEnumFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.MyMessagePackObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.EnumFormatter(container: None, usesMapMode: True)",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.MyMessagePackObjectFormatter.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.MyEnumFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.MyMessagePackObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.EnumFormatter_CollidingTypeNames",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.MyMessagePackObjectFormatter.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.NS1.MyEnumFormatter.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.NS2.MyEnumFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.GenericCustomFormatter",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.SampleObject.SampleObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.GenericDataTypeWithPrivateMember",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.HasPrivateSerializedMemberAndIsGenericNamed`1.HasPrivateSerializedMemberAndIsGenericNamedFormatter.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.HasPrivateSerializedMemberAndIsGenericOrdinal`1.HasPrivateSerializedMemberAndIsGenericOrdinalFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.GenericType",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.ContainerObjectFormatter.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.MyGenericTypeFormatter`1.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.GenericTypeArg",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.GenericClassFormatter`2.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.GenericType_CollidingTypeNames",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.MyMessagePackObjectFormatter.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.NS1.MyTypeFormatter`1.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.NS2.MyTypeFormatter`1.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.GenericWithConstraintsThatReferenceTypeParameter",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.GenericConstrainedClassIntKeyFormatter`2.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.ImplicitFormatterTypes",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TypeWithAutoGeneratedFormatterFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.InterfaceUnionUsedWithNullableRefAnnotation",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.UnionContainerFormatter.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.IMyTypeFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.UnionContainerFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.MixType_CollidingTypeNames",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.MyMessagePackObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.NS1.MyTypeFormatter.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.NS2.MyTypeFormatter.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.NS3.MyTypeFormatter`1.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.NS1.MyTypeFormatter.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.NestedMessagePackObjects",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.A.B.CFormatter.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.A.BFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.NestedMessagePackObjects_Array",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.A.B.CFormatter.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.A.BFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.NoFieldWithCustomFormatterCollected",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TestFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.NoPrivateAccessNeeded",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.Test3Formatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.NoPrivateMemberCollected",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TestFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.NonDefaultDeserializingConstructor_Private",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.A.AFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.NonGenericType_CollidingTypeNames",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.MyMessagePackObjectFormatter.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.NS1.MyTypeFormatter.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.NS2.MyTypeFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.SimplifiedNameForKeywordsAndSyntaxSugar",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.SampleObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.SpecifyFormatterFromStockSet",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.GFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.SystemCollectionsObjectModelCollection",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.AFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.SystemMemoryTypes",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.AFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.UnionFormatter(container: Namespace)",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.MyTestNamespace.Derived1Formatter.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.MyTestNamespace.Derived2Formatter.g.cs\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.MyTestNamespace.MyMessagePackObjectFormatter.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.MyTestNamespace.IMyTypeFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.MyTestNamespace.MyMessagePackObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.UnionFormatter(container: NestingClass)",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.ContainingClass.Derived1Formatter.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.ContainingClass.Derived2Formatter.g.cs\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.ContainingClass.MyMessagePackObjectFormatter.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.ContainingClass.IMyTypeFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.ContainingClass.MyMessagePackObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenerationTests.UnionFormatter(container: None)",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.Derived1Formatter.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.Derived2Formatter.g.cs\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.MyMessagePackObjectFormatter.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.IMyTypeFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.MyMessagePackObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenericsFormatterTests.GenericsOfT1T2Formatter",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyGenericObjectFormatter`2.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyObjectFormatter.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyObjectNestedFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenericsFormatterTests.GenericsOfTFormatter",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyGenericObjectFormatter`1.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyObjectFormatter.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyObjectNestedFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenericsFormatterTests.GenericsOfTFormatter_FormatterOnly",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyGenericObjectFormatter`1.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenericsFormatterTests.GenericsOfTFormatter_WithKnownTypes",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyGenericObjectFormatter`1.g.cs\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyObjectFormatter.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyObject2Formatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenericsFormatterTests.GenericsUnionFormatter",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.WrapperFormatter`1.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenericsFormatterTests.GenericsUnionFormatter_Nested",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyGenericObjectFormatter`1.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyInnerGenericObjectFormatter`1.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.WrapperFormatter`1.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenericsFormatterTests.Generics_Constraints_Multiple",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyGenericObjectFormatter`4.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenericsFormatterTests.Generics_Constraints_NullableReferenceType",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyGenericObjectFormatter`4.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenericsFormatterTests.Generics_Constraints_ReferenceType_Nullable",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyGenericObjectFormatter`2.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenericsFormatterTests.Generics_Constraints_Struct",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyGenericObjectFormatter`1.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenericsFormatterTests.Generics_Constraints_Type",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyGenericObjectFormatter`1.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenericsFormatterTests.Generics_Defined_In_ReferencedProject",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyGenericObjectFormatter`1.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyObjectFormatter.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyObjectNestedFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenericsFormatterTests.NestedGenericTypes",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyGenericObjectFormatter`1.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyInnerGenericObjectFormatter`1.g.cs\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyObjectFormatter.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyObject2Formatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyObjectFormatter.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.WrapperFormatter`1.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenericsFormatterTests.NullableFormatter",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyObjectFormatter.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyEnumFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenericsFormatterTests.RecursiveGenerics_Direct",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.AFormatter`1.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "GenericsFormatterTests.WellKnownGenericsFormatter",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "ImplicitResolverForCustomFormattersTests.MultipleFunctionalCustomFormattersForType_MultiFormatter",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\ncontent of 'MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs' did not match. Diff shown with expected as baseline:\n-// <auto-generated /><LF>\n-<LF>#pragma warning disable 618, 612, 414, 168, CS1591, SA1129, SA1309, SA1312, SA1403, SA1649<LF>\n-<LF>using MsgPack = global::MessagePack;<LF>\n-<LF>[assembly: MsgPack::Internal.GeneratedAssemblyMessagePackResolverAttribute(typeof(MessagePack.GeneratedMessagePackResolver), 3, 0)]<LF>\n-<LF>namespace MessagePack {<LF>\n-<LF>/// <summary>A MessagePack resolver that uses generated formatters for types in this assembly.</summary><LF>\n-#if !NETSTANDARD2_0 && !NETFRAMEWORK<LF>\n-[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]<LF>\n-#endif<LF>\n-partial class GeneratedMessagePackResolver : MsgPack::IFormatterResolver<LF>\n-{<LF>\n-\t/// <summary>An instance of this resolver that only returns formatters specifically generated for types in this assembly.</summary><LF>\n-\tpublic static readonly MsgPack::IFormatterResolver Instance = new GeneratedMessagePackResolver();<LF>\n-<LF>\tprivate GeneratedMessagePackResolver()<LF>\n-\t{<LF>\n-\t}<LF>\n-<LF>\tpublic MsgPack::Formatters.IMessagePackFormatter<T> GetFormatter<T>()<LF>\n-\t{<LF>\n-\t\treturn FormatterCache<T>.Formatter;<LF>\n-\t}<LF>\n-<LF>#if !NETSTANDARD2_0 && !NETFRAMEWORK<LF>\n-\t[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]<LF>\n-#endif<LF>\n-\tprivate static class FormatterCache<T><LF>\n-\t{<LF>\n-\t\tinternal static readonly MsgPack::Formatters.IMessagePackFormatter<T> Formatter;<LF>\n-<LF>\t\tstatic FormatterCache()<LF>\n-\t\t{<LF>\n-\t\t\tvar f = GeneratedMessagePackResolverGetFormatterHelper.GetFormatter(typeof(T));<LF>\n-\t\t\tif (f != null)<LF>\n-\t\t\t{<LF>\n-\t\t\t\tFormatter = (MsgPack::Formatters.IMessagePackFormatter<T>)f;<LF>\n-\t\t\t}<LF>\n-\t\t}<LF>\n-\t}<LF>\n-<LF>#if !NETSTANDARD2_0 && !NETFRAMEWORK<LF>\n-\t[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]<LF>\n-#endif<LF>\n-\tprivate static class GeneratedMessagePackResolverGetFormatterHelper<LF>\n-\t{<LF>\n-\t\tprivate static readonly global::System.Collections.Generic.Dictionary<global::System.Type, int> closedTypeLookup = new global::System.Collections.Generic.Dictionary<global::System.Type, int>(1)<LF>\n-\t\t{<LF>\n-\t\t\t{ typeof(global::B), 0 },<LF>\n-\t\t};<LF>\n-<LF>\t\tinternal static object GetFormatter(global::System.Type t)<LF>\n-\t\t{<LF>\n-"
+          },
+          {
+            "test": "ImplicitResolverForCustomFormattersTests.MultipleFunctionalCustomFormattersForType_OnlyOneNonExcluded",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\ncontent of 'MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs' did not match. Diff shown with expected as baseline:\n-// <auto-generated /><LF>\n-<LF>#pragma warning disable 618, 612, 414, 168, CS1591, SA1129, SA1309, SA1312, SA1403, SA1649<LF>\n-<LF>using MsgPack = global::MessagePack;<LF>\n-<LF>[assembly: MsgPack::Internal.GeneratedAssemblyMessagePackResolverAttribute(typeof(MessagePack.GeneratedMessagePackResolver), 3, 0)]<LF>\n-<LF>namespace MessagePack {<LF>\n-<LF>/// <summary>A MessagePack resolver that uses generated formatters for types in this assembly.</summary><LF>\n-#if !NETSTANDARD2_0 && !NETFRAMEWORK<LF>\n-[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]<LF>\n-#endif<LF>\n-partial class GeneratedMessagePackResolver : MsgPack::IFormatterResolver<LF>\n-{<LF>\n-\t/// <summary>An instance of this resolver that only returns formatters specifically generated for types in this assembly.</summary><LF>\n-\tpublic static readonly MsgPack::IFormatterResolver Instance = new GeneratedMessagePackResolver();<LF>\n-<LF>\tprivate GeneratedMessagePackResolver()<LF>\n-\t{<LF>\n-\t}<LF>\n-<LF>\tpublic MsgPack::Formatters.IMessagePackFormatter<T> GetFormatter<T>()<LF>\n-\t{<LF>\n-\t\treturn FormatterCache<T>.Formatter;<LF>\n-\t}<LF>\n-<LF>#if !NETSTANDARD2_0 && !NETFRAMEWORK<LF>\n-\t[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]<LF>\n-#endif<LF>\n-\tprivate static class FormatterCache<T><LF>\n-\t{<LF>\n-\t\tinternal static readonly MsgPack::Formatters.IMessagePackFormatter<T> Formatter;<LF>\n-<LF>\t\tstatic FormatterCache()<LF>\n-\t\t{<LF>\n-\t\t\tvar f = GeneratedMessagePackResolverGetFormatterHelper.GetFormatter(typeof(T));<LF>\n-\t\t\tif (f != null)<LF>\n-\t\t\t{<LF>\n-\t\t\t\tFormatter = (MsgPack::Formatters.IMessagePackFormatter<T>)f;<LF>\n-\t\t\t}<LF>\n-\t\t}<LF>\n-\t}<LF>\n-<LF>#if !NETSTANDARD2_0 && !NETFRAMEWORK<LF>\n-\t[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]<LF>\n-#endif<LF>\n-\tprivate static class GeneratedMessagePackResolverGetFormatterHelper<LF>\n-\t{<LF>\n-\t\tprivate static readonly global::System.Collections.Generic.Dictionary<global::System.Type, int> closedTypeLookup = new global::System.Collections.Generic.Dictionary<global::System.Type, int>(1)<LF>\n-\t\t{<LF>\n-\t\t\t{ typeof(global::A), 0 },<LF>\n-\t\t};<LF>\n-<LF>\t\tinternal static object GetFormatter(global::System.Type t)<LF>\n-\t\t{<LF>\n-"
+          },
+          {
+            "test": "ImplicitResolverForCustomFormattersTests.OpenGenericFormatter",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\ncontent of 'MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs' did not match. Diff shown with expected as baseline:\n-// <auto-generated /><LF>\n-<LF>#pragma warning disable 618, 612, 414, 168, CS1591, SA1129, SA1309, SA1312, SA1403, SA1649<LF>\n-<LF>using MsgPack = global::MessagePack;<LF>\n-<LF>[assembly: MsgPack::Internal.GeneratedAssemblyMessagePackResolverAttribute(typeof(MessagePack.GeneratedMessagePackResolver), 3, 0)]<LF>\n-<LF>namespace MessagePack {<LF>\n-<LF>/// <summary>A MessagePack resolver that uses generated formatters for types in this assembly.</summary><LF>\n-#if !NETSTANDARD2_0 && !NETFRAMEWORK<LF>\n-[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]<LF>\n-#endif<LF>\n-partial class GeneratedMessagePackResolver : MsgPack::IFormatterResolver<LF>\n-{<LF>\n-\t/// <summary>An instance of this resolver that only returns formatters specifically generated for types in this assembly.</summary><LF>\n-\tpublic static readonly MsgPack::IFormatterResolver Instance = new GeneratedMessagePackResolver();<LF>\n-<LF>\tprivate GeneratedMessagePackResolver()<LF>\n-\t{<LF>\n-\t}<LF>\n-<LF>\tpublic MsgPack::Formatters.IMessagePackFormatter<T> GetFormatter<T>()<LF>\n-\t{<LF>\n-\t\treturn FormatterCache<T>.Formatter;<LF>\n-\t}<LF>\n-<LF>#if !NETSTANDARD2_0 && !NETFRAMEWORK<LF>\n-\t[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]<LF>\n-#endif<LF>\n-\tprivate static class FormatterCache<T><LF>\n-\t{<LF>\n-\t\tinternal static readonly MsgPack::Formatters.IMessagePackFormatter<T> Formatter;<LF>\n-<LF>\t\tstatic FormatterCache()<LF>\n-\t\t{<LF>\n-\t\t\tvar f = GeneratedMessagePackResolverGetFormatterHelper.GetFormatter(typeof(T));<LF>\n-\t\t\tif (f != null)<LF>\n-\t\t\t{<LF>\n-\t\t\t\tFormatter = (MsgPack::Formatters.IMessagePackFormatter<T>)f;<LF>\n-\t\t\t}<LF>\n-\t\t}<LF>\n-\t}<LF>\n-<LF>#if !NETSTANDARD2_0 && !NETFRAMEWORK<LF>\n-\t[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]<LF>\n-#endif<LF>\n-\tprivate static class GeneratedMessagePackResolverGetFormatterHelper<LF>\n-\t{<LF>\n-\t\tprivate static readonly global::System.Collections.Generic.Dictionary<global::System.Type, int> openTypeLookup = new global::System.Collections.Generic.Dictionary<global::System.Type, int>(1)<LF>\n-\t\t{<LF>\n-\t\t\t{ typeof(global::DynamicArgumentTuple<,>), 0 },<LF>\n-\t\t};<LF>\n-<LF>\t\tinternal static object GetFormatter(global::System.Ty"
+          },
+          {
+            "test": "MessagePackFormatterAttributeTests.CanGenerateMessagePackFormatterAttr",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.BarFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "MultipleTypesTests.TwoTypes(usesMapMode: False)",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.Object1Formatter.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.Object2Formatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "MultipleTypesTests.TwoTypes(usesMapMode: True)",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.Object1Formatter.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.Object2Formatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "PrivateMemberAccessTests.FormatterForClassWithPrivateMembers(type: \"class\", version: CSharp7_3)",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MyObject.MyObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "PrivateMemberAccessTests.FormatterForClassWithPrivateMembers(type: \"record struct\", version: CSharp10)",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MyObject.MyObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "PrivateMemberAccessTests.FormatterForClassWithPrivateMembers(type: \"record\", version: CSharp9)",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MyObject.MyObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "PrivateMemberAccessTests.FormatterForClassWithPrivateMembers(type: \"struct\", version: CSharp7_3)",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MyObject.MyObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "PrivateMemberAccessTests.FormatterForClassWithPrivateMembers_MapMode",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MyObject.MyObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "PrivateMemberAccessTests.FormatterForClassWithPrivateMembers_WithNamespace",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.A.MyObject.MyObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "StringKeyedFormatterTests.PropertiesGetterOnlyDefaultValue",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyMessagePackObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "StringKeyedFormatterTests.PropertiesGetterOnlyIgnore",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyMessagePackObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "StringKeyedFormatterTests.PropertiesGetterOnlyMixed",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyMessagePackObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "StringKeyedFormatterTests.PropertiesGetterOnlyWithParameterizedConstructor",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyMessagePackObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "StringKeyedFormatterTests.PropertiesGetterOnlyWithParameterizedConstructorDefaultValue",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyMessagePackObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "StringKeyedFormatterTests.PropertiesGetterOnlyWithParameterizedConstructorPartially",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyMessagePackObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "StringKeyedFormatterTests.PropertiesGetterSetter",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyMessagePackObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "StringKeyedFormatterTests.PropertiesGetterSetterWithDefaultValue",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyMessagePackObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "StringKeyedFormatterTests.PropertiesGetterSetterWithDefaultValueInputPartially",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyMessagePackObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "StringKeyedFormatterTests.PropertiesGetterSetterWithParameterizedConstructor",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyMessagePackObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "StringKeyedFormatterTests.PropertiesGetterSetterWithParameterizedConstructorAndDefaultValue",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyMessagePackObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "StringKeyedFormatterTests.PropertiesGetterSetterWithParameterizedConstructorDoNotUseSetter",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyMessagePackObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          },
+          {
+            "test": "StringKeyedFormatterTests.PropertiesGetterSetterWithParameterizedConstructorPartially",
+            "message": "System.InvalidOperationException : Context: Source generator application\nContext: Verifying source generated files\nExpected source file list to match\n+MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyMessagePackObjectFormatter.g.cs\n-MessagePack.SourceGenerator/MessagePack.SourceGenerator.MessagePackGenerator/MessagePack.GeneratedMessagePackResolver.g.cs\n"
+          }
+        ],
+        "passed_names": [
+          "CodeCoverageExclusionTests.AllGeneratedTypesAreExcludedFromCodeCoverage",
+          "CodeCoverageExclusionTests.ExcludeAttributeIsGuardedForTargetsWhereItIsUnavailable",
+          "FormatterCodeFixProviderTests.InaccessibleCustomFormatterConstructor(initialModifiers: \"\", expectedModifiers: \"internal \")",
+          "FormatterCodeFixProviderTests.InaccessibleCustomFormatterConstructor(initialModifiers: \"private \", expectedModifiers: \"internal \")",
+          "FormatterCodeFixProviderTests.InaccessibleCustomFormatterConstructor(initialModifiers: \"private protected \", expectedModifiers: \"internal \")",
+          "FormatterCodeFixProviderTests.InaccessibleCustomFormatterConstructor(initialModifiers: \"protected \", expectedModifiers: \"protected internal \")",
+          "FormatterCodeFixProviderTests.InaccessibleCustomFormatterType(initialModifiers: \"\", expectedModifiers: \"internal \")",
+          "FormatterCodeFixProviderTests.InaccessibleCustomFormatterType(initialModifiers: \"private \", expectedModifiers: \"internal \")",
+          "FormatterCodeFixProviderTests.InaccessibleCustomFormatterType(initialModifiers: \"private protected \", expectedModifiers: \"internal \")",
+          "FormatterCodeFixProviderTests.InaccessibleCustomFormatterType(initialModifiers: \"protected \", expectedModifiers: \"protected internal \")",
+          "FullModelTests.Equals_ByValue",
+          "FullModelTests.Equals_Null",
+          "GenerationTests.ExcludeFormatterFromSourceGeneratedResolver",
+          "GenerationTests.NoGenerationForAnnotationOnly",
+          "ImplicitResolverForCustomFormattersTests.CustomFormatterWithoutDefaultConstructor",
+          "ImplicitResolverForCustomFormattersTests.CustomFormatterWithoutDefaultConstructor_Excluded",
+          "ImplicitResolverForCustomFormattersTests.MultipleFunctionalCustomFormattersForType",
+          "MemberSerializationInfoTests.Equals_ByValue",
+          "MsgPack001SpecifyOptionsAnalyzerTests.InvocationWithOptions_LocalVariable",
+          "MsgPack001SpecifyOptionsAnalyzerTests.Invocation_ExplicitlyNull",
+          "MsgPack001SpecifyOptionsAnalyzerTests.Invocation_OmittedOptionalParameter",
+          "MsgPack001SpecifyOptionsAnalyzerTests.Invocation_OmittedOptionalParameter_VB",
+          "MsgPack002UseConstantOptionsAnalyzerTests.Fields",
+          "MsgPack002UseConstantOptionsAnalyzerTests.Invocation_WithImmutableStaticOptions",
+          "MsgPack002UseConstantOptionsAnalyzerTests.Invocation_WithImmutableStaticOptions_VB",
+          "MsgPack002UseConstantOptionsAnalyzerTests.Invocation_WithMutableStaticOptions",
+          "MsgPack002UseConstantOptionsAnalyzerTests.Members_BasedOnStaticOptions",
+          "MsgPack002UseConstantOptionsAnalyzerTests.Properties",
+          "MsgPack00xAnalyzerTests.AbstractFormatterDoesNotAttractAttention",
+          "MsgPack00xAnalyzerTests.AddAttributeToField_WithComment",
+          "MsgPack00xAnalyzerTests.AddAttributeToGenericType",
+          "MsgPack00xAnalyzerTests.AddAttributeToTypeForRecord1",
+          "MsgPack00xAnalyzerTests.AddAttributeToTypeForRecord2",
+          "MsgPack00xAnalyzerTests.AddAttributeToTypeForRecordPrimaryConstructor",
+          "MsgPack00xAnalyzerTests.AddAttributeToType_Fields",
+          "MsgPack00xAnalyzerTests.AddAttributeToType_Generic",
+          "MsgPack00xAnalyzerTests.AddAttributeToType_Nullable",
+          "MsgPack00xAnalyzerTests.AddAttributeToType_Properties",
+          "MsgPack00xAnalyzerTests.AddAttributesToMembers",
+          "MsgPack00xAnalyzerTests.AddAttributesToMembersOfRecord",
+          "MsgPack00xAnalyzerTests.AddAttributesToMembersOfRecordStruct",
+          "MsgPack00xAnalyzerTests.AddAttributesToMembersOfRecordStructWithPrimaryCtor",
+          "MsgPack00xAnalyzerTests.AddAttributesToMembersOfRecordWithPrimaryCtor",
+          "MsgPack00xAnalyzerTests.AddAttributesToMembers_AllowPrivateAttribute",
+          "MsgPack00xAnalyzerTests.AddAttributesToMembers_MixedVisibility",
+          "MsgPack00xAnalyzerTests.AddAttributesToMembers_PublicOnly",
+          "MsgPack00xAnalyzerTests.AddIgnoreAttributesToMembers",
+          "MsgPack00xAnalyzerTests.CodeFixAppliesAcrossFiles",
+          "MsgPack00xAnalyzerTests.DerivedAttributes",
+          "MsgPack00xAnalyzerTests.DerivedAttributes_SourceGenerationDisabled",
+          "MsgPack00xAnalyzerTests.DoNotAddAttributesToClassWithPrimaryCtor",
+          "MsgPack00xAnalyzerTests.InitPropertyInitializer",
+          "MsgPack00xAnalyzerTests.InvalidMessageFormatterType",
+          "MsgPack00xAnalyzerTests.MessageFormatterAttribute",
+          "MsgPack00xAnalyzerTests.NameCollisionsInForceMapMode",
+          "MsgPack00xAnalyzerTests.NoMessagePackReference",
+          "MsgPack00xAnalyzerTests.NullStringKey",
+          "MsgPack00xAnalyzerTests.PrivateMembersInBaseClassNeedNoAttribution",
+          "MsgPack011PartialTypeRequiredTests.CodeFixOffered",
+          "MsgPack011PartialTypeRequiredTests.NestedPartialTypeRequiresPartialDeclaringType",
+          "MsgPack011PartialTypeRequiredTests.NestedPartialTypeRequiresPartialSelfAndDeclaringType",
+          "MsgPack012InaccessibleDataTypeTests.InaccessibleNestedDataType",
+          "MsgPack012InaccessibleDataTypeTests.InaccessibleNestedDataType_OuterNesting",
+          "MsgPack014NullableRefTypeFormatterTests.RefTypeWithNullableAnnotation",
+          "MsgPack014NullableRefTypeFormatterTests.RefTypeWithoutNullableAnnotationsEnabled",
+          "MsgPack014NullableRefTypeFormatterTests.RefTypeWithoutNullableGetsFixed",
+          "MsgPack014NullableRefTypeFormatterTests.ValueTypeWithoutNullableAnnotation",
+          "MsgPack015AllowPrivateRequiredTests.AddForNonPublicDeserializingConstructor",
+          "MsgPack015AllowPrivateRequiredTests.AddForNonPublicType",
+          "MsgPack015AllowPrivateRequiredTests.AddForPublicTypeNestedUnderNonPublicType",
+          "MsgPack015AllowPrivateRequiredTests.AddWhenNonPublicPropertyIsAnnotated",
+          "MsgPack015AllowPrivateRequiredTests.SetWhenNonPublicPropertyIsAnnotated",
+          "MultipleTypesTests.ZeroTypes",
+          "PrivateMemberAccessTests.FormatterForClassWithPrivateMembers_Nested_NonPartialTypes(type: \"class\", languageVersion: CSharp7_3)",
+          "PrivateMemberAccessTests.FormatterForClassWithPrivateMembers_Nested_NonPartialTypes(type: \"record\", languageVersion: CSharp9)",
+          "PrivateMemberAccessTests.FormatterForClassWithPrivateMembers_Nested_NonPartialTypes(type: \"struct\", languageVersion: CSharp7_3)",
+          "PrivateMemberAccessTests.FormatterForClassWithPrivateMembers_NonPartialTypes(type: \"class\", languageVersion: CSharp7_3)",
+          "PrivateMemberAccessTests.FormatterForClassWithPrivateMembers_NonPartialTypes(type: \"record\", languageVersion: CSharp9)",
+          "PrivateMemberAccessTests.FormatterForClassWithPrivateMembers_NonPartialTypes(type: \"struct\", languageVersion: CSharp7_3)",
+          "UnionSerializationInfoTests.Equals_ByValue"
+        ]
+      }
+    ],
+    "comparisons": {}
+  },
+  "tool_versions": {
+    "dotnet_sdk": "8.0.402",
+    "os": "Linux 6.18.44-fc-v470 x86_64 (Linux, not macOS)",
+    "python": "3.13.18",
+    "git": "git version 2.43.0"
+  },
+  "produced_by": "script"
+}

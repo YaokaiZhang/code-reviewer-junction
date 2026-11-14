@@ -1,0 +1,147 @@
+{
+  "branch": "ju26-issue-2283",
+  "issue": 2283,
+  "title": "Generator and analyzer crash on a closed generic struct from a referenced assembly",
+  "base": "32258fdb",
+  "head": "9df83c38",
+  "diff": {
+    "files": 4,
+    "insertions": 225,
+    "deletions": 3
+  },
+  "claims": [
+    {
+      "id": "C-2283-01",
+      "claim": "The generator and the analyzer no longer crash on a closed generic struct or record struct from a referenced assembly, and the resolver is generated again.",
+      "tier": "Tested",
+      "why_this_tier": "2 new tests fail on base with the crash from the issue (AD0001 and CS8785, IndexOutOfRangeException) and pass on the branch, and still pass when the new filter is removed, so the crash fix alone makes them pass.",
+      "requirement": "R-2283-1",
+      "requirement_inferred": false,
+      "evidence": [
+        "evidence/ju26-issue-2283/old-vs-new-tests.json"
+      ],
+      "diff_parts": [
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:985",
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1077",
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1429-1435",
+        "tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs:4-6",
+        "tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs:499-581",
+        "tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs:628-685"
+      ],
+      "chain": [
+        {
+          "link": "ClosedGenericStruct_FromMetadataReference and ClosedGenericRecordStruct_FromMetadataReference fail on base with AD0001 + CS8785 (IndexOutOfRangeException)",
+          "tier": "Tested"
+        },
+        {
+          "link": "both pass on the branch, and both assert the resolver hint name is generated (R-2283-2)",
+          "tier": "Tested"
+        },
+        {
+          "link": "both still pass with the filter line reverted (ablation), so the crash fix carries them",
+          "tier": "Tested"
+        }
+      ]
+    },
+    {
+      "id": "C-2283-02",
+      "claim": "A new filter drops every analyzer diagnostic whose location is not in this project's source; we showed it hides MsgPack003 about the consumer's own unattributed type.",
+      "tier": "Refused",
+      "why_this_tier": "It silences diagnostics, which is a product call for the analyser owner, not something a test can settle.",
+      "requirement": "R-2283-3",
+      "requirement_inferred": true,
+      "evidence": [
+        "evidence/ju26-issue-2283/dropped-warning.json",
+        "evidence/ju26-issue-2283/report-sites.json",
+        "evidence/ju26-issue-2283/old-vs-new-tests.json"
+      ],
+      "diff_parts": [
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:239",
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1436-1451",
+        "tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs:582-627"
+      ],
+      "owner_role": "analyser owner",
+      "chain": [
+        {
+          "link": "probe test: base reports MsgPack003 'Type must be marked with MessagePackObjectAttribute: Box.Content' (Error, no crash) when the consumer's own class Plain is used as Lib.Box<Plain>; on the branch it is gone and nothing else reports it",
+          "tier": "Tested"
+        },
+        {
+          "link": "28 of the 29 live report sites in TypeCollector.cs go through the filter (script count; whether each location can fall outside is a text heuristic)",
+          "tier": "Measured"
+        },
+        {
+          "link": "the new test ClosedGenericStruct_FromMetadataReference_UnkeyedMember passes only because of the filter: with the filter removed it fails on 2 MsgPack004 diagnostics, so it locks the dropping in",
+          "tier": "Tested"
+        },
+        {
+          "link": "whether diagnostics about types from other assemblies should be dropped, moved to the consumer's member, or kept",
+          "tier": "Refused"
+        }
+      ]
+    },
+    {
+      "id": "C-2283-03",
+      "claim": "README and the MsgPack004 page now say diagnostics about types from referenced assemblies are reported by the defining assembly; for the MsgPack003 case above no assembly reports it.",
+      "tier": "Refused",
+      "why_this_tier": "The text documents the dropped warnings as product behaviour, so it stands or falls with C-2283-02.",
+      "requirement": "R-2283-3",
+      "requirement_inferred": true,
+      "evidence": [
+        "evidence/ju26-issue-2283/dropped-warning.json"
+      ],
+      "diff_parts": [
+        "README.md:1639-1643",
+        "doc/analyzers/MsgPack004.md:48-52"
+      ],
+      "owner_role": "analyser owner"
+    },
+    {
+      "id": "C-2283-04",
+      "claim": "No existing test in the source generator test project changes outcome: 167 of 167 pass on base and on the branch.",
+      "tier": "Measured",
+      "why_this_tier": "A count from a test run; passing on both sides shows no regression in what is tested, not correctness.",
+      "requirement": "R-2283-1",
+      "requirement_inferred": false,
+      "evidence": [
+        "evidence/ju26-issue-2283/old-vs-new-tests.json"
+      ],
+      "diff_parts": [
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:239",
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:985",
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1077"
+      ]
+    }
+  ],
+  "found": [
+    "We found (with a hand-written probe test, not a rule) that the filter hides MsgPack003 for the consumer's own unattributed type when it is wrapped in a generic from a referenced assembly. A rule cannot notice that a filter hides warnings; the rule only set the tier once the test showed it.",
+    "The change does two things, not one: a crash fix (2 lines plus a helper) and a filter on 28 of 29 live report sites. The issue asked only for the first.",
+    "One of the 3 new tests (ClosedGenericStruct_FromMetadataReference_UnkeyedMember) is a test of the filter, not of the crash fix: it fails when only the filter is removed.",
+    "The filter also prevents a second base crash: with a project (compilation) reference, base throws 'Reported diagnostic MsgPack003 has a source location in file Lib.cs, which is not part of the compilation' (AD0001). On the branch that diagnostic is dropped instead.",
+    "A duplicate [Key(0)] in a generic type from a referenced assembly still crashes the analyzer on the branch (ArgumentException: same key added), as on base; its MsgPack005 is now dropped. Outside this issue's scope.",
+    "Report-site count: 29 live sites by our method (28 through the filter, 1 bypass); the handoff's 29 was a simple grep that includes 2 commented-out lines and misses 2 live calls. Same number, different sites."
+  ],
+  "refused": [
+    {
+      "what": "Accept ReportIfLocatedInCompilation, which drops analyzer diagnostics located in metadata, in another project, or with no location.",
+      "why": "Dropping warnings is a product call. The analyser owner decides whether these are dropped, reported at the consumer's member instead, or kept; the MsgPack003 case shows at least one is a real problem in the consumer's own code."
+    },
+    {
+      "what": "Accept the README and MsgPack004.md text saying the defining assembly reports these diagnostics.",
+      "why": "It describes the filter as intended behaviour, and for MsgPack003 on a consumer type it is not true; it follows the decision on the filter."
+    }
+  ],
+  "scope_drift": [
+    "Issue 2283 asks for no crash and a generated resolver. The filter, and the docs on where diagnostics are reported, were not asked for; the issue has no maintainer statement on diagnostics for referenced types.",
+    "The filter wraps all 28 filtered report sites, not only the 2 sites that crashed."
+  ],
+  "not_checked": [
+    "The issue's exact setup (ProjectReference in a real MSBuild or IDE build). The new tests reference the library as a compiled image; our probe covers a compilation reference only for two other shapes.",
+    "The content of the generated resolver: the new tests use SkipGeneratedSourcesCheck and only check that the resolver file exists.",
+    "Runtime behaviour after a dropped MsgPack003 (does serialising Box<Plain> fail at run time).",
+    "Only MsgPack003, MsgPack004 and MsgPack005 were exercised through the filter; 'can be outside the compilation' for the other filtered sites is a text heuristic in report_sites.py.",
+    "The issue's trigger matrix (class vs struct, generic vs not) beyond the 3 new tests and 6 probe cases.",
+    "The generator path: the generator passes no report callback, so the filter does not apply there (read, not run)."
+  ],
+  "uncovered_diff_parts": []
+}

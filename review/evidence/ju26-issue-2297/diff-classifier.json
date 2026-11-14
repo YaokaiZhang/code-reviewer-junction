@@ -1,0 +1,2258 @@
+{
+  "check": "diff-classifier",
+  "branch": "ju26-issue-2297",
+  "base": "32258fdb",
+  "head": "a0aa5ab2",
+  "command": "python3 review/scripts/diff_classifier.py --repo $MP_REPO --branch ju26-issue-2297 --write",
+  "result": "pass",
+  "summary": "237 files changed: 222 snapshot, 6 template, 6 generated-output, 1 test, 1 doc, 1 logic; 220 of 222 snapshots change only by attribute and #if/#endif guard lines, 2 do not; 3 snapshot files left unchanged, 1 Resources dir(s) with no test method",
+  "details": {
+    "files_changed": 237,
+    "insertions": 1383,
+    "deletions": 9,
+    "insertions_by_category": {
+      "doc": 3,
+      "generated-output": 13,
+      "logic": 1,
+      "snapshot": 1209,
+      "template": 27,
+      "test": 130
+    },
+    "deletions_by_category": {
+      "doc": 0,
+      "generated-output": 7,
+      "logic": 1,
+      "snapshot": 1,
+      "template": 0,
+      "test": 0
+    },
+    "counts_by_category": {
+      "doc": 1,
+      "generated-output": 6,
+      "logic": 1,
+      "snapshot": 222,
+      "template": 6,
+      "test": 1
+    },
+    "snapshots_total": 222,
+    "snapshots_pure_attribute_and_guard": 220,
+    "snapshots_other": 2,
+    "snapshots_other_directories": [
+      "tests/MessagePack.SourceGenerator.Tests/Resources/GenericDataTypeWithPrivateMember"
+    ],
+    "snapshots_other_detail": [
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericDataTypeWithPrivateMember/Formatters.HasPrivateSerializedMemberAndIsGenericNamed`1.HasPrivateSerializedMemberAndIsGenericNamedFormatter.g.cs",
+        "non_attribute_lines": [
+          {
+            "hunk_new_start": 9,
+            "side": "removed",
+            "kind": "other",
+            "line": "{\tinternal sealed class HasPrivateSerializedMemberAndIsGenericNamedFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::HasPrivateSerializedMemberAndIsGenericNamed<T>>"
+          },
+          {
+            "hunk_new_start": 9,
+            "side": "added",
+            "kind": "other",
+            "line": "{"
+          },
+          {
+            "hunk_new_start": 9,
+            "side": "added",
+            "kind": "other",
+            "line": "\tinternal sealed class HasPrivateSerializedMemberAndIsGenericNamedFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::HasPrivateSerializedMemberAndIsGenericNamed<T>>"
+          }
+        ]
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericDataTypeWithPrivateMember/Formatters.HasPrivateSerializedMemberAndIsGenericOrdinal`1.HasPrivateSerializedMemberAndIsGenericOrdinalFormatter.g.cs",
+        "non_attribute_lines": [
+          {
+            "hunk_new_start": 12,
+            "side": "added",
+            "kind": "blank",
+            "line": ""
+          }
+        ]
+      }
+    ],
+    "snapshot_files_on_branch": 225,
+    "snapshot_files_unchanged": [
+      "tests/MessagePack.SourceGenerator.Tests/Resources/InterfaceUnion/Formatters.MessagePack.GeneratedMessagePackResolver.IMyTypeFormatter.g.cs",
+      "tests/MessagePack.SourceGenerator.Tests/Resources/InterfaceUnion/Formatters.MessagePack.GeneratedMessagePackResolver.UnionContainerFormatter.g.cs",
+      "tests/MessagePack.SourceGenerator.Tests/Resources/InterfaceUnion/MessagePack.GeneratedMessagePackResolver.g.cs"
+    ],
+    "resource_dirs_on_branch": 90,
+    "resource_dirs_without_test_method": [
+      "InterfaceUnion"
+    ],
+    "templates_pure_attribute_and_guard": 6,
+    "templates_total": 6,
+    "distinct_added_attribute_lines": {
+      "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]": 377
+    },
+    "rules": {
+      "pure": "no removed lines; every added line matches attribute /^\\s*\\[[^\\]]+\\]\\s*$/ or guard /^\\s*#\\s*(if|elif|else|endif)\\b/; CR ignored",
+      "categories": "snapshot=tests/**/Resources/**; template=*.tt; generated-output=.cs with sibling .tt; test=other tests/**; doc=*.md; logic=rest"
+    },
+    "files": [
+      {
+        "path": "README.md",
+        "status": "M",
+        "category": "doc",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1
+      },
+      {
+        "path": "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.cs",
+        "status": "M",
+        "category": "generated-output",
+        "insertions": 4,
+        "deletions": 1,
+        "hunks": 2
+      },
+      {
+        "path": "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt",
+        "status": "M",
+        "category": "template",
+        "insertions": 6,
+        "deletions": 0,
+        "hunks": 2,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "src/MessagePack.SourceGenerator/Transforms/EnumTemplate.cs",
+        "status": "M",
+        "category": "generated-output",
+        "insertions": 1,
+        "deletions": 1,
+        "hunks": 1
+      },
+      {
+        "path": "src/MessagePack.SourceGenerator/Transforms/EnumTemplate.tt",
+        "status": "M",
+        "category": "template",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.cs",
+        "status": "M",
+        "category": "generated-output",
+        "insertions": 1,
+        "deletions": 1,
+        "hunks": 1
+      },
+      {
+        "path": "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.tt",
+        "status": "M",
+        "category": "template",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs",
+        "status": "M",
+        "category": "generated-output",
+        "insertions": 5,
+        "deletions": 2,
+        "hunks": 3
+      },
+      {
+        "path": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt",
+        "status": "M",
+        "category": "template",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "src/MessagePack.SourceGenerator/Transforms/StringKey/StringKeyFormatterTemplate.cs",
+        "status": "M",
+        "category": "generated-output",
+        "insertions": 1,
+        "deletions": 1,
+        "hunks": 1
+      },
+      {
+        "path": "src/MessagePack.SourceGenerator/Transforms/StringKey/StringKeyFormatterTemplate.tt",
+        "status": "M",
+        "category": "template",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "src/MessagePack.SourceGenerator/Transforms/TransformUtilities.cs",
+        "status": "M",
+        "category": "logic",
+        "insertions": 1,
+        "deletions": 1,
+        "hunks": 1
+      },
+      {
+        "path": "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.cs",
+        "status": "M",
+        "category": "generated-output",
+        "insertions": 1,
+        "deletions": 1,
+        "hunks": 1
+      },
+      {
+        "path": "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.tt",
+        "status": "M",
+        "category": "template",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+        "status": "A",
+        "category": "test",
+        "insertions": 130,
+        "deletions": 0,
+        "hunks": 1
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/AdditionalAllowTypes/Formatters.MessagePack.GeneratedMessagePackResolver.TypeWithAutoGeneratedFormatterFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/AdditionalAllowTypes/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/AdditionalFormatterTypes/DefiningProject.MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/AdditionalFormatterTypes/TestProject.Formatters.MessagePack.GeneratedMessagePackResolver.TypeWithAutoGeneratedFormatterFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/AdditionalFormatterTypes/TestProject.MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/AdditionalFormatterTypes_RedundantAttribute/Formatters.MessagePack.GeneratedMessagePackResolver.TypeWithAutoGeneratedFormatterFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/AdditionalFormatterTypes_RedundantAttribute/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/Array2DJaggedProperty/Formatters.MessagePack.GeneratedMessagePackResolver.ContainerObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/Array2DJaggedProperty/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/ArrayTypedProperty/Formatters.MessagePack.GeneratedMessagePackResolver.ContainerObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/ArrayTypedProperty/Formatters.MessagePack.GeneratedMessagePackResolver.SubObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/ArrayTypedProperty/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/CanGenerateMessagePackFormatterAttr/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.BarFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/CanGenerateMessagePackFormatterAttr/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/CompositeResolver_MixedResolverTypes/MyResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 6,
+        "deletions": 0,
+        "hunks": 2,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/CompositeResolver_Nested/MyResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 6,
+        "deletions": 0,
+        "hunks": 2,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/CustomFormatterForGenericWithConstraints/Formatters.MessagePack.GeneratedMessagePackResolver.SampleObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/CustomFormatterForGenericWithConstraints/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/CustomFormatterViaAttributeOnField(False)/Formatters.MessagePack.GeneratedMessagePackResolver.HasFieldWithCustomFormatterAttributeFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/CustomFormatterViaAttributeOnField(False)/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/CustomFormatterViaAttributeOnField(True)/Formatters.MessagePack.GeneratedMessagePackResolver.HasFieldWithCustomFormatterAttributeFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/CustomFormatterViaAttributeOnField(True)/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/CustomFormatterViaAttributeOnProperty(False)/Formatters.MessagePack.GeneratedMessagePackResolver.HasPropertyWithCustomFormatterAttributeFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/CustomFormatterViaAttributeOnProperty(False)/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/CustomFormatterViaAttributeOnProperty(True)/Formatters.MessagePack.GeneratedMessagePackResolver.HasPropertyWithCustomFormatterAttributeFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/CustomFormatterViaAttributeOnProperty(True)/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/CustomFormatterWithSingletonPattern/Formatters.MessagePack.GeneratedMessagePackResolver.GFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/CustomFormatterWithSingletonPattern/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/DeserializingConstructorParameterMemberTypeAssignability_Incompatible/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/DeserializingConstructorParameterMemberTypeAssignability_MemberAssignsToParamType/Formatters.MessagePack.GeneratedMessagePackResolver.AFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/DeserializingConstructorParameterMemberTypeAssignability_MemberAssignsToParamType/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/EmbeddedTypes/Formatters.MessagePack.GeneratedMessagePackResolver.AFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/EmbeddedTypes/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/EnumFormatter(Namespace, False)/Formatters.MessagePack.GeneratedMessagePackResolver.MyTestNamespace.MyEnumFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 0,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/EnumFormatter(Namespace, False)/Formatters.MessagePack.GeneratedMessagePackResolver.MyTestNamespace.MyMessagePackObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 0,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/EnumFormatter(Namespace, False)/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 0,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/EnumFormatter(Namespace, True)/Formatters.MessagePack.GeneratedMessagePackResolver.MyTestNamespace.MyEnumFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 0,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/EnumFormatter(Namespace, True)/Formatters.MessagePack.GeneratedMessagePackResolver.MyTestNamespace.MyMessagePackObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 0,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/EnumFormatter(Namespace, True)/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 0,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/EnumFormatter(NestingClass, False)/Formatters.MessagePack.GeneratedMessagePackResolver.ContainingClass.MyEnumFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 0,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/EnumFormatter(NestingClass, False)/Formatters.MessagePack.GeneratedMessagePackResolver.ContainingClass.MyMessagePackObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 0,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/EnumFormatter(NestingClass, False)/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 0,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/EnumFormatter(NestingClass, True)/Formatters.MessagePack.GeneratedMessagePackResolver.ContainingClass.MyEnumFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 0,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/EnumFormatter(NestingClass, True)/Formatters.MessagePack.GeneratedMessagePackResolver.ContainingClass.MyMessagePackObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 0,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/EnumFormatter(NestingClass, True)/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 0,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/EnumFormatter(None, False)/Formatters.MessagePack.GeneratedMessagePackResolver.MyEnumFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 0,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/EnumFormatter(None, False)/Formatters.MessagePack.GeneratedMessagePackResolver.MyMessagePackObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 0,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/EnumFormatter(None, False)/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 0,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/EnumFormatter(None, True)/Formatters.MessagePack.GeneratedMessagePackResolver.MyEnumFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 0,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/EnumFormatter(None, True)/Formatters.MessagePack.GeneratedMessagePackResolver.MyMessagePackObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 0,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/EnumFormatter(None, True)/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 0,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/EnumFormatter_CollidingTypeNames/Formatters.MessagePack.GeneratedMessagePackResolver.MyMessagePackObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/EnumFormatter_CollidingTypeNames/Formatters.MessagePack.GeneratedMessagePackResolver.NS1.MyEnumFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/EnumFormatter_CollidingTypeNames/Formatters.MessagePack.GeneratedMessagePackResolver.NS2.MyEnumFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/EnumFormatter_CollidingTypeNames/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/FormatterForClassWithPrivateMembers(class)/Formatters.MyObject.MyObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/FormatterForClassWithPrivateMembers(class)/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/FormatterForClassWithPrivateMembers(record struct)/Formatters.MyObject.MyObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 0,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/FormatterForClassWithPrivateMembers(record struct)/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 0,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/FormatterForClassWithPrivateMembers(record)/Formatters.MyObject.MyObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/FormatterForClassWithPrivateMembers(record)/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/FormatterForClassWithPrivateMembers(struct)/Formatters.MyObject.MyObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/FormatterForClassWithPrivateMembers(struct)/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/FormatterForClassWithPrivateMembers_MapMode/Formatters.MyObject.MyObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/FormatterForClassWithPrivateMembers_MapMode/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/FormatterForClassWithPrivateMembers_WithNamespace/Formatters.A.MyObject.MyObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/FormatterForClassWithPrivateMembers_WithNamespace/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericCustomFormatter/Formatters.SampleObject.SampleObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericCustomFormatter/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericDataTypeWithPrivateMember/Formatters.HasPrivateSerializedMemberAndIsGenericNamed`1.HasPrivateSerializedMemberAndIsGenericNamedFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 5,
+        "deletions": 1,
+        "hunks": 1,
+        "pure_attribute_and_guard": false,
+        "non_attribute_lines": [
+          {
+            "hunk_new_start": 9,
+            "side": "removed",
+            "kind": "other",
+            "line": "{\tinternal sealed class HasPrivateSerializedMemberAndIsGenericNamedFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::HasPrivateSerializedMemberAndIsGenericNamed<T>>"
+          },
+          {
+            "hunk_new_start": 9,
+            "side": "added",
+            "kind": "other",
+            "line": "{"
+          },
+          {
+            "hunk_new_start": 9,
+            "side": "added",
+            "kind": "other",
+            "line": "\tinternal sealed class HasPrivateSerializedMemberAndIsGenericNamedFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::HasPrivateSerializedMemberAndIsGenericNamed<T>>"
+          }
+        ]
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericDataTypeWithPrivateMember/Formatters.HasPrivateSerializedMemberAndIsGenericOrdinal`1.HasPrivateSerializedMemberAndIsGenericOrdinalFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 4,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": false,
+        "non_attribute_lines": [
+          {
+            "hunk_new_start": 12,
+            "side": "added",
+            "kind": "blank",
+            "line": ""
+          }
+        ]
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericDataTypeWithPrivateMember/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericType/Formatters.MessagePack.GeneratedMessagePackResolver.ContainerObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericType/Formatters.MessagePack.GeneratedMessagePackResolver.MyGenericTypeFormatter`1.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericType/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericTypeArg/Formatters.MessagePack.GeneratedMessagePackResolver.GenericClassFormatter`2.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericTypeArg/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericType_CollidingTypeNames/Formatters.MessagePack.GeneratedMessagePackResolver.MyMessagePackObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericType_CollidingTypeNames/Formatters.MessagePack.GeneratedMessagePackResolver.NS1.MyTypeFormatter`1.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericType_CollidingTypeNames/Formatters.MessagePack.GeneratedMessagePackResolver.NS2.MyTypeFormatter`1.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericType_CollidingTypeNames/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericWithConstraintsThatReferenceTypeParameter/Formatters.MessagePack.GeneratedMessagePackResolver.GenericConstrainedClassIntKeyFormatter`2.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericWithConstraintsThatReferenceTypeParameter/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericsOfT1T2Formatter/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyGenericObjectFormatter`2.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericsOfT1T2Formatter/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericsOfT1T2Formatter/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyObjectNestedFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericsOfT1T2Formatter/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericsOfTFormatter/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyGenericObjectFormatter`1.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericsOfTFormatter/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericsOfTFormatter/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyObjectNestedFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericsOfTFormatter/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericsOfTFormatter_FormatterOnly/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyGenericObjectFormatter`1.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericsOfTFormatter_FormatterOnly/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericsOfTFormatter_WithKnownTypes/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyGenericObjectFormatter`1.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericsOfTFormatter_WithKnownTypes/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyObject2Formatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericsOfTFormatter_WithKnownTypes/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericsOfTFormatter_WithKnownTypes/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericsUnionFormatter/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.WrapperFormatter`1.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericsUnionFormatter/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericsUnionFormatter_Nested/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyGenericObjectFormatter`1.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericsUnionFormatter_Nested/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyInnerGenericObjectFormatter`1.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericsUnionFormatter_Nested/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.WrapperFormatter`1.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericsUnionFormatter_Nested/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/Generics_Constraints_Multiple/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyGenericObjectFormatter`4.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/Generics_Constraints_Multiple/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/Generics_Constraints_NullableReferenceType/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyGenericObjectFormatter`4.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/Generics_Constraints_NullableReferenceType/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/Generics_Constraints_ReferenceType_Nullable/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyGenericObjectFormatter`2.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/Generics_Constraints_ReferenceType_Nullable/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/Generics_Constraints_Struct/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyGenericObjectFormatter`1.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/Generics_Constraints_Struct/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/Generics_Constraints_Type/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyGenericObjectFormatter`1.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/Generics_Constraints_Type/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/Generics_Defined_In_ReferencedProject/DefiningProject.Formatters.TempProject.MyResolver.TempProject.MyGenericObjectFormatter`1.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/Generics_Defined_In_ReferencedProject/DefiningProject.TempProject.MyResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/Generics_Defined_In_ReferencedProject/TestProject.Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyGenericObjectFormatter`1.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/Generics_Defined_In_ReferencedProject/TestProject.Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/Generics_Defined_In_ReferencedProject/TestProject.Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyObjectNestedFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/Generics_Defined_In_ReferencedProject/TestProject.MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/ImplicitFormatterTypes/Formatters.MessagePack.GeneratedMessagePackResolver.TypeWithAutoGeneratedFormatterFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/ImplicitFormatterTypes/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/InterfaceUnionUsedWithNullableRefAnnotation/Formatters.MessagePack.GeneratedMessagePackResolver.IMyTypeFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/InterfaceUnionUsedWithNullableRefAnnotation/Formatters.MessagePack.GeneratedMessagePackResolver.UnionContainerFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/InterfaceUnionUsedWithNullableRefAnnotation/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/MixType_CollidingTypeNames/Formatters.MessagePack.GeneratedMessagePackResolver.MyMessagePackObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/MixType_CollidingTypeNames/Formatters.MessagePack.GeneratedMessagePackResolver.NS1.MyTypeFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/MixType_CollidingTypeNames/Formatters.MessagePack.GeneratedMessagePackResolver.NS2.MyTypeFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/MixType_CollidingTypeNames/Formatters.MessagePack.GeneratedMessagePackResolver.NS3.MyTypeFormatter`1.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/MixType_CollidingTypeNames/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/MultipleFunctionalCustomFormattersForType_MultiFormatter/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/MultipleFunctionalCustomFormattersForType_OnlyOneNonExcluded/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/NestedGenericTypes/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyGenericObjectFormatter`1.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/NestedGenericTypes/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyInnerGenericObjectFormatter`1.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/NestedGenericTypes/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyObject2Formatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/NestedGenericTypes/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/NestedGenericTypes/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.WrapperFormatter`1.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/NestedGenericTypes/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/NestedMessagePackObjects/Formatters.MessagePack.GeneratedMessagePackResolver.A.B.CFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/NestedMessagePackObjects/Formatters.MessagePack.GeneratedMessagePackResolver.A.BFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/NestedMessagePackObjects/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/NestedMessagePackObjects_Array/Formatters.MessagePack.GeneratedMessagePackResolver.A.B.CFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/NestedMessagePackObjects_Array/Formatters.MessagePack.GeneratedMessagePackResolver.A.BFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/NestedMessagePackObjects_Array/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/NoFieldWithCustomFormatterCollected/Formatters.MessagePack.GeneratedMessagePackResolver.TestFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/NoFieldWithCustomFormatterCollected/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/NoPrivateAccessNeeded/Formatters.MessagePack.GeneratedMessagePackResolver.Test3Formatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/NoPrivateAccessNeeded/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/NoPrivateMemberCollected/Formatters.MessagePack.GeneratedMessagePackResolver.TestFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/NoPrivateMemberCollected/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/NonDefaultDeserializingConstructor_Private/Formatters.A.AFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/NonDefaultDeserializingConstructor_Private/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/NonGenericType_CollidingTypeNames/Formatters.MessagePack.GeneratedMessagePackResolver.MyMessagePackObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/NonGenericType_CollidingTypeNames/Formatters.MessagePack.GeneratedMessagePackResolver.NS1.MyTypeFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/NonGenericType_CollidingTypeNames/Formatters.MessagePack.GeneratedMessagePackResolver.NS2.MyTypeFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/NonGenericType_CollidingTypeNames/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/NullableFormatter/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyEnumFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/NullableFormatter/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/NullableFormatter/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/OpenGenericFormatter/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/PropertiesGetterOnlyDefaultValue/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyMessagePackObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/PropertiesGetterOnlyDefaultValue/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/PropertiesGetterOnlyIgnore/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyMessagePackObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/PropertiesGetterOnlyIgnore/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/PropertiesGetterOnlyMixed/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyMessagePackObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/PropertiesGetterOnlyMixed/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/PropertiesGetterOnlyWithParameterizedConstructor/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyMessagePackObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/PropertiesGetterOnlyWithParameterizedConstructor/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/PropertiesGetterOnlyWithParameterizedConstructorDefaultValue/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyMessagePackObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/PropertiesGetterOnlyWithParameterizedConstructorDefaultValue/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/PropertiesGetterOnlyWithParameterizedConstructorPartially/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyMessagePackObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/PropertiesGetterOnlyWithParameterizedConstructorPartially/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/PropertiesGetterSetter/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyMessagePackObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/PropertiesGetterSetter/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/PropertiesGetterSetterWithDefaultValue/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyMessagePackObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/PropertiesGetterSetterWithDefaultValue/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/PropertiesGetterSetterWithDefaultValueInputPartially/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyMessagePackObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/PropertiesGetterSetterWithDefaultValueInputPartially/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/PropertiesGetterSetterWithParameterizedConstructor/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyMessagePackObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/PropertiesGetterSetterWithParameterizedConstructor/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/PropertiesGetterSetterWithParameterizedConstructorAndDefaultValue/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyMessagePackObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/PropertiesGetterSetterWithParameterizedConstructorAndDefaultValue/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/PropertiesGetterSetterWithParameterizedConstructorDoNotUseSetter/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyMessagePackObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/PropertiesGetterSetterWithParameterizedConstructorDoNotUseSetter/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/PropertiesGetterSetterWithParameterizedConstructorPartially/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyMessagePackObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/PropertiesGetterSetterWithParameterizedConstructorPartially/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/RecordWithPrimaryConstructor/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyMessagePackObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/RecordWithPrimaryConstructor/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/RecordWithWithInitOnlyProps/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyMessagePackObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/RecordWithWithInitOnlyProps/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/RecursiveGenerics_Direct/Formatters.MessagePack.GeneratedMessagePackResolver.AFormatter`1.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/RecursiveGenerics_Direct/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/SimplifiedNameForKeywordsAndSyntaxSugar/Formatters.MessagePack.GeneratedMessagePackResolver.SampleObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/SimplifiedNameForKeywordsAndSyntaxSugar/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/SpecifyFormatterFromStockSet/Formatters.MessagePack.GeneratedMessagePackResolver.GFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/SpecifyFormatterFromStockSet/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/SystemCollectionsObjectModelCollection/Formatters.MessagePack.GeneratedMessagePackResolver.AFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/SystemCollectionsObjectModelCollection/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/SystemMemoryTypes/Formatters.MessagePack.GeneratedMessagePackResolver.AFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/SystemMemoryTypes/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/TwoTypes(False)/Formatters.MessagePack.GeneratedMessagePackResolver.Object1Formatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/TwoTypes(False)/Formatters.MessagePack.GeneratedMessagePackResolver.Object2Formatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/TwoTypes(False)/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/TwoTypes(True)/Formatters.MessagePack.GeneratedMessagePackResolver.Object1Formatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/TwoTypes(True)/Formatters.MessagePack.GeneratedMessagePackResolver.Object2Formatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/TwoTypes(True)/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/UnionFormatter(Namespace)/Formatters.MessagePack.GeneratedMessagePackResolver.MyTestNamespace.Derived1Formatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/UnionFormatter(Namespace)/Formatters.MessagePack.GeneratedMessagePackResolver.MyTestNamespace.Derived2Formatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/UnionFormatter(Namespace)/Formatters.MessagePack.GeneratedMessagePackResolver.MyTestNamespace.IMyTypeFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/UnionFormatter(Namespace)/Formatters.MessagePack.GeneratedMessagePackResolver.MyTestNamespace.MyMessagePackObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/UnionFormatter(Namespace)/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/UnionFormatter(NestingClass)/Formatters.MessagePack.GeneratedMessagePackResolver.ContainingClass.Derived1Formatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/UnionFormatter(NestingClass)/Formatters.MessagePack.GeneratedMessagePackResolver.ContainingClass.Derived2Formatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/UnionFormatter(NestingClass)/Formatters.MessagePack.GeneratedMessagePackResolver.ContainingClass.IMyTypeFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/UnionFormatter(NestingClass)/Formatters.MessagePack.GeneratedMessagePackResolver.ContainingClass.MyMessagePackObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/UnionFormatter(NestingClass)/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/UnionFormatter(None)/Formatters.MessagePack.GeneratedMessagePackResolver.Derived1Formatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/UnionFormatter(None)/Formatters.MessagePack.GeneratedMessagePackResolver.Derived2Formatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/UnionFormatter(None)/Formatters.MessagePack.GeneratedMessagePackResolver.IMyTypeFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/UnionFormatter(None)/Formatters.MessagePack.GeneratedMessagePackResolver.MyMessagePackObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/UnionFormatter(None)/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/WellKnownGenericsFormatter/Formatters.MessagePack.GeneratedMessagePackResolver.TempProject.MyObjectFormatter.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 3,
+        "deletions": 0,
+        "hunks": 1,
+        "pure_attribute_and_guard": true
+      },
+      {
+        "path": "tests/MessagePack.SourceGenerator.Tests/Resources/WellKnownGenericsFormatter/MessagePack.GeneratedMessagePackResolver.g.cs",
+        "status": "M",
+        "category": "snapshot",
+        "insertions": 9,
+        "deletions": 0,
+        "hunks": 3,
+        "pure_attribute_and_guard": true
+      }
+    ]
+  },
+  "tool_versions": {
+    "python": "3.13.18",
+    "git": "git version 2.43.0"
+  },
+  "produced_by": "script"
+}

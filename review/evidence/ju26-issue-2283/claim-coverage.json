@@ -1,0 +1,20 @@
+{
+  "check": "claim-coverage",
+  "branch": "ju26-issue-2283",
+  "base": "32258fdb",
+  "command": "python3 review/scripts/claim_coverage.py --repo $MP_REPO --branch ju26-issue-2283 --write",
+  "result": "pass",
+  "summary": "9 of 9 changed hunks covered by a claim; 0 of 4 files have uncovered hunks",
+  "details": {
+    "hunks_total": 9,
+    "hunks_uncovered": 0,
+    "files_total": 4,
+    "files_with_uncovered": 0,
+    "uncovered": []
+  },
+  "tool_versions": {
+    "git": "git version 2.43.0",
+    "python": "3.13.18"
+  },
+  "produced_by": "script"
+}

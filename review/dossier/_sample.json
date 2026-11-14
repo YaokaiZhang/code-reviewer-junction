@@ -1,0 +1,130 @@
+{
+  "sample": true,
+  "branch": "ju26-issue-2283",
+  "issue": 2283,
+  "title": "Source generator crashes when a member is declared in metadata",
+  "base": "32258fdb",
+  "head": "9df83c38",
+  "diff": {
+    "files": 4,
+    "insertions": 225,
+    "deletions": 3
+  },
+  "claims": [
+    {
+      "id": "C-2283-01",
+      "claim": "The generator no longer throws when a [MessagePackObject] type inherits a member declared in a referenced assembly.",
+      "tier": "Tested",
+      "why_this_tier": "The new regression test fails on base with InvalidOperationException and passes on the branch.",
+      "requirement": "R-2283-1",
+      "requirement_inferred": false,
+      "evidence": [
+        "evidence/ju26-issue-2283/old-vs-new-tests.json"
+      ],
+      "diff_parts": [
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:236-240",
+        "tests/MessagePack.SourceGenerator.Tests/MetadataMemberTests.cs:1-64"
+      ],
+      "chain": [
+        {
+          "link": "Test reproduces the crash on base",
+          "tier": "Tested"
+        },
+        {
+          "link": "Same test passes on branch head",
+          "tier": "Tested"
+        }
+      ]
+    },
+    {
+      "id": "C-2283-02",
+      "claim": "Generated formatters for every existing snapshot type are byte-identical before and after the change.",
+      "tier": "Proved",
+      "why_this_tier": "Regenerated all snapshot outputs on base and head; the byte diff is empty.",
+      "requirement": "R-2283-2",
+      "requirement_inferred": true,
+      "evidence": [
+        "evidence/ju26-issue-2283/snapshot-byte-diff.json"
+      ],
+      "diff_parts": [
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:236-240"
+      ]
+    },
+    {
+      "id": "C-2283-03",
+      "claim": "A new filter, ReportIfLocatedInCompilation, drops every diagnostic whose location is not in the compilation's own source.",
+      "tier": "Refused",
+      "why_this_tier": "It silences diagnostics, including ones that point at metadata members a user can still fix by changing their own attributes.",
+      "requirement": "R-2283-1",
+      "requirement_inferred": true,
+      "evidence": [
+        "evidence/ju26-issue-2283/dropped-warning.json",
+        "evidence/ju26-issue-2283/report-sites.json"
+      ],
+      "diff_parts": [
+        "src/MessagePack.SourceGenerator/Analyzers/AnalyzerUtilities.cs:88-131",
+        "src/MessagePack.SourceGenerator/Analyzers/MsgPack00xAnalyzer.cs:57-61"
+      ],
+      "owner_role": "analyser owner",
+      "chain": [
+        {
+          "link": "Report sites that go through the filter (report-sites)",
+          "tier": "Measured"
+        },
+        {
+          "link": "A probe diagnostic is lost on branch (dropped-warning)",
+          "tier": "Tested"
+        },
+        {
+          "link": "No lost diagnostic is one a user needs",
+          "tier": "Argued"
+        }
+      ]
+    },
+    {
+      "id": "C-2283-04",
+      "claim": "Skipping metadata members in the collector is safe because their formatters come from the referenced assembly.",
+      "tier": "Argued",
+      "why_this_tier": "No test covers a referenced assembly that ships without its own formatter.",
+      "requirement": "R-2283-1",
+      "requirement_inferred": false,
+      "evidence": [],
+      "diff_parts": [
+        "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:241-252"
+      ],
+      "owner_role": "generator maintainer"
+    },
+    {
+      "id": "C-2283-05",
+      "claim": "Generator run time on the benchmark solution is within noise of base.",
+      "tier": "Measured",
+      "why_this_tier": "The number comes from a timing harness, not a pass/fail check.",
+      "requirement": "R-2283-2",
+      "requirement_inferred": true,
+      "evidence": [
+        "evidence/ju26-issue-2283/generator-timing.json"
+      ],
+      "diff_parts": []
+    }
+  ],
+  "found": [
+    "ReportIfLocatedInCompilation also suppresses MsgPack003 for user types whose base class lives in a package.",
+    "The regression test pins one shape (inherited property); fields and explicit interface members are not exercised."
+  ],
+  "refused": [
+    {
+      "what": "ReportIfLocatedInCompilation filter",
+      "why": "Drops warnings; tier rule 1."
+    }
+  ],
+  "scope_drift": [
+    "Analyser diagnostic filtering was not asked for by issue 2283."
+  ],
+  "not_checked": [
+    "Behaviour with Unity / IL2CPP builds.",
+    "Diagnostics in IDE live analysis (only command-line build was run)."
+  ],
+  "uncovered_diff_parts": [
+    "src/MessagePack.SourceGenerator/Analyzers/AnalyzerUtilities.cs:132-140"
+  ]
+}

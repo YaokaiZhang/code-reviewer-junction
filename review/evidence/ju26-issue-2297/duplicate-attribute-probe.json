@@ -1,0 +1,18 @@
+{
+  "check": "duplicate-attribute-probe",
+  "branch": "ju26-issue-2297",
+  "base": "32258fdb",
+  "command": "for w in wt-2297-base (32258fdb) wt-2297-branch (origin/ju26-issue-2297), worktrees made by regen_check.py: cp $SCRATCH/DuplicateExclusionProbeTests.cs $SCRATCH/$w/tests/MessagePack.SourceGenerator.Tests/ && cd $SCRATCH/$w && dotnet build tests/MessagePack.SourceGenerator.Tests -nodeReuse:false && dotnet test tests/MessagePack.SourceGenerator.Tests --no-build --filter FullyQualifiedName~DuplicateExclusionProbeTests. The probe runs the real MessagePackGenerator on a source whose user-declared `public partial class MessagePack.GeneratedMessagePackResolver` already has [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage], then asserts the output compilation has no errors.",
+  "result": "fail",
+  "summary": "A user's own [ExcludeFromCodeCoverage] on their partial resolver compiles on base (1 of 1 probe passed) and breaks on the branch (1 of 1 failed, error CS0579 duplicate attribute)",
+  "details": {
+    "probe_test": "DuplicateExclusionProbeTests.UserExcludedResolverStillCompiles (scratch file, removed after the run; not part of the branch)",
+    "base": {"passed": 1, "failed": 0},
+    "branch": {"passed": 0, "failed": 1, "error": "CS0579: Duplicate 'global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage' attribute"},
+    "standalone_shape_probe": {"dir": "$SCRATCH/wt-2297-dupprobe", "build_exit_code": 1, "error": "CS0579", "note": "same result with a hand-written copy of the emitted shape, no generator"},
+    "why_it_matters": "ExcludeFromCodeCoverageAttribute has AllowMultiple = false and attributes on all partial declarations of a type merge. The resolver (ResolverTemplate) and, by reading, the composite resolver (CompositeResolverTemplate) are partial classes the user declares, so a hand-written exclusion, the obvious workaround before this change, now breaks the build. Formatters are generator-only types and are not affected this way.",
+    "covered_by_branch_tests": false
+  },
+  "tool_versions": {"dotnet_sdk": "8.0.402", "os": "Linux 6.18.44-fc-v470 x86_64 (Linux, not macOS)"},
+  "produced_by": "hand"
+}

@@ -1,0 +1,40 @@
+{
+  "check": "diff-stat",
+  "branch": "ju26-issue-2283",
+  "base": "32258fdb",
+  "command": "git -C <clone> diff --shortstat 32258fdb origin/ju26-issue-2283 && git -C <clone> diff --numstat 32258fdb origin/ju26-issue-2283",
+  "result": "pass",
+  "summary": "4 files changed, 225 insertions, 3 deletions",
+  "details": {
+    "head": "9df83c38",
+    "files": 4,
+    "insertions": 225,
+    "deletions": 3,
+    "per_file": [
+      {
+        "insertions": "5",
+        "deletions": "0",
+        "path": "README.md"
+      },
+      {
+        "insertions": "5",
+        "deletions": "0",
+        "path": "doc/analyzers/MsgPack004.md"
+      },
+      {
+        "insertions": "26",
+        "deletions": "3",
+        "path": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs"
+      },
+      {
+        "insertions": "189",
+        "deletions": "0",
+        "path": "tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs"
+      }
+    ]
+  },
+  "tool_versions": {
+    "git": "git version 2.43.0"
+  },
+  "produced_by": "hand"
+}

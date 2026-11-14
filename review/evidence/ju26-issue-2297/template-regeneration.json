@@ -1,0 +1,121 @@
+{
+  "check": "template-regeneration",
+  "branch": "ju26-issue-2297",
+  "base": "32258fdb",
+  "command": "python3 review/scripts/template_check.py --repo $MP_REPO --branch ju26-issue-2297 --t4 <dotnet-t4 3.0.0 t4> --write",
+  "result": "pass",
+  "summary": "dotnet-t4 regeneration of 6 templates, TransformText() compared after normalising layout: base 6 of 6 match, branch 6 of 6 match, 0 t4 errors; negative control: branch regeneration differs from base .cs for 6 of 6",
+  "details": {
+    "templates": [
+      "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt",
+      "src/MessagePack.SourceGenerator/Transforms/EnumTemplate.tt",
+      "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.tt",
+      "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt",
+      "src/MessagePack.SourceGenerator/Transforms/StringKey/StringKeyFormatterTemplate.tt",
+      "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.tt"
+    ],
+    "base_matching": 6,
+    "branch_matching": 6,
+    "t4_errors": 0,
+    "negative_controls_differing": 6,
+    "method": "TransformText() body compared after dropping whitespace outside string literals, merging string literals and adjacent Write calls, and dropping `this.GenerationEnvironment = null;`; .tt fed with CRLF line endings. Header comment, CodeDOM layout and the base-class region are ignored.",
+    "limits": "Not a byte-for-byte reproduction of Visual Studio's TextTemplatingFilePreprocessor output; equality is of emitted text, not of file bytes.",
+    "results": [
+      {
+        "template": "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt",
+        "rev": "32258fdb",
+        "class": "MessagePack.SourceGenerator.Transforms.CompositeResolverTemplate",
+        "status": "match",
+        "normalised_length": 2055
+      },
+      {
+        "template": "src/MessagePack.SourceGenerator/Transforms/EnumTemplate.tt",
+        "rev": "32258fdb",
+        "class": "MessagePack.SourceGenerator.Transforms.EnumTemplate",
+        "status": "match",
+        "normalised_length": 1267
+      },
+      {
+        "template": "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.tt",
+        "rev": "32258fdb",
+        "class": "MessagePack.SourceGenerator.Transforms.FormatterTemplate",
+        "status": "match",
+        "normalised_length": 6435
+      },
+      {
+        "template": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt",
+        "rev": "32258fdb",
+        "class": "MessagePack.SourceGenerator.Transforms.ResolverTemplate",
+        "status": "match",
+        "normalised_length": 5132
+      },
+      {
+        "template": "src/MessagePack.SourceGenerator/Transforms/StringKey/StringKeyFormatterTemplate.tt",
+        "rev": "32258fdb",
+        "class": "MessagePack.SourceGenerator.Transforms.StringKeyFormatterTemplate",
+        "status": "match",
+        "normalised_length": 6615
+      },
+      {
+        "template": "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.tt",
+        "rev": "32258fdb",
+        "class": "MessagePack.SourceGenerator.Transforms.UnionTemplate",
+        "status": "match",
+        "normalised_length": 4968
+      },
+      {
+        "template": "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt",
+        "rev": "origin/ju26-issue-2297",
+        "class": "MessagePack.SourceGenerator.Transforms.CompositeResolverTemplate",
+        "status": "match",
+        "normalised_length": 2295,
+        "negative_control_base_cs_differs": true
+      },
+      {
+        "template": "src/MessagePack.SourceGenerator/Transforms/EnumTemplate.tt",
+        "rev": "origin/ju26-issue-2297",
+        "class": "MessagePack.SourceGenerator.Transforms.EnumTemplate",
+        "status": "match",
+        "normalised_length": 1388,
+        "negative_control_base_cs_differs": true
+      },
+      {
+        "template": "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.tt",
+        "rev": "origin/ju26-issue-2297",
+        "class": "MessagePack.SourceGenerator.Transforms.FormatterTemplate",
+        "status": "match",
+        "normalised_length": 6556,
+        "negative_control_base_cs_differs": true
+      },
+      {
+        "template": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt",
+        "rev": "origin/ju26-issue-2297",
+        "class": "MessagePack.SourceGenerator.Transforms.ResolverTemplate",
+        "status": "match",
+        "normalised_length": 5493,
+        "negative_control_base_cs_differs": true
+      },
+      {
+        "template": "src/MessagePack.SourceGenerator/Transforms/StringKey/StringKeyFormatterTemplate.tt",
+        "rev": "origin/ju26-issue-2297",
+        "class": "MessagePack.SourceGenerator.Transforms.StringKeyFormatterTemplate",
+        "status": "match",
+        "normalised_length": 6736,
+        "negative_control_base_cs_differs": true
+      },
+      {
+        "template": "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.tt",
+        "rev": "origin/ju26-issue-2297",
+        "class": "MessagePack.SourceGenerator.Transforms.UnionTemplate",
+        "status": "match",
+        "normalised_length": 5089,
+        "negative_control_base_cs_differs": true
+      }
+    ]
+  },
+  "tool_versions": {
+    "dotnet-t4": "T4 text template processor version 3.0.0.1+cb559e2032",
+    "python": "3.13.18"
+  },
+  "produced_by": "script"
+}

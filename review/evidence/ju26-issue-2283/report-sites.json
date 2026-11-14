@@ -1,0 +1,671 @@
+{
+  "check": "report-sites",
+  "branch": "ju26-issue-2283",
+  "base": "32258fdb",
+  "command": "python3 review/scripts/report_sites.py --repo <clone> --branch ju26-issue-2283 --out review/evidence/ju26-issue-2283/report-sites.json",
+  "result": "pass",
+  "summary": "29 live report sites in TypeCollector.cs: 28 go through the filter (19 distinct descriptors), 1 bypass it; 28 of the 28 filtered sites can have a location outside the compilation's source; simple grep for 'reportDiagnostic?.Invoke' counts 29 lines (2 of them commented out)",
+  "details": {
+    "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+    "rev": "origin/ju26-issue-2283",
+    "method": "regex over non-comment lines for calls through this.reportDiagnostic (?.Invoke, direct call, local-function capture) and reportAnalyzerDiagnostic?.Invoke; arguments that are variables are traced to their assignment in the same method; 'deferred' is traced to the four deferredDiagnosticsForNonPublicMembers.Add sites",
+    "live_sites": 29,
+    "sites_through_filter": 28,
+    "sites_bypassing_filter": 1,
+    "distinct_descriptors_through_filter": [
+      "AOTDerivedKeyAttribute",
+      "AOTInitProperty",
+      "AotUnionAttributeRequiresTypeArg",
+      "BaseTypeContainsUnattributedPublicMembers",
+      "BothStringAndIntKeyAreNull",
+      "CollidingMemberNamesInForceMapMode",
+      "DeserializingConstructorParameterIndexMissing",
+      "DeserializingConstructorParameterNameDuplicate",
+      "DeserializingConstructorParameterNameMissing",
+      "DeserializingConstructorParameterTypeMismatch",
+      "DoNotMixStringAndIntKeys",
+      "KeysMustBeUnique",
+      "MemberNeedsKey",
+      "MessageFormatterMustBeMessagePackFormatter",
+      "MessagePackObjectAllowPrivateRequired",
+      "NoDeserializingConstructor",
+      "PartialTypeRequired",
+      "TypeMustBeMessagePackObject",
+      "UnionAttributeRequired"
+    ],
+    "filtered_sites_location_can_be_outside": 28,
+    "commented_out_sites": [
+      {
+        "line": 465,
+        "code": "////this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.AotArrayRankTooHigh));"
+      },
+      {
+        "line": 715,
+        "code": "////this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.TypeMustBeMessagePackObject, ((BaseTypeDeclarationSyntax)type.DeclaringSyntaxReferences[0].GetSyntax()).Identifier.Get"
+      },
+      {
+        "line": 744,
+        "code": "// this.reportDiagnostic();"
+      }
+    ],
+    "simple_grep": {
+      "pattern": "reportDiagnostic?.Invoke",
+      "branch_count": 29,
+      "base_count": 29,
+      "commented_lines_in_branch_count": 2,
+      "live_sites_missed_by_simple_grep": [
+        248,
+        1188
+      ],
+      "note": "the handoff's 29; it includes commented-out lines, misses this.reportDiagnostic(deferred) and the unfiltered reportAnalyzerDiagnostic?.Invoke"
+    },
+    "premise": "every filtered site sits in code reached from CollectCore, which recurses into closed generic types defined in other assemblies (CollectGeneric -> GetObjectInfo / CollectCore(type.OriginalDefinition)); so the symbol a location is taken from can come from another assembly",
+    "sites": [
+      {
+        "line": 248,
+        "method": "TypeCollector",
+        "via": "reportAnalyzerDiagnostic?.Invoke",
+        "through_filter": false,
+        "descriptors": [
+          "InaccessibleDataType"
+        ],
+        "location_expressions": [
+          "decl.Identifier.GetLocation()"
+        ],
+        "traced": [],
+        "location_can_be_outside_compilation_source": "no",
+        "why": [
+          "declaration of the analysed target type (from FindInaccessibleTypes(targetType))"
+        ],
+        "code": "reportAnalyzerDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.InaccessibleDataType, decl.Identifier.GetLocation()));"
+      },
+      {
+        "line": 397,
+        "method": "CollectUnion",
+        "via": "this.reportDiagnostic?.Invoke",
+        "through_filter": true,
+        "descriptors": [
+          "UnionAttributeRequired"
+        ],
+        "location_expressions": [
+          "type.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation()"
+        ],
+        "traced": [],
+        "location_can_be_outside_compilation_source": "yes",
+        "why": [
+          "derived from the symbol's declaring syntax: null (no location) for a symbol from a referenced assembly, another compilation's tree for a symbol from a project reference"
+        ],
+        "code": "this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.UnionAttributeRequired, type.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation()));"
+      },
+      {
+        "line": 405,
+        "method": "CollectUnion",
+        "via": "this.reportDiagnostic?.Invoke",
+        "through_filter": true,
+        "descriptors": [
+          "AotUnionAttributeRequiresTypeArg"
+        ],
+        "location_expressions": [
+          "GetIdentifierLocation(type)"
+        ],
+        "traced": [],
+        "location_can_be_outside_compilation_source": "yes",
+        "why": [
+          "derived from the symbol's declaring syntax: null (no location) for a symbol from a referenced assembly, another compilation's tree for a symbol from a project reference"
+        ],
+        "code": "this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.AotUnionAttributeRequiresTypeArg, GetIdentifierLocation(type)));"
+      },
+      {
+        "line": 695,
+        "method": "CheckValidMessagePackFormatterAttribute",
+        "via": "this.reportDiagnostic?.Invoke",
+        "through_filter": true,
+        "descriptors": [
+          "MessageFormatterMustBeMessagePackFormatter"
+        ],
+        "location_expressions": [
+          "location <- Location? location = ((AttributeSyntax?)formatterAttribute.ApplicationSyntaxReference?.GetSyntax())?.ArgumentList?.Arguments[0].GetLocation();"
+        ],
+        "traced": [
+          {
+            "var": "location",
+            "assigned_at": 693
+          }
+        ],
+        "location_can_be_outside_compilation_source": "yes",
+        "why": [
+          "derived from the symbol's declaring syntax: null (no location) for a symbol from a referenced assembly, another compilation's tree for a symbol from a project reference"
+        ],
+        "code": "this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.MessageFormatterMustBeMessagePackFormatter, location, typeInfo));"
+      },
+      {
+        "line": 789,
+        "method": "GetObjectInfo",
+        "via": "reportDiagnostic?.Invoke",
+        "through_filter": true,
+        "descriptors": [
+          "CollidingMemberNamesInForceMapMode"
+        ],
+        "location_expressions": [
+          "location <- var location = syntax switch { PropertyDeclarationSyntax { Identifier: SyntaxToken propertyId } => propertyId.GetLocation(), VariableDeclaratorSyntax { Identifier: SyntaxToken fieldId } => fieldId.GetLocation(), not null => syntax.GetLocation(), _ => null, };"
+        ],
+        "traced": [
+          {
+            "var": "location",
+            "assigned_at": 781
+          }
+        ],
+        "location_can_be_outside_compilation_source": "yes",
+        "why": [
+          "derived from the symbol's declaring syntax: null (no location) for a symbol from a referenced assembly, another compilation's tree for a symbol from a project reference"
+        ],
+        "code": "reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.CollidingMemberNamesInForceMapMode, location));"
+      },
+      {
+        "line": 933,
+        "method": "GetObjectInfo",
+        "via": "this.reportDiagnostic?.Invoke",
+        "through_filter": true,
+        "descriptors": [
+          "AOTDerivedKeyAttribute",
+          "MemberNeedsKey"
+        ],
+        "location_expressions": [
+          "derivedKeyAttribute.GetSyntax(this.cancellationToken).GetLocation()",
+          "identifier?.GetLocation()"
+        ],
+        "traced": [
+          {
+            "var": "diagnostic",
+            "assigned_at": 928
+          }
+        ],
+        "location_can_be_outside_compilation_source": "yes",
+        "why": [
+          "derived from the symbol's declaring syntax: null (no location) for a symbol from a referenced assembly, another compilation's tree for a symbol from a project reference"
+        ],
+        "code": "this.reportDiagnostic?.Invoke(diagnostic);"
+      },
+      {
+        "line": 958,
+        "method": "GetObjectInfo",
+        "via": "this.reportDiagnostic?.Invoke",
+        "through_filter": true,
+        "descriptors": [
+          "AOTDerivedKeyAttribute",
+          "BaseTypeContainsUnattributedPublicMembers"
+        ],
+        "location_expressions": [
+          "baseSyntax.GetLocation()",
+          "baseSyntax.GetLocation()"
+        ],
+        "traced": [
+          {
+            "var": "diagnostic",
+            "assigned_at": 947
+          }
+        ],
+        "location_can_be_outside_compilation_source": "yes",
+        "why": [
+          "derived from the symbol's declaring syntax: null (no location) for a symbol from a referenced assembly, another compilation's tree for a symbol from a project reference"
+        ],
+        "code": "this.reportDiagnostic?.Invoke(diagnostic);"
+      },
+      {
+        "line": 985,
+        "method": "GetObjectInfo",
+        "via": "this.reportDiagnostic?.Invoke",
+        "through_filter": true,
+        "descriptors": [
+          "BothStringAndIntKeyAreNull"
+        ],
+        "location_expressions": [
+          "GetPropertyIdentifierLocation(item)"
+        ],
+        "traced": [],
+        "location_can_be_outside_compilation_source": "yes",
+        "why": [
+          "derived from the symbol's declaring syntax: null (no location) for a symbol from a referenced assembly, another compilation's tree for a symbol from a project reference"
+        ],
+        "code": "this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.BothStringAndIntKeyAreNull, GetPropertyIdentifierLocation(item), formattedType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), item.Name));"
+      },
+      {
+        "line": 994,
+        "method": "GetObjectInfo",
+        "via": "this.reportDiagnostic?.Invoke",
+        "through_filter": true,
+        "descriptors": [
+          "AOTInitProperty"
+        ],
+        "location_expressions": [
+          "initializer.GetLocation()"
+        ],
+        "traced": [],
+        "location_can_be_outside_compilation_source": "yes",
+        "why": [
+          "derived from the symbol's declaring syntax: null (no location) for a symbol from a referenced assembly, another compilation's tree for a symbol from a project reference"
+        ],
+        "code": "this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.AOTInitProperty, initializer.GetLocation()));"
+      },
+      {
+        "line": 1007,
+        "method": "GetObjectInfo",
+        "via": "this.reportDiagnostic?.Invoke",
+        "through_filter": true,
+        "descriptors": [
+          "DoNotMixStringAndIntKeys"
+        ],
+        "location_expressions": [
+          "item.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation()"
+        ],
+        "traced": [],
+        "location_can_be_outside_compilation_source": "yes",
+        "why": [
+          "derived from the symbol's declaring syntax: null (no location) for a symbol from a referenced assembly, another compilation's tree for a symbol from a project reference"
+        ],
+        "code": "this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.DoNotMixStringAndIntKeys, item.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation()));"
+      },
+      {
+        "line": 1015,
+        "method": "GetObjectInfo",
+        "via": "this.reportDiagnostic?.Invoke",
+        "through_filter": true,
+        "descriptors": [
+          "KeysMustBeUnique"
+        ],
+        "location_expressions": [
+          "item.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation()"
+        ],
+        "traced": [],
+        "location_can_be_outside_compilation_source": "yes",
+        "why": [
+          "derived from the symbol's declaring syntax: null (no location) for a symbol from a referenced assembly, another compilation's tree for a symbol from a project reference"
+        ],
+        "code": "this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.KeysMustBeUnique, item.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation()));"
+      },
+      {
+        "line": 1028,
+        "method": "GetObjectInfo",
+        "via": "this.reportDiagnostic?.Invoke",
+        "through_filter": true,
+        "descriptors": [
+          "KeysMustBeUnique"
+        ],
+        "location_expressions": [
+          "item.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation()"
+        ],
+        "traced": [],
+        "location_can_be_outside_compilation_source": "yes",
+        "why": [
+          "derived from the symbol's declaring syntax: null (no location) for a symbol from a referenced assembly, another compilation's tree for a symbol from a project reference"
+        ],
+        "code": "this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.KeysMustBeUnique, item.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation()));"
+      },
+      {
+        "line": 1080,
+        "method": "GetObjectInfo",
+        "via": "this.reportDiagnostic?.Invoke",
+        "through_filter": true,
+        "descriptors": [
+          "AOTDerivedKeyAttribute",
+          "MemberNeedsKey"
+        ],
+        "location_expressions": [
+          "derivedKeyAttribute.GetSyntax(this.cancellationToken).GetLocation()",
+          "item.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation()"
+        ],
+        "traced": [
+          {
+            "var": "diagnostic",
+            "assigned_at": 1075
+          }
+        ],
+        "location_can_be_outside_compilation_source": "yes",
+        "why": [
+          "derived from the symbol's declaring syntax: null (no location) for a symbol from a referenced assembly, another compilation's tree for a symbol from a project reference"
+        ],
+        "code": "this.reportDiagnostic?.Invoke(diagnostic);"
+      },
+      {
+        "line": 1105,
+        "method": "GetObjectInfo",
+        "via": "this.reportDiagnostic?.Invoke",
+        "through_filter": true,
+        "descriptors": [
+          "AOTDerivedKeyAttribute",
+          "BaseTypeContainsUnattributedPublicMembers"
+        ],
+        "location_expressions": [
+          "baseSyntax.GetLocation()",
+          "baseSyntax.GetLocation()"
+        ],
+        "traced": [
+          {
+            "var": "diagnostic",
+            "assigned_at": 1094
+          }
+        ],
+        "location_can_be_outside_compilation_source": "yes",
+        "why": [
+          "derived from the symbol's declaring syntax: null (no location) for a symbol from a referenced assembly, another compilation's tree for a symbol from a project reference"
+        ],
+        "code": "this.reportDiagnostic?.Invoke(diagnostic);"
+      },
+      {
+        "line": 1128,
+        "method": "GetObjectInfo",
+        "via": "this.reportDiagnostic?.Invoke",
+        "through_filter": true,
+        "descriptors": [
+          "BothStringAndIntKeyAreNull"
+        ],
+        "location_expressions": [
+          "item.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation()"
+        ],
+        "traced": [],
+        "location_can_be_outside_compilation_source": "yes",
+        "why": [
+          "derived from the symbol's declaring syntax: null (no location) for a symbol from a referenced assembly, another compilation's tree for a symbol from a project reference"
+        ],
+        "code": "this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.BothStringAndIntKeyAreNull, item.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation()));"
+      },
+      {
+        "line": 1140,
+        "method": "GetObjectInfo",
+        "via": "this.reportDiagnostic?.Invoke",
+        "through_filter": true,
+        "descriptors": [
+          "DoNotMixStringAndIntKeys"
+        ],
+        "location_expressions": [
+          "item.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation()"
+        ],
+        "traced": [],
+        "location_can_be_outside_compilation_source": "yes",
+        "why": [
+          "derived from the symbol's declaring syntax: null (no location) for a symbol from a referenced assembly, another compilation's tree for a symbol from a project reference"
+        ],
+        "code": "this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.DoNotMixStringAndIntKeys, item.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation()));"
+      },
+      {
+        "line": 1148,
+        "method": "GetObjectInfo",
+        "via": "this.reportDiagnostic?.Invoke",
+        "through_filter": true,
+        "descriptors": [
+          "KeysMustBeUnique"
+        ],
+        "location_expressions": [
+          "item.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation()"
+        ],
+        "traced": [],
+        "location_can_be_outside_compilation_source": "yes",
+        "why": [
+          "derived from the symbol's declaring syntax: null (no location) for a symbol from a referenced assembly, another compilation's tree for a symbol from a project reference"
+        ],
+        "code": "this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.KeysMustBeUnique, item.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation()));"
+      },
+      {
+        "line": 1161,
+        "method": "GetObjectInfo",
+        "via": "this.reportDiagnostic?.Invoke",
+        "through_filter": true,
+        "descriptors": [
+          "KeysMustBeUnique"
+        ],
+        "location_expressions": [
+          "item.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation()"
+        ],
+        "traced": [],
+        "location_can_be_outside_compilation_source": "yes",
+        "why": [
+          "derived from the symbol's declaring syntax: null (no location) for a symbol from a referenced assembly, another compilation's tree for a symbol from a project reference"
+        ],
+        "code": "this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.KeysMustBeUnique, item.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation()));"
+      },
+      {
+        "line": 1188,
+        "method": "GetObjectInfo",
+        "via": "this.reportDiagnostic",
+        "through_filter": true,
+        "descriptors": [
+          "AOTDerivedKeyAttribute",
+          "MemberNeedsKey",
+          "BaseTypeContainsUnattributedPublicMembers"
+        ],
+        "location_expressions": [
+          "derivedKeyAttribute.GetSyntax(this.cancellationToken).GetLocation()",
+          "identifier?.GetLocation()",
+          "baseSyntax.GetLocation()",
+          "baseSyntax.GetLocation()",
+          "derivedKeyAttribute.GetSyntax(this.cancellationToken).GetLocation()",
+          "item.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation()",
+          "baseSyntax.GetLocation()",
+          "baseSyntax.GetLocation()"
+        ],
+        "traced": [
+          {
+            "from": "deferredDiagnosticsForNonPublicMembers.Add at line 937",
+            "assigned_at": 928
+          },
+          {
+            "from": "deferredDiagnosticsForNonPublicMembers.Add at line 962",
+            "assigned_at": 947
+          },
+          {
+            "from": "deferredDiagnosticsForNonPublicMembers.Add at line 1084",
+            "assigned_at": 1075
+          },
+          {
+            "from": "deferredDiagnosticsForNonPublicMembers.Add at line 1109",
+            "assigned_at": 1094
+          }
+        ],
+        "location_can_be_outside_compilation_source": "yes",
+        "why": [
+          "derived from the symbol's declaring syntax: null (no location) for a symbol from a referenced assembly, another compilation's tree for a symbol from a project reference"
+        ],
+        "code": "this.reportDiagnostic(deferred);"
+      },
+      {
+        "line": 1211,
+        "method": "GetObjectInfo",
+        "via": "this.reportDiagnostic?.Invoke",
+        "through_filter": true,
+        "descriptors": [
+          "NoDeserializingConstructor"
+        ],
+        "location_expressions": [
+          "GetIdentifierLocation(formattedType)"
+        ],
+        "traced": [],
+        "location_can_be_outside_compilation_source": "yes",
+        "why": [
+          "derived from the symbol's declaring syntax: null (no location) for a symbol from a referenced assembly, another compilation's tree for a symbol from a project reference"
+        ],
+        "code": "this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.NoDeserializingConstructor, GetIdentifierLocation(formattedType)));"
+      },
+      {
+        "line": 1247,
+        "method": "GetObjectInfo",
+        "via": "this.reportDiagnostic?.Invoke",
+        "through_filter": true,
+        "descriptors": [
+          "DeserializingConstructorParameterTypeMismatch"
+        ],
+        "location_expressions": [
+          "GetLocation(item)"
+        ],
+        "traced": [],
+        "location_can_be_outside_compilation_source": "yes",
+        "why": [
+          "derived from the symbol's declaring syntax: null (no location) for a symbol from a referenced assembly, another compilation's tree for a symbol from a project reference"
+        ],
+        "code": "this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.DeserializingConstructorParameterTypeMismatch, GetLocation(item)));"
+      },
+      {
+        "line": 1261,
+        "method": "GetObjectInfo",
+        "via": "this.reportDiagnostic?.Invoke",
+        "through_filter": true,
+        "descriptors": [
+          "DeserializingConstructorParameterIndexMissing"
+        ],
+        "location_expressions": [
+          "GetParameterListLocation(ctor)"
+        ],
+        "traced": [],
+        "location_can_be_outside_compilation_source": "yes",
+        "why": [
+          "derived from the symbol's declaring syntax: null (no location) for a symbol from a referenced assembly, another compilation's tree for a symbol from a project reference"
+        ],
+        "code": "this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.DeserializingConstructorParameterIndexMissing, GetParameterListLocation(ctor)));"
+      },
+      {
+        "line": 1276,
+        "method": "GetObjectInfo",
+        "via": "this.reportDiagnostic?.Invoke",
+        "through_filter": true,
+        "descriptors": [
+          "DeserializingConstructorParameterNameMissing"
+        ],
+        "location_expressions": [
+          "GetParameterListLocation(ctor)"
+        ],
+        "traced": [],
+        "location_can_be_outside_compilation_source": "yes",
+        "why": [
+          "derived from the symbol's declaring syntax: null (no location) for a symbol from a referenced assembly, another compilation's tree for a symbol from a project reference"
+        ],
+        "code": "this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.DeserializingConstructorParameterNameMissing, GetParameterListLocation(ctor)));"
+      },
+      {
+        "line": 1291,
+        "method": "GetObjectInfo",
+        "via": "this.reportDiagnostic?.Invoke",
+        "through_filter": true,
+        "descriptors": [
+          "DeserializingConstructorParameterNameDuplicate"
+        ],
+        "location_expressions": [
+          "GetLocation(item)"
+        ],
+        "traced": [],
+        "location_can_be_outside_compilation_source": "yes",
+        "why": [
+          "derived from the symbol's declaring syntax: null (no location) for a symbol from a referenced assembly, another compilation's tree for a symbol from a project reference"
+        ],
+        "code": "this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.DeserializingConstructorParameterNameDuplicate, GetLocation(item)));"
+      },
+      {
+        "line": 1308,
+        "method": "GetObjectInfo",
+        "via": "this.reportDiagnostic?.Invoke",
+        "through_filter": true,
+        "descriptors": [
+          "DeserializingConstructorParameterTypeMismatch"
+        ],
+        "location_expressions": [
+          "GetLocation(item)"
+        ],
+        "traced": [],
+        "location_can_be_outside_compilation_source": "yes",
+        "why": [
+          "derived from the symbol's declaring syntax: null (no location) for a symbol from a referenced assembly, another compilation's tree for a symbol from a project reference"
+        ],
+        "code": "this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.DeserializingConstructorParameterTypeMismatch, GetLocation(item)));"
+      },
+      {
+        "line": 1324,
+        "method": "GetObjectInfo",
+        "via": "this.reportDiagnostic?.Invoke",
+        "through_filter": true,
+        "descriptors": [
+          "NoDeserializingConstructor"
+        ],
+        "location_expressions": [
+          "GetIdentifierLocation(formattedType)"
+        ],
+        "traced": [],
+        "location_can_be_outside_compilation_source": "yes",
+        "why": [
+          "derived from the symbol's declaring syntax: null (no location) for a symbol from a referenced assembly, another compilation's tree for a symbol from a project reference"
+        ],
+        "code": "this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.NoDeserializingConstructor, GetIdentifierLocation(formattedType)));"
+      },
+      {
+        "line": 1345,
+        "method": "GetObjectInfo",
+        "via": "this.reportDiagnostic?.Invoke",
+        "through_filter": true,
+        "descriptors": [
+          "TypeMustBeMessagePackObject"
+        ],
+        "location_expressions": [
+          "location <- Location location = callerSymbol is not null ? callerSymbol.Locations[0] : formattedType.Locations[0];"
+        ],
+        "traced": [
+          {
+            "var": "location",
+            "assigned_at": 1341
+          }
+        ],
+        "location_can_be_outside_compilation_source": "yes",
+        "why": [
+          "symbol.Locations[0]: a metadata location when the symbol comes from a referenced assembly"
+        ],
+        "code": "this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.TypeMustBeMessagePackObject, location, typeInfo, targetName));"
+      },
+      {
+        "line": 1364,
+        "method": "GetObjectInfo",
+        "via": "this.reportDiagnostic?.Invoke",
+        "through_filter": true,
+        "descriptors": [
+          "MessagePackObjectAllowPrivateRequired"
+        ],
+        "location_expressions": [
+          "location <- location = attSyntax.ArgumentList?.Arguments.First(a => a.NameEquals?.Name.Identifier.ValueText == Constants.AllowPrivatePropertyName)?.Expression.GetLocation() ?? location;"
+        ],
+        "traced": [
+          {
+            "var": "location",
+            "assigned_at": 1361
+          }
+        ],
+        "location_can_be_outside_compilation_source": "yes",
+        "why": [
+          "derived from the symbol's declaring syntax: null (no location) for a symbol from a referenced assembly, another compilation's tree for a symbol from a project reference"
+        ],
+        "code": "this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.MessagePackObjectAllowPrivateRequired, location));"
+      },
+      {
+        "line": 1393,
+        "method": "GetObjectInfo",
+        "via": "this.reportDiagnostic?.Invoke",
+        "through_filter": true,
+        "descriptors": [
+          "PartialTypeRequired"
+        ],
+        "location_expressions": [
+          "primaryLocation <- Location? primaryLocation = targetType?.Identifier.GetLocation();"
+        ],
+        "traced": [
+          {
+            "var": "primaryLocation",
+            "assigned_at": 1391
+          }
+        ],
+        "location_can_be_outside_compilation_source": "yes",
+        "why": [
+          "derived from the symbol's declaring syntax: null (no location) for a symbol from a referenced assembly, another compilation's tree for a symbol from a project reference"
+        ],
+        "code": "this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.PartialTypeRequired, primaryLocation, (IEnumerable<Location>?)addlLocations));"
+      }
+    ]
+  },
+  "tool_versions": {
+    "python": "3.13.18"
+  },
+  "produced_by": "script"
+}

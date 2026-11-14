@@ -1,0 +1,277 @@
+{
+  "check": "dropped-warning",
+  "branch": "ju26-issue-2283",
+  "base": "32258fdb",
+  "command": "python3 review/scripts/dropped_warning_test/run.py --repo <clone> --out-dir review/evidence/ju26-issue-2283",
+  "result": "fail",
+  "summary": "MsgPack003 (unattributed_consumer_type_inside_metadata_generic) is reported on base without any analyzer crash and is absent on branch; 3 of 6 probe cases lose a diagnostic on branch",
+  "details": {
+    "head": "9df83c38409c8bfad0517aebffe48211eda4a5b4",
+    "headline_case": {
+      "case": "unattributed_consumer_type_inside_metadata_generic",
+      "lib_reference": "metadata image (NuGet / built DLL)",
+      "base": {
+        "diagnostics": [
+          {
+            "id": "MsgPack003",
+            "severity": "Error",
+            "message": "Type must be marked with MessagePackObjectAttribute: Box.Content",
+            "location_kind": "MetadataFile",
+            "location": "MetadataFile(Lib.dll)"
+          }
+        ],
+        "analyzer_exceptions": []
+      },
+      "branch": {
+        "diagnostics": [],
+        "analyzer_exceptions": []
+      },
+      "nofilter": {
+        "diagnostics": [
+          {
+            "id": "MsgPack003",
+            "severity": "Error",
+            "message": "Type must be marked with MessagePackObjectAttribute: Box.Content",
+            "location_kind": "MetadataFile",
+            "location": "MetadataFile(Lib.dll)"
+          }
+        ],
+        "analyzer_exceptions": []
+      },
+      "dropped_on_branch": [
+        "MsgPack003"
+      ],
+      "base_crashed": false,
+      "branch_crashed": false
+    },
+    "cases": [
+      {
+        "case": "control_box_in_same_project",
+        "lib_reference": "none",
+        "base": {
+          "diagnostics": [
+            {
+              "id": "MsgPack003",
+              "severity": "Error",
+              "message": "Type must be marked with MessagePackObjectAttribute: Box.Content",
+              "location_kind": "SourceFile",
+              "location": "SourceFile(App.cs[123..130))"
+            }
+          ],
+          "analyzer_exceptions": []
+        },
+        "branch": {
+          "diagnostics": [
+            {
+              "id": "MsgPack003",
+              "severity": "Error",
+              "message": "Type must be marked with MessagePackObjectAttribute: Box.Content",
+              "location_kind": "SourceFile",
+              "location": "SourceFile(App.cs[123..130))"
+            }
+          ],
+          "analyzer_exceptions": []
+        },
+        "nofilter": {
+          "diagnostics": [
+            {
+              "id": "MsgPack003",
+              "severity": "Error",
+              "message": "Type must be marked with MessagePackObjectAttribute: Box.Content",
+              "location_kind": "SourceFile",
+              "location": "SourceFile(App.cs[123..130))"
+            }
+          ],
+          "analyzer_exceptions": []
+        },
+        "dropped_on_branch": [],
+        "base_crashed": false,
+        "branch_crashed": false
+      },
+      {
+        "case": "unattributed_consumer_type_inside_metadata_generic",
+        "lib_reference": "metadata image (NuGet / built DLL)",
+        "base": {
+          "diagnostics": [
+            {
+              "id": "MsgPack003",
+              "severity": "Error",
+              "message": "Type must be marked with MessagePackObjectAttribute: Box.Content",
+              "location_kind": "MetadataFile",
+              "location": "MetadataFile(Lib.dll)"
+            }
+          ],
+          "analyzer_exceptions": []
+        },
+        "branch": {
+          "diagnostics": [],
+          "analyzer_exceptions": []
+        },
+        "nofilter": {
+          "diagnostics": [
+            {
+              "id": "MsgPack003",
+              "severity": "Error",
+              "message": "Type must be marked with MessagePackObjectAttribute: Box.Content",
+              "location_kind": "MetadataFile",
+              "location": "MetadataFile(Lib.dll)"
+            }
+          ],
+          "analyzer_exceptions": []
+        },
+        "dropped_on_branch": [
+          "MsgPack003"
+        ],
+        "base_crashed": false,
+        "branch_crashed": false
+      },
+      {
+        "case": "unattributed_consumer_type_inside_project_reference_generic",
+        "lib_reference": "compilation reference (project reference in the IDE)",
+        "base": {
+          "diagnostics": [],
+          "analyzer_exceptions": [
+            "ArgumentException: Reported diagnostic 'MsgPack003' has a source location in file 'Lib.cs', which is not part of the compilation being analyzed. (Parameter 'diagnostic')"
+          ]
+        },
+        "branch": {
+          "diagnostics": [],
+          "analyzer_exceptions": []
+        },
+        "nofilter": {
+          "diagnostics": [],
+          "analyzer_exceptions": [
+            "ArgumentException: Reported diagnostic 'MsgPack003' has a source location in file 'Lib.cs', which is not part of the compilation being analyzed. (Parameter 'diagnostic')"
+          ]
+        },
+        "dropped_on_branch": [],
+        "base_crashed": true,
+        "branch_crashed": false
+      },
+      {
+        "case": "duplicate_keys_in_metadata_generic",
+        "lib_reference": "metadata image (NuGet / built DLL)",
+        "base": {
+          "diagnostics": [
+            {
+              "id": "MsgPack005",
+              "severity": "Error",
+              "message": "All KeyAttribute arguments must be unique",
+              "location_kind": "None",
+              "location": "none"
+            }
+          ],
+          "analyzer_exceptions": [
+            "ArgumentException: An item with the same key has already been added. Key: 0"
+          ]
+        },
+        "branch": {
+          "diagnostics": [],
+          "analyzer_exceptions": [
+            "ArgumentException: An item with the same key has already been added. Key: 0"
+          ]
+        },
+        "nofilter": {
+          "diagnostics": [
+            {
+              "id": "MsgPack005",
+              "severity": "Error",
+              "message": "All KeyAttribute arguments must be unique",
+              "location_kind": "None",
+              "location": "none"
+            }
+          ],
+          "analyzer_exceptions": [
+            "ArgumentException: An item with the same key has already been added. Key: 0"
+          ]
+        },
+        "dropped_on_branch": [
+          "MsgPack005"
+        ],
+        "base_crashed": true,
+        "branch_crashed": true
+      },
+      {
+        "case": "duplicate_keys_in_project_reference_generic",
+        "lib_reference": "compilation reference (project reference in the IDE)",
+        "base": {
+          "diagnostics": [],
+          "analyzer_exceptions": [
+            "ArgumentException: Reported diagnostic 'MsgPack005' has a source location in file 'Lib.cs', which is not part of the compilation being analyzed. (Parameter 'diagnostic')"
+          ]
+        },
+        "branch": {
+          "diagnostics": [],
+          "analyzer_exceptions": [
+            "ArgumentException: An item with the same key has already been added. Key: 0"
+          ]
+        },
+        "nofilter": {
+          "diagnostics": [],
+          "analyzer_exceptions": [
+            "ArgumentException: Reported diagnostic 'MsgPack005' has a source location in file 'Lib.cs', which is not part of the compilation being analyzed. (Parameter 'diagnostic')"
+          ]
+        },
+        "dropped_on_branch": [],
+        "base_crashed": true,
+        "branch_crashed": true
+      },
+      {
+        "case": "unkeyed_member_in_metadata_generic",
+        "lib_reference": "metadata image (NuGet / built DLL)",
+        "base": {
+          "diagnostics": [
+            {
+              "id": "MsgPack004",
+              "severity": "Error",
+              "message": "Properties and fields of MessagePackObject-attributed types require either KeyAttribute or IgnoreMemberAttribute: global::Lib.MyGenericStruct<int>.Unkeyed",
+              "location_kind": "None",
+              "location": "none"
+            }
+          ],
+          "analyzer_exceptions": [
+            "IndexOutOfRangeException: Index was outside the bounds of the array."
+          ]
+        },
+        "branch": {
+          "diagnostics": [],
+          "analyzer_exceptions": []
+        },
+        "nofilter": {
+          "diagnostics": [
+            {
+              "id": "MsgPack004",
+              "severity": "Error",
+              "message": "Properties and fields of MessagePackObject-attributed types require either KeyAttribute or IgnoreMemberAttribute: global::Lib.MyGenericStruct<int>.Unkeyed",
+              "location_kind": "None",
+              "location": "none"
+            },
+            {
+              "id": "MsgPack004",
+              "severity": "Error",
+              "message": "Properties and fields of MessagePackObject-attributed types require either KeyAttribute or IgnoreMemberAttribute: global::Lib.MyGenericStruct<T>.Unkeyed",
+              "location_kind": "None",
+              "location": "none"
+            }
+          ],
+          "analyzer_exceptions": []
+        },
+        "dropped_on_branch": [
+          "MsgPack004"
+        ],
+        "base_crashed": true,
+        "branch_crashed": false
+      }
+    ],
+    "probe_source": "review/scripts/dropped_warning_test/DroppedWarningProbe.cs",
+    "how": "the probe runs MsgPack00xMessagePackAnalyzer via CompilationWithAnalyzers on a consumer compilation that references a small library either as a metadata image or as a compilation reference; it records every diagnostic and every analyzer exception",
+    "result_meaning": "fail = a diagnostic the base reported is silently gone on the branch"
+  },
+  "tool_versions": {
+    "dotnet_sdk": "8.0.402",
+    "Microsoft.CodeAnalysis": "4.12.0 (Directory.Packages.props)",
+    "Microsoft.CodeAnalysis.Testing": "1.1.2 (Directory.Packages.props)",
+    "python": "3.13.18"
+  },
+  "produced_by": "hand"
+}
