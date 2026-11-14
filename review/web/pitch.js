@@ -476,7 +476,7 @@
           '<p class="p-cap p-same-lede" data-rv>Old projects often have weak tests, and new tests only check what someone thought of. This check needs no tests: the old version is the answer key.</p>' +
           '<ul class="p-rules" data-rv>' +
             '<li><b>1</b>Build the old version and the new one.</li>' +
-            '<li><b>2</b>Run both on code that already exists.</li>' +
+            '<li><b>2</b>Feed both the same real projects that use the library, written before the change.</li>' +
             '<li><b>3</b>Compare what they produce. Each difference must match a claim, or a person looks.</li>' +
             '<li><b>4</b>Record which changed lines actually ran.</li>' +
           '</ul>' +
