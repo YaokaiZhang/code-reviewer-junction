@@ -6,6 +6,7 @@
   "cards": [
     {
       "id": "T-2234-01",
+      "title": "Opted-out type: a field with no key still gets a warning",
       "test": "MemberWithoutKeyIsReported",
       "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
       "span": [
@@ -64,6 +65,7 @@
     },
     {
       "id": "T-2234-02",
+      "title": "Opted-out type: a private field still gets a warning",
       "test": "AllowPrivateRequiredIsReported",
       "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
       "span": [
@@ -122,6 +124,7 @@
     },
     {
       "id": "T-2234-03",
+      "title": "Opted-out type: a field whose type is not set up for saving still gets a warning",
       "test": "MemberTypeMustBeMessagePackObjectIsReported",
       "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
       "span": [
@@ -180,6 +183,7 @@
     },
     {
       "id": "T-2234-04",
+      "title": "Opted-out type: two fields with the same number key get a warning, no crash",
       "test": "DuplicateIntKeysAreReportedWithoutAnalyzerFailure",
       "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
       "span": [
@@ -238,6 +242,7 @@
     },
     {
       "id": "T-2234-05",
+      "title": "Opted-out type: two fields with the same text key get a warning, no crash",
       "test": "DuplicateStringKeysAreReportedWithoutAnalyzerFailure",
       "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
       "span": [
@@ -296,6 +301,7 @@
     },
     {
       "id": "T-2234-06",
+      "title": "Opted-out type: mixing number and text keys gets a warning, no crash",
       "test": "MixedKeyKindsAreReportedWithoutAnalyzerFailure",
       "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
       "span": [
@@ -353,6 +359,7 @@
     },
     {
       "id": "T-2234-07",
+      "title": "Normal type: two fields with the same key get a warning, no crash",
       "test": "DuplicateKeysAreReportedWithoutAnalyzerFailureForGeneratedTypes",
       "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
       "span": [
@@ -411,6 +418,7 @@
     },
     {
       "id": "T-2234-08",
+      "title": "Opted-out type: warnings about generated code stay quiet",
       "test": "SourceGenerationOnlyDiagnosticsAreNotReportedWhenSuppressed",
       "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
       "span": [
@@ -477,6 +485,7 @@
     },
     {
       "id": "T-2234-09",
+      "title": "Opted-out type: no generated code is produced for it",
       "test": "NoFormatterIsGeneratedForSuppressedType",
       "file": "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs",
       "span": [
@@ -536,6 +545,7 @@
     },
     {
       "id": "T-2234-10",
+      "title": "Opted-out type: it can still be saved and loaded",
       "test": "SuppressedTypeRoundTripsThroughDynamicResolver",
       "file": "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs",
       "span": [

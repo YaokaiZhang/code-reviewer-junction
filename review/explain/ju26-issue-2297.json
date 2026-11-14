@@ -1,216 +1,218 @@
 {
- "branch": "ju26-issue-2297",
- "head": "a0aa5ab2",
- "produced_by": "agent",
- "note": "Pseudo-code written by the reviewing agent; explain_check.py verifies every step against the cited lines.",
- "cards": [
-  {
-   "id": "T-2297-01",
-   "test": "AllGeneratedTypesAreExcludedFromCodeCoverage",
-   "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
-   "span": [
-    64,
-    79
-   ],
-   "helpers": [
+  "branch": "ju26-issue-2297",
+  "head": "a0aa5ab2",
+  "produced_by": "agent",
+  "note": "Pseudo-code written by the reviewing agent; explain_check.py verifies every step against the cited lines.",
+  "cards": [
     {
-     "name": "ExcludeAttribute",
-     "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
-     "span": [
-      16,
-      16
-     ]
+      "id": "T-2297-01",
+      "title": "Every generated file is marked 'skip in coverage', once",
+      "test": "AllGeneratedTypesAreExcludedFromCodeCoverage",
+      "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+      "span": [
+        64,
+        79
+      ],
+      "helpers": [
+        {
+          "name": "ExcludeAttribute",
+          "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+          "span": [
+            16,
+            16
+          ]
+        },
+        {
+          "name": "TestSource",
+          "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+          "span": [
+            21,
+            62
+          ]
+        },
+        {
+          "name": "RunGeneratorAsync",
+          "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+          "span": [
+            112,
+            129
+          ]
+        }
+      ],
+      "claims": [
+        "C-2297-04",
+        "C-2297-09"
+      ],
+      "steps": [
+        {
+          "op": "GIVEN",
+          "text": "a sample source, `TestSource`, with objects, an enum, a union and a resolver.",
+          "lines": [
+            21,
+            58
+          ]
+        },
+        {
+          "op": "AND",
+          "text": "`ExcludeAttribute` holds the full `ExcludeFromCodeCoverage` attribute text.",
+          "lines": [
+            16,
+            16
+          ]
+        },
+        {
+          "op": "WHEN",
+          "text": "`RunGeneratorAsync` runs the source generator once on the sample.",
+          "lines": [
+            67,
+            67
+          ]
+        },
+        {
+          "op": "AND",
+          "text": "the helper discards the generator's diagnostics (`out _, out _`).",
+          "lines": [
+            122,
+            128
+          ]
+        },
+        {
+          "op": "THEN",
+          "text": "at least five files are generated (`generated.Count >= 5`).",
+          "lines": [
+            71,
+            71
+          ]
+        },
+        {
+          "op": "AND",
+          "text": "every generated file contains the attribute (`text.Contains(ExcludeAttribute)`).",
+          "lines": [
+            73,
+            77
+          ]
+        }
+      ],
+      "results_from": [
+        "evidence/ju26-issue-2297/new-tests-on-base.json",
+        "evidence/ju26-issue-2297/regeneration.json"
+      ],
+      "does_not_check": [
+        "It checks each file has the attribute at least once, not that every type has it.",
+        "It does not compile the generated code or look for generator errors."
+      ],
+      "notes": [
+        "It fails before the change, because the resolver file lacks the attribute, and passes after."
+      ]
     },
     {
-     "name": "TestSource",
-     "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
-     "span": [
-      21,
-      62
-     ]
-    },
-    {
-     "name": "RunGeneratorAsync",
-     "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
-     "span": [
-      112,
-      129
-     ]
+      "id": "T-2297-02",
+      "title": "The mark is hidden on older platforms that lack it",
+      "test": "ExcludeAttributeIsGuardedForTargetsWhereItIsUnavailable",
+      "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+      "span": [
+        81,
+        97
+      ],
+      "helpers": [
+        {
+          "name": "ExcludeAttribute",
+          "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+          "span": [
+            16,
+            16
+          ]
+        },
+        {
+          "name": "Guard",
+          "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+          "span": [
+            18,
+            19
+          ]
+        },
+        {
+          "name": "TestSource",
+          "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+          "span": [
+            21,
+            62
+          ]
+        },
+        {
+          "name": "CountOccurrences",
+          "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+          "span": [
+            99,
+            110
+          ]
+        },
+        {
+          "name": "RunGeneratorAsync",
+          "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+          "span": [
+            112,
+            129
+          ]
+        }
+      ],
+      "claims": [
+        "C-2297-04",
+        "C-2297-08"
+      ],
+      "steps": [
+        {
+          "op": "GIVEN",
+          "text": "`Guard` is `#if !NETSTANDARD2_0 && !NETFRAMEWORK`, meant to hide the attribute on older targets.",
+          "lines": [
+            18,
+            19
+          ]
+        },
+        {
+          "op": "WHEN",
+          "text": "`RunGeneratorAsync(TestSource)` runs the generator on the sample.",
+          "lines": [
+            84,
+            84
+          ]
+        },
+        {
+          "op": "AND",
+          "text": "each file's Windows line endings become plain newlines (`text.Replace(\"\\r\\n\", \"\\n\")`).",
+          "lines": [
+            88,
+            88
+          ]
+        },
+        {
+          "op": "AND",
+          "text": "it counts all attributes, and those wrapped between `Guard` and `#endif`.",
+          "lines": [
+            91,
+            93
+          ]
+        },
+        {
+          "op": "THEN",
+          "text": "each file has an attribute, and all are guarded (`Assert.Equal(attributeCount, guardedCount)`).",
+          "lines": [
+            94,
+            95
+          ]
+        }
+      ],
+      "results_from": [
+        "evidence/ju26-issue-2297/new-tests-on-base.json",
+        "evidence/ju26-issue-2297/regeneration.json"
+      ],
+      "does_not_check": [
+        "It does not show that netstandard2.0 or .NET Framework projects still build.",
+        "It does not check that the guard is needed, and we found the attribute exists on both targets."
+      ],
+      "notes": [
+        "It fails before the change, because the resolver file lacks the attribute, and passes after."
+      ]
     }
-   ],
-   "claims": [
-    "C-2297-04",
-    "C-2297-09"
-   ],
-   "steps": [
-    {
-     "op": "GIVEN",
-     "text": "a sample source, `TestSource`, with objects, an enum, a union and a resolver.",
-     "lines": [
-      21,
-      58
-     ]
-    },
-    {
-     "op": "AND",
-     "text": "`ExcludeAttribute` holds the full `ExcludeFromCodeCoverage` attribute text.",
-     "lines": [
-      16,
-      16
-     ]
-    },
-    {
-     "op": "WHEN",
-     "text": "`RunGeneratorAsync` runs the source generator once on the sample.",
-     "lines": [
-      67,
-      67
-     ]
-    },
-    {
-     "op": "AND",
-     "text": "the helper discards the generator's diagnostics (`out _, out _`).",
-     "lines": [
-      122,
-      128
-     ]
-    },
-    {
-     "op": "THEN",
-     "text": "at least five files are generated (`generated.Count >= 5`).",
-     "lines": [
-      71,
-      71
-     ]
-    },
-    {
-     "op": "AND",
-     "text": "every generated file contains the attribute (`text.Contains(ExcludeAttribute)`).",
-     "lines": [
-      73,
-      77
-     ]
-    }
-   ],
-   "results_from": [
-    "evidence/ju26-issue-2297/new-tests-on-base.json",
-    "evidence/ju26-issue-2297/regeneration.json"
-   ],
-   "does_not_check": [
-    "It checks each file has the attribute at least once, not that every type has it.",
-    "It does not compile the generated code or look for generator errors."
-   ],
-   "notes": [
-    "It fails before the change, because the resolver file lacks the attribute, and passes after."
-   ]
-  },
-  {
-   "id": "T-2297-02",
-   "test": "ExcludeAttributeIsGuardedForTargetsWhereItIsUnavailable",
-   "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
-   "span": [
-    81,
-    97
-   ],
-   "helpers": [
-    {
-     "name": "ExcludeAttribute",
-     "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
-     "span": [
-      16,
-      16
-     ]
-    },
-    {
-     "name": "Guard",
-     "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
-     "span": [
-      18,
-      19
-     ]
-    },
-    {
-     "name": "TestSource",
-     "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
-     "span": [
-      21,
-      62
-     ]
-    },
-    {
-     "name": "CountOccurrences",
-     "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
-     "span": [
-      99,
-      110
-     ]
-    },
-    {
-     "name": "RunGeneratorAsync",
-     "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
-     "span": [
-      112,
-      129
-     ]
-    }
-   ],
-   "claims": [
-    "C-2297-04",
-    "C-2297-08"
-   ],
-   "steps": [
-    {
-     "op": "GIVEN",
-     "text": "`Guard` is `#if !NETSTANDARD2_0 && !NETFRAMEWORK`, meant to hide the attribute on older targets.",
-     "lines": [
-      18,
-      19
-     ]
-    },
-    {
-     "op": "WHEN",
-     "text": "`RunGeneratorAsync(TestSource)` runs the generator on the sample.",
-     "lines": [
-      84,
-      84
-     ]
-    },
-    {
-     "op": "AND",
-     "text": "each file's Windows line endings become plain newlines (`text.Replace(\"\\r\\n\", \"\\n\")`).",
-     "lines": [
-      88,
-      88
-     ]
-    },
-    {
-     "op": "AND",
-     "text": "it counts all attributes, and those wrapped between `Guard` and `#endif`.",
-     "lines": [
-      91,
-      93
-     ]
-    },
-    {
-     "op": "THEN",
-     "text": "each file has an attribute, and all are guarded (`Assert.Equal(attributeCount, guardedCount)`).",
-     "lines": [
-      94,
-      95
-     ]
-    }
-   ],
-   "results_from": [
-    "evidence/ju26-issue-2297/new-tests-on-base.json",
-    "evidence/ju26-issue-2297/regeneration.json"
-   ],
-   "does_not_check": [
-    "It does not show that netstandard2.0 or .NET Framework projects still build.",
-    "It does not check that the guard is needed, and we found the attribute exists on both targets."
-   ],
-   "notes": [
-    "It fails before the change, because the resolver file lacks the attribute, and passes after."
-   ]
-  }
- ]
+  ]
 }

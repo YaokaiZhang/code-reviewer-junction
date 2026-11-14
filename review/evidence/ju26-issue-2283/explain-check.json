@@ -13,6 +13,7 @@
     "cards": [
       {
         "id": "T-2283-01",
+        "title": "A generic struct from another library no longer crashes the build",
         "test": "ClosedGenericStruct_FromMetadataReference",
         "file": "tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs",
         "span": [
@@ -270,6 +271,7 @@
       },
       {
         "id": "T-2283-02",
+        "title": "A generic record struct from another library no longer crashes the build",
         "test": "ClosedGenericRecordStruct_FromMetadataReference",
         "file": "tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs",
         "span": [
@@ -523,6 +525,7 @@
       },
       {
         "id": "T-2283-03",
+        "title": "Another library's missing key is not reported in your build",
         "test": "ClosedGenericStruct_FromMetadataReference_UnkeyedMember",
         "file": "tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs",
         "span": [

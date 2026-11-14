@@ -13,6 +13,7 @@
     "cards": [
       {
         "id": "T-2297-01",
+        "title": "Every generated file is marked 'skip in coverage', once",
         "test": "AllGeneratedTypesAreExcludedFromCodeCoverage",
         "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
         "span": [
@@ -250,6 +251,7 @@
       },
       {
         "id": "T-2297-02",
+        "title": "The mark is hidden on older platforms that lack it",
         "test": "ExcludeAttributeIsGuardedForTargetsWhereItIsUnavailable",
         "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
         "span": [
