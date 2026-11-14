@@ -312,7 +312,7 @@
         '<div class="p-hows">' + rows.map(function (r, i) {
           return '<article class="p-how' + (i === 0 ? ' on' : '') + '">' +
             '<div class="p-how-t">' +
-              '<span class="g c-' + r.c + '">' + esc(r.g) + ' <b>' + r.v + '</b></span>' +
+              '<span class="g c-' + r.c + '">score <b>' + r.v + '</b></span>' +
               '<h3>' + esc(r.h) + '</h3>' +
               '<p>' + esc(r.p) + '</p>' +
               '<dl><dt>Why it counts</dt><dd>' + esc(r.why) + '</dd><dt>What it can’t tell</dt><dd>' + esc(r.lim) + '</dd></dl>' +
@@ -611,7 +611,7 @@
   function setupKinds(root) {
     var box = root.querySelector('.p-kexp');
     if (!box) return;
-    var idle = box.innerHTML, items = root.querySelectorAll('.p-kinds [data-help]');
+    var items = root.querySelectorAll('.p-kinds [data-help]'), idle;
     function html(el) {
       var h = KIND_HELP[el.getAttribute('data-help')];
       if (!h) return '';
@@ -633,6 +633,8 @@
       box.innerHTML = keep;
       box.style.minHeight = mx ? mx + 'px' : '';
     }
+    idle = items[0] ? html(items[0]) : box.innerHTML;
+    box.innerHTML = idle;
     fit();
     on(window, 'resize', fit);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
@@ -703,10 +705,10 @@
   function countUp(el) {
     var target = +el.dataset.count;
     if (reduce || !target) { el.textContent = fmt(target); return; }
-    var t0 = performance.now(), ms = 700;
+    var t0 = performance.now(), ms = 500;
     function step(now) {
       var u = clamp((now - t0) / ms, 0, 1);
-      el.textContent = fmt(target * (1 - Math.pow(1 - u, 3)));
+      el.textContent = fmt(target * (0.6 + 0.4 * (1 - Math.pow(1 - u, 3))));
       if (u < 1 && el.isConnected) requestAnimationFrame(step);
     }
     requestAnimationFrame(step);
@@ -728,7 +730,7 @@
         if (el.dataset.count != null) countUp(el);
         if (el.querySelectorAll) el.querySelectorAll('i[data-w]').forEach(function (i) { i.style.width = i.dataset.w + '%'; });
       });
-    }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+    }, { threshold: 0, rootMargin: '0px' });
     els.forEach(function (el) { io.observe(el); });
     cleanup.push(function () { io.disconnect(); });
   }
