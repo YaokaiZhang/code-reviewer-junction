@@ -25,6 +25,7 @@ review/
   LESSONS.md DECISIONS.md
   evidence/<branch>/   one JSON per check, each with the command that produced it
   dossier/<branch>.*   claims with tiers (.json) and the owner view (.md)
+  source/<branch>.json diff hunks behind each claim, with GitHub links
   receipts/            signed receipts
   proof/               Dafny model + proof for 2234
   scripts/             collectors and renderers (Python 3, stdlib)
@@ -59,7 +60,7 @@ npm run tests
 |---|---|---|
 | `npm run dev` | render dossiers, serve the owner view | 1 s |
 | `npm run setup` | clone the target into `.work/mp`, install .NET SDK 8.0.402 into `.work/dotnet` if missing | 1–2 min |
-| `npm run evidence` | git-only collectors: diff classifier, clones and complexity, report sites, claim coverage | seconds |
+| `npm run evidence` | git-only collectors: diff classifier, clones and complexity, report sites, claim coverage, source excerpts for the owner view | seconds |
 | `npm run tests` | build and run the C# tests: regeneration, TransformUtilities removal, old-vs-new tests, dropped-warning probe | ~4 min |
 | `npm run sign -- ju26-issue-2283` | sign a dossier from the terminal, writes `review/receipts/` | — |
 

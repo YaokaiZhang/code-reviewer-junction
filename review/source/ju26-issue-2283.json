@@ -1,0 +1,1903 @@
+{
+ "branch": "ju26-issue-2283",
+ "base": "32258fdbee4bcd653c79f51b4376b5103c6f4d27",
+ "head": "9df83c38409c8bfad0517aebffe48211eda4a5b4",
+ "compare": "https://github.com/te-industry-tech-office/junction26-messagepack-csharp/compare/32258fdbee4bcd653c79f51b4376b5103c6f4d27...9df83c38409c8bfad0517aebffe48211eda4a5b4",
+ "command": "python3 review/scripts/source_context.py --repo $MP_REPO --branch ju26-issue-2283",
+ "parts": {
+  "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:985": {
+   "url": "https://github.com/te-industry-tech-office/junction26-messagepack-csharp/blob/9df83c38409c8bfad0517aebffe48211eda4a5b4/src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs#L985",
+   "files": 1,
+   "hunks": 1,
+   "shown": [
+    {
+     "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+     "head": "@@ -982,7 +982,7 @@ public class TypeCollector",
+     "lines": [
+      [
+       " ",
+       982,
+       982,
+       "                    var stringKey = key is { Value: string stringKeyValue } ? stringKeyValue : default;"
+      ],
+      [
+       " ",
+       983,
+       983,
+       "                    if (intKey == null && stringKey == null)"
+      ],
+      [
+       " ",
+       984,
+       984,
+       "                    {"
+      ],
+      [
+       "-",
+       985,
+       null,
+       "                        this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.BothStringAndIntKeyAreNull, ((PropertyDeclarationSyntax)item.DeclaringSyntaxReferences[0].GetSyntax()).Identifier.GetLocation(), formattedType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), item.Name));"
+      ],
+      [
+       "+",
+       null,
+       985,
+       "                        this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.BothStringAndIntKeyAreNull, GetPropertyIdentifierLocation(item), formattedType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), item.Name));"
+      ],
+      [
+       " ",
+       986,
+       986,
+       "                    }"
+      ],
+      [
+       " ",
+       987,
+       987,
+       ""
+      ],
+      [
+       " ",
+       988,
+       988,
+       "                    // A property with an init accessor and an initializer has a default that will be discarded by the deserializer."
+      ]
+     ],
+     "cut": 0
+    }
+   ]
+  },
+  "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1077": {
+   "url": "https://github.com/te-industry-tech-office/junction26-messagepack-csharp/blob/9df83c38409c8bfad0517aebffe48211eda4a5b4/src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs#L1077",
+   "files": 1,
+   "hunks": 1,
+   "shown": [
+    {
+     "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+     "head": "@@ -1074,7 +1074,7 @@ public class TypeCollector",
+     "lines": [
+      [
+       " ",
+       1074,
+       1074,
+       "                            {"
+      ],
+      [
+       " ",
+       1075,
+       1075,
+       "                                Diagnostic diagnostic = derivedKeyAttribute is not null && suppressSourceGeneration is not true"
+      ],
+      [
+       " ",
+       1076,
+       1076,
+       "                                    ? Diagnostic.Create(MsgPack00xMessagePackAnalyzer.AOTDerivedKeyAttribute, derivedKeyAttribute.GetSyntax(this.cancellationToken).GetLocation())"
+      ],
+      [
+       "-",
+       1077,
+       null,
+       "                                    : Diagnostic.Create(MsgPack00xMessagePackAnalyzer.MemberNeedsKey, item.DeclaringSyntaxReferences[0].GetSyntax().GetLocation(), formattedType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), item.Name);"
+      ],
+      [
+       "+",
+       null,
+       1077,
+       "                                    : Diagnostic.Create(MsgPack00xMessagePackAnalyzer.MemberNeedsKey, item.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation(), formattedType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), item.Name);"
+      ],
+      [
+       " ",
+       1078,
+       1078,
+       "                                if (nonPublicMembersAreSerialized || (item.DeclaredAccessibility & Accessibility.Public) == Accessibility.Public)"
+      ],
+      [
+       " ",
+       1079,
+       1079,
+       "                                {"
+      ],
+      [
+       " ",
+       1080,
+       1080,
+       "                                    this.reportDiagnostic?.Invoke(diagnostic);"
+      ]
+     ],
+     "cut": 0
+    }
+   ]
+  },
+  "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1429-1435": {
+   "url": "https://github.com/te-industry-tech-office/junction26-messagepack-csharp/blob/9df83c38409c8bfad0517aebffe48211eda4a5b4/src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs#L1429-L1435",
+   "files": 1,
+   "hunks": 1,
+   "shown": [
+    {
+     "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+     "head": "@@ -1426,6 +1426,29 @@ public class TypeCollector",
+     "lines": [
+      [
+       " ",
+       1426,
+       1426,
+       ""
+      ],
+      [
+       " ",
+       1427,
+       1427,
+       "    private static Location? GetIdentifierLocation(INamedTypeSymbol type) => ((BaseTypeDeclarationSyntax?)type.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax())?.Identifier.GetLocation();"
+      ],
+      [
+       " ",
+       1428,
+       1428,
+       ""
+      ],
+      [
+       "+",
+       null,
+       1429,
+       "    /// <summary>"
+      ],
+      [
+       "+",
+       null,
+       1430,
+       "    /// Gets the location of the identifier of a property, if it is declared in source."
+      ],
+      [
+       "+",
+       null,
+       1431,
+       "    /// </summary>"
+      ],
+      [
+       "+",
+       null,
+       1432,
+       "    /// <param name=\"property\">The property symbol. It may be declared in metadata, in which case <see langword=\"null\" /> is returned.</param>"
+      ],
+      [
+       "+",
+       null,
+       1433,
+       "    /// <returns>The location of the identifier, or <see langword=\"null\" /> if the property has no declaration in source.</returns>"
+      ],
+      [
+       "+",
+       null,
+       1434,
+       "    private static Location? GetPropertyIdentifierLocation(IPropertySymbol property) => (property.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as PropertyDeclarationSyntax)?.Identifier.GetLocation();"
+      ],
+      [
+       "+",
+       null,
+       1435,
+       ""
+      ],
+      [
+       "+",
+       null,
+       1436,
+       "    /// <summary>"
+      ],
+      [
+       "+",
+       null,
+       1437,
+       "    /// Reports a diagnostic only when its location belongs to the compilation being analyzed."
+      ],
+      [
+       "+",
+       null,
+       1438,
+       "    /// </summary>"
+      ],
+      [
+       "+",
+       null,
+       1439,
+       "    /// <remarks>"
+      ],
+      [
+       "+",
+       null,
+       1440,
+       "    /// Types and members that come from metadata (or from another compilation) have no location in the compilation being analyzed."
+      ],
+      [
+       "+",
+       null,
+       1441,
+       "    /// Their problems are reported by the compilation that defines them, so they are dropped here rather than being reported"
+      ],
+      [
+       "+",
+       null,
+       1442,
+       "    /// against a location that does not exist, which analyzers are not permitted to do."
+      ],
+      [
+       "+",
+       null,
+       1443,
+       "    /// </remarks>"
+      ],
+      [
+       "+",
+       null,
+       1444,
+       "    private void ReportIfLocatedInCompilation(Action<Diagnostic> report, Diagnostic diagnostic)"
+      ],
+      [
+       "+",
+       null,
+       1445,
+       "    {"
+      ],
+      [
+       "+",
+       null,
+       1446,
+       "        if (diagnostic.Location.IsInSource && this.compilation.ContainsSyntaxTree(diagnostic.Location.SourceTree))"
+      ],
+      [
+       "+",
+       null,
+       1447,
+       "        {"
+      ],
+      [
+       "+",
+       null,
+       1448,
+       "            report(diagnostic);"
+      ],
+      [
+       "+",
+       null,
+       1449,
+       "        }"
+      ],
+      [
+       "+",
+       null,
+       1450,
+       "    }"
+      ],
+      [
+       "+",
+       null,
+       1451,
+       ""
+      ],
+      [
+       " ",
+       1429,
+       1452,
+       "    private static Location? GetLocation(IParameterSymbol parameter) => parameter.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation();"
+      ],
+      [
+       " ",
+       1430,
+       1453,
+       ""
+      ],
+      [
+       " ",
+       1431,
+       1454,
+       "    private static Location? GetParameterListLocation(IMethodSymbol? method) => ((BaseMethodDeclarationSyntax?)method?.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax())?.ParameterList.GetLocation();"
+      ]
+     ],
+     "cut": 0
+    }
+   ]
+  },
+  "tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs:4-6": {
+   "url": "https://github.com/te-industry-tech-office/junction26-messagepack-csharp/blob/9df83c38409c8bfad0517aebffe48211eda4a5b4/tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs#L4-L6",
+   "files": 1,
+   "hunks": 1,
+   "shown": [
+    {
+     "file": "tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs",
+     "head": "@@ -1,7 +1,9 @@",
+     "lines": [
+      [
+       " ",
+       1,
+       1,
+       "﻿// Copyright (c) All contributors. All rights reserved."
+      ],
+      [
+       " ",
+       2,
+       2,
+       "// Licensed under the MIT license. See LICENSE file in the project root for full license information."
+      ],
+      [
+       " ",
+       3,
+       3,
+       ""
+      ],
+      [
+       "+",
+       null,
+       4,
+       "using Microsoft.CodeAnalysis;"
+      ],
+      [
+       " ",
+       4,
+       5,
+       "using Microsoft.CodeAnalysis.CSharp;"
+      ],
+      [
+       "+",
+       null,
+       6,
+       "using Microsoft.CodeAnalysis.Testing;"
+      ],
+      [
+       " ",
+       5,
+       7,
+       "using VerifyCS = CSharpSourceGeneratorVerifier<MessagePack.SourceGenerator.MessagePackGenerator>;"
+      ],
+      [
+       " ",
+       6,
+       8,
+       ""
+      ],
+      [
+       " ",
+       7,
+       9,
+       "public class GenericsFormatterTests"
+      ]
+     ],
+     "cut": 0
+    }
+   ]
+  },
+  "tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs:499-581": {
+   "url": "https://github.com/te-industry-tech-office/junction26-messagepack-csharp/blob/9df83c38409c8bfad0517aebffe48211eda4a5b4/tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs#L499-L581",
+   "files": 1,
+   "hunks": 1,
+   "shown": [
+    {
+     "file": "tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs",
+     "head": "@@ -494,6 +496,193 @@ namespace TempProject",
+     "lines": [
+      [
+       " ",
+       494,
+       496,
+       "        }.RunAsync();"
+      ],
+      [
+       " ",
+       495,
+       497,
+       "    }"
+      ],
+      [
+       " ",
+       496,
+       498,
+       ""
+      ],
+      [
+       "+",
+       null,
+       499,
+       "    /// <summary>"
+      ],
+      [
+       "+",
+       null,
+       500,
+       "    /// Asserts that a closed generic value type defined in a referenced <em>assembly</em> (metadata only, no syntax),"
+      ],
+      [
+       "+",
+       null,
+       501,
+       "    /// used as a member type, does not crash the generator or analyzer."
+      ],
+      [
+       "+",
+       null,
+       502,
+       "    /// </summary>"
+      ],
+      [
+       "+",
+       null,
+       503,
+       "    /// <remarks>"
+      ],
+      [
+       "+",
+       null,
+       504,
+       "    /// See https://github.com/MessagePack-CSharp/MessagePack-CSharp/issues/2283."
+      ],
+      [
+       "+",
+       null,
+       505,
+       "    /// </remarks>"
+      ],
+      [
+       "+",
+       null,
+       506,
+       "    [Fact]"
+      ],
+      [
+       "+",
+       null,
+       507,
+       "    public async Task ClosedGenericStruct_FromMetadataReference()"
+      ],
+      [
+       "+",
+       null,
+       508,
+       "    {"
+      ],
+      [
+       "+",
+       null,
+       509,
+       "        string defineSource = \"\"\""
+      ],
+      [
+       "+",
+       null,
+       510,
+       "using MessagePack;"
+      ],
+      [
+       "+",
+       null,
+       511,
+       ""
+      ],
+      [
+       "+",
+       null,
+       512,
+       "namespace TempProject"
+      ],
+      [
+       "+",
+       null,
+       513,
+       "{"
+      ],
+      [
+       "+",
+       null,
+       514,
+       "    [MessagePackObject]"
+      ],
+      [
+       "+",
+       null,
+       515,
+       "    public struct MyGenericStruct<T>"
+      ],
+      [
+       "+",
+       null,
+       516,
+       "    {"
+      ],
+      [
+       "+",
+       null,
+       517,
+       "        [Key(0)]"
+      ],
+      [
+       "+",
+       null,
+       518,
+       "        public T Content { get; set; }"
+      ],
+      [
+       "+",
+       null,
+       519,
+       "    }"
+      ],
+      [
+       "+",
+       null,
+       520,
+       "}"
+      ],
+      [
+       "+",
+       null,
+       521,
+       "\"\"\";"
+      ],
+      [
+       "+",
+       null,
+       522,
+       ""
+      ],
+      [
+       "+",
+       null,
+       523,
+       "        string usageSource = \"\"\""
+      ],
+      [
+       "+",
+       null,
+       524,
+       "using MessagePack;"
+      ],
+      [
+       "+",
+       null,
+       525,
+       ""
+      ],
+      [
+       "+",
+       null,
+       526,
+       "namespace TempProject"
+      ],
+      [
+       "+",
+       null,
+       527,
+       "{"
+      ],
+      [
+       "+",
+       null,
+       528,
+       "    [MessagePackObject]"
+      ],
+      [
+       "+",
+       null,
+       529,
+       "    public class MyObject"
+      ],
+      [
+       "+",
+       null,
+       530,
+       "    {"
+      ],
+      [
+       "+",
+       null,
+       531,
+       "        [Key(0)]"
+      ],
+      [
+       "+",
+       null,
+       532,
+       "        public MyGenericStruct<int> Value { get; set; }"
+      ],
+      [
+       "+",
+       null,
+       533,
+       "    }"
+      ],
+      [
+       "+",
+       null,
+       534,
+       ""
+      ],
+      [
+       "+",
+       null,
+       535,
+       "    [GeneratedMessagePackResolver]"
+      ],
+      [
+       "+",
+       null,
+       536,
+       "    partial class MyResolver { }"
+      ],
+      [
+       "+",
+       null,
+       537,
+       "}"
+      ],
+      [
+       "+",
+       null,
+       538,
+       "\"\"\";"
+      ],
+      [
+       "+",
+       null,
+       539,
+       ""
+      ],
+      [
+       "+",
+       null,
+       540,
+       "        await RunWithMetadataReferenceAsync(defineSource, usageSource, \"TempProject.MyResolver.g.cs\");"
+      ],
+      [
+       "+",
+       null,
+       541,
+       "    }"
+      ],
+      [
+       "+",
+       null,
+       542,
+       ""
+      ],
+      [
+       "+",
+       null,
+       543,
+       "    /// <summary>"
+      ],
+      [
+       "+",
+       null,
+       544,
+       "    /// Asserts that a closed generic <em>record struct</em> defined in a referenced assembly, used as a member type,"
+      ],
+      [
+       "+",
+       null,
+       545,
+       "    /// does not crash the generator or analyzer."
+      ],
+      [
+       "+",
+       null,
+       546,
+       "    /// </summary>"
+      ],
+      [
+       "+",
+       null,
+       547,
+       "    /// <remarks>"
+      ],
+      [
+       "+",
+       null,
+       548,
+       "    /// See https://github.com/MessagePack-CSharp/MessagePack-CSharp/issues/2283."
+      ],
+      [
+       "+",
+       null,
+       549,
+       "    /// </remarks>"
+      ],
+      [
+       "+",
+       null,
+       550,
+       "    [Fact]"
+      ],
+      [
+       "+",
+       null,
+       551,
+       "    public async Task ClosedGenericRecordStruct_FromMetadataReference()"
+      ],
+      [
+       "+",
+       null,
+       552,
+       "    {"
+      ],
+      [
+       "+",
+       null,
+       553,
+       "        string defineSource = \"\"\""
+      ],
+      [
+       "+",
+       null,
+       554,
+       "using MessagePack;"
+      ],
+      [
+       "+",
+       null,
+       555,
+       ""
+      ]
+     ],
+     "cut": 133
+    }
+   ]
+  },
+  "tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs:628-685": {
+   "url": "https://github.com/te-industry-tech-office/junction26-messagepack-csharp/blob/9df83c38409c8bfad0517aebffe48211eda4a5b4/tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs#L628-L685",
+   "files": 1,
+   "hunks": 1,
+   "shown": [
+    {
+     "file": "tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs",
+     "head": "@@ -494,6 +496,193 @@ namespace TempProject",
+     "lines": [
+      [
+       " ",
+       494,
+       496,
+       "        }.RunAsync();"
+      ],
+      [
+       " ",
+       495,
+       497,
+       "    }"
+      ],
+      [
+       " ",
+       496,
+       498,
+       ""
+      ],
+      [
+       "+",
+       null,
+       499,
+       "    /// <summary>"
+      ],
+      [
+       "+",
+       null,
+       500,
+       "    /// Asserts that a closed generic value type defined in a referenced <em>assembly</em> (metadata only, no syntax),"
+      ],
+      [
+       "+",
+       null,
+       501,
+       "    /// used as a member type, does not crash the generator or analyzer."
+      ],
+      [
+       "+",
+       null,
+       502,
+       "    /// </summary>"
+      ],
+      [
+       "+",
+       null,
+       503,
+       "    /// <remarks>"
+      ],
+      [
+       "+",
+       null,
+       504,
+       "    /// See https://github.com/MessagePack-CSharp/MessagePack-CSharp/issues/2283."
+      ],
+      [
+       "+",
+       null,
+       505,
+       "    /// </remarks>"
+      ],
+      [
+       "+",
+       null,
+       506,
+       "    [Fact]"
+      ],
+      [
+       "+",
+       null,
+       507,
+       "    public async Task ClosedGenericStruct_FromMetadataReference()"
+      ],
+      [
+       "+",
+       null,
+       508,
+       "    {"
+      ],
+      [
+       "+",
+       null,
+       509,
+       "        string defineSource = \"\"\""
+      ],
+      [
+       "+",
+       null,
+       510,
+       "using MessagePack;"
+      ],
+      [
+       "+",
+       null,
+       511,
+       ""
+      ],
+      [
+       "+",
+       null,
+       512,
+       "namespace TempProject"
+      ],
+      [
+       "+",
+       null,
+       513,
+       "{"
+      ],
+      [
+       "+",
+       null,
+       514,
+       "    [MessagePackObject]"
+      ],
+      [
+       "+",
+       null,
+       515,
+       "    public struct MyGenericStruct<T>"
+      ],
+      [
+       "+",
+       null,
+       516,
+       "    {"
+      ],
+      [
+       "+",
+       null,
+       517,
+       "        [Key(0)]"
+      ],
+      [
+       "+",
+       null,
+       518,
+       "        public T Content { get; set; }"
+      ],
+      [
+       "+",
+       null,
+       519,
+       "    }"
+      ],
+      [
+       "+",
+       null,
+       520,
+       "}"
+      ],
+      [
+       "+",
+       null,
+       521,
+       "\"\"\";"
+      ],
+      [
+       "+",
+       null,
+       522,
+       ""
+      ],
+      [
+       "+",
+       null,
+       523,
+       "        string usageSource = \"\"\""
+      ],
+      [
+       "+",
+       null,
+       524,
+       "using MessagePack;"
+      ],
+      [
+       "+",
+       null,
+       525,
+       ""
+      ],
+      [
+       "+",
+       null,
+       526,
+       "namespace TempProject"
+      ],
+      [
+       "+",
+       null,
+       527,
+       "{"
+      ],
+      [
+       "+",
+       null,
+       528,
+       "    [MessagePackObject]"
+      ],
+      [
+       "+",
+       null,
+       529,
+       "    public class MyObject"
+      ],
+      [
+       "+",
+       null,
+       530,
+       "    {"
+      ],
+      [
+       "+",
+       null,
+       531,
+       "        [Key(0)]"
+      ],
+      [
+       "+",
+       null,
+       532,
+       "        public MyGenericStruct<int> Value { get; set; }"
+      ],
+      [
+       "+",
+       null,
+       533,
+       "    }"
+      ],
+      [
+       "+",
+       null,
+       534,
+       ""
+      ],
+      [
+       "+",
+       null,
+       535,
+       "    [GeneratedMessagePackResolver]"
+      ],
+      [
+       "+",
+       null,
+       536,
+       "    partial class MyResolver { }"
+      ],
+      [
+       "+",
+       null,
+       537,
+       "}"
+      ],
+      [
+       "+",
+       null,
+       538,
+       "\"\"\";"
+      ],
+      [
+       "+",
+       null,
+       539,
+       ""
+      ],
+      [
+       "+",
+       null,
+       540,
+       "        await RunWithMetadataReferenceAsync(defineSource, usageSource, \"TempProject.MyResolver.g.cs\");"
+      ],
+      [
+       "+",
+       null,
+       541,
+       "    }"
+      ],
+      [
+       "+",
+       null,
+       542,
+       ""
+      ],
+      [
+       "+",
+       null,
+       543,
+       "    /// <summary>"
+      ],
+      [
+       "+",
+       null,
+       544,
+       "    /// Asserts that a closed generic <em>record struct</em> defined in a referenced assembly, used as a member type,"
+      ],
+      [
+       "+",
+       null,
+       545,
+       "    /// does not crash the generator or analyzer."
+      ],
+      [
+       "+",
+       null,
+       546,
+       "    /// </summary>"
+      ],
+      [
+       "+",
+       null,
+       547,
+       "    /// <remarks>"
+      ],
+      [
+       "+",
+       null,
+       548,
+       "    /// See https://github.com/MessagePack-CSharp/MessagePack-CSharp/issues/2283."
+      ],
+      [
+       "+",
+       null,
+       549,
+       "    /// </remarks>"
+      ],
+      [
+       "+",
+       null,
+       550,
+       "    [Fact]"
+      ],
+      [
+       "+",
+       null,
+       551,
+       "    public async Task ClosedGenericRecordStruct_FromMetadataReference()"
+      ],
+      [
+       "+",
+       null,
+       552,
+       "    {"
+      ],
+      [
+       "+",
+       null,
+       553,
+       "        string defineSource = \"\"\""
+      ],
+      [
+       "+",
+       null,
+       554,
+       "using MessagePack;"
+      ],
+      [
+       "+",
+       null,
+       555,
+       ""
+      ]
+     ],
+     "cut": 133
+    }
+   ]
+  },
+  "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:239": {
+   "url": "https://github.com/te-industry-tech-office/junction26-messagepack-csharp/blob/9df83c38409c8bfad0517aebffe48211eda4a5b4/src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs#L239",
+   "files": 1,
+   "hunks": 1,
+   "shown": [
+    {
+     "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+     "head": "@@ -236,7 +236,7 @@ public class TypeCollector",
+     "lines": [
+      [
+       " ",
+       236,
+       236,
+       "    private TypeCollector(Compilation compilation, AnalyzerOptions options, ReferenceSymbols referenceSymbols, ITypeSymbol targetType, Action<Diagnostic>? reportAnalyzerDiagnostic, CancellationToken cancellationToken)"
+      ],
+      [
+       " ",
+       237,
+       237,
+       "    {"
+      ],
+      [
+       " ",
+       238,
+       238,
+       "        this.typeReferences = referenceSymbols;"
+      ],
+      [
+       "-",
+       239,
+       null,
+       "        this.reportDiagnostic = reportAnalyzerDiagnostic;"
+      ],
+      [
+       "+",
+       null,
+       239,
+       "        this.reportDiagnostic = reportAnalyzerDiagnostic is null ? null : diagnostic => ReportIfLocatedInCompilation(reportAnalyzerDiagnostic, diagnostic);"
+      ],
+      [
+       " ",
+       240,
+       240,
+       "        this.options = options;"
+      ],
+      [
+       " ",
+       241,
+       241,
+       "        this.compilation = compilation;"
+      ],
+      [
+       " ",
+       242,
+       242,
+       "        this.cancellationToken = cancellationToken;"
+      ]
+     ],
+     "cut": 0
+    }
+   ]
+  },
+  "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1436-1451": {
+   "url": "https://github.com/te-industry-tech-office/junction26-messagepack-csharp/blob/9df83c38409c8bfad0517aebffe48211eda4a5b4/src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs#L1436-L1451",
+   "files": 1,
+   "hunks": 1,
+   "shown": [
+    {
+     "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+     "head": "@@ -1426,6 +1426,29 @@ public class TypeCollector",
+     "lines": [
+      [
+       " ",
+       1426,
+       1426,
+       ""
+      ],
+      [
+       " ",
+       1427,
+       1427,
+       "    private static Location? GetIdentifierLocation(INamedTypeSymbol type) => ((BaseTypeDeclarationSyntax?)type.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax())?.Identifier.GetLocation();"
+      ],
+      [
+       " ",
+       1428,
+       1428,
+       ""
+      ],
+      [
+       "+",
+       null,
+       1429,
+       "    /// <summary>"
+      ],
+      [
+       "+",
+       null,
+       1430,
+       "    /// Gets the location of the identifier of a property, if it is declared in source."
+      ],
+      [
+       "+",
+       null,
+       1431,
+       "    /// </summary>"
+      ],
+      [
+       "+",
+       null,
+       1432,
+       "    /// <param name=\"property\">The property symbol. It may be declared in metadata, in which case <see langword=\"null\" /> is returned.</param>"
+      ],
+      [
+       "+",
+       null,
+       1433,
+       "    /// <returns>The location of the identifier, or <see langword=\"null\" /> if the property has no declaration in source.</returns>"
+      ],
+      [
+       "+",
+       null,
+       1434,
+       "    private static Location? GetPropertyIdentifierLocation(IPropertySymbol property) => (property.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as PropertyDeclarationSyntax)?.Identifier.GetLocation();"
+      ],
+      [
+       "+",
+       null,
+       1435,
+       ""
+      ],
+      [
+       "+",
+       null,
+       1436,
+       "    /// <summary>"
+      ],
+      [
+       "+",
+       null,
+       1437,
+       "    /// Reports a diagnostic only when its location belongs to the compilation being analyzed."
+      ],
+      [
+       "+",
+       null,
+       1438,
+       "    /// </summary>"
+      ],
+      [
+       "+",
+       null,
+       1439,
+       "    /// <remarks>"
+      ],
+      [
+       "+",
+       null,
+       1440,
+       "    /// Types and members that come from metadata (or from another compilation) have no location in the compilation being analyzed."
+      ],
+      [
+       "+",
+       null,
+       1441,
+       "    /// Their problems are reported by the compilation that defines them, so they are dropped here rather than being reported"
+      ],
+      [
+       "+",
+       null,
+       1442,
+       "    /// against a location that does not exist, which analyzers are not permitted to do."
+      ],
+      [
+       "+",
+       null,
+       1443,
+       "    /// </remarks>"
+      ],
+      [
+       "+",
+       null,
+       1444,
+       "    private void ReportIfLocatedInCompilation(Action<Diagnostic> report, Diagnostic diagnostic)"
+      ],
+      [
+       "+",
+       null,
+       1445,
+       "    {"
+      ],
+      [
+       "+",
+       null,
+       1446,
+       "        if (diagnostic.Location.IsInSource && this.compilation.ContainsSyntaxTree(diagnostic.Location.SourceTree))"
+      ],
+      [
+       "+",
+       null,
+       1447,
+       "        {"
+      ],
+      [
+       "+",
+       null,
+       1448,
+       "            report(diagnostic);"
+      ],
+      [
+       "+",
+       null,
+       1449,
+       "        }"
+      ],
+      [
+       "+",
+       null,
+       1450,
+       "    }"
+      ],
+      [
+       "+",
+       null,
+       1451,
+       ""
+      ],
+      [
+       " ",
+       1429,
+       1452,
+       "    private static Location? GetLocation(IParameterSymbol parameter) => parameter.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation();"
+      ],
+      [
+       " ",
+       1430,
+       1453,
+       ""
+      ],
+      [
+       " ",
+       1431,
+       1454,
+       "    private static Location? GetParameterListLocation(IMethodSymbol? method) => ((BaseMethodDeclarationSyntax?)method?.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax())?.ParameterList.GetLocation();"
+      ]
+     ],
+     "cut": 0
+    }
+   ]
+  },
+  "tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs:582-627": {
+   "url": "https://github.com/te-industry-tech-office/junction26-messagepack-csharp/blob/9df83c38409c8bfad0517aebffe48211eda4a5b4/tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs#L582-L627",
+   "files": 1,
+   "hunks": 1,
+   "shown": [
+    {
+     "file": "tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs",
+     "head": "@@ -494,6 +496,193 @@ namespace TempProject",
+     "lines": [
+      [
+       " ",
+       494,
+       496,
+       "        }.RunAsync();"
+      ],
+      [
+       " ",
+       495,
+       497,
+       "    }"
+      ],
+      [
+       " ",
+       496,
+       498,
+       ""
+      ],
+      [
+       "+",
+       null,
+       499,
+       "    /// <summary>"
+      ],
+      [
+       "+",
+       null,
+       500,
+       "    /// Asserts that a closed generic value type defined in a referenced <em>assembly</em> (metadata only, no syntax),"
+      ],
+      [
+       "+",
+       null,
+       501,
+       "    /// used as a member type, does not crash the generator or analyzer."
+      ],
+      [
+       "+",
+       null,
+       502,
+       "    /// </summary>"
+      ],
+      [
+       "+",
+       null,
+       503,
+       "    /// <remarks>"
+      ],
+      [
+       "+",
+       null,
+       504,
+       "    /// See https://github.com/MessagePack-CSharp/MessagePack-CSharp/issues/2283."
+      ],
+      [
+       "+",
+       null,
+       505,
+       "    /// </remarks>"
+      ],
+      [
+       "+",
+       null,
+       506,
+       "    [Fact]"
+      ],
+      [
+       "+",
+       null,
+       507,
+       "    public async Task ClosedGenericStruct_FromMetadataReference()"
+      ],
+      [
+       "+",
+       null,
+       508,
+       "    {"
+      ],
+      [
+       "+",
+       null,
+       509,
+       "        string defineSource = \"\"\""
+      ],
+      [
+       "+",
+       null,
+       510,
+       "using MessagePack;"
+      ],
+      [
+       "+",
+       null,
+       511,
+       ""
+      ],
+      [
+       "+",
+       null,
+       512,
+       "namespace TempProject"
+      ],
+      [
+       "+",
+       null,
+       513,
+       "{"
+      ],
+      [
+       "+",
+       null,
+       514,
+       "    [MessagePackObject]"
+      ],
+      [
+       "+",
+       null,
+       515,
+       "    public struct MyGenericStruct<T>"
+      ],
+      [
+       "+",
+       null,
+       516,
+       "    {"
+      ],
+      [
+       "+",
+       null,
+       517,
+       "        [Key(0)]"
+      ],
+      [
+       "+",
+       null,
+       518,
+       "        public T Content { get; set; }"
+      ],
+      [
+       "+",
+       null,
+       519,
+       "    }"
+      ],
+      [
+       "+",
+       null,
+       520,
+       "}"
+      ],
+      [
+       "+",
+       null,
+       521,
+       "\"\"\";"
+      ],
+      [
+       "+",
+       null,
+       522,
+       ""
+      ],
+      [
+       "+",
+       null,
+       523,
+       "        string usageSource = \"\"\""
+      ],
+      [
+       "+",
+       null,
+       524,
+       "using MessagePack;"
+      ],
+      [
+       "+",
+       null,
+       525,
+       ""
+      ],
+      [
+       "+",
+       null,
+       526,
+       "namespace TempProject"
+      ],
+      [
+       "+",
+       null,
+       527,
+       "{"
+      ],
+      [
+       "+",
+       null,
+       528,
+       "    [MessagePackObject]"
+      ],
+      [
+       "+",
+       null,
+       529,
+       "    public class MyObject"
+      ],
+      [
+       "+",
+       null,
+       530,
+       "    {"
+      ],
+      [
+       "+",
+       null,
+       531,
+       "        [Key(0)]"
+      ],
+      [
+       "+",
+       null,
+       532,
+       "        public MyGenericStruct<int> Value { get; set; }"
+      ],
+      [
+       "+",
+       null,
+       533,
+       "    }"
+      ],
+      [
+       "+",
+       null,
+       534,
+       ""
+      ],
+      [
+       "+",
+       null,
+       535,
+       "    [GeneratedMessagePackResolver]"
+      ],
+      [
+       "+",
+       null,
+       536,
+       "    partial class MyResolver { }"
+      ],
+      [
+       "+",
+       null,
+       537,
+       "}"
+      ],
+      [
+       "+",
+       null,
+       538,
+       "\"\"\";"
+      ],
+      [
+       "+",
+       null,
+       539,
+       ""
+      ],
+      [
+       "+",
+       null,
+       540,
+       "        await RunWithMetadataReferenceAsync(defineSource, usageSource, \"TempProject.MyResolver.g.cs\");"
+      ],
+      [
+       "+",
+       null,
+       541,
+       "    }"
+      ],
+      [
+       "+",
+       null,
+       542,
+       ""
+      ],
+      [
+       "+",
+       null,
+       543,
+       "    /// <summary>"
+      ],
+      [
+       "+",
+       null,
+       544,
+       "    /// Asserts that a closed generic <em>record struct</em> defined in a referenced assembly, used as a member type,"
+      ],
+      [
+       "+",
+       null,
+       545,
+       "    /// does not crash the generator or analyzer."
+      ],
+      [
+       "+",
+       null,
+       546,
+       "    /// </summary>"
+      ],
+      [
+       "+",
+       null,
+       547,
+       "    /// <remarks>"
+      ],
+      [
+       "+",
+       null,
+       548,
+       "    /// See https://github.com/MessagePack-CSharp/MessagePack-CSharp/issues/2283."
+      ],
+      [
+       "+",
+       null,
+       549,
+       "    /// </remarks>"
+      ],
+      [
+       "+",
+       null,
+       550,
+       "    [Fact]"
+      ],
+      [
+       "+",
+       null,
+       551,
+       "    public async Task ClosedGenericRecordStruct_FromMetadataReference()"
+      ],
+      [
+       "+",
+       null,
+       552,
+       "    {"
+      ],
+      [
+       "+",
+       null,
+       553,
+       "        string defineSource = \"\"\""
+      ],
+      [
+       "+",
+       null,
+       554,
+       "using MessagePack;"
+      ],
+      [
+       "+",
+       null,
+       555,
+       ""
+      ]
+     ],
+     "cut": 133
+    }
+   ]
+  },
+  "README.md:1639-1643": {
+   "url": "https://github.com/te-industry-tech-office/junction26-messagepack-csharp/blob/9df83c38409c8bfad0517aebffe48211eda4a5b4/README.md#L1639-L1643",
+   "files": 1,
+   "hunks": 1,
+   "shown": [
+    {
+     "file": "README.md",
+     "head": "@@ -1636,6 +1636,11 @@ Two assembly-level attributes exist to help with mixing in your own custom forma",
+     "lines": [
+      [
+       " ",
+       1636,
+       1636,
+       ""
+      ],
+      [
+       " ",
+       1637,
+       1637,
+       "Learn more about using a mix of your own custom formatters and automatically generated ones in [the Analyzer section](#analyzer)."
+      ],
+      [
+       " ",
+       1638,
+       1638,
+       ""
+      ],
+      [
+       "+",
+       null,
+       1639,
+       "### Generic types from referenced assemblies"
+      ],
+      [
+       "+",
+       null,
+       1640,
+       ""
+      ],
+      [
+       "+",
+       null,
+       1641,
+       "Closed generic types defined in a referenced assembly (for example, `Item<int>` where `Item<T>` is defined in another project or NuGet package) can be used as members of your `[MessagePackObject]` types, including generic value types and record structs."
+      ],
+      [
+       "+",
+       null,
+       1642,
+       "Diagnostics about the members of such a type are reported by the assembly that defines it rather than by the consuming project, so any problem must be fixed there."
+      ],
+      [
+       "+",
+       null,
+       1643,
+       ""
+      ],
+      [
+       " ",
+       1639,
+       1644,
+       "### MagicOnion"
+      ],
+      [
+       " ",
+       1640,
+       1645,
+       ""
+      ],
+      [
+       " ",
+       1641,
+       1646,
+       "[MagicOnion](https://github.com/Cysharp/MagicOnion) is a code-first gRPC framework based on grpc-dotnet and MessagePack. gRPC usually communicates with Protocol Buffers using IDL. But MagicOnion uses MessagePack for C# and does not need IDL. When communicating C# to C#, schemaless (or rather C# classes as schema) is better than using IDL."
+      ]
+     ],
+     "cut": 0
+    }
+   ]
+  },
+  "doc/analyzers/MsgPack004.md:48-52": {
+   "url": "https://github.com/te-industry-tech-office/junction26-messagepack-csharp/blob/9df83c38409c8bfad0517aebffe48211eda4a5b4/doc/analyzers/MsgPack004.md#L48-L52",
+   "files": 1,
+   "hunks": 1,
+   "shown": [
+    {
+     "file": "doc/analyzers/MsgPack004.md",
+     "head": "@@ -45,3 +45,8 @@ public class C {",
+     "lines": [
+      [
+       " ",
+       45,
+       45,
+       "    public int B { get; set; }"
+      ],
+      [
+       " ",
+       46,
+       46,
+       "}"
+      ],
+      [
+       " ",
+       47,
+       47,
+       "```"
+      ],
+      [
+       "+",
+       null,
+       48,
+       ""
+      ],
+      [
+       "+",
+       null,
+       49,
+       "## Types from referenced assemblies"
+      ],
+      [
+       "+",
+       null,
+       50,
+       ""
+      ],
+      [
+       "+",
+       null,
+       51,
+       "This analyzer only reports on members declared in the project being compiled."
+      ],
+      [
+       "+",
+       null,
+       52,
+       "Members of a type defined in a referenced assembly are reported by the project that defines that type, so an unattributed public member of such a type must be fixed in its defining project."
+      ]
+     ],
+     "cut": 0
+    }
+   ]
+  }
+ }
+}
