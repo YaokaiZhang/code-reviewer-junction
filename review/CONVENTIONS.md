@@ -13,6 +13,8 @@ Scripts take the path of a local clone of the target repo as `--repo` (or env `M
   "base": "32258fdb",
   "command": "the exact command that produced this",
   "result": "pass | fail | error",
+  "provides": ["rebuild-compare | proof-model | flip-test | revert-test | probe | count"],
+  "contract_changes": [{"contract": "diagnostics", "what": "...", "diff_parts": ["..."]}],
   "summary": "one line, every number in it comes from details",
   "details": {},
   "tool_versions": {},
@@ -39,6 +41,10 @@ Scripts take the path of a local clone of the target repo as `--repo` (or env `M
     "requirement": "R-2283-1",
     "requirement_inferred": false,
     "evidence": ["evidence/ju26-issue-2283/old-vs-new-tests.json"],
+    "support": [{"file": "evidence/ju26-issue-2283/old-vs-new-tests.json", "kind": "flip-test"}],
+    "combine": "any | all (all = a chain: the weakest link counts)",
+    "contradicted_by": ["evidence files that contradict the claim"],
+    "depends_on": ["claim ids this claim stands or falls with"],
     "diff_parts": ["src/.../TypeCollector.cs:236-240"],
     "owner_role": "only for Argued and Refused",
     "chain": [{"link": "...", "tier": "Tested"}]
@@ -51,15 +57,38 @@ Scripts take the path of a local clone of the target repo as `--repo` (or env `M
 }
 ```
 
-## Tier rules (first match wins)
+## Confidence score and owner gate — `scripts/confidence.py`
 
-1. **Refused** — touches public API, wire format, silenced or dropped warnings, or security.
-2. **Proved** — a deterministic checker passed on the real artefact (regeneration, byte diff, proof with no gap).
-3. **Tested** — a test fails on base and passes on the branch. A chain takes its weakest link.
-4. **Measured** — the evidence is a number from a tool.
-5. **Argued** — everything else.
+The agent does not pick a tier or a number. The script computes both from the evidence and writes
+`evidence/<branch>/confidence.json`.
 
-Machines settle Proved/Tested/Measured. A named owner decides Argued and Refused.
+**Score (0–100)** — the kind of check the claim uses, then fixed adjustments:
+
+| Kind (`support[].kind`) | Points | Plain words |
+|---|---|---|
+| rebuild-compare | 90 | rebuilt and compared: identical |
+| proof-model | 80 | model proved, and matched to the real code on every tested input |
+| flip-test | 75 | a test fails before the change and passes after |
+| revert-test | 75 | undo only this change: a test fails |
+| probe | 60 | an experiment on the real code |
+| count | 40 | a number from a tool |
+| (none) | 15 | no check backs it |
+
+Adjustments: run by hand −10 · an undo test also backs it +5 · re-run on a clean machine matched +5,
+did not match −30 · contradicting evidence caps the score at 25. `combine: any` takes the best
+supporting check, `all` the weakest. Bands: high ≥ 80, medium 50–79, low < 50.
+
+The script refuses a claim that uses a file as a kind the file does not `provides`.
+
+**Owner gate (was "Refused")** — separate from the score. A claim NEEDS OWNER when an evidence file's
+`contract_changes` shows a user-visible promise changed, the claim's non-test diff parts lie inside
+that change's diff parts, and `tripwires.json` shows those hunks touch the same contract; or when it
+`depends_on` a claim that needs an owner. A high score never clears the gate. The owner is the top
+committer on the contract's paths at base (`context/project.json`); the gate cites matching maintainer
+rules from `context/history.json`.
+
+The old tier names stay as words for the kinds: Proved = rebuild-compare / proof, Tested = flip or
+undo test, Measured = count, Argued = none, Refused = needs owner.
 
 ## Honesty rules
 

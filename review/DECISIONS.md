@@ -20,3 +20,8 @@ Running log, newest last.
 - 2283: The "can the location fall outside the compilation" column in report-sites.json is a text heuristic, stated as such; only MsgPack003, MsgPack004 and MsgPack005 were exercised.
 - 2283: Evidence from the per-branch harness is marked `produced_by: hand`: the probe cases were designed by the reviewing agent after reading the diff, so "the tool flagged" would be untrue.
 - 2283: The remaining duplicate-key crash in a referenced generic is listed under found, not as a claim: same on base and branch, outside this issue.
+- Tiers are no longer written by the agent. confidence.py computes a score from the kind of check behind each claim (fixed points, listed in CONVENTIONS) and a separate owner gate. Organizer feedback: "are the labels written by AI? prove them".
+- The gate needs a check that a promise changed (evidence `contract_changes`) on the claim's own lines, plus a tripwire on those hunks. It reproduces the 4 claims the agent had marked Refused (C-2234-04, C-2283-02, C-2283-03, C-2297-07). Which lines cause each change is still the reviewer's reading of the probe; an undo-and-rerun per change would make it a machine fact.
+- A claim whose lines only partly overlap a changed promise (C-2234-01 shares the `continue` with C-2234-04) gets `shares_lines_with`, not the gate.
+- C-2283-04 scores 30 (low): its only evidence was run by hand. This settles the open relabel question.
+- Project rules come from upstream history (context/history.json): 37 PRs, 20 rules, each with a linked maintainer quote dated before base. No rule there is about analyzer diagnostics, so the diagnostics gates cite the owner and the probe, not a rule.
