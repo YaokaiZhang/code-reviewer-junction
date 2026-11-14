@@ -516,6 +516,8 @@
       '<div class="pane rc"><h5>The code</h5><div class="code" tabindex="0" aria-label="Code for ' + esc(card.title) + '">' + diffCode(card) + '</div></div>' +
       '<div class="pane an"><h5>Why</h5><p class="verdict">' + rich(card.verdict) + '</p>' +
         ((card.because || []).length ? '<ul class="bc">' + card.because.map(becauseHtml).join('') + '</ul>' : '') +
+        (card.impact ? '<div class="imp imp-' + esc(card.impact.level) + '"><h6>If this ships <em>' + esc(card.impact.level) + ' impact</em></h6>' +
+          '<p><b>Who:</b> ' + rich(card.impact.who) + '</p><p><b>What happens:</b> ' + rich(card.impact.effect) + '</p></div>' : '') +
         (card.unsure ? '<div class="dnc"><h6>Not sure</h6><p>' + rich(card.unsure) + '</p></div>' : '') +
         (card.ask ? '<div class="ask"><h6>Your call</h6><p>' + rich(card.ask) + '</p></div>' : '') +
       '</div></div>';

@@ -135,7 +135,12 @@
         }
       ],
       "unsure": "The comment assumes the other library reports the warning. Our test shows that, for a mistake in the app's own type, nobody does.",
-      "ask": "Should these warnings be dropped, moved to the app's own code, or kept?"
+      "ask": "Should these warnings be dropped, moved to the app's own code, or kept?",
+      "impact": {
+        "level": "large",
+        "who": "Users whose own type sits inside a generic type from another library (a NuGet package or a built DLL).",
+        "effect": "A build error they used to get is gone, so the mistake is no longer caught at build time and can only surface when the app runs. The same filter covers 28 report sites with 19 kinds of warning, so more than this one case may go quiet."
+      }
     },
     {
       "id": "C-2283-03",
@@ -181,7 +186,12 @@
         }
       ],
       "unsure": "The notes may be right for mistakes that really live in the other library.",
-      "ask": "If the warnings stay hidden, should these notes stay, or be changed?"
+      "ask": "If the warnings stay hidden, should these notes stay, or be changed?",
+      "impact": {
+        "level": "small",
+        "who": "Maintainers and users who read the code comments.",
+        "effect": "Nothing changes at run time. But the notes say the hidden warnings are safe, so later readers may trust them and not look for the gap."
+      }
     },
     {
       "id": "C-2283-04",

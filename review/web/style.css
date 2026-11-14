@@ -970,3 +970,13 @@ a.evc:hover { background: rgba(255,179,0,.1); }
 .fb .fs { flex-basis: 100%; color: var(--txt); line-height: 1.45; }
 .k-found { --c: var(--ph); } .k-drift { --c: var(--t-argued); }
 .monitor .term { container-type: inline-size; }
+
+/* decision card: what shipping it would mean for users */
+.imp { margin-top: 18px; padding: 10px 12px; border-left: 3px solid var(--t-argued); background: rgba(255,179,0,.05); }
+.imp-large { border-left-color: var(--t-refused, #ff5a3c); }
+.imp h6 { font-weight: 400; font-size: 16px; letter-spacing: 2px; text-transform: uppercase; color: var(--t-argued); margin-bottom: 6px; }
+.imp h6 em { font-style: normal; letter-spacing: 1px; margin-left: 8px; padding: 0 6px; border: 1px solid currentColor; border-radius: 3px; font-size: 13px; }
+.imp-large h6 em { color: var(--t-refused, #ff5a3c); }
+.imp p { font-family: var(--sans); font-size: 14px; line-height: 1.45; color: var(--txt); text-shadow: none; margin: 0 0 4px; }
+.imp p b { font-weight: 600; }
+.imp .ic { font-family: var(--mono); font-size: .88em; }

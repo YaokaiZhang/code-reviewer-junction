@@ -53,7 +53,7 @@ R-2234-2 *(inferred)*
 
 R-2234-1
 
-- [`old-vs-new-tests`](../evidence/ju26-issue-2234/old-vs-new-tests.json) **ERROR** — 10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 4 pass on base (not evidence), 0 fail on branch, 2 not runnable here (project does not build on branch)
+- [`old-vs-new-tests`](../evidence/ju26-issue-2234/old-vs-new-tests.json) **pass** — 10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 6 pass on base (not evidence), 0 fail on branch, 0 not runnable here (project does not build on branch)
 - [`findings-probes`](../evidence/ju26-issue-2234/findings-probes.json) **pass** — (a) continue skips member type: confirmed; (b) second member of a duplicate key gets MsgPack005: yes, finding dropped; null-key first field crashes analyzer on branch: confirmed (11 scenarios, real analyzer, base and branch)
 - `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1008`
 - `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1023-1026`
@@ -75,7 +75,7 @@ R-2234-3 *(inferred)*
 - The model matches the real TypeCollector on 3710 inputs.
 - The duplicate-key tests fail before the change and pass after.
 
-- [`old-vs-new-tests`](../evidence/ju26-issue-2234/old-vs-new-tests.json) **ERROR** — 10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 4 pass on base (not evidence), 0 fail on branch, 2 not runnable here (project does not build on branch)
+- [`old-vs-new-tests`](../evidence/ju26-issue-2234/old-vs-new-tests.json) **pass** — 10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 6 pass on base (not evidence), 0 fail on branch, 0 not runnable here (project does not build on branch)
 - [`findings-probes`](../evidence/ju26-issue-2234/findings-probes.json) **pass** — (a) continue skips member type: confirmed; (b) second member of a duplicate key gets MsgPack005: yes, finding dropped; null-key first field crashes analyzer on branch: confirmed (11 scenarios, real analyzer, base and branch)
 - [`proof`](../evidence/ju26-issue-2234/proof.json) **pass** — Dafny: Dafny program verifier finished with 23 verified, 0 errors; locked theorem 'never fails' is false for the branch (counterexample: first keyed member is a field with [Key(null)]), the stated mutation fails to verify; model vs real C# on 3710 inputs of 1..4 members: branch 0 mismatches, base 0 mismatches; C# threw on 156 branch inputs and 3346 base inputs; with int/string keys only (1592 inputs) C# threw on 1500 on base and 0 on branch
 - `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1023-1026`
@@ -120,20 +120,20 @@ R-2234-1
 
 R-2234-1
 
-- [`old-vs-new-tests`](../evidence/ju26-issue-2234/old-vs-new-tests.json) **ERROR** — 10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 4 pass on base (not evidence), 0 fail on branch, 2 not runnable here (project does not build on branch)
+- [`old-vs-new-tests`](../evidence/ju26-issue-2234/old-vs-new-tests.json) **pass** — 10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 6 pass on base (not evidence), 0 fail on branch, 0 not runnable here (project does not build on branch)
 - `tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs:1-79`
 - `tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs:168-193`
 
 </details>
 
-<details><summary>○ 15 · C-2234-08 — A type with SuppressSourceGeneration gets no generated formatter, and still round-trips through the run-time (dynamic) resolver. The 2 new execution tests are meant to show this.</summary>
+<details><summary>○ 45 · C-2234-08 — A type with SuppressSourceGeneration gets no generated formatter, and still round-trips through the run-time (dynamic) resolver. The 2 new execution tests are meant to show this.</summary>
 
-> The tests never ran. Their project does not build here, before or after the change, because the source generator does not load (CS9057).
+> Both tests build and pass with SDK 9.0.321, but they also pass on the old code, so they guard the behaviour rather than prove the fix.
 
 R-2234-1
 
-- [`old-vs-new-tests`](../evidence/ju26-issue-2234/old-vs-new-tests.json) **ERROR** — 10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 4 pass on base (not evidence), 0 fail on branch, 2 not runnable here (project does not build on branch)
-- [`execution-tests-build`](../evidence/ju26-issue-2234/execution-tests-build.json) **FAIL** · hand — ExecutionTests does not build here: the source generator is not loaded (CS9057, generator references compiler 4.12, SDK 8.0.402 runs 4.11), so 5 CS errors; the new test file also raises SA1649
+- [`old-vs-new-tests`](../evidence/ju26-issue-2234/old-vs-new-tests.json) **pass** — 10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 6 pass on base (not evidence), 0 fail on branch, 0 not runnable here (project does not build on branch)
+- [`execution-tests-build`](../evidence/ju26-issue-2234/execution-tests-build.json) **pass** · hand — ExecutionTests builds with SDK 9.0.321 (0 errors). SDK 8.0.402, which global.json pins, could not load the source generator (CS9057: it needs compiler 4.12, that SDK has 4.11). The new test file raises SA1649
 - `tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs:1-37`
 
 </details>
@@ -144,7 +144,7 @@ R-2234-1
 
 R-2234-1
 
-- [`old-vs-new-tests`](../evidence/ju26-issue-2234/old-vs-new-tests.json) **ERROR** — 10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 4 pass on base (not evidence), 0 fail on branch, 2 not runnable here (project does not build on branch)
+- [`old-vs-new-tests`](../evidence/ju26-issue-2234/old-vs-new-tests.json) **pass** — 10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 6 pass on base (not evidence), 0 fail on branch, 0 not runnable here (project does not build on branch)
 - [`findings-probes`](../evidence/ju26-issue-2234/findings-probes.json) **pass** — (a) continue skips member type: confirmed; (b) second member of a duplicate key gets MsgPack005: yes, finding dropped; null-key first field crashes analyzer on branch: confirmed (11 scenarios, real analyzer, base and branch)
 - `README.md:1620-1633`
 
@@ -168,9 +168,8 @@ R-2234-1
 
 - The README gains a 14-line section, 'Opting out of source generation'. The issue title asks for an analyzer fix, not documentation.
 
-#### Not checked · 7
+#### Not checked · 6
 
-- The 2 execution tests in SuppressedSourceGenerationTests.cs. Their project does not build here: the generator needs compiler 4.12, but SDK 8.0.402 has 4.11 (CS9057).
 - The code the source generator emits for repeated or mixed keys, when the first member wins. The generator shows no diagnostics here (reportDiagnostic is null).
 - Whether suppressed types get MsgPack012 (inaccessible types), as the README claims.
 - The full test suite after the change. We ran only the new tests and our experiments.

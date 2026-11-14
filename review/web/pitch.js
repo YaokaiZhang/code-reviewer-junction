@@ -13,6 +13,32 @@
     ['count', 'A number from a tool', 40],
     ['none', 'Nothing backs it', 15]
   ];
+  /* what each kind of evidence means, shown on hover: plain words, why it scores that, a real example */
+  var KIND_HELP = {
+    'rebuild-compare': ['Run the code generator again and compare its output with the files in the change.',
+      'Same output, character for character, means nobody slipped in a hand edit. Hard to fake, so it scores highest.',
+      'Used on #2297 for its generated files.'],
+    'proof-model': ['Write the rule as a small math model. A prover (Dafny) checks it for every possible case, then the model is tested against the real C# code.',
+      'Very strong, but the model is a copy of the code, not the code itself.',
+      'On #2234 the prover found an input that still crashes the analyzer.'],
+    'flip-test': ['Run the AI\'s new tests on the old code too.',
+      'A test that fails before and passes after shows this change is what fixed it. A test that passes on both shows nothing about the fix.',
+      'On #2283, all 3 new tests fail before and pass after.'],
+    'revert-test': ['Take back only this one part of the change, then run the tests.',
+      'If a test now fails, that test really depends on this part.',
+      'On #2297, undoing one part makes 1 of 169 tests fail.'],
+    'probe': ['Write a tiny throwaway app that hits the case, then run the real compiler or analyzer on the old and new code.',
+      'It shows real behaviour, but only for the cases someone thought to try.',
+      'On #2234 it showed that one warning is no longer reported.'],
+    'count': ['A tool measures something, for example how much code is copy-pasted.',
+      'Useful context, but a number alone cannot say the fix is right.',
+      'On #2234, copy-pasted blocks in one file went from 10 to 12.'],
+    'none': ['The AI says so, and nothing checks it yet.',
+      'Shown so you know where to look, not as a reason to trust it.',
+      ''],
+    'hand': ['A person or the AI ran the check by hand, not a script.', 'Harder for anyone to repeat exactly, so it costs 10 points.', ''],
+    'replay': ['The same command was run again on a fresh machine.', 'Getting the same result shows it does not depend on our setup, so it adds 5 points.', '']
+  };
   var BANDS = [['high', 'High', '80+'], ['medium', 'Medium', '50–79'], ['low', 'Low', 'under 50']];
   /* learning from the project: the backtest on past pull requests */
   /* the decision shown in the trace chapter, when the data has it */
@@ -166,7 +192,7 @@
   function secKinds(s) {
     var rows = KINDS.map(function (k) {
       var v = s.kinds[k[0]] != null ? +s.kinds[k[0]] : k[2];
-      return '<li><span class="k">' + esc(k[1]) + '</span>' +
+      return '<li tabindex="0" data-help="' + k[0] + '"><span class="k">' + esc(k[1]) + '</span>' +
         '<span class="bar"><i class="b-' + band(v) + '" data-w="' + v + '"></i></span>' +
         '<b>' + v + '</b></li>';
     }).join('');
@@ -179,7 +205,8 @@
         '</div>' +
         '<div class="p-panel" data-rv>' +
           '<ul class="p-kbars" aria-label="Score for each kind of evidence">' + rows + '</ul>' +
-          '<div class="p-adj"><span><b>−10</b> run by hand</span><span><b>+5</b> re-run on a clean machine, same result</span></div>' +
+          '<div class="p-adj"><span tabindex="0" data-help="hand"><b>−10</b> run by hand</span><span tabindex="0" data-help="replay"><b>+5</b> re-run on a clean machine, same result</span></div>' +
+          '<div class="p-kexp" aria-live="polite"><p class="p-kexp-0">Hover or tap a row to see what it means.</p></div>' +
           bandKey() +
         '</div>' +
       '</div>' +
@@ -488,6 +515,32 @@
   }
 
   /* all steps shown; hover or focus on a step lights its code lines */
+  /* the evidence chart: hover, focus or tap a row to explain it */
+  function setupKinds(root) {
+    var box = root.querySelector('.p-kexp');
+    if (!box) return;
+    var idle = box.innerHTML, items = root.querySelectorAll('.p-kinds [data-help]');
+    function show(el) {
+      var h = KIND_HELP[el.getAttribute('data-help')];
+      if (!h) return;
+      for (var i = 0; i < items.length; i++) items[i].classList.toggle('on', items[i] === el);
+      var name = el.querySelector('.k');
+      box.innerHTML = '<b>' + esc(name ? name.textContent : el.textContent) + '</b>' +
+        '<p>' + esc(h[0]) + '</p><p class="why">' + esc(h[1]) + '</p>' + (h[2] ? '<p class="eg">' + esc(h[2]) + '</p>' : '');
+    }
+    function hide() {
+      for (var i = 0; i < items.length; i++) items[i].classList.remove('on');
+      box.innerHTML = idle;
+    }
+    Array.prototype.forEach.call(items, function (el) {
+      el.addEventListener('mouseenter', function () { show(el); });
+      el.addEventListener('focus', function () { show(el); });
+      el.addEventListener('click', function () { show(el); });
+      el.addEventListener('mouseleave', hide);
+      el.addEventListener('blur', hide);
+    });
+  }
+
   function setupTrace(root) {
     var sec = root.querySelector('[data-progress="trace"]');
     if (!sec) return;
@@ -621,6 +674,7 @@
     setupTransitions(wrap);
     setupOwner(wrap);
     setupTrace(wrap);
+    setupKinds(wrap);
     setupRail(wrap);
     setupReveals(wrap);
     on(window, 'scroll', tick, { passive: true });

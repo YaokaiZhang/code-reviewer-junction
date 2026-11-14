@@ -268,7 +268,12 @@
         }
       ],
       "unsure": "The member still gets the mixed-key warning. That may be enough, but it is a product choice.",
-      "ask": "Is it fine to lose the type warning when the member's key is already wrong?"
+      "ask": "Is it fine to lose the type warning when the member's key is already wrong?",
+      "impact": {
+        "level": "small",
+        "who": "Users whose type mixes string and int keys and also has a member whose type cannot be saved.",
+        "effect": "Their build still fails, on the mixed-key error. Only after they fix the keys does the type error show up. They lose one fix-and-rebuild round; nothing broken can ship."
+      }
     },
     {
       "id": "C-2234-05",
@@ -443,7 +448,7 @@
     {
       "id": "C-2234-08",
       "kind": "claim",
-      "title": "Run-time tests never actually ran",
+      "title": "Run-time tests pass, before and after",
       "steps": [
         {
           "op": "GIVEN",
@@ -476,18 +481,18 @@
           "side": "new"
         }
       ],
-      "verdict": "We could not confirm this: the test project does not build here, before or after the change.",
+      "verdict": "We accept this: both tests pass. They pass on the old code too, so they guard the behaviour; they do not prove the fix.",
       "because": [
         {
-          "text": "The test project fails to build because the code generator does not load. So these tests never ran.",
+          "text": "With SDK 9 the test project builds. The pinned SDK 8.0.402 could not load the code generator.",
           "evidence": "evidence/ju26-issue-2234/execution-tests-build.json"
         },
         {
-          "text": "Two of the new tests could not be run here.",
+          "text": "Both tests pass before and after the change.",
           "evidence": "evidence/ju26-issue-2234/old-vs-new-tests.json"
         }
       ],
-      "unsure": "The tests look right, but nobody has seen them pass."
+      "unsure": "The repo pins SDK 8.0.402. We ran with 9.0.321 because that SDK could not load the generator."
     },
     {
       "id": "C-2234-09",

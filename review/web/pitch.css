@@ -128,6 +128,15 @@
 .p-kbars .bar i, .p-meter2 .bar i { display: block; height: 100%; width: 0; border-radius: inherit; transition: width 1.2s cubic-bezier(.2,.7,.2,1) .15s; }
 .p-kbars b { font-family: var(--vt); font-weight: 400; font-size: 2rem; line-height: 1; text-align: right; color: #fff3d6; }
 .p-adj { display: flex; flex-wrap: wrap; gap: 10px 26px; margin-top: 24px; padding-top: 18px; border-top: 1px dashed rgba(255,179,0,.3); font-family: var(--sans); font-size: 15px; color: #efdcb0; }
+.p-kbars li, .p-adj span { cursor: help; border-radius: 6px; outline: none; transition: background .15s; }
+.p-kbars li { padding: 2px 6px; margin: 0 -6px; }
+.p-kbars li.on, .p-kbars li:focus-visible, .p-adj span.on, .p-adj span:focus-visible { background: rgba(255,179,0,.12); }
+.p-kexp { margin-top: 16px; min-height: 7.6em; padding: 12px 14px; border-radius: 8px; background: rgba(255,179,0,.06); border: 1px solid rgba(255,179,0,.18); font-family: var(--sans); font-size: 14.5px; line-height: 1.45; color: #efdcb0; }
+.p-kexp b { display: block; margin-bottom: 4px; font-weight: 600; color: #fff3d6; }
+.p-kexp p { margin: 0 0 4px; }
+.p-kexp .why { max-width: none; font-size: inherit; line-height: inherit; color: #d9c08a; }
+.p-kexp .eg { color: var(--ph); }
+.p-kexp-0 { color: #a8926a; font-style: italic; }
 .p-adj b { font-family: var(--vt); font-weight: 400; font-size: 1.6rem; margin-right: 6px; color: var(--ph); }
 
 .p-bands { margin-top: 4vh; }
@@ -243,7 +252,7 @@
   .p-sec { padding: 7vh 16px; min-height: 0; }
   .p-trans { height: 108vh; height: 108svh; }
   .p-ctx { font-size: 1.2rem; }
-  .p-grid2, .p-owner-in { grid-template-columns: minmax(0, 1fr); }
+  .p-grid2, .p-owner-in, .p-kinds .p-grid2, .p-learn .p-grid2 { grid-template-columns: minmax(0, 1fr); }
   .p-keycap { position: relative; left: auto; right: auto; bottom: auto; margin-top: 18px; }
   .p-choice { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px 0 14px; min-height: 240px; }
   .p-kbars li { grid-template-columns: minmax(0, 1fr) 2.2em; gap: 4px 12px; }

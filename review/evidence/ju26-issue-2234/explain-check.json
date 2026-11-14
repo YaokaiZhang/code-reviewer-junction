@@ -1144,27 +1144,27 @@
           "It does not check that the analyzer still validates the type."
         ],
         "notes": [
-          "Result unknown: this test project does not build here, before or after the change."
+          "Passes before and after the change (SDK 9.0.321), so it guards this behaviour but does not show the fix."
         ],
         "method_found": true,
         "results": [
           {
             "run": "before the change",
-            "outcome": "build_failed",
+            "outcome": "pass",
             "message": "",
             "source": "evidence/ju26-issue-2234/old-vs-new-tests.json",
             "produced_by": "script"
           },
           {
             "run": "after the change",
-            "outcome": "build_failed",
+            "outcome": "pass",
             "message": "",
             "source": "evidence/ju26-issue-2234/old-vs-new-tests.json",
             "produced_by": "script"
           }
         ],
         "flips": false,
-        "verdict": "did not run here",
+        "verdict": "passes before the change too: it does not test the change",
         "code": {
           "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs": {
             "20": "    [Fact]",
@@ -1282,27 +1282,27 @@
           "It checks that the value survives the round trip, not the bytes."
         ],
         "notes": [
-          "Result unknown: this test project does not build here, before or after the change."
+          "Passes before and after the change (SDK 9.0.321), so it guards this behaviour but does not show the fix."
         ],
         "method_found": true,
         "results": [
           {
             "run": "before the change",
-            "outcome": "build_failed",
+            "outcome": "pass",
             "message": "",
             "source": "evidence/ju26-issue-2234/old-vs-new-tests.json",
             "produced_by": "script"
           },
           {
             "run": "after the change",
-            "outcome": "build_failed",
+            "outcome": "pass",
             "message": "",
             "source": "evidence/ju26-issue-2234/old-vs-new-tests.json",
             "produced_by": "script"
           }
         ],
         "flips": false,
-        "verdict": "did not run here",
+        "verdict": "passes before the change too: it does not test the change",
         "code": {
           "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs": {
             "26": "    [Fact]",

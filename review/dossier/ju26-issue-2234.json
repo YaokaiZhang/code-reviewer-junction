@@ -215,18 +215,21 @@
     {
       "id": "C-2234-08",
       "claim": "A type with SuppressSourceGeneration gets no generated formatter, and still round-trips through the run-time (dynamic) resolver. The 2 new execution tests are meant to show this.",
-      "tier": "Argued",
-      "why_this_tier": "The tests never ran. Their project does not build here, before or after the change, because the source generator does not load (CS9057).",
+      "tier": "Measured",
+      "why_this_tier": "Both tests build and pass with SDK 9.0.321, but they also pass on the old code, so they guard the behaviour rather than prove the fix.",
       "requirement": "R-2234-1",
       "requirement_inferred": false,
       "evidence": [
         "evidence/ju26-issue-2234/old-vs-new-tests.json",
         "evidence/ju26-issue-2234/execution-tests-build.json"
       ],
-      "support": [],
-      "contradicted_by": [
-        "evidence/ju26-issue-2234/execution-tests-build.json"
+      "support": [
+        {
+          "file": "evidence/ju26-issue-2234/old-vs-new-tests.json",
+          "kind": "count"
+        }
       ],
+      "contradicted_by": [],
       "diff_parts": [
         "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs:1-37"
       ],
@@ -275,7 +278,6 @@
     "The README gains a 14-line section, 'Opting out of source generation'. The issue title asks for an analyzer fix, not documentation."
   ],
   "not_checked": [
-    "The 2 execution tests in SuppressedSourceGenerationTests.cs. Their project does not build here: the generator needs compiler 4.12, but SDK 8.0.402 has 4.11 (CS9057).",
     "The code the source generator emits for repeated or mixed keys, when the first member wins. The generator shows no diagnostics here (reportDiagnostic is null).",
     "Whether suppressed types get MsgPack012 (inaccessible types), as the README claims.",
     "The full test suite after the change. We ran only the new tests and our experiments.",

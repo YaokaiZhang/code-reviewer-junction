@@ -540,7 +540,7 @@
         "It does not check that the analyzer still validates the type."
       ],
       "notes": [
-        "Result unknown: this test project does not build here, before or after the change."
+        "Passes before and after the change (SDK 9.0.321), so it guards this behaviour but does not show the fix."
       ]
     },
     {
@@ -608,7 +608,7 @@
         "It checks that the value survives the round trip, not the bytes."
       ],
       "notes": [
-        "Result unknown: this test project does not build here, before or after the change."
+        "Passes before and after the change (SDK 9.0.321), so it guards this behaviour but does not show the fix."
       ]
     }
   ]

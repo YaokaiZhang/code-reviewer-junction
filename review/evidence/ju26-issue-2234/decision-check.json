@@ -87,8 +87,8 @@
           {
             "text": "Four new tests crash on the old code and pass on the new code.",
             "evidence": "evidence/ju26-issue-2234/old-vs-new-tests.json",
-            "result": "error",
-            "summary": "10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 4 pass on base (not evidence), 0 fail on branch, 2 not runnable here (project does not build on branch)",
+            "result": "pass",
+            "summary": "10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 6 pass on base (not evidence), 0 fail on branch, 0 not runnable here (project does not build on branch)",
             "produced_by": "script",
             "check": "old-vs-new-tests"
           },
@@ -1129,6 +1129,11 @@
         ],
         "unsure": "The member still gets the mixed-key warning. That may be enough, but it is a product choice.",
         "ask": "Is it fine to lose the type warning when the member's key is already wrong?",
+        "impact": {
+          "level": "small",
+          "who": "Users whose type mixes string and int keys and also has a member whose type cannot be saved.",
+          "effect": "Their build still fails, on the mixed-key error. Only after they fix the keys does the type error show up. They lose one fix-and-rebuild round; nothing broken can ship."
+        },
         "code": [
           {
             "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
@@ -1365,8 +1370,8 @@
           {
             "text": "The repeated-key tests crash on the old code and pass on the new code.",
             "evidence": "evidence/ju26-issue-2234/old-vs-new-tests.json",
-            "result": "error",
-            "summary": "10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 4 pass on base (not evidence), 0 fail on branch, 2 not runnable here (project does not build on branch)",
+            "result": "pass",
+            "summary": "10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 6 pass on base (not evidence), 0 fail on branch, 0 not runnable here (project does not build on branch)",
             "produced_by": "script",
             "check": "old-vs-new-tests"
           },
@@ -2057,8 +2062,8 @@
           {
             "text": "We ran each new test on the old and the new code. These four pass on both.",
             "evidence": "evidence/ju26-issue-2234/old-vs-new-tests.json",
-            "result": "error",
-            "summary": "10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 4 pass on base (not evidence), 0 fail on branch, 2 not runnable here (project does not build on branch)",
+            "result": "pass",
+            "summary": "10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 6 pass on base (not evidence), 0 fail on branch, 0 not runnable here (project does not build on branch)",
             "produced_by": "script",
             "check": "old-vs-new-tests"
           }
@@ -2617,7 +2622,7 @@
       {
         "id": "C-2234-08",
         "kind": "claim",
-        "title": "Run-time tests never actually ran",
+        "title": "Run-time tests pass, before and after",
         "steps": [
           {
             "op": "GIVEN",
@@ -2659,26 +2664,26 @@
             "in_change": true
           }
         ],
-        "verdict": "We could not confirm this: the test project does not build here, before or after the change.",
+        "verdict": "We accept this: both tests pass. They pass on the old code too, so they guard the behaviour; they do not prove the fix.",
         "because": [
           {
-            "text": "The test project fails to build because the code generator does not load. So these tests never ran.",
+            "text": "With SDK 9 the test project builds. The pinned SDK 8.0.402 could not load the code generator.",
             "evidence": "evidence/ju26-issue-2234/execution-tests-build.json",
-            "result": "fail",
-            "summary": "ExecutionTests does not build here: the source generator is not loaded (CS9057, generator references compiler 4.12, SDK 8.0.402 runs 4.11), so 5 CS errors; the new test file also raises SA1649",
+            "result": "pass",
+            "summary": "ExecutionTests builds with SDK 9.0.321 (0 errors). SDK 8.0.402, which global.json pins, could not load the source generator (CS9057: it needs compiler 4.12, that SDK has 4.11). The new test file raises SA1649",
             "produced_by": "hand",
             "check": "execution-tests-build"
           },
           {
-            "text": "Two of the new tests could not be run here.",
+            "text": "Both tests pass before and after the change.",
             "evidence": "evidence/ju26-issue-2234/old-vs-new-tests.json",
-            "result": "error",
-            "summary": "10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 4 pass on base (not evidence), 0 fail on branch, 2 not runnable here (project does not build on branch)",
+            "result": "pass",
+            "summary": "10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 6 pass on base (not evidence), 0 fail on branch, 0 not runnable here (project does not build on branch)",
             "produced_by": "script",
             "check": "old-vs-new-tests"
           }
         ],
-        "unsure": "The tests look right, but nobody has seen them pass.",
+        "unsure": "The repo pins SDK 8.0.402. We ran with 9.0.321 because that SDK could not load the generator.",
         "code": [
           {
             "file": "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs",
@@ -2983,8 +2988,8 @@
           {
             "text": "The new tests cover most promises, but none checks that types can be reached.",
             "evidence": "evidence/ju26-issue-2234/old-vs-new-tests.json",
-            "result": "error",
-            "summary": "10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 4 pass on base (not evidence), 0 fail on branch, 2 not runnable here (project does not build on branch)",
+            "result": "pass",
+            "summary": "10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 6 pass on base (not evidence), 0 fail on branch, 0 not runnable here (project does not build on branch)",
             "produced_by": "script",
             "check": "old-vs-new-tests"
           }
@@ -3966,8 +3971,8 @@
           {
             "text": "We ran the new tests on the old code. Some pass there, some crash.",
             "evidence": "evidence/ju26-issue-2234/old-vs-new-tests.json",
-            "result": "error",
-            "summary": "10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 4 pass on base (not evidence), 0 fail on branch, 2 not runnable here (project does not build on branch)",
+            "result": "pass",
+            "summary": "10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 6 pass on base (not evidence), 0 fail on branch, 0 not runnable here (project does not build on branch)",
             "produced_by": "script",
             "check": "old-vs-new-tests"
           }
@@ -4633,8 +4638,8 @@
           {
             "text": "The build log for that project shows this style warning.",
             "evidence": "evidence/ju26-issue-2234/execution-tests-build.json",
-            "result": "fail",
-            "summary": "ExecutionTests does not build here: the source generator is not loaded (CS9057, generator references compiler 4.12, SDK 8.0.402 runs 4.11), so 5 CS errors; the new test file also raises SA1649",
+            "result": "pass",
+            "summary": "ExecutionTests builds with SDK 9.0.321 (0 errors). SDK 8.0.402, which global.json pins, could not load the source generator (CS9057: it needs compiler 4.12, that SDK has 4.11). The new test file raises SA1649",
             "produced_by": "hand",
             "check": "execution-tests-build"
           }

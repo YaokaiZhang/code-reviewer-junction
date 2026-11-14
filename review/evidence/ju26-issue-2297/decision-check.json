@@ -1951,6 +1951,11 @@
         ],
         "unsure": "We do not know how many users add this mark by hand. The class can be public, so the mark also shows in the user's own type.",
         "ask": "Should the generator mark the user's own resolver class, or only the classes it fully owns?",
+        "impact": {
+          "level": "large",
+          "who": "Users who already added [ExcludeFromCodeCoverage] to their own resolver class by hand, the obvious workaround before this change.",
+          "effect": "After upgrading, their build breaks with error CS0579 (duplicate attribute). The fix is deleting one line, but a minor update should not break a working build."
+        },
         "code": [
           {
             "file": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt",

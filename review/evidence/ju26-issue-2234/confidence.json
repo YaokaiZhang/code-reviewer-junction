@@ -36,7 +36,7 @@
           {
             "file": "evidence/ju26-issue-2234/old-vs-new-tests.json",
             "kind": "flip-test",
-            "summary": "10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 4 pass on base (not evidence), 0 fail on branch, 2 not runnable here (project does not build on branch)",
+            "summary": "10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 6 pass on base (not evidence), 0 fail on branch, 0 not runnable here (project does not build on branch)",
             "produced_by": "script",
             "replay": "match",
             "parts": [
@@ -183,7 +183,7 @@
           {
             "file": "evidence/ju26-issue-2234/old-vs-new-tests.json",
             "kind": "flip-test",
-            "summary": "10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 4 pass on base (not evidence), 0 fail on branch, 2 not runnable here (project does not build on branch)",
+            "summary": "10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 6 pass on base (not evidence), 0 fail on branch, 0 not runnable here (project does not build on branch)",
             "produced_by": "script",
             "replay": "match",
             "parts": [
@@ -257,7 +257,7 @@
           {
             "file": "evidence/ju26-issue-2234/old-vs-new-tests.json",
             "kind": "count",
-            "summary": "10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 4 pass on base (not evidence), 0 fail on branch, 2 not runnable here (project does not build on branch)",
+            "summary": "10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 6 pass on base (not evidence), 0 fail on branch, 0 not runnable here (project does not build on branch)",
             "produced_by": "script",
             "replay": "match",
             "parts": [
@@ -278,16 +278,30 @@
         "depends_on": []
       },
       "C-2234-08": {
-        "score": 15,
+        "score": 45,
         "band": "low",
-        "how": "no check backs it",
-        "signals": [],
-        "contradicted_by": [
+        "how": "best supporting check",
+        "signals": [
           {
-            "file": "evidence/ju26-issue-2234/execution-tests-build.json",
-            "summary": "ExecutionTests does not build here: the source generator is not loaded (CS9057, generator references compiler 4.12, SDK 8.0.402 runs 4.11), so 5 CS errors; the new test file also raises SA1649"
+            "file": "evidence/ju26-issue-2234/old-vs-new-tests.json",
+            "kind": "count",
+            "summary": "10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 6 pass on base (not evidence), 0 fail on branch, 0 not runnable here (project does not build on branch)",
+            "produced_by": "script",
+            "replay": "match",
+            "parts": [
+              {
+                "text": "number from a tool",
+                "delta": 40
+              },
+              {
+                "text": "re-run on a clean machine: same result",
+                "delta": 5
+              }
+            ],
+            "score": 45
           }
         ],
+        "contradicted_by": [],
         "gate": null,
         "depends_on": []
       },

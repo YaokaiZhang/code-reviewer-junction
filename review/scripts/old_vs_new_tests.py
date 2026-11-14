@@ -165,6 +165,7 @@ def main():
     ap.add_argument("--base", default="32258fdb")
     ap.add_argument("--out", required=True)
     ap.add_argument("--workdir", help="where worktrees go (reused if present); default: new temp dir")
+    ap.add_argument("--sdk", help="run with this .NET SDK instead of the one global.json pins (written into both worktrees only)")
     args = ap.parse_args()
 
     repo = os.path.abspath(args.repo)
@@ -193,6 +194,10 @@ def main():
     br_wt = os.path.join(workdir, "branch")
     ensure_worktree(repo, base_wt, base_sha)
     ensure_worktree(repo, br_wt, br_sha)
+    if args.sdk:  # same override on both sides, so base and branch still differ only by the change
+        for wt in (base_wt, br_wt):
+            with open(os.path.join(wt, "global.json"), "w") as f:
+                json.dump({"sdk": {"version": args.sdk, "rollForward": "latestFeature"}}, f)
 
     # Copy every changed file under tests/ (tests + helpers/resources) from the branch onto base.
     copied, removed = [], []
@@ -278,10 +283,12 @@ def main():
         "branch": args.branch,
         "base": args.base,
         "head": br_sha[:8],
-        "command": f"python3 review/scripts/old_vs_new_tests.py --repo <clone> --branch {args.branch} --out {rel_out}",
+        "command": f"python3 review/scripts/old_vs_new_tests.py --repo <clone> --branch {args.branch} --out {rel_out}"
+                   + (f" --sdk {args.sdk}" if args.sdk else ""),
         # Nothing actually ran: the filter matched no test. That is a tool error, not a test failure.
         "result": "error" if new_or_changed and all(m["verdict"] in ("unknown",) or m["verdict"].startswith("not runnable") for m in new_or_changed)
                   else ("fail" if bad else ("error" if unrunnable else "pass")),
+        "provides": (["flip-test"] if counts["evidence"] else []) + ["count"],
         "summary": (f"{counts['new_or_changed_methods']} new or changed test methods "
                     f"({counts['test_methods_added']} added, {counts['test_methods_modified']} modified): "
                     f"{counts['evidence']} fail on base and pass on branch, "
@@ -298,6 +305,7 @@ def main():
             "runs": runs,
         },
         "tool_versions": {"dotnet_sdk": dotnet_ver, "python": sys.version.split()[0]},
+        "sdk_override": args.sdk and f"global.json pins another SDK; both sides ran on {args.sdk} instead",
         "produced_by": "script",
     }
     os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
