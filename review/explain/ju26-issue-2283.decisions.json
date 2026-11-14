@@ -1,0 +1,552 @@
+{
+  "branch": "ju26-issue-2283",
+  "produced_by": "agent",
+  "note": "Written by the reviewing agent. decision_check.py checks every step against the real code and attaches the real evidence results.",
+  "decisions": [
+    {
+      "id": "C-2283-01",
+      "kind": "claim",
+      "title": "The crash is fixed",
+      "steps": [
+        {
+          "op": "BEFORE",
+          "text": "the code took the first source line of a property with `DeclaringSyntaxReferences[0]`. A type from another library has none, so it crashed.",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            985,
+            985
+          ],
+          "side": "old"
+        },
+        {
+          "op": "NOW",
+          "text": "it asks a new helper, `GetPropertyIdentifierLocation(item)`, instead.",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            985,
+            985
+          ],
+          "side": "new"
+        },
+        {
+          "op": "ALSO",
+          "text": "a second place now uses `FirstOrDefault()` so it gets nothing instead of crashing.",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1077,
+            1077
+          ],
+          "side": "new"
+        },
+        {
+          "op": "SO",
+          "text": "when there is no source line, the helper gives back nothing (`FirstOrDefault()?.GetSyntax()`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1434,
+            1434
+          ],
+          "side": "new"
+        },
+        {
+          "op": "AND",
+          "text": "two new tests check that the code is still produced (`Assert.Contains(expectedResolverHintName, hintNames)`).",
+          "file": "tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs",
+          "lines": [
+            657,
+            658
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "The crash from the issue is fixed, and tests prove it.",
+      "because": [
+        {
+          "text": "The new tests fail before the change and pass after it.",
+          "evidence": "evidence/ju26-issue-2283/old-vs-new-tests.script.json"
+        },
+        {
+          "text": "Two of the tests still pass with the new filter taken out. So the crash fix alone makes them pass.",
+          "evidence": "evidence/ju26-issue-2283/old-vs-new-tests.json"
+        }
+      ]
+    },
+    {
+      "id": "C-2283-02",
+      "kind": "claim",
+      "title": "Some warnings are now silenced",
+      "steps": [
+        {
+          "op": "BEFORE",
+          "text": "every warning went straight to `reportAnalyzerDiagnostic`.",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            239,
+            239
+          ],
+          "side": "old"
+        },
+        {
+          "op": "NOW",
+          "text": "every warning passes through `ReportIfLocatedInCompilation` first.",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            239,
+            239
+          ]
+        },
+        {
+          "op": "IF",
+          "text": "the warning points at code in this project (`IsInSource` and `ContainsSyntaxTree`),",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1446,
+            1446
+          ]
+        },
+        {
+          "op": "THEN",
+          "text": "it is shown to the user (`report(diagnostic)`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1448,
+            1448
+          ]
+        },
+        {
+          "op": "ELSE",
+          "text": "it is dropped without a trace. The comment says the other library will report it (`reported by the compilation that defines them`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1440,
+            1442
+          ]
+        }
+      ],
+      "verdict": "This hides a warning users used to get, so the analyzer's owner must decide.",
+      "because": [
+        {
+          "text": "We wrote a small app that makes a common mistake. The old code warns about it. The new code says nothing, and no other place warns either.",
+          "evidence": "evidence/ju26-issue-2283/dropped-warning.json"
+        },
+        {
+          "text": "Almost every warning in this file goes through the new filter, not only the one that crashed.",
+          "evidence": "evidence/ju26-issue-2283/report-sites.json"
+        }
+      ],
+      "unsure": "The comment assumes the other library reports the warning. Our test shows that, for a mistake in the app's own type, nobody does.",
+      "ask": "Should these warnings be dropped, moved to the app's own code, or kept?"
+    },
+    {
+      "id": "C-2283-03",
+      "kind": "claim",
+      "title": "The new notes promise too much",
+      "steps": [
+        {
+          "op": "NOW",
+          "text": "the README says these warnings are `reported by the assembly that defines it`.",
+          "file": "README.md",
+          "lines": [
+            1642,
+            1642
+          ],
+          "side": "new"
+        },
+        {
+          "op": "ALSO",
+          "text": "the warning page says the same: they are `reported by the project that defines that type`.",
+          "file": "doc/analyzers/MsgPack004.md",
+          "lines": [
+            52,
+            52
+          ],
+          "side": "new"
+        },
+        {
+          "op": "BUT",
+          "text": "the code just drops them (`report(diagnostic)` runs only for this project's code).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1446,
+            1448
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "The notes describe the hidden warnings as fine, so they wait on the owner's choice about the filter.",
+      "because": [
+        {
+          "text": "In our test, the mistake was in the app's own type. No other library warned about it. So the note is wrong there.",
+          "evidence": "evidence/ju26-issue-2283/dropped-warning.json"
+        }
+      ],
+      "unsure": "The notes may be right for mistakes that really live in the other library.",
+      "ask": "If the warnings stay hidden, should these notes stay, or be changed?"
+    },
+    {
+      "id": "C-2283-04",
+      "kind": "claim",
+      "title": "Old tests still pass",
+      "steps": [
+        {
+          "op": "NOW",
+          "text": "every warning goes through the new filter (`ReportIfLocatedInCompilation`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            239,
+            239
+          ],
+          "side": "new"
+        },
+        {
+          "op": "AND",
+          "text": "two places now use the safe helpers (`GetPropertyIdentifierLocation`, `FirstOrDefault()`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            985,
+            1077
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "No old test broke, but that does not prove the change is right.",
+      "because": [
+        {
+          "text": "All old tests in the project pass both before and after.",
+          "evidence": "evidence/ju26-issue-2283/old-vs-new-tests.json"
+        }
+      ],
+      "unsure": "Old tests may not cover the warnings that are now hidden."
+    },
+    {
+      "id": "F-2283-1",
+      "kind": "found",
+      "ref": 0,
+      "title": "A real mistake now gets no warning",
+      "steps": [
+        {
+          "op": "GIVEN",
+          "text": "the app's own type lacks the needed mark, so the code builds a warning (`TypeMustBeMessagePackObject`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1345,
+            1345
+          ],
+          "side": "new"
+        },
+        {
+          "op": "IF",
+          "text": "the warning points into another library, not this project (`ContainsSyntaxTree`),",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1446,
+            1446
+          ],
+          "side": "new"
+        },
+        {
+          "op": "THEN",
+          "text": "it is never passed to `report(diagnostic)`, so the user sees nothing.",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1448,
+            1448
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "We found a hidden warning about the user's own code. Only a hand-written test could show it.",
+      "because": [
+        {
+          "text": "The old code warns about this case. The new code does not.",
+          "evidence": "evidence/ju26-issue-2283/dropped-warning.json"
+        }
+      ]
+    },
+    {
+      "id": "F-2283-2",
+      "kind": "found",
+      "ref": 1,
+      "title": "One change does two jobs",
+      "steps": [
+        {
+          "op": "NOW",
+          "text": "the crash fix is small: a safe helper (`GetPropertyIdentifierLocation(item)`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            985,
+            985
+          ],
+          "side": "new"
+        },
+        {
+          "op": "ALSO",
+          "text": "every warning is now sent through a filter (`ReportIfLocatedInCompilation`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            239,
+            239
+          ],
+          "side": "new"
+        },
+        {
+          "op": "BUT",
+          "text": "the issue asked only for the crash fix. The filter is extra (`private void ReportIfLocatedInCompilation`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1444,
+            1444
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "The filter is a separate change and should be judged on its own.",
+      "because": [
+        {
+          "text": "Almost every warning in the file goes through the filter.",
+          "evidence": "evidence/ju26-issue-2283/report-sites.json"
+        }
+      ]
+    },
+    {
+      "id": "F-2283-3",
+      "kind": "found",
+      "ref": 2,
+      "title": "One new test checks the filter",
+      "steps": [
+        {
+          "op": "GIVEN",
+          "text": "the other library's type has a property with no key (`public int Unkeyed { get; set; }`).",
+          "file": "tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs",
+          "lines": [
+            603,
+            603
+          ],
+          "side": "new"
+        },
+        {
+          "op": "THEN",
+          "text": "the test `ClosedGenericStruct_FromMetadataReference_UnkeyedMember` expects no warning at all.",
+          "file": "tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs",
+          "lines": [
+            590,
+            590
+          ],
+          "side": "new"
+        },
+        {
+          "op": "SO",
+          "text": "it passes only because the filter hides that warning (`RunWithMetadataReferenceAsync`).",
+          "file": "tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs",
+          "lines": [
+            625,
+            625
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "This test locks in the hidden warnings, so it is not proof of the crash fix.",
+      "because": [
+        {
+          "text": "The test fails when only the filter is removed.",
+          "evidence": "evidence/ju26-issue-2283/old-vs-new-tests.json"
+        }
+      ]
+    },
+    {
+      "id": "F-2283-4",
+      "kind": "found",
+      "ref": 3,
+      "title": "The filter also stops a second crash",
+      "steps": [
+        {
+          "op": "GIVEN",
+          "text": "the other library is linked as a project, so a warning can point at a file outside this one (`not permitted to do`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1442,
+            1442
+          ],
+          "side": "new"
+        },
+        {
+          "op": "BEFORE",
+          "text": "the warning was sent anyway (`reportAnalyzerDiagnostic`), and the analyzer crashed.",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            239,
+            239
+          ],
+          "side": "old"
+        },
+        {
+          "op": "NOW",
+          "text": "such a warning is dropped (`ContainsSyntaxTree`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1446,
+            1446
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "The filter does fix a real crash, so removing it needs a different fix in its place.",
+      "because": [
+        {
+          "text": "Our test cases with a linked project show the warning is now dropped instead of crashing.",
+          "evidence": "evidence/ju26-issue-2283/dropped-warning.json"
+        }
+      ]
+    },
+    {
+      "id": "F-2283-5",
+      "kind": "found",
+      "ref": 4,
+      "title": "A duplicate key still crashes",
+      "steps": [
+        {
+          "op": "GIVEN",
+          "text": "two properties share one key in a type from another library (`KeysMustBeUnique`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1015,
+            1015
+          ],
+          "side": "new"
+        },
+        {
+          "op": "THEN",
+          "text": "the analyzer still crashes, before and after the change. Its warning also goes through the filter (`this.reportDiagnostic?.Invoke`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1015,
+            1015
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "This crash is not fixed, but it is outside what the issue asked.",
+      "because": [
+        {
+          "text": "Our test cases tried this mistake on both versions.",
+          "evidence": "evidence/ju26-issue-2283/dropped-warning.json"
+        }
+      ]
+    },
+    {
+      "id": "F-2283-6",
+      "kind": "found",
+      "ref": 5,
+      "title": "Same count, different places",
+      "steps": [
+        {
+          "op": "GIVEN",
+          "text": "one warning skips the filter (`reportAnalyzerDiagnostic?.Invoke`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            248,
+            248
+          ],
+          "side": "new"
+        },
+        {
+          "op": "ALSO",
+          "text": "one more is sent a different way (`this.reportDiagnostic(deferred)`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1188,
+            1188
+          ],
+          "side": "new"
+        },
+        {
+          "op": "BUT",
+          "text": "a simple text search also counts lines that are switched off (`////this.reportDiagnostic`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            465,
+            465
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "Our count and the task notes agree on the number, by luck. We trust ours, made by a script.",
+      "because": [
+        {
+          "text": "The script counts only the lines that really run.",
+          "evidence": "evidence/ju26-issue-2283/report-sites.json"
+        }
+      ]
+    },
+    {
+      "id": "D-2283-1",
+      "kind": "drift",
+      "ref": 0,
+      "title": "Extra work nobody asked for",
+      "steps": [
+        {
+          "op": "NOW",
+          "text": "a filter was added (`ReportIfLocatedInCompilation`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            239,
+            239
+          ],
+          "side": "new"
+        },
+        {
+          "op": "ALSO",
+          "text": "the README got a new section (`Generic types from referenced assemblies`).",
+          "file": "README.md",
+          "lines": [
+            1639,
+            1639
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "The issue asked for no crash. The filter and the notes go beyond it.",
+      "because": [
+        {
+          "text": "The filter hides a warning the user needs.",
+          "evidence": "evidence/ju26-issue-2283/dropped-warning.json"
+        }
+      ]
+    },
+    {
+      "id": "D-2283-2",
+      "kind": "drift",
+      "ref": 1,
+      "title": "The filter reaches too far",
+      "steps": [
+        {
+          "op": "NOW",
+          "text": "every warning is wrapped, in one line (`diagnostic => ReportIfLocatedInCompilation`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            239,
+            239
+          ],
+          "side": "new"
+        },
+        {
+          "op": "BUT",
+          "text": "only two places crashed (`GetPropertyIdentifierLocation(item)`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            985,
+            985
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "The filter touches far more than the crash needed.",
+      "because": [
+        {
+          "text": "Almost every warning in the file goes through the filter.",
+          "evidence": "evidence/ju26-issue-2283/report-sites.json"
+        }
+      ]
+    }
+  ]
+}

@@ -84,7 +84,7 @@ def main():
         cov = REVIEW / "evidence" / branch / "claim-coverage.json"
         d["_coverage"] = load(cov) if cov.is_file() else None
         for name, fn in (("_confidence", "confidence.json"), ("_tests", "explain-check.json"),
-                         ("_readability", "readability.json"), ("_replay", "replay.json")):
+                         ("_readability", "readability.json"), ("_replay", "replay.json"), ("_decisions", "decision-check.json")):
             f = REVIEW / "evidence" / branch / fn
             d[name] = load(f) if f.is_file() else None
         d["_requirements"] = {c["requirement"]: reqs[c["requirement"]] for c in d.get("claims") or [] if c.get("requirement") in reqs}

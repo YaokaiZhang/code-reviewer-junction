@@ -1,0 +1,893 @@
+{
+  "branch": "ju26-issue-2297",
+  "produced_by": "agent",
+  "note": "Written by the reviewing agent. decision_check.py checks every step against the real code and attaches the real evidence results.",
+  "decisions": [
+    {
+      "id": "C-2297-01",
+      "kind": "claim",
+      "title": "Most saved outputs only gain three lines",
+      "steps": [
+        {
+          "op": "NOW",
+          "text": "a typical saved output gains three lines: `#if !NETSTANDARD2_0 && !NETFRAMEWORK`, the mark `ExcludeFromCodeCoverage`, and `#endif`.",
+          "file": "tests/MessagePack.SourceGenerator.Tests/Resources/AdditionalAllowTypes/MessagePack.GeneratedMessagePackResolver.g.cs",
+          "lines": [
+            12,
+            14
+          ],
+          "side": "new"
+        },
+        {
+          "op": "BUT",
+          "text": "in one file the opening brace used to share a line with the class (`{ internal sealed class`).",
+          "file": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericDataTypeWithPrivateMember/Formatters.HasPrivateSerializedMemberAndIsGenericNamed`1.HasPrivateSerializedMemberAndIsGenericNamedFormatter.g.cs",
+          "lines": [
+            9,
+            9
+          ],
+          "side": "old"
+        },
+        {
+          "op": "NOW",
+          "text": "that brace stands alone, and the new lines follow it (`#if !NETSTANDARD2_0`).",
+          "file": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericDataTypeWithPrivateMember/Formatters.HasPrivateSerializedMemberAndIsGenericNamed`1.HasPrivateSerializedMemberAndIsGenericNamedFormatter.g.cs",
+          "lines": [
+            9,
+            13
+          ],
+          "side": "new"
+        },
+        {
+          "op": "ALSO",
+          "text": "in its sister file one empty line appears after the brace, before `#if !NETSTANDARD2_0`.",
+          "file": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericDataTypeWithPrivateMember/Formatters.HasPrivateSerializedMemberAndIsGenericOrdinal`1.HasPrivateSerializedMemberAndIsGenericOrdinalFormatter.g.cs",
+          "lines": [
+            11,
+            13
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "The AI accepts the count: only 2 saved outputs change in other ways, and both changes are explained.",
+      "because": [
+        {
+          "text": "A script sorted every changed saved output. It found 2 that change by more than the new lines.",
+          "evidence": "evidence/ju26-issue-2297/diff-classifier.json"
+        }
+      ],
+      "unsure": "A count describes the change. It does not show the saved outputs are right; that is the next card."
+    },
+    {
+      "id": "C-2297-02",
+      "kind": "claim",
+      "title": "Saved outputs match the new generator",
+      "steps": [
+        {
+          "op": "GIVEN",
+          "text": "a test, `GenericDataTypeWithPrivateMember`, feeds sample code to the generator.",
+          "file": "tests/MessagePack.SourceGenerator.Tests/GenerationTests.cs",
+          "lines": [
+            757,
+            757
+          ],
+          "side": "new"
+        },
+        {
+          "op": "WHEN",
+          "text": "`RunDefaultAsync` runs the generator and compares its output with the saved files.",
+          "file": "tests/MessagePack.SourceGenerator.Tests/GenerationTests.cs",
+          "lines": [
+            779,
+            779
+          ],
+          "side": "new"
+        },
+        {
+          "op": "THEN",
+          "text": "each saved file must already hold the new mark (`ExcludeFromCodeCoverage`), or the test fails.",
+          "file": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericDataTypeWithPrivateMember/Formatters.HasPrivateSerializedMemberAndIsGenericNamed`1.HasPrivateSerializedMemberAndIsGenericNamedFormatter.g.cs",
+          "lines": [
+            10,
+            12
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "The AI trusts all the re-recorded outputs, because the tests rebuild them from the real generator and they match.",
+      "because": [
+        {
+          "text": "The tests passed before the change and pass after it, with the new saved files.",
+          "evidence": "evidence/ju26-issue-2297/regeneration.json"
+        }
+      ],
+      "unsure": "This only holds when the saved files use Windows line endings (see the line-endings card)."
+    },
+    {
+      "id": "C-2297-03",
+      "kind": "claim",
+      "title": "Templates match their ready-made copies",
+      "steps": [
+        {
+          "op": "NOW",
+          "text": "the template source gains the three new lines (`ExcludeFromCodeCoverage`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.tt",
+          "lines": [
+            14,
+            16
+          ],
+          "side": "new"
+        },
+        {
+          "op": "BEFORE",
+          "text": "its ready-made copy wrote the class line directly (`this.Write(\"\\tinternal sealed class \");`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.cs",
+          "lines": [
+            33,
+            33
+          ],
+          "side": "old"
+        },
+        {
+          "op": "NOW",
+          "text": "the copy writes the same new lines first (`ExcludeFromCodeCoverage`, then `internal sealed class`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.cs",
+          "lines": [
+            33,
+            33
+          ],
+          "side": "new"
+        },
+        {
+          "op": "ALSO",
+          "text": "the resolver template and its copy change the same way (`ExcludeFromCodeCoverage`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.cs",
+          "lines": [
+            38,
+            38
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "The AI accepts that each template and its copy say the same thing, so nothing was edited in one place only.",
+      "because": [
+        {
+          "text": "We rebuilt the copies from the 6 templates. All 6 match, and the same check catches the old copies as different.",
+          "evidence": "evidence/ju26-issue-2297/template-regeneration.json"
+        }
+      ],
+      "unsure": "We compared the text they produce, not every byte. Visual Studio's own tool was not used."
+    },
+    {
+      "id": "C-2297-04",
+      "kind": "claim",
+      "title": "Every generated file gets the mark",
+      "steps": [
+        {
+          "op": "GIVEN",
+          "text": "a sample with objects, an enum, a union and a resolver (`MessagePackObject`, `MyEnum`, `Union`, `GeneratedMessagePackResolver`).",
+          "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+          "lines": [
+            21,
+            62
+          ],
+          "side": "new"
+        },
+        {
+          "op": "THEN",
+          "text": "every generated file must contain the mark (`text.Contains(ExcludeAttribute)`).",
+          "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+          "lines": [
+            73,
+            77
+          ],
+          "side": "new"
+        },
+        {
+          "op": "AND",
+          "text": "every copy of the mark must sit inside the guard (`Assert.Equal(attributeCount, guardedCount)`).",
+          "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+          "lines": [
+            95,
+            95
+          ],
+          "side": "new"
+        },
+        {
+          "op": "SO",
+          "text": "each template adds the guarded mark, for example the union one (`ExcludeFromCodeCoverage`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/UnionTemplate.tt",
+          "lines": [
+            10,
+            12
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "The AI accepts that the mark reaches every kind of generated file, because the new tests prove it.",
+      "because": [
+        {
+          "text": "The 2 new tests fail on the old code and pass on the new code.",
+          "evidence": "evidence/ju26-issue-2297/new-tests-on-base.json"
+        },
+        {
+          "text": "The whole test suite passes after the change.",
+          "evidence": "evidence/ju26-issue-2297/regeneration.json"
+        }
+      ],
+      "unsure": "The test checks each file has the mark at least once, not that every class in it does."
+    },
+    {
+      "id": "C-2297-05",
+      "kind": "claim",
+      "title": "A small helper fix was needed",
+      "steps": [
+        {
+          "op": "GIVEN",
+          "text": "a formatter sits inside a generic class with type rules (`anyConstraints`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/TransformUtilities.cs",
+          "lines": [
+            56,
+            56
+          ],
+          "side": "new"
+        },
+        {
+          "op": "BEFORE",
+          "text": "the helper wrote the opening brace with no line break after it (`anyConstraints ? \"{\"`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/TransformUtilities.cs",
+          "lines": [
+            58,
+            58
+          ],
+          "side": "old"
+        },
+        {
+          "op": "BUT",
+          "text": "the templates now start with a line that must begin a fresh line (`#if !NETSTANDARD2_0`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.tt",
+          "lines": [
+            14,
+            14
+          ],
+          "side": "new"
+        },
+        {
+          "op": "NOW",
+          "text": "the helper adds a line break after the brace (`anyConstraints ? \"{\\r\\n\"`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/TransformUtilities.cs",
+          "lines": [
+            58,
+            58
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "The AI keeps the helper edit: without it, the generated code does not build.",
+      "because": [
+        {
+          "text": "Undoing only this line makes one test fail; putting it back makes it pass.",
+          "evidence": "evidence/ju26-issue-2297/transformutilities-removal.json"
+        },
+        {
+          "text": "By hand, we saw the brace and the new line glued together, which C# rejects.",
+          "evidence": "evidence/ju26-issue-2297/transformutilities-removal-output.json"
+        }
+      ]
+    },
+    {
+      "id": "C-2297-06",
+      "kind": "claim",
+      "title": "The fix adds one empty line",
+      "steps": [
+        {
+          "op": "NOW",
+          "text": "the helper always ends the brace with a line break (`\"{\\r\\n\"`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/TransformUtilities.cs",
+          "lines": [
+            58,
+            58
+          ],
+          "side": "new"
+        },
+        {
+          "op": "BUT",
+          "text": "one template already leaves an empty line after the brace (`EmitNestingTypesAndNamespaces`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.tt",
+          "lines": [
+            11,
+            13
+          ],
+          "side": "new"
+        },
+        {
+          "op": "SO",
+          "text": "that saved output gets one extra empty line before `#if !NETSTANDARD2_0`.",
+          "file": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericDataTypeWithPrivateMember/Formatters.HasPrivateSerializedMemberAndIsGenericOrdinal`1.HasPrivateSerializedMemberAndIsGenericOrdinalFormatter.g.cs",
+          "lines": [
+            11,
+            13
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "The AI accepts the extra empty line as the only visible side effect.",
+      "because": [
+        {
+          "text": "The sorting script counted this one extra difference.",
+          "evidence": "evidence/ju26-issue-2297/diff-classifier.json"
+        },
+        {
+          "text": "With the helper edit undone, the empty line goes away.",
+          "evidence": "evidence/ju26-issue-2297/transformutilities-removal-output.json"
+        }
+      ],
+      "unsure": "We believe the empty line is harmless, and that the enum template gets it too. We found both by reading, not by a test."
+    },
+    {
+      "id": "C-2297-07",
+      "kind": "claim",
+      "title": "Users' own resolver mark now clashes",
+      "steps": [
+        {
+          "op": "NOW",
+          "text": "the generator puts the mark on the resolver class (`ExcludeFromCodeCoverage`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt",
+          "lines": [
+            14,
+            16
+          ],
+          "side": "new"
+        },
+        {
+          "op": "GIVEN",
+          "text": "that class is the user's own; the generator only fills in the rest (`partial class <#= ResolverName.Name #>`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt",
+          "lines": [
+            17,
+            17
+          ],
+          "side": "new"
+        },
+        {
+          "op": "ALSO",
+          "text": "the combined resolver gets the same mark (`ExcludeFromCodeCoverage`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/CompositeResolverTemplate.tt",
+          "lines": [
+            7,
+            9
+          ],
+          "side": "new"
+        },
+        {
+          "op": "IF",
+          "text": "the user already wrote the mark on their half (`partial class GeneratedMessagePackResolver`), the class has it twice and the build stops.",
+          "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+          "lines": [
+            57,
+            58
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "This breaks the build for users who already added the mark by hand, so the owner must decide.",
+      "because": [
+        {
+          "text": "A small app with the mark on its own resolver builds on the old code and fails on the new code.",
+          "evidence": "evidence/ju26-issue-2297/duplicate-attribute-probe.json"
+        }
+      ],
+      "unsure": "We do not know how many users add this mark by hand. The class can be public, so the mark also shows in the user's own type.",
+      "ask": "Should the generator mark the user's own resolver class, or only the classes it fully owns?"
+    },
+    {
+      "id": "C-2297-08",
+      "kind": "claim",
+      "title": "The mark is left out where it works",
+      "steps": [
+        {
+          "op": "NOW",
+          "text": "every mark is wrapped in a check for the target (`#if !NETSTANDARD2_0 && !NETFRAMEWORK`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.tt",
+          "lines": [
+            14,
+            16
+          ],
+          "side": "new"
+        },
+        {
+          "op": "SO",
+          "text": "on older targets the mark is skipped (`#endif`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/EnumTemplate.tt",
+          "lines": [
+            8,
+            10
+          ],
+          "side": "new"
+        },
+        {
+          "op": "GIVEN",
+          "text": "the AI's reason, in a test comment: the mark is `not available on netstandard2.0 or .NET Framework`.",
+          "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+          "lines": [
+            18,
+            19
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "The AI's reason is wrong: the mark exists on those older targets, so their users silently lose the feature.",
+      "because": [
+        {
+          "text": "The mark exists in both older libraries, and a sample without the check builds on all three targets.",
+          "evidence": "evidence/ju26-issue-2297/attribute-availability.json"
+        }
+      ],
+      "unsure": "Turning the mark on for older targets is a choice for the owner. It would also change the tests and the readme."
+    },
+    {
+      "id": "C-2297-09",
+      "kind": "claim",
+      "title": "The readme repeats the wrong reason",
+      "steps": [
+        {
+          "op": "NOW",
+          "text": "the readme says all generated formatters and resolvers are `decorated with` the mark.",
+          "file": "README.md",
+          "lines": [
+            1639,
+            1639
+          ],
+          "side": "new"
+        },
+        {
+          "op": "BUT",
+          "text": "it adds that the mark is `only emitted for targets where it is available`, naming older targets.",
+          "file": "README.md",
+          "lines": [
+            1640,
+            1640
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "The first sentence is right; the second repeats a reason our check disproves.",
+      "because": [
+        {
+          "text": "The new tests show every generated file carries the mark.",
+          "evidence": "evidence/ju26-issue-2297/new-tests-on-base.json"
+        },
+        {
+          "text": "The mark exists on the older targets the readme rules out.",
+          "evidence": "evidence/ju26-issue-2297/attribute-availability.json"
+        }
+      ]
+    },
+    {
+      "id": "C-2297-10",
+      "kind": "claim",
+      "title": "Tests depend on Windows line endings",
+      "steps": [
+        {
+          "op": "GIVEN",
+          "text": "saved outputs are checked out with Windows line endings (`*.g.cs eol=crlf`).",
+          "file": "tests/MessagePack.SourceGenerator.Tests/Resources/.gitattributes",
+          "lines": [
+            3,
+            3
+          ],
+          "side": "new"
+        },
+        {
+          "op": "SO",
+          "text": "they match the generator, which `always emits CRLF line endings`.",
+          "file": "tests/MessagePack.SourceGenerator.Tests/Resources/.gitattributes",
+          "lines": [
+            1,
+            1
+          ],
+          "side": "new"
+        },
+        {
+          "op": "BUT",
+          "text": "the new test ignores line endings itself (`Replace(\"\\r\\n\", \"\\n\")`); the saved-output tests do not.",
+          "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+          "lines": [
+            88,
+            88
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "The AI notes the saved-output tests pass only with Windows line endings; it is a condition, not a fault in the change.",
+      "because": [
+        {
+          "text": "With the saved outputs switched to Unix line endings, many tests fail.",
+          "evidence": "evidence/ju26-issue-2297/snapshot-line-endings.json"
+        },
+        {
+          "text": "With the normal checkout, all tests pass.",
+          "evidence": "evidence/ju26-issue-2297/regeneration.json"
+        }
+      ],
+      "unsure": "We did not try a Mac."
+    },
+    {
+      "id": "F-2297-1",
+      "kind": "found",
+      "ref": 0,
+      "title": "Two saved outputs differ a bit more",
+      "steps": [
+        {
+          "op": "BEFORE",
+          "text": "the brace shared a line with the class (`{ internal sealed class`).",
+          "file": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericDataTypeWithPrivateMember/Formatters.HasPrivateSerializedMemberAndIsGenericNamed`1.HasPrivateSerializedMemberAndIsGenericNamedFormatter.g.cs",
+          "lines": [
+            9,
+            9
+          ],
+          "side": "old"
+        },
+        {
+          "op": "NOW",
+          "text": "the brace stands alone, then the new lines (`#if !NETSTANDARD2_0`).",
+          "file": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericDataTypeWithPrivateMember/Formatters.HasPrivateSerializedMemberAndIsGenericNamed`1.HasPrivateSerializedMemberAndIsGenericNamedFormatter.g.cs",
+          "lines": [
+            9,
+            13
+          ],
+          "side": "new"
+        },
+        {
+          "op": "ALSO",
+          "text": "the sister file gets one empty line before `#if !NETSTANDARD2_0`.",
+          "file": "tests/MessagePack.SourceGenerator.Tests/Resources/GenericDataTypeWithPrivateMember/Formatters.HasPrivateSerializedMemberAndIsGenericOrdinal`1.HasPrivateSerializedMemberAndIsGenericOrdinalFormatter.g.cs",
+          "lines": [
+            11,
+            13
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "Both extra differences come from the helper fix, so the AI accepts them.",
+      "because": [
+        {
+          "text": "The sorting script flagged exactly these two files.",
+          "evidence": "evidence/ju26-issue-2297/diff-classifier.json"
+        }
+      ]
+    },
+    {
+      "id": "F-2297-2",
+      "kind": "found",
+      "ref": 1,
+      "title": "The unexplained helper edit is needed",
+      "steps": [
+        {
+          "op": "BEFORE",
+          "text": "the brace had no line break after it (`anyConstraints ? \"{\"`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/TransformUtilities.cs",
+          "lines": [
+            58,
+            58
+          ],
+          "side": "old"
+        },
+        {
+          "op": "NOW",
+          "text": "it gets one (`anyConstraints ? \"{\\r\\n\"`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/TransformUtilities.cs",
+          "lines": [
+            58,
+            58
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "The edit stays: without it the generated code does not build. The commit should say why.",
+      "because": [
+        {
+          "text": "Undoing only this line makes a test fail.",
+          "evidence": "evidence/ju26-issue-2297/transformutilities-removal.json"
+        }
+      ]
+    },
+    {
+      "id": "F-2297-3",
+      "kind": "found",
+      "ref": 2,
+      "title": "The mark is skipped where it works",
+      "steps": [
+        {
+          "op": "NOW",
+          "text": "every mark is wrapped in `#if !NETSTANDARD2_0 && !NETFRAMEWORK`.",
+          "file": "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.tt",
+          "lines": [
+            14,
+            16
+          ],
+          "side": "new"
+        },
+        {
+          "op": "BUT",
+          "text": "the test comment says it is `not available on netstandard2.0`.",
+          "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+          "lines": [
+            18,
+            18
+          ],
+          "side": "new"
+        },
+        {
+          "op": "ALSO",
+          "text": "the readme says the same (`only emitted for targets where it is available`).",
+          "file": "README.md",
+          "lines": [
+            1640,
+            1640
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "The check is too strict: users on older targets get no mark and are not told.",
+      "because": [
+        {
+          "text": "The mark exists on the older targets, and a sample builds there without the check.",
+          "evidence": "evidence/ju26-issue-2297/attribute-availability.json"
+        }
+      ]
+    },
+    {
+      "id": "F-2297-4",
+      "kind": "found",
+      "ref": 3,
+      "title": "Some users' builds will break",
+      "steps": [
+        {
+          "op": "NOW",
+          "text": "the user's own resolver class gets the mark (`ExcludeFromCodeCoverage`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/ResolverTemplate.tt",
+          "lines": [
+            14,
+            17
+          ],
+          "side": "new"
+        },
+        {
+          "op": "IF",
+          "text": "the user marked their half (`partial class GeneratedMessagePackResolver`) already, the mark appears twice and the build stops.",
+          "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+          "lines": [
+            57,
+            58
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "This is a breaking change, and no test on the branch covers it.",
+      "because": [
+        {
+          "text": "A small app shows the build passing before and failing after.",
+          "evidence": "evidence/ju26-issue-2297/duplicate-attribute-probe.json"
+        }
+      ]
+    },
+    {
+      "id": "F-2297-5",
+      "kind": "found",
+      "ref": 4,
+      "title": "The test copies the check's exact text",
+      "steps": [
+        {
+          "op": "GIVEN",
+          "text": "the test stores the exact check text (`private const string Guard = \"#if !NETSTANDARD2_0 && !NETFRAMEWORK\"`).",
+          "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+          "lines": [
+            19,
+            19
+          ],
+          "side": "new"
+        },
+        {
+          "op": "THEN",
+          "text": "it counts marks wrapped in that text (`{Guard}`).",
+          "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+          "lines": [
+            92,
+            93
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "Widening the check will also mean changing this test.",
+      "because": []
+    },
+    {
+      "id": "F-2297-6",
+      "kind": "found",
+      "ref": 5,
+      "title": "Older targets are never built in tests",
+      "steps": [
+        {
+          "op": "GIVEN",
+          "text": "the saved-output tests set only the language version (`WithLanguageVersion`).",
+          "file": "tests/MessagePack.SourceGenerator.Tests/Verifiers/CSharpSourceGeneratorVerifier`1+Test.cs",
+          "lines": [
+            183,
+            186
+          ],
+          "side": "new"
+        },
+        {
+          "op": "ALSO",
+          "text": "the new test does the same (`new CSharpParseOptions(LanguageVersion.Latest)`).",
+          "file": "tests/MessagePack.SourceGenerator.Tests/CodeCoverageExclusionTests.cs",
+          "lines": [
+            118,
+            118
+          ],
+          "side": "new"
+        },
+        {
+          "op": "SO",
+          "text": "no test builds the code as an older target would, where `#if !NETSTANDARD2_0` leaves the mark out.",
+          "file": "src/MessagePack.SourceGenerator/Transforms/FormatterTemplate.tt",
+          "lines": [
+            14,
+            14
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "The path for older targets is untested, so a mistake there would go unseen.",
+      "because": [],
+      "unsure": "We found this by reading the test helpers, not by running a test."
+    },
+    {
+      "id": "F-2297-7",
+      "kind": "found",
+      "ref": 6,
+      "title": "One old folder is now out of date",
+      "steps": [
+        {
+          "op": "GIVEN",
+          "text": "an old saved folder still has the resolver without the mark (`partial class GeneratedMessagePackResolver`).",
+          "file": "tests/MessagePack.SourceGenerator.Tests/Resources/InterfaceUnion/MessagePack.GeneratedMessagePackResolver.g.cs",
+          "lines": [
+            11,
+            12
+          ],
+          "side": "new"
+        },
+        {
+          "op": "BUT",
+          "text": "the same class elsewhere now has it (`ExcludeFromCodeCoverage`).",
+          "file": "tests/MessagePack.SourceGenerator.Tests/Resources/AdditionalAllowTypes/MessagePack.GeneratedMessagePackResolver.g.cs",
+          "lines": [
+            12,
+            14
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "No test uses this folder, so it is harmless but stale and could be removed or updated.",
+      "because": [
+        {
+          "text": "The sorting script flagged one saved folder with no matching test.",
+          "evidence": "evidence/ju26-issue-2297/diff-classifier.json"
+        }
+      ]
+    },
+    {
+      "id": "F-2297-8",
+      "kind": "found",
+      "ref": 7,
+      "title": "Tests only compare, they never rewrite",
+      "steps": [
+        {
+          "op": "GIVEN",
+          "text": "the switch that rewrites saved files is off (`////#define WRITE_EXPECTED`).",
+          "file": "tests/MessagePack.SourceGenerator.Tests/Verifiers/CSharpSourceGeneratorVerifier`1+Test.cs",
+          "lines": [
+            5,
+            5
+          ],
+          "side": "new"
+        },
+        {
+          "op": "THEN",
+          "text": "the writing step only runs with that switch (`[Conditional(\"WRITE_EXPECTED\")]`).",
+          "file": "tests/MessagePack.SourceGenerator.Tests/Verifiers/CSharpSourceGeneratorVerifier`1+Test.cs",
+          "lines": [
+            218,
+            219
+          ],
+          "side": "new"
+        },
+        {
+          "op": "SO",
+          "text": "a normal test run only compares output with the saved files (`WriteTreeToDiskIfNecessary`).",
+          "file": "tests/MessagePack.SourceGenerator.Tests/Verifiers/CSharpSourceGeneratorVerifier`1+Test.cs",
+          "lines": [
+            197,
+            197
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "This corrects our own notes: a passing run really is a comparison, not a rewrite.",
+      "because": []
+    },
+    {
+      "id": "F-2297-9",
+      "kind": "found",
+      "ref": 8,
+      "title": "A test failure hides the real cause",
+      "steps": [
+        {
+          "op": "WHEN",
+          "text": "the test helper hands the work to the test framework (`base.GetProjectCompilationAsync`).",
+          "file": "tests/MessagePack.SourceGenerator.Tests/Verifiers/CSharpSourceGeneratorVerifier`1+Test.cs",
+          "lines": [
+            193,
+            193
+          ],
+          "side": "new"
+        },
+        {
+          "op": "THEN",
+          "text": "the framework compares the list of generated files (`expectedNames`).",
+          "file": "tests/MessagePack.SourceGenerator.Tests/Verifiers/CSharpSourceGeneratorVerifier`1+Test.cs",
+          "lines": [
+            194,
+            198
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "When output changes, the failure message points at the file list, not at the real build error.",
+      "because": [
+        {
+          "text": "Our manual run had to dig out the real error, a broken line, by hand.",
+          "evidence": "evidence/ju26-issue-2297/transformutilities-removal-output.json"
+        }
+      ],
+      "unsure": "The message text comes from the outside test framework, so we could not cite it here."
+    },
+    {
+      "id": "D-2297-1",
+      "kind": "drift",
+      "ref": 0,
+      "title": "Nothing outside the task changed",
+      "steps": [
+        {
+          "op": "BEFORE",
+          "text": "one edit outside the templates looked off-topic (`anyConstraints ? \"{\"`).",
+          "file": "src/MessagePack.SourceGenerator/Transforms/TransformUtilities.cs",
+          "lines": [
+            58,
+            58
+          ],
+          "side": "old"
+        },
+        {
+          "op": "NOW",
+          "text": "it adds a line break (`anyConstraints ? \"{\\r\\n\"`), which the new lines need.",
+          "file": "src/MessagePack.SourceGenerator/Transforms/TransformUtilities.cs",
+          "lines": [
+            58,
+            58
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "The AI found no change outside the task; the one doubtful edit is needed.",
+      "because": [
+        {
+          "text": "Undoing that edit makes a test fail.",
+          "evidence": "evidence/ju26-issue-2297/transformutilities-removal.json"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,4367 @@
+{
+  "check": "decision-check",
+  "branch": "ju26-issue-2283",
+  "base": "32258fdb",
+  "head": "9df83c38",
+  "command": "python3 review/scripts/decision_check.py --repo $MP_REPO --branch ju26-issue-2283 --write",
+  "result": "pass",
+  "provides": [
+    "count"
+  ],
+  "summary": "12 decisions explained in 36 steps; 36 of 36 steps match the cited code; 4 of 4 claims have a card",
+  "details": {
+    "cards": [
+      {
+        "id": "C-2283-01",
+        "kind": "claim",
+        "title": "The crash is fixed",
+        "steps": [
+          {
+            "op": "BEFORE",
+            "text": "the code took the first source line of a property with `DeclaringSyntaxReferences[0]`. A type from another library has none, so it crashed.",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              985,
+              985
+            ],
+            "side": "old",
+            "verified": true,
+            "problems": [],
+            "in_change": true
+          },
+          {
+            "op": "NOW",
+            "text": "it asks a new helper, `GetPropertyIdentifierLocation(item)`, instead.",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              985,
+              985
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": true
+          },
+          {
+            "op": "ALSO",
+            "text": "a second place now uses `FirstOrDefault()` so it gets nothing instead of crashing.",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              1077,
+              1077
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": true
+          },
+          {
+            "op": "SO",
+            "text": "when there is no source line, the helper gives back nothing (`FirstOrDefault()?.GetSyntax()`).",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              1434,
+              1434
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": true
+          },
+          {
+            "op": "AND",
+            "text": "two new tests check that the code is still produced (`Assert.Contains(expectedResolverHintName, hintNames)`).",
+            "file": "tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs",
+            "lines": [
+              657,
+              658
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": true
+          }
+        ],
+        "verdict": "The crash from the issue is fixed, and tests prove it.",
+        "because": [
+          {
+            "text": "The new tests fail before the change and pass after it.",
+            "evidence": "evidence/ju26-issue-2283/old-vs-new-tests.script.json",
+            "result": "pass",
+            "summary": "3 new or changed test methods (3 added, 0 modified): 3 fail on base and pass on branch, 0 pass on base (not evidence), 0 fail on branch, 0 not runnable here (project does not build on branch)",
+            "produced_by": "script",
+            "check": "old-vs-new-tests"
+          },
+          {
+            "text": "Two of the tests still pass with the new filter taken out. So the crash fix alone makes them pass.",
+            "evidence": "evidence/ju26-issue-2283/old-vs-new-tests.json",
+            "result": "pass",
+            "summary": "3 of 3 new tests fail on base and pass on branch; 1 of them (ClosedGenericStruct_FromMetadataReference_UnkeyedMember) also fails when only the filter is removed; whole test project: 167 of 167 pre-existing tests pass on base and 167 on branch",
+            "produced_by": "hand",
+            "check": "old-vs-new-tests"
+          }
+        ],
+        "code": [
+          {
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "rows": [
+              [
+                " ",
+                982,
+                982,
+                "                    var stringKey = key is { Value: string stringKeyValue } ? stringKeyValue : default;"
+              ],
+              [
+                " ",
+                983,
+                983,
+                "                    if (intKey == null && stringKey == null)"
+              ],
+              [
+                " ",
+                984,
+                984,
+                "                    {"
+              ],
+              [
+                "-",
+                985,
+                null,
+                "                        this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.BothStringAndIntKeyAreNull, ((PropertyDeclarationSyntax)item.DeclaringSyntaxReferences[0].GetSyntax()).Identifier.GetLocation(), formattedType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), item.Name));"
+              ],
+              [
+                "+",
+                null,
+                985,
+                "                        this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.BothStringAndIntKeyAreNull, GetPropertyIdentifierLocation(item), formattedType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), item.Name));"
+              ],
+              [
+                " ",
+                986,
+                986,
+                "                    }"
+              ],
+              [
+                " ",
+                987,
+                987,
+                ""
+              ],
+              [
+                " ",
+                988,
+                988,
+                "                    // A property with an init accessor and an initializer has a default that will be discarded by the deserializer."
+              ],
+              [
+                "gap",
+                null,
+                null,
+                ""
+              ],
+              [
+                " ",
+                1074,
+                1074,
+                "                            {"
+              ],
+              [
+                " ",
+                1075,
+                1075,
+                "                                Diagnostic diagnostic = derivedKeyAttribute is not null && suppressSourceGeneration is not true"
+              ],
+              [
+                " ",
+                1076,
+                1076,
+                "                                    ? Diagnostic.Create(MsgPack00xMessagePackAnalyzer.AOTDerivedKeyAttribute, derivedKeyAttribute.GetSyntax(this.cancellationToken).GetLocation())"
+              ],
+              [
+                "-",
+                1077,
+                null,
+                "                                    : Diagnostic.Create(MsgPack00xMessagePackAnalyzer.MemberNeedsKey, item.DeclaringSyntaxReferences[0].GetSyntax().GetLocation(), formattedType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), item.Name);"
+              ],
+              [
+                "+",
+                null,
+                1077,
+                "                                    : Diagnostic.Create(MsgPack00xMessagePackAnalyzer.MemberNeedsKey, item.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation(), formattedType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), item.Name);"
+              ],
+              [
+                " ",
+                1078,
+                1078,
+                "                                if (nonPublicMembersAreSerialized || (item.DeclaredAccessibility & Accessibility.Public) == Accessibility.Public)"
+              ],
+              [
+                " ",
+                1079,
+                1079,
+                "                                {"
+              ],
+              [
+                " ",
+                1080,
+                1080,
+                "                                    this.reportDiagnostic?.Invoke(diagnostic);"
+              ],
+              [
+                "gap",
+                null,
+                null,
+                ""
+              ],
+              [
+                " ",
+                1426,
+                1426,
+                ""
+              ],
+              [
+                " ",
+                1427,
+                1427,
+                "    private static Location? GetIdentifierLocation(INamedTypeSymbol type) => ((BaseTypeDeclarationSyntax?)type.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax())?.Identifier.GetLocation();"
+              ],
+              [
+                " ",
+                1428,
+                1428,
+                ""
+              ],
+              [
+                "+",
+                null,
+                1429,
+                "    /// <summary>"
+              ],
+              [
+                "+",
+                null,
+                1430,
+                "    /// Gets the location of the identifier of a property, if it is declared in source."
+              ],
+              [
+                "+",
+                null,
+                1431,
+                "    /// </summary>"
+              ],
+              [
+                "+",
+                null,
+                1432,
+                "    /// <param name=\"property\">The property symbol. It may be declared in metadata, in which case <see langword=\"null\" /> is returned.</param>"
+              ],
+              [
+                "+",
+                null,
+                1433,
+                "    /// <returns>The location of the identifier, or <see langword=\"null\" /> if the property has no declaration in source.</returns>"
+              ],
+              [
+                "+",
+                null,
+                1434,
+                "    private static Location? GetPropertyIdentifierLocation(IPropertySymbol property) => (property.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as PropertyDeclarationSyntax)?.Identifier.GetLocation();"
+              ],
+              [
+                "+",
+                null,
+                1435,
+                ""
+              ],
+              [
+                "+",
+                null,
+                1436,
+                "    /// <summary>"
+              ],
+              [
+                "+",
+                null,
+                1437,
+                "    /// Reports a diagnostic only when its location belongs to the compilation being analyzed."
+              ],
+              [
+                "+",
+                null,
+                1438,
+                "    /// </summary>"
+              ],
+              [
+                "+",
+                null,
+                1439,
+                "    /// <remarks>"
+              ],
+              [
+                "+",
+                null,
+                1440,
+                "    /// Types and members that come from metadata (or from another compilation) have no location in the compilation being analyzed."
+              ],
+              [
+                "+",
+                null,
+                1441,
+                "    /// Their problems are reported by the compilation that defines them, so they are dropped here rather than being reported"
+              ],
+              [
+                "+",
+                null,
+                1442,
+                "    /// against a location that does not exist, which analyzers are not permitted to do."
+              ],
+              [
+                "+",
+                null,
+                1443,
+                "    /// </remarks>"
+              ],
+              [
+                "+",
+                null,
+                1444,
+                "    private void ReportIfLocatedInCompilation(Action<Diagnostic> report, Diagnostic diagnostic)"
+              ],
+              [
+                "+",
+                null,
+                1445,
+                "    {"
+              ],
+              [
+                "+",
+                null,
+                1446,
+                "        if (diagnostic.Location.IsInSource && this.compilation.ContainsSyntaxTree(diagnostic.Location.SourceTree))"
+              ],
+              [
+                "+",
+                null,
+                1447,
+                "        {"
+              ],
+              [
+                "+",
+                null,
+                1448,
+                "            report(diagnostic);"
+              ],
+              [
+                "+",
+                null,
+                1449,
+                "        }"
+              ],
+              [
+                "+",
+                null,
+                1450,
+                "    }"
+              ],
+              [
+                "+",
+                null,
+                1451,
+                ""
+              ],
+              [
+                " ",
+                1429,
+                1452,
+                "    private static Location? GetLocation(IParameterSymbol parameter) => parameter.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation();"
+              ],
+              [
+                " ",
+                1430,
+                1453,
+                ""
+              ],
+              [
+                " ",
+                1431,
+                1454,
+                "    private static Location? GetParameterListLocation(IMethodSymbol? method) => ((BaseMethodDeclarationSyntax?)method?.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax())?.ParameterList.GetLocation();"
+              ]
+            ],
+            "cut": 0
+          },
+          {
+            "file": "tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs",
+            "rows": [
+              [
+                " ",
+                494,
+                496,
+                "        }.RunAsync();"
+              ],
+              [
+                " ",
+                495,
+                497,
+                "    }"
+              ],
+              [
+                " ",
+                496,
+                498,
+                ""
+              ],
+              [
+                "+",
+                null,
+                499,
+                "    /// <summary>"
+              ],
+              [
+                "+",
+                null,
+                500,
+                "    /// Asserts that a closed generic value type defined in a referenced <em>assembly</em> (metadata only, no syntax),"
+              ],
+              [
+                "+",
+                null,
+                501,
+                "    /// used as a member type, does not crash the generator or analyzer."
+              ],
+              [
+                "+",
+                null,
+                502,
+                "    /// </summary>"
+              ],
+              [
+                "+",
+                null,
+                503,
+                "    /// <remarks>"
+              ],
+              [
+                "+",
+                null,
+                504,
+                "    /// See https://github.com/MessagePack-CSharp/MessagePack-CSharp/issues/2283."
+              ],
+              [
+                "+",
+                null,
+                505,
+                "    /// </remarks>"
+              ],
+              [
+                "+",
+                null,
+                506,
+                "    [Fact]"
+              ],
+              [
+                "+",
+                null,
+                507,
+                "    public async Task ClosedGenericStruct_FromMetadataReference()"
+              ],
+              [
+                "+",
+                null,
+                508,
+                "    {"
+              ],
+              [
+                "+",
+                null,
+                509,
+                "        string defineSource = \"\"\""
+              ],
+              [
+                "+",
+                null,
+                510,
+                "using MessagePack;"
+              ],
+              [
+                "+",
+                null,
+                511,
+                ""
+              ],
+              [
+                "+",
+                null,
+                512,
+                "namespace TempProject"
+              ],
+              [
+                "+",
+                null,
+                513,
+                "{"
+              ],
+              [
+                "+",
+                null,
+                514,
+                "    [MessagePackObject]"
+              ],
+              [
+                "+",
+                null,
+                515,
+                "    public struct MyGenericStruct<T>"
+              ],
+              [
+                "+",
+                null,
+                516,
+                "    {"
+              ],
+              [
+                "+",
+                null,
+                517,
+                "        [Key(0)]"
+              ],
+              [
+                "+",
+                null,
+                518,
+                "        public T Content { get; set; }"
+              ],
+              [
+                "+",
+                null,
+                519,
+                "    }"
+              ],
+              [
+                "+",
+                null,
+                520,
+                "}"
+              ],
+              [
+                "+",
+                null,
+                521,
+                "\"\"\";"
+              ],
+              [
+                "+",
+                null,
+                522,
+                ""
+              ],
+              [
+                "+",
+                null,
+                523,
+                "        string usageSource = \"\"\""
+              ],
+              [
+                "+",
+                null,
+                524,
+                "using MessagePack;"
+              ],
+              [
+                "+",
+                null,
+                525,
+                ""
+              ],
+              [
+                "+",
+                null,
+                526,
+                "namespace TempProject"
+              ],
+              [
+                "+",
+                null,
+                527,
+                "{"
+              ],
+              [
+                "+",
+                null,
+                528,
+                "    [MessagePackObject]"
+              ],
+              [
+                "+",
+                null,
+                529,
+                "    public class MyObject"
+              ],
+              [
+                "+",
+                null,
+                530,
+                "    {"
+              ],
+              [
+                "+",
+                null,
+                531,
+                "        [Key(0)]"
+              ],
+              [
+                "+",
+                null,
+                532,
+                "        public MyGenericStruct<int> Value { get; set; }"
+              ],
+              [
+                "+",
+                null,
+                533,
+                "    }"
+              ],
+              [
+                "+",
+                null,
+                534,
+                ""
+              ],
+              [
+                "+",
+                null,
+                535,
+                "    [GeneratedMessagePackResolver]"
+              ],
+              [
+                "+",
+                null,
+                536,
+                "    partial class MyResolver { }"
+              ],
+              [
+                "+",
+                null,
+                537,
+                "}"
+              ],
+              [
+                "+",
+                null,
+                538,
+                "\"\"\";"
+              ],
+              [
+                "+",
+                null,
+                539,
+                ""
+              ],
+              [
+                "+",
+                null,
+                540,
+                "        await RunWithMetadataReferenceAsync(defineSource, usageSource, \"TempProject.MyResolver.g.cs\");"
+              ],
+              [
+                "+",
+                null,
+                541,
+                "    }"
+              ],
+              [
+                "+",
+                null,
+                542,
+                ""
+              ],
+              [
+                "+",
+                null,
+                543,
+                "    /// <summary>"
+              ],
+              [
+                "+",
+                null,
+                544,
+                "    /// Asserts that a closed generic <em>record struct</em> defined in a referenced assembly, used as a member type,"
+              ],
+              [
+                "+",
+                null,
+                545,
+                "    /// does not crash the generator or analyzer."
+              ],
+              [
+                "+",
+                null,
+                546,
+                "    /// </summary>"
+              ],
+              [
+                "+",
+                null,
+                547,
+                "    /// <remarks>"
+              ],
+              [
+                "+",
+                null,
+                548,
+                "    /// See https://github.com/MessagePack-CSharp/MessagePack-CSharp/issues/2283."
+              ],
+              [
+                "+",
+                null,
+                549,
+                "    /// </remarks>"
+              ],
+              [
+                "+",
+                null,
+                550,
+                "    [Fact]"
+              ],
+              [
+                "+",
+                null,
+                551,
+                "    public async Task ClosedGenericRecordStruct_FromMetadataReference()"
+              ],
+              [
+                "+",
+                null,
+                552,
+                "    {"
+              ],
+              [
+                "+",
+                null,
+                553,
+                "        string defineSource = \"\"\""
+              ],
+              [
+                "+",
+                null,
+                554,
+                "using MessagePack;"
+              ],
+              [
+                "+",
+                null,
+                555,
+                ""
+              ],
+              [
+                "+",
+                null,
+                556,
+                "namespace Lib;"
+              ],
+              [
+                "+",
+                null,
+                557,
+                ""
+              ],
+              [
+                "+",
+                null,
+                558,
+                "[MessagePackObject]"
+              ],
+              [
+                "+",
+                null,
+                559,
+                "public partial record struct Item<T>([property: Key(0)] string Key);"
+              ],
+              [
+                "+",
+                null,
+                560,
+                "\"\"\";"
+              ],
+              [
+                "+",
+                null,
+                561,
+                ""
+              ],
+              [
+                "+",
+                null,
+                562,
+                "        string usageSource = \"\"\""
+              ],
+              [
+                "+",
+                null,
+                563,
+                "using MessagePack;"
+              ],
+              [
+                "+",
+                null,
+                564,
+                "using Lib;"
+              ],
+              [
+                "+",
+                null,
+                565,
+                ""
+              ],
+              [
+                "+",
+                null,
+                566,
+                "namespace App;"
+              ],
+              [
+                "+",
+                null,
+                567,
+                ""
+              ],
+              [
+                "+",
+                null,
+                568,
+                "[MessagePackObject]"
+              ],
+              [
+                "+",
+                null,
+                569,
+                "public sealed partial record Cmd([property: Key(0)] string Scope)"
+              ],
+              [
+                "+",
+                null,
+                570,
+                "{"
+              ],
+              [
+                "+",
+                null,
+                571,
+                "    [Key(1)]"
+              ],
+              [
+                "+",
+                null,
+                572,
+                "    public Item<int> Member { get; init; }"
+              ],
+              [
+                "+",
+                null,
+                573,
+                "}"
+              ],
+              [
+                "+",
+                null,
+                574,
+                ""
+              ],
+              [
+                "+",
+                null,
+                575,
+                "[GeneratedMessagePackResolver]"
+              ],
+              [
+                "+",
+                null,
+                576,
+                "partial class AppResolver { }"
+              ],
+              [
+                "+",
+                null,
+                577,
+                "\"\"\";"
+              ],
+              [
+                "+",
+                null,
+                578,
+                ""
+              ],
+              [
+                "+",
+                null,
+                579,
+                "        await RunWithMetadataReferenceAsync(defineSource, usageSource, \"App.AppResolver.g.cs\", LanguageVersion.Latest);"
+              ],
+              [
+                "+",
+                null,
+                580,
+                "    }"
+              ],
+              [
+                "+",
+                null,
+                581,
+                ""
+              ],
+              [
+                "+",
+                null,
+                582,
+                "    /// <summary>"
+              ],
+              [
+                "+",
+                null,
+                583,
+                "    /// Asserts that a closed generic value type from a referenced assembly whose members lack a key attribute"
+              ],
+              [
+                "+",
+                null,
+                584,
+                "    /// does not crash the generator or analyzer, since its member diagnostics belong to the defining assembly."
+              ],
+              [
+                "+",
+                null,
+                585,
+                "    /// </summary>"
+              ]
+            ],
+            "cut": 103
+          }
+        ],
+        "problems": [],
+        "verified": true
+      },
+      {
+        "id": "C-2283-02",
+        "kind": "claim",
+        "title": "Some warnings are now silenced",
+        "steps": [
+          {
+            "op": "BEFORE",
+            "text": "every warning went straight to `reportAnalyzerDiagnostic`.",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              239,
+              239
+            ],
+            "side": "old",
+            "verified": true,
+            "problems": [],
+            "in_change": true
+          },
+          {
+            "op": "NOW",
+            "text": "every warning passes through `ReportIfLocatedInCompilation` first.",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              239,
+              239
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": true
+          },
+          {
+            "op": "IF",
+            "text": "the warning points at code in this project (`IsInSource` and `ContainsSyntaxTree`),",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              1446,
+              1446
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": true
+          },
+          {
+            "op": "THEN",
+            "text": "it is shown to the user (`report(diagnostic)`).",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              1448,
+              1448
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": true
+          },
+          {
+            "op": "ELSE",
+            "text": "it is dropped without a trace. The comment says the other library will report it (`reported by the compilation that defines them`).",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              1440,
+              1442
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": true
+          }
+        ],
+        "verdict": "This hides a warning users used to get, so the analyzer's owner must decide.",
+        "because": [
+          {
+            "text": "We wrote a small app that makes a common mistake. The old code warns about it. The new code says nothing, and no other place warns either.",
+            "evidence": "evidence/ju26-issue-2283/dropped-warning.json",
+            "result": "fail",
+            "summary": "MsgPack003 (unattributed_consumer_type_inside_metadata_generic) is reported on base without any analyzer crash and is absent on branch; 3 of 6 probe cases lose a diagnostic on branch",
+            "produced_by": "hand",
+            "check": "dropped-warning"
+          },
+          {
+            "text": "Almost every warning in this file goes through the new filter, not only the one that crashed.",
+            "evidence": "evidence/ju26-issue-2283/report-sites.json",
+            "result": "pass",
+            "summary": "29 live report sites in TypeCollector.cs: 28 go through the filter (19 distinct descriptors), 1 bypass it; 28 of the 28 filtered sites can have a location outside the compilation's source; simple grep for 'reportDiagnostic?.Invoke' counts 29 lines (2 of them commented out)",
+            "produced_by": "script",
+            "check": "report-sites"
+          }
+        ],
+        "unsure": "The comment assumes the other library reports the warning. Our test shows that, for a mistake in the app's own type, nobody does.",
+        "ask": "Should these warnings be dropped, moved to the app's own code, or kept?",
+        "code": [
+          {
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "rows": [
+              [
+                " ",
+                236,
+                236,
+                "    private TypeCollector(Compilation compilation, AnalyzerOptions options, ReferenceSymbols referenceSymbols, ITypeSymbol targetType, Action<Diagnostic>? reportAnalyzerDiagnostic, CancellationToken cancellationToken)"
+              ],
+              [
+                " ",
+                237,
+                237,
+                "    {"
+              ],
+              [
+                " ",
+                238,
+                238,
+                "        this.typeReferences = referenceSymbols;"
+              ],
+              [
+                "-",
+                239,
+                null,
+                "        this.reportDiagnostic = reportAnalyzerDiagnostic;"
+              ],
+              [
+                "+",
+                null,
+                239,
+                "        this.reportDiagnostic = reportAnalyzerDiagnostic is null ? null : diagnostic => ReportIfLocatedInCompilation(reportAnalyzerDiagnostic, diagnostic);"
+              ],
+              [
+                " ",
+                240,
+                240,
+                "        this.options = options;"
+              ],
+              [
+                " ",
+                241,
+                241,
+                "        this.compilation = compilation;"
+              ],
+              [
+                " ",
+                242,
+                242,
+                "        this.cancellationToken = cancellationToken;"
+              ],
+              [
+                "gap",
+                null,
+                null,
+                ""
+              ],
+              [
+                " ",
+                1426,
+                1426,
+                ""
+              ],
+              [
+                " ",
+                1427,
+                1427,
+                "    private static Location? GetIdentifierLocation(INamedTypeSymbol type) => ((BaseTypeDeclarationSyntax?)type.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax())?.Identifier.GetLocation();"
+              ],
+              [
+                " ",
+                1428,
+                1428,
+                ""
+              ],
+              [
+                "+",
+                null,
+                1429,
+                "    /// <summary>"
+              ],
+              [
+                "+",
+                null,
+                1430,
+                "    /// Gets the location of the identifier of a property, if it is declared in source."
+              ],
+              [
+                "+",
+                null,
+                1431,
+                "    /// </summary>"
+              ],
+              [
+                "+",
+                null,
+                1432,
+                "    /// <param name=\"property\">The property symbol. It may be declared in metadata, in which case <see langword=\"null\" /> is returned.</param>"
+              ],
+              [
+                "+",
+                null,
+                1433,
+                "    /// <returns>The location of the identifier, or <see langword=\"null\" /> if the property has no declaration in source.</returns>"
+              ],
+              [
+                "+",
+                null,
+                1434,
+                "    private static Location? GetPropertyIdentifierLocation(IPropertySymbol property) => (property.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as PropertyDeclarationSyntax)?.Identifier.GetLocation();"
+              ],
+              [
+                "+",
+                null,
+                1435,
+                ""
+              ],
+              [
+                "+",
+                null,
+                1436,
+                "    /// <summary>"
+              ],
+              [
+                "+",
+                null,
+                1437,
+                "    /// Reports a diagnostic only when its location belongs to the compilation being analyzed."
+              ],
+              [
+                "+",
+                null,
+                1438,
+                "    /// </summary>"
+              ],
+              [
+                "+",
+                null,
+                1439,
+                "    /// <remarks>"
+              ],
+              [
+                "+",
+                null,
+                1440,
+                "    /// Types and members that come from metadata (or from another compilation) have no location in the compilation being analyzed."
+              ],
+              [
+                "+",
+                null,
+                1441,
+                "    /// Their problems are reported by the compilation that defines them, so they are dropped here rather than being reported"
+              ],
+              [
+                "+",
+                null,
+                1442,
+                "    /// against a location that does not exist, which analyzers are not permitted to do."
+              ],
+              [
+                "+",
+                null,
+                1443,
+                "    /// </remarks>"
+              ],
+              [
+                "+",
+                null,
+                1444,
+                "    private void ReportIfLocatedInCompilation(Action<Diagnostic> report, Diagnostic diagnostic)"
+              ],
+              [
+                "+",
+                null,
+                1445,
+                "    {"
+              ],
+              [
+                "+",
+                null,
+                1446,
+                "        if (diagnostic.Location.IsInSource && this.compilation.ContainsSyntaxTree(diagnostic.Location.SourceTree))"
+              ],
+              [
+                "+",
+                null,
+                1447,
+                "        {"
+              ],
+              [
+                "+",
+                null,
+                1448,
+                "            report(diagnostic);"
+              ],
+              [
+                "+",
+                null,
+                1449,
+                "        }"
+              ],
+              [
+                "+",
+                null,
+                1450,
+                "    }"
+              ],
+              [
+                "+",
+                null,
+                1451,
+                ""
+              ],
+              [
+                " ",
+                1429,
+                1452,
+                "    private static Location? GetLocation(IParameterSymbol parameter) => parameter.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation();"
+              ],
+              [
+                " ",
+                1430,
+                1453,
+                ""
+              ],
+              [
+                " ",
+                1431,
+                1454,
+                "    private static Location? GetParameterListLocation(IMethodSymbol? method) => ((BaseMethodDeclarationSyntax?)method?.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax())?.ParameterList.GetLocation();"
+              ]
+            ],
+            "cut": 0
+          }
+        ],
+        "problems": [],
+        "verified": true
+      },
+      {
+        "id": "C-2283-03",
+        "kind": "claim",
+        "title": "The new notes promise too much",
+        "steps": [
+          {
+            "op": "NOW",
+            "text": "the README says these warnings are `reported by the assembly that defines it`.",
+            "file": "README.md",
+            "lines": [
+              1642,
+              1642
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": true
+          },
+          {
+            "op": "ALSO",
+            "text": "the warning page says the same: they are `reported by the project that defines that type`.",
+            "file": "doc/analyzers/MsgPack004.md",
+            "lines": [
+              52,
+              52
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": true
+          },
+          {
+            "op": "BUT",
+            "text": "the code just drops them (`report(diagnostic)` runs only for this project's code).",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              1446,
+              1448
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": false
+          }
+        ],
+        "verdict": "The notes describe the hidden warnings as fine, so they wait on the owner's choice about the filter.",
+        "because": [
+          {
+            "text": "In our test, the mistake was in the app's own type. No other library warned about it. So the note is wrong there.",
+            "evidence": "evidence/ju26-issue-2283/dropped-warning.json",
+            "result": "fail",
+            "summary": "MsgPack003 (unattributed_consumer_type_inside_metadata_generic) is reported on base without any analyzer crash and is absent on branch; 3 of 6 probe cases lose a diagnostic on branch",
+            "produced_by": "hand",
+            "check": "dropped-warning"
+          }
+        ],
+        "unsure": "The notes may be right for mistakes that really live in the other library.",
+        "ask": "If the warnings stay hidden, should these notes stay, or be changed?",
+        "code": [
+          {
+            "file": "README.md",
+            "rows": [
+              [
+                " ",
+                1636,
+                1636,
+                ""
+              ],
+              [
+                " ",
+                1637,
+                1637,
+                "Learn more about using a mix of your own custom formatters and automatically generated ones in [the Analyzer section](#analyzer)."
+              ],
+              [
+                " ",
+                1638,
+                1638,
+                ""
+              ],
+              [
+                "+",
+                null,
+                1639,
+                "### Generic types from referenced assemblies"
+              ],
+              [
+                "+",
+                null,
+                1640,
+                ""
+              ],
+              [
+                "+",
+                null,
+                1641,
+                "Closed generic types defined in a referenced assembly (for example, `Item<int>` where `Item<T>` is defined in another project or NuGet package) can be used as members of your `[MessagePackObject]` types, including generic value types and record structs."
+              ],
+              [
+                "+",
+                null,
+                1642,
+                "Diagnostics about the members of such a type are reported by the assembly that defines it rather than by the consuming project, so any problem must be fixed there."
+              ],
+              [
+                "+",
+                null,
+                1643,
+                ""
+              ],
+              [
+                " ",
+                1639,
+                1644,
+                "### MagicOnion"
+              ],
+              [
+                " ",
+                1640,
+                1645,
+                ""
+              ],
+              [
+                " ",
+                1641,
+                1646,
+                "[MagicOnion](https://github.com/Cysharp/MagicOnion) is a code-first gRPC framework based on grpc-dotnet and MessagePack. gRPC usually communicates with Protocol Buffers using IDL. But MagicOnion uses MessagePack for C# and does not need IDL. When communicating C# to C#, schemaless (or rather C# classes as schema) is better than using IDL."
+              ]
+            ],
+            "cut": 0
+          },
+          {
+            "file": "doc/analyzers/MsgPack004.md",
+            "rows": [
+              [
+                " ",
+                45,
+                45,
+                "    public int B { get; set; }"
+              ],
+              [
+                " ",
+                46,
+                46,
+                "}"
+              ],
+              [
+                " ",
+                47,
+                47,
+                "```"
+              ],
+              [
+                "+",
+                null,
+                48,
+                ""
+              ],
+              [
+                "+",
+                null,
+                49,
+                "## Types from referenced assemblies"
+              ],
+              [
+                "+",
+                null,
+                50,
+                ""
+              ],
+              [
+                "+",
+                null,
+                51,
+                "This analyzer only reports on members declared in the project being compiled."
+              ],
+              [
+                "+",
+                null,
+                52,
+                "Members of a type defined in a referenced assembly are reported by the project that defines that type, so an unattributed public member of such a type must be fixed in its defining project."
+              ]
+            ],
+            "cut": 0
+          },
+          {
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "rows": [
+              [
+                " ",
+                1426,
+                1426,
+                ""
+              ],
+              [
+                " ",
+                1427,
+                1427,
+                "    private static Location? GetIdentifierLocation(INamedTypeSymbol type) => ((BaseTypeDeclarationSyntax?)type.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax())?.Identifier.GetLocation();"
+              ],
+              [
+                " ",
+                1428,
+                1428,
+                ""
+              ],
+              [
+                "+",
+                null,
+                1429,
+                "    /// <summary>"
+              ],
+              [
+                "+",
+                null,
+                1430,
+                "    /// Gets the location of the identifier of a property, if it is declared in source."
+              ],
+              [
+                "+",
+                null,
+                1431,
+                "    /// </summary>"
+              ],
+              [
+                "+",
+                null,
+                1432,
+                "    /// <param name=\"property\">The property symbol. It may be declared in metadata, in which case <see langword=\"null\" /> is returned.</param>"
+              ],
+              [
+                "+",
+                null,
+                1433,
+                "    /// <returns>The location of the identifier, or <see langword=\"null\" /> if the property has no declaration in source.</returns>"
+              ],
+              [
+                "+",
+                null,
+                1434,
+                "    private static Location? GetPropertyIdentifierLocation(IPropertySymbol property) => (property.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as PropertyDeclarationSyntax)?.Identifier.GetLocation();"
+              ],
+              [
+                "+",
+                null,
+                1435,
+                ""
+              ],
+              [
+                "+",
+                null,
+                1436,
+                "    /// <summary>"
+              ],
+              [
+                "+",
+                null,
+                1437,
+                "    /// Reports a diagnostic only when its location belongs to the compilation being analyzed."
+              ],
+              [
+                "+",
+                null,
+                1438,
+                "    /// </summary>"
+              ],
+              [
+                "+",
+                null,
+                1439,
+                "    /// <remarks>"
+              ],
+              [
+                "+",
+                null,
+                1440,
+                "    /// Types and members that come from metadata (or from another compilation) have no location in the compilation being analyzed."
+              ],
+              [
+                "+",
+                null,
+                1441,
+                "    /// Their problems are reported by the compilation that defines them, so they are dropped here rather than being reported"
+              ],
+              [
+                "+",
+                null,
+                1442,
+                "    /// against a location that does not exist, which analyzers are not permitted to do."
+              ],
+              [
+                "+",
+                null,
+                1443,
+                "    /// </remarks>"
+              ],
+              [
+                "+",
+                null,
+                1444,
+                "    private void ReportIfLocatedInCompilation(Action<Diagnostic> report, Diagnostic diagnostic)"
+              ],
+              [
+                "+",
+                null,
+                1445,
+                "    {"
+              ],
+              [
+                "+",
+                null,
+                1446,
+                "        if (diagnostic.Location.IsInSource && this.compilation.ContainsSyntaxTree(diagnostic.Location.SourceTree))"
+              ],
+              [
+                "+",
+                null,
+                1447,
+                "        {"
+              ],
+              [
+                "+",
+                null,
+                1448,
+                "            report(diagnostic);"
+              ],
+              [
+                "+",
+                null,
+                1449,
+                "        }"
+              ],
+              [
+                "+",
+                null,
+                1450,
+                "    }"
+              ],
+              [
+                "+",
+                null,
+                1451,
+                ""
+              ],
+              [
+                " ",
+                1429,
+                1452,
+                "    private static Location? GetLocation(IParameterSymbol parameter) => parameter.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation();"
+              ],
+              [
+                " ",
+                1430,
+                1453,
+                ""
+              ],
+              [
+                " ",
+                1431,
+                1454,
+                "    private static Location? GetParameterListLocation(IMethodSymbol? method) => ((BaseMethodDeclarationSyntax?)method?.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax())?.ParameterList.GetLocation();"
+              ]
+            ],
+            "cut": 0
+          }
+        ],
+        "problems": [],
+        "verified": true
+      },
+      {
+        "id": "C-2283-04",
+        "kind": "claim",
+        "title": "Old tests still pass",
+        "steps": [
+          {
+            "op": "NOW",
+            "text": "every warning goes through the new filter (`ReportIfLocatedInCompilation`).",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              239,
+              239
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": true
+          },
+          {
+            "op": "AND",
+            "text": "two places now use the safe helpers (`GetPropertyIdentifierLocation`, `FirstOrDefault()`).",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              985,
+              1077
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": true
+          }
+        ],
+        "verdict": "No old test broke, but that does not prove the change is right.",
+        "because": [
+          {
+            "text": "All old tests in the project pass both before and after.",
+            "evidence": "evidence/ju26-issue-2283/old-vs-new-tests.json",
+            "result": "pass",
+            "summary": "3 of 3 new tests fail on base and pass on branch; 1 of them (ClosedGenericStruct_FromMetadataReference_UnkeyedMember) also fails when only the filter is removed; whole test project: 167 of 167 pre-existing tests pass on base and 167 on branch",
+            "produced_by": "hand",
+            "check": "old-vs-new-tests"
+          }
+        ],
+        "unsure": "Old tests may not cover the warnings that are now hidden.",
+        "code": [
+          {
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "rows": [
+              [
+                " ",
+                236,
+                236,
+                "    private TypeCollector(Compilation compilation, AnalyzerOptions options, ReferenceSymbols referenceSymbols, ITypeSymbol targetType, Action<Diagnostic>? reportAnalyzerDiagnostic, CancellationToken cancellationToken)"
+              ],
+              [
+                " ",
+                237,
+                237,
+                "    {"
+              ],
+              [
+                " ",
+                238,
+                238,
+                "        this.typeReferences = referenceSymbols;"
+              ],
+              [
+                "-",
+                239,
+                null,
+                "        this.reportDiagnostic = reportAnalyzerDiagnostic;"
+              ],
+              [
+                "+",
+                null,
+                239,
+                "        this.reportDiagnostic = reportAnalyzerDiagnostic is null ? null : diagnostic => ReportIfLocatedInCompilation(reportAnalyzerDiagnostic, diagnostic);"
+              ],
+              [
+                " ",
+                240,
+                240,
+                "        this.options = options;"
+              ],
+              [
+                " ",
+                241,
+                241,
+                "        this.compilation = compilation;"
+              ],
+              [
+                " ",
+                242,
+                242,
+                "        this.cancellationToken = cancellationToken;"
+              ],
+              [
+                "gap",
+                null,
+                null,
+                ""
+              ],
+              [
+                " ",
+                982,
+                982,
+                "                    var stringKey = key is { Value: string stringKeyValue } ? stringKeyValue : default;"
+              ],
+              [
+                " ",
+                983,
+                983,
+                "                    if (intKey == null && stringKey == null)"
+              ],
+              [
+                " ",
+                984,
+                984,
+                "                    {"
+              ],
+              [
+                "-",
+                985,
+                null,
+                "                        this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.BothStringAndIntKeyAreNull, ((PropertyDeclarationSyntax)item.DeclaringSyntaxReferences[0].GetSyntax()).Identifier.GetLocation(), formattedType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), item.Name));"
+              ],
+              [
+                "+",
+                null,
+                985,
+                "                        this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.BothStringAndIntKeyAreNull, GetPropertyIdentifierLocation(item), formattedType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), item.Name));"
+              ],
+              [
+                " ",
+                986,
+                986,
+                "                    }"
+              ],
+              [
+                " ",
+                987,
+                987,
+                ""
+              ],
+              [
+                " ",
+                988,
+                988,
+                "                    // A property with an init accessor and an initializer has a default that will be discarded by the deserializer."
+              ],
+              [
+                "gap",
+                null,
+                null,
+                ""
+              ],
+              [
+                " ",
+                1074,
+                1074,
+                "                            {"
+              ],
+              [
+                " ",
+                1075,
+                1075,
+                "                                Diagnostic diagnostic = derivedKeyAttribute is not null && suppressSourceGeneration is not true"
+              ],
+              [
+                " ",
+                1076,
+                1076,
+                "                                    ? Diagnostic.Create(MsgPack00xMessagePackAnalyzer.AOTDerivedKeyAttribute, derivedKeyAttribute.GetSyntax(this.cancellationToken).GetLocation())"
+              ],
+              [
+                "-",
+                1077,
+                null,
+                "                                    : Diagnostic.Create(MsgPack00xMessagePackAnalyzer.MemberNeedsKey, item.DeclaringSyntaxReferences[0].GetSyntax().GetLocation(), formattedType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), item.Name);"
+              ],
+              [
+                "+",
+                null,
+                1077,
+                "                                    : Diagnostic.Create(MsgPack00xMessagePackAnalyzer.MemberNeedsKey, item.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation(), formattedType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), item.Name);"
+              ],
+              [
+                " ",
+                1078,
+                1078,
+                "                                if (nonPublicMembersAreSerialized || (item.DeclaredAccessibility & Accessibility.Public) == Accessibility.Public)"
+              ],
+              [
+                " ",
+                1079,
+                1079,
+                "                                {"
+              ],
+              [
+                " ",
+                1080,
+                1080,
+                "                                    this.reportDiagnostic?.Invoke(diagnostic);"
+              ],
+              [
+                "gap",
+                null,
+                null,
+                ""
+              ],
+              [
+                " ",
+                null,
+                989,
+                "                    if (suppressSourceGeneration is not true && isInitOnly)"
+              ],
+              [
+                " ",
+                null,
+                990,
+                "                    {"
+              ],
+              [
+                " ",
+                null,
+                991,
+                "                        EqualsValueClauseSyntax? initializer = item.DeclaringSyntaxReferences.Select(s => (s.GetSyntax(this.cancellationToken) as PropertyDeclarationSyntax)?.Initializer).FirstOrDefault(i => i is not null);"
+              ],
+              [
+                " ",
+                null,
+                992,
+                "                        if (initializer is not null)"
+              ],
+              [
+                " ",
+                null,
+                993,
+                "                        {"
+              ],
+              [
+                " ",
+                null,
+                994,
+                "                            this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.AOTInitProperty, initializer.GetLocation()));"
+              ],
+              [
+                " ",
+                null,
+                995,
+                "                        }"
+              ],
+              [
+                " ",
+                null,
+                996,
+                "                    }"
+              ],
+              [
+                " ",
+                null,
+                997,
+                ""
+              ],
+              [
+                " ",
+                null,
+                998,
+                "                    if (searchFirst)"
+              ],
+              [
+                " ",
+                null,
+                999,
+                "                    {"
+              ],
+              [
+                " ",
+                null,
+                1000,
+                "                        searchFirst = false;"
+              ],
+              [
+                " ",
+                null,
+                1001,
+                "                        isIntKey = intKey != null;"
+              ],
+              [
+                " ",
+                null,
+                1002,
+                "                    }"
+              ],
+              [
+                " ",
+                null,
+                1003,
+                "                    else"
+              ],
+              [
+                " ",
+                null,
+                1004,
+                "                    {"
+              ],
+              [
+                " ",
+                null,
+                1005,
+                "                        if ((isIntKey && intKey == null) || (!isIntKey && stringKey == null))"
+              ],
+              [
+                " ",
+                null,
+                1006,
+                "                        {"
+              ],
+              [
+                " ",
+                null,
+                1007,
+                "                            this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.DoNotMixStringAndIntKeys, item.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation()));"
+              ],
+              [
+                " ",
+                null,
+                1008,
+                "                        }"
+              ],
+              [
+                " ",
+                null,
+                1009,
+                "                    }"
+              ],
+              [
+                " ",
+                null,
+                1010,
+                ""
+              ],
+              [
+                " ",
+                null,
+                1011,
+                "                    if (isIntKey)"
+              ],
+              [
+                " ",
+                null,
+                1012,
+                "                    {"
+              ],
+              [
+                " ",
+                null,
+                1013,
+                "                        if (intMembers.ContainsKey(intKey!.Value))"
+              ],
+              [
+                " ",
+                null,
+                1014,
+                "                        {"
+              ],
+              [
+                " ",
+                null,
+                1015,
+                "                            this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.KeysMustBeUnique, item.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation()));"
+              ],
+              [
+                " ",
+                null,
+                1016,
+                "                        }"
+              ],
+              [
+                " ",
+                null,
+                1017,
+                ""
+              ],
+              [
+                " ",
+                null,
+                1018,
+                "                        var member = new MemberSerializationInfo(true, isWritable, isReadable, isInitOnly, item.IsRequired, intKey!.Value, item.Name, item.Name, item.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), item.Type.ToDisplayString(BinaryWriteFormat), specialFormatter)"
+              ],
+              [
+                " ",
+                null,
+                1019,
+                "                        {"
+              ],
+              [
+                " ",
+                null,
+                1020,
+                "                            DeclaringType = GetDeclaringTypeIfColliding(item),"
+              ],
+              [
+                " ",
+                null,
+                1021,
+                "                        };"
+              ],
+              [
+                " ",
+                null,
+                1022,
+                "                        intMembers.Add(member.IntKey, (member, item.Type));"
+              ],
+              [
+                " ",
+                null,
+                1023,
+                "                    }"
+              ],
+              [
+                " ",
+                null,
+                1024,
+                "                    else if (stringKey is not null)"
+              ],
+              [
+                " ",
+                null,
+                1025,
+                "                    {"
+              ],
+              [
+                " ",
+                null,
+                1026,
+                "                        if (stringMembers.ContainsKey(stringKey!))"
+              ],
+              [
+                " ",
+                null,
+                1027,
+                "                        {"
+              ],
+              [
+                " ",
+                null,
+                1028,
+                "                            this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.KeysMustBeUnique, item.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation()));"
+              ],
+              [
+                " ",
+                null,
+                1029,
+                "                        }"
+              ],
+              [
+                " ",
+                null,
+                1030,
+                ""
+              ],
+              [
+                " ",
+                null,
+                1031,
+                "                        var member = new MemberSerializationInfo(true, isWritable, isReadable, isInitOnly, item.IsRequired, hiddenIntKey++, stringKey!, item.Name, item.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), item.Type.ToDisplayString(BinaryWriteFormat), specialFormatter)"
+              ],
+              [
+                " ",
+                null,
+                1032,
+                "                        {"
+              ],
+              [
+                " ",
+                null,
+                1033,
+                "                            DeclaringType = GetDeclaringTypeIfColliding(item),"
+              ],
+              [
+                " ",
+                null,
+                1034,
+                "                        };"
+              ],
+              [
+                " ",
+                null,
+                1035,
+                "                        stringMembers.Add(member.StringKey, (member, item.Type));"
+              ],
+              [
+                " ",
+                null,
+                1036,
+                "                    }"
+              ],
+              [
+                " ",
+                null,
+                1037,
+                ""
+              ],
+              [
+                " ",
+                null,
+                1038,
+                "                    var messagePackFormatter = item.GetAttributes().FirstOrDefault(x => x.AttributeClass.ApproximatelyEqual(this.typeReferences.FormatterAttribute))?.ConstructorArguments[0];"
+              ],
+              [
+                " ",
+                null,
+                1039,
+                ""
+              ],
+              [
+                " ",
+                null,
+                1040,
+                "                    if (messagePackFormatter == null)"
+              ],
+              [
+                " ",
+                null,
+                1041,
+                "                    {"
+              ],
+              [
+                " ",
+                null,
+                1042,
+                "                        // recursive collect"
+              ],
+              [
+                " ",
+                null,
+                1043,
+                "                        this.CollectCore(item.Type, item);"
+              ],
+              [
+                " ",
+                null,
+                1044,
+                "                    }"
+              ],
+              [
+                " ",
+                null,
+                1045,
+                "                }"
+              ],
+              [
+                " ",
+                null,
+                1046,
+                "            }"
+              ],
+              [
+                " ",
+                null,
+                1047,
+                ""
+              ],
+              [
+                " ",
+                null,
+                1048,
+                "            foreach (IFieldSymbol item in formattedType.GetAllMembers().OfType<IFieldSymbol>())"
+              ],
+              [
+                " ",
+                null,
+                1049,
+                "            {"
+              ],
+              [
+                " ",
+                null,
+                1050,
+                "                if (item.IsImplicitlyDeclared || item.IsStatic)"
+              ],
+              [
+                " ",
+                null,
+                1051,
+                "                {"
+              ]
+            ],
+            "cut": 22
+          }
+        ],
+        "problems": [],
+        "verified": true
+      },
+      {
+        "id": "F-2283-1",
+        "kind": "found",
+        "ref": 0,
+        "title": "A real mistake now gets no warning",
+        "steps": [
+          {
+            "op": "GIVEN",
+            "text": "the app's own type lacks the needed mark, so the code builds a warning (`TypeMustBeMessagePackObject`).",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              1345,
+              1345
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          },
+          {
+            "op": "IF",
+            "text": "the warning points into another library, not this project (`ContainsSyntaxTree`),",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              1446,
+              1446
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          },
+          {
+            "op": "THEN",
+            "text": "it is never passed to `report(diagnostic)`, so the user sees nothing.",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              1448,
+              1448
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          }
+        ],
+        "verdict": "We found a hidden warning about the user's own code. Only a hand-written test could show it.",
+        "because": [
+          {
+            "text": "The old code warns about this case. The new code does not.",
+            "evidence": "evidence/ju26-issue-2283/dropped-warning.json",
+            "result": "fail",
+            "summary": "MsgPack003 (unattributed_consumer_type_inside_metadata_generic) is reported on base without any analyzer crash and is absent on branch; 3 of 6 probe cases lose a diagnostic on branch",
+            "produced_by": "hand",
+            "check": "dropped-warning"
+          }
+        ],
+        "code": [
+          {
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "rows": [
+              [
+                " ",
+                1426,
+                1426,
+                ""
+              ],
+              [
+                " ",
+                1427,
+                1427,
+                "    private static Location? GetIdentifierLocation(INamedTypeSymbol type) => ((BaseTypeDeclarationSyntax?)type.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax())?.Identifier.GetLocation();"
+              ],
+              [
+                " ",
+                1428,
+                1428,
+                ""
+              ],
+              [
+                "+",
+                null,
+                1429,
+                "    /// <summary>"
+              ],
+              [
+                "+",
+                null,
+                1430,
+                "    /// Gets the location of the identifier of a property, if it is declared in source."
+              ],
+              [
+                "+",
+                null,
+                1431,
+                "    /// </summary>"
+              ],
+              [
+                "+",
+                null,
+                1432,
+                "    /// <param name=\"property\">The property symbol. It may be declared in metadata, in which case <see langword=\"null\" /> is returned.</param>"
+              ],
+              [
+                "+",
+                null,
+                1433,
+                "    /// <returns>The location of the identifier, or <see langword=\"null\" /> if the property has no declaration in source.</returns>"
+              ],
+              [
+                "+",
+                null,
+                1434,
+                "    private static Location? GetPropertyIdentifierLocation(IPropertySymbol property) => (property.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as PropertyDeclarationSyntax)?.Identifier.GetLocation();"
+              ],
+              [
+                "+",
+                null,
+                1435,
+                ""
+              ],
+              [
+                "+",
+                null,
+                1436,
+                "    /// <summary>"
+              ],
+              [
+                "+",
+                null,
+                1437,
+                "    /// Reports a diagnostic only when its location belongs to the compilation being analyzed."
+              ],
+              [
+                "+",
+                null,
+                1438,
+                "    /// </summary>"
+              ],
+              [
+                "+",
+                null,
+                1439,
+                "    /// <remarks>"
+              ],
+              [
+                "+",
+                null,
+                1440,
+                "    /// Types and members that come from metadata (or from another compilation) have no location in the compilation being analyzed."
+              ],
+              [
+                "+",
+                null,
+                1441,
+                "    /// Their problems are reported by the compilation that defines them, so they are dropped here rather than being reported"
+              ],
+              [
+                "+",
+                null,
+                1442,
+                "    /// against a location that does not exist, which analyzers are not permitted to do."
+              ],
+              [
+                "+",
+                null,
+                1443,
+                "    /// </remarks>"
+              ],
+              [
+                "+",
+                null,
+                1444,
+                "    private void ReportIfLocatedInCompilation(Action<Diagnostic> report, Diagnostic diagnostic)"
+              ],
+              [
+                "+",
+                null,
+                1445,
+                "    {"
+              ],
+              [
+                "+",
+                null,
+                1446,
+                "        if (diagnostic.Location.IsInSource && this.compilation.ContainsSyntaxTree(diagnostic.Location.SourceTree))"
+              ],
+              [
+                "+",
+                null,
+                1447,
+                "        {"
+              ],
+              [
+                "+",
+                null,
+                1448,
+                "            report(diagnostic);"
+              ],
+              [
+                "+",
+                null,
+                1449,
+                "        }"
+              ],
+              [
+                "+",
+                null,
+                1450,
+                "    }"
+              ],
+              [
+                "+",
+                null,
+                1451,
+                ""
+              ],
+              [
+                " ",
+                1429,
+                1452,
+                "    private static Location? GetLocation(IParameterSymbol parameter) => parameter.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation();"
+              ],
+              [
+                " ",
+                1430,
+                1453,
+                ""
+              ],
+              [
+                " ",
+                1431,
+                1454,
+                "    private static Location? GetParameterListLocation(IMethodSymbol? method) => ((BaseMethodDeclarationSyntax?)method?.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax())?.ParameterList.GetLocation();"
+              ],
+              [
+                "gap",
+                null,
+                null,
+                ""
+              ],
+              [
+                " ",
+                null,
+                1343,
+                ""
+              ],
+              [
+                " ",
+                null,
+                1344,
+                "                ImmutableDictionary<string, string?> typeInfo = ImmutableDictionary.Create<string, string?>().Add(\"type\", formattedType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));"
+              ],
+              [
+                " ",
+                null,
+                1345,
+                "                this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.TypeMustBeMessagePackObject, location, typeInfo, targetName));"
+              ],
+              [
+                " ",
+                null,
+                1346,
+                "            }"
+              ],
+              [
+                " ",
+                null,
+                1347,
+                ""
+              ]
+            ],
+            "cut": 0
+          }
+        ],
+        "problems": [],
+        "verified": true
+      },
+      {
+        "id": "F-2283-2",
+        "kind": "found",
+        "ref": 1,
+        "title": "One change does two jobs",
+        "steps": [
+          {
+            "op": "NOW",
+            "text": "the crash fix is small: a safe helper (`GetPropertyIdentifierLocation(item)`).",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              985,
+              985
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          },
+          {
+            "op": "ALSO",
+            "text": "every warning is now sent through a filter (`ReportIfLocatedInCompilation`).",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              239,
+              239
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          },
+          {
+            "op": "BUT",
+            "text": "the issue asked only for the crash fix. The filter is extra (`private void ReportIfLocatedInCompilation`).",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              1444,
+              1444
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          }
+        ],
+        "verdict": "The filter is a separate change and should be judged on its own.",
+        "because": [
+          {
+            "text": "Almost every warning in the file goes through the filter.",
+            "evidence": "evidence/ju26-issue-2283/report-sites.json",
+            "result": "pass",
+            "summary": "29 live report sites in TypeCollector.cs: 28 go through the filter (19 distinct descriptors), 1 bypass it; 28 of the 28 filtered sites can have a location outside the compilation's source; simple grep for 'reportDiagnostic?.Invoke' counts 29 lines (2 of them commented out)",
+            "produced_by": "script",
+            "check": "report-sites"
+          }
+        ],
+        "code": [
+          {
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "rows": [
+              [
+                " ",
+                236,
+                236,
+                "    private TypeCollector(Compilation compilation, AnalyzerOptions options, ReferenceSymbols referenceSymbols, ITypeSymbol targetType, Action<Diagnostic>? reportAnalyzerDiagnostic, CancellationToken cancellationToken)"
+              ],
+              [
+                " ",
+                237,
+                237,
+                "    {"
+              ],
+              [
+                " ",
+                238,
+                238,
+                "        this.typeReferences = referenceSymbols;"
+              ],
+              [
+                "-",
+                239,
+                null,
+                "        this.reportDiagnostic = reportAnalyzerDiagnostic;"
+              ],
+              [
+                "+",
+                null,
+                239,
+                "        this.reportDiagnostic = reportAnalyzerDiagnostic is null ? null : diagnostic => ReportIfLocatedInCompilation(reportAnalyzerDiagnostic, diagnostic);"
+              ],
+              [
+                " ",
+                240,
+                240,
+                "        this.options = options;"
+              ],
+              [
+                " ",
+                241,
+                241,
+                "        this.compilation = compilation;"
+              ],
+              [
+                " ",
+                242,
+                242,
+                "        this.cancellationToken = cancellationToken;"
+              ],
+              [
+                "gap",
+                null,
+                null,
+                ""
+              ],
+              [
+                " ",
+                982,
+                982,
+                "                    var stringKey = key is { Value: string stringKeyValue } ? stringKeyValue : default;"
+              ],
+              [
+                " ",
+                983,
+                983,
+                "                    if (intKey == null && stringKey == null)"
+              ],
+              [
+                " ",
+                984,
+                984,
+                "                    {"
+              ],
+              [
+                "-",
+                985,
+                null,
+                "                        this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.BothStringAndIntKeyAreNull, ((PropertyDeclarationSyntax)item.DeclaringSyntaxReferences[0].GetSyntax()).Identifier.GetLocation(), formattedType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), item.Name));"
+              ],
+              [
+                "+",
+                null,
+                985,
+                "                        this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.BothStringAndIntKeyAreNull, GetPropertyIdentifierLocation(item), formattedType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), item.Name));"
+              ],
+              [
+                " ",
+                986,
+                986,
+                "                    }"
+              ],
+              [
+                " ",
+                987,
+                987,
+                ""
+              ],
+              [
+                " ",
+                988,
+                988,
+                "                    // A property with an init accessor and an initializer has a default that will be discarded by the deserializer."
+              ],
+              [
+                "gap",
+                null,
+                null,
+                ""
+              ],
+              [
+                " ",
+                1426,
+                1426,
+                ""
+              ],
+              [
+                " ",
+                1427,
+                1427,
+                "    private static Location? GetIdentifierLocation(INamedTypeSymbol type) => ((BaseTypeDeclarationSyntax?)type.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax())?.Identifier.GetLocation();"
+              ],
+              [
+                " ",
+                1428,
+                1428,
+                ""
+              ],
+              [
+                "+",
+                null,
+                1429,
+                "    /// <summary>"
+              ],
+              [
+                "+",
+                null,
+                1430,
+                "    /// Gets the location of the identifier of a property, if it is declared in source."
+              ],
+              [
+                "+",
+                null,
+                1431,
+                "    /// </summary>"
+              ],
+              [
+                "+",
+                null,
+                1432,
+                "    /// <param name=\"property\">The property symbol. It may be declared in metadata, in which case <see langword=\"null\" /> is returned.</param>"
+              ],
+              [
+                "+",
+                null,
+                1433,
+                "    /// <returns>The location of the identifier, or <see langword=\"null\" /> if the property has no declaration in source.</returns>"
+              ],
+              [
+                "+",
+                null,
+                1434,
+                "    private static Location? GetPropertyIdentifierLocation(IPropertySymbol property) => (property.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as PropertyDeclarationSyntax)?.Identifier.GetLocation();"
+              ],
+              [
+                "+",
+                null,
+                1435,
+                ""
+              ],
+              [
+                "+",
+                null,
+                1436,
+                "    /// <summary>"
+              ],
+              [
+                "+",
+                null,
+                1437,
+                "    /// Reports a diagnostic only when its location belongs to the compilation being analyzed."
+              ],
+              [
+                "+",
+                null,
+                1438,
+                "    /// </summary>"
+              ],
+              [
+                "+",
+                null,
+                1439,
+                "    /// <remarks>"
+              ],
+              [
+                "+",
+                null,
+                1440,
+                "    /// Types and members that come from metadata (or from another compilation) have no location in the compilation being analyzed."
+              ],
+              [
+                "+",
+                null,
+                1441,
+                "    /// Their problems are reported by the compilation that defines them, so they are dropped here rather than being reported"
+              ],
+              [
+                "+",
+                null,
+                1442,
+                "    /// against a location that does not exist, which analyzers are not permitted to do."
+              ],
+              [
+                "+",
+                null,
+                1443,
+                "    /// </remarks>"
+              ],
+              [
+                "+",
+                null,
+                1444,
+                "    private void ReportIfLocatedInCompilation(Action<Diagnostic> report, Diagnostic diagnostic)"
+              ],
+              [
+                "+",
+                null,
+                1445,
+                "    {"
+              ],
+              [
+                "+",
+                null,
+                1446,
+                "        if (diagnostic.Location.IsInSource && this.compilation.ContainsSyntaxTree(diagnostic.Location.SourceTree))"
+              ],
+              [
+                "+",
+                null,
+                1447,
+                "        {"
+              ],
+              [
+                "+",
+                null,
+                1448,
+                "            report(diagnostic);"
+              ],
+              [
+                "+",
+                null,
+                1449,
+                "        }"
+              ],
+              [
+                "+",
+                null,
+                1450,
+                "    }"
+              ],
+              [
+                "+",
+                null,
+                1451,
+                ""
+              ],
+              [
+                " ",
+                1429,
+                1452,
+                "    private static Location? GetLocation(IParameterSymbol parameter) => parameter.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation();"
+              ],
+              [
+                " ",
+                1430,
+                1453,
+                ""
+              ],
+              [
+                " ",
+                1431,
+                1454,
+                "    private static Location? GetParameterListLocation(IMethodSymbol? method) => ((BaseMethodDeclarationSyntax?)method?.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax())?.ParameterList.GetLocation();"
+              ]
+            ],
+            "cut": 0
+          }
+        ],
+        "problems": [],
+        "verified": true
+      },
+      {
+        "id": "F-2283-3",
+        "kind": "found",
+        "ref": 2,
+        "title": "One new test checks the filter",
+        "steps": [
+          {
+            "op": "GIVEN",
+            "text": "the other library's type has a property with no key (`public int Unkeyed { get; set; }`).",
+            "file": "tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs",
+            "lines": [
+              603,
+              603
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          },
+          {
+            "op": "THEN",
+            "text": "the test `ClosedGenericStruct_FromMetadataReference_UnkeyedMember` expects no warning at all.",
+            "file": "tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs",
+            "lines": [
+              590,
+              590
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          },
+          {
+            "op": "SO",
+            "text": "it passes only because the filter hides that warning (`RunWithMetadataReferenceAsync`).",
+            "file": "tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs",
+            "lines": [
+              625,
+              625
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          }
+        ],
+        "verdict": "This test locks in the hidden warnings, so it is not proof of the crash fix.",
+        "because": [
+          {
+            "text": "The test fails when only the filter is removed.",
+            "evidence": "evidence/ju26-issue-2283/old-vs-new-tests.json",
+            "result": "pass",
+            "summary": "3 of 3 new tests fail on base and pass on branch; 1 of them (ClosedGenericStruct_FromMetadataReference_UnkeyedMember) also fails when only the filter is removed; whole test project: 167 of 167 pre-existing tests pass on base and 167 on branch",
+            "produced_by": "hand",
+            "check": "old-vs-new-tests"
+          }
+        ],
+        "code": [
+          {
+            "file": "tests/MessagePack.SourceGenerator.Tests/GenericsFormatterTests.cs",
+            "rows": [
+              [
+                " ",
+                494,
+                496,
+                "        }.RunAsync();"
+              ],
+              [
+                " ",
+                495,
+                497,
+                "    }"
+              ],
+              [
+                " ",
+                496,
+                498,
+                ""
+              ],
+              [
+                "+",
+                null,
+                499,
+                "    /// <summary>"
+              ],
+              [
+                "+",
+                null,
+                500,
+                "    /// Asserts that a closed generic value type defined in a referenced <em>assembly</em> (metadata only, no syntax),"
+              ],
+              [
+                "+",
+                null,
+                501,
+                "    /// used as a member type, does not crash the generator or analyzer."
+              ],
+              [
+                "+",
+                null,
+                502,
+                "    /// </summary>"
+              ],
+              [
+                "+",
+                null,
+                503,
+                "    /// <remarks>"
+              ],
+              [
+                "+",
+                null,
+                504,
+                "    /// See https://github.com/MessagePack-CSharp/MessagePack-CSharp/issues/2283."
+              ],
+              [
+                "+",
+                null,
+                505,
+                "    /// </remarks>"
+              ],
+              [
+                "+",
+                null,
+                506,
+                "    [Fact]"
+              ],
+              [
+                "+",
+                null,
+                507,
+                "    public async Task ClosedGenericStruct_FromMetadataReference()"
+              ],
+              [
+                "+",
+                null,
+                508,
+                "    {"
+              ],
+              [
+                "+",
+                null,
+                509,
+                "        string defineSource = \"\"\""
+              ],
+              [
+                "+",
+                null,
+                510,
+                "using MessagePack;"
+              ],
+              [
+                "+",
+                null,
+                511,
+                ""
+              ],
+              [
+                "+",
+                null,
+                512,
+                "namespace TempProject"
+              ],
+              [
+                "+",
+                null,
+                513,
+                "{"
+              ],
+              [
+                "+",
+                null,
+                514,
+                "    [MessagePackObject]"
+              ],
+              [
+                "+",
+                null,
+                515,
+                "    public struct MyGenericStruct<T>"
+              ],
+              [
+                "+",
+                null,
+                516,
+                "    {"
+              ],
+              [
+                "+",
+                null,
+                517,
+                "        [Key(0)]"
+              ],
+              [
+                "+",
+                null,
+                518,
+                "        public T Content { get; set; }"
+              ],
+              [
+                "+",
+                null,
+                519,
+                "    }"
+              ],
+              [
+                "+",
+                null,
+                520,
+                "}"
+              ],
+              [
+                "+",
+                null,
+                521,
+                "\"\"\";"
+              ],
+              [
+                "+",
+                null,
+                522,
+                ""
+              ],
+              [
+                "+",
+                null,
+                523,
+                "        string usageSource = \"\"\""
+              ],
+              [
+                "+",
+                null,
+                524,
+                "using MessagePack;"
+              ],
+              [
+                "+",
+                null,
+                525,
+                ""
+              ],
+              [
+                "+",
+                null,
+                526,
+                "namespace TempProject"
+              ],
+              [
+                "+",
+                null,
+                527,
+                "{"
+              ],
+              [
+                "+",
+                null,
+                528,
+                "    [MessagePackObject]"
+              ],
+              [
+                "+",
+                null,
+                529,
+                "    public class MyObject"
+              ],
+              [
+                "+",
+                null,
+                530,
+                "    {"
+              ],
+              [
+                "+",
+                null,
+                531,
+                "        [Key(0)]"
+              ],
+              [
+                "+",
+                null,
+                532,
+                "        public MyGenericStruct<int> Value { get; set; }"
+              ],
+              [
+                "+",
+                null,
+                533,
+                "    }"
+              ],
+              [
+                "+",
+                null,
+                534,
+                ""
+              ],
+              [
+                "+",
+                null,
+                535,
+                "    [GeneratedMessagePackResolver]"
+              ],
+              [
+                "+",
+                null,
+                536,
+                "    partial class MyResolver { }"
+              ],
+              [
+                "+",
+                null,
+                537,
+                "}"
+              ],
+              [
+                "+",
+                null,
+                538,
+                "\"\"\";"
+              ],
+              [
+                "+",
+                null,
+                539,
+                ""
+              ],
+              [
+                "+",
+                null,
+                540,
+                "        await RunWithMetadataReferenceAsync(defineSource, usageSource, \"TempProject.MyResolver.g.cs\");"
+              ],
+              [
+                "+",
+                null,
+                541,
+                "    }"
+              ],
+              [
+                "+",
+                null,
+                542,
+                ""
+              ],
+              [
+                "+",
+                null,
+                543,
+                "    /// <summary>"
+              ],
+              [
+                "+",
+                null,
+                544,
+                "    /// Asserts that a closed generic <em>record struct</em> defined in a referenced assembly, used as a member type,"
+              ],
+              [
+                "+",
+                null,
+                545,
+                "    /// does not crash the generator or analyzer."
+              ],
+              [
+                "+",
+                null,
+                546,
+                "    /// </summary>"
+              ],
+              [
+                "+",
+                null,
+                547,
+                "    /// <remarks>"
+              ],
+              [
+                "+",
+                null,
+                548,
+                "    /// See https://github.com/MessagePack-CSharp/MessagePack-CSharp/issues/2283."
+              ],
+              [
+                "+",
+                null,
+                549,
+                "    /// </remarks>"
+              ],
+              [
+                "+",
+                null,
+                550,
+                "    [Fact]"
+              ],
+              [
+                "+",
+                null,
+                551,
+                "    public async Task ClosedGenericRecordStruct_FromMetadataReference()"
+              ],
+              [
+                "+",
+                null,
+                552,
+                "    {"
+              ],
+              [
+                "+",
+                null,
+                553,
+                "        string defineSource = \"\"\""
+              ],
+              [
+                "+",
+                null,
+                554,
+                "using MessagePack;"
+              ],
+              [
+                "+",
+                null,
+                555,
+                ""
+              ],
+              [
+                "+",
+                null,
+                556,
+                "namespace Lib;"
+              ],
+              [
+                "+",
+                null,
+                557,
+                ""
+              ],
+              [
+                "+",
+                null,
+                558,
+                "[MessagePackObject]"
+              ],
+              [
+                "+",
+                null,
+                559,
+                "public partial record struct Item<T>([property: Key(0)] string Key);"
+              ],
+              [
+                "+",
+                null,
+                560,
+                "\"\"\";"
+              ],
+              [
+                "+",
+                null,
+                561,
+                ""
+              ],
+              [
+                "+",
+                null,
+                562,
+                "        string usageSource = \"\"\""
+              ],
+              [
+                "+",
+                null,
+                563,
+                "using MessagePack;"
+              ],
+              [
+                "+",
+                null,
+                564,
+                "using Lib;"
+              ],
+              [
+                "+",
+                null,
+                565,
+                ""
+              ],
+              [
+                "+",
+                null,
+                566,
+                "namespace App;"
+              ],
+              [
+                "+",
+                null,
+                567,
+                ""
+              ],
+              [
+                "+",
+                null,
+                568,
+                "[MessagePackObject]"
+              ],
+              [
+                "+",
+                null,
+                569,
+                "public sealed partial record Cmd([property: Key(0)] string Scope)"
+              ],
+              [
+                "+",
+                null,
+                570,
+                "{"
+              ],
+              [
+                "+",
+                null,
+                571,
+                "    [Key(1)]"
+              ],
+              [
+                "+",
+                null,
+                572,
+                "    public Item<int> Member { get; init; }"
+              ],
+              [
+                "+",
+                null,
+                573,
+                "}"
+              ],
+              [
+                "+",
+                null,
+                574,
+                ""
+              ],
+              [
+                "+",
+                null,
+                575,
+                "[GeneratedMessagePackResolver]"
+              ],
+              [
+                "+",
+                null,
+                576,
+                "partial class AppResolver { }"
+              ],
+              [
+                "+",
+                null,
+                577,
+                "\"\"\";"
+              ],
+              [
+                "+",
+                null,
+                578,
+                ""
+              ],
+              [
+                "+",
+                null,
+                579,
+                "        await RunWithMetadataReferenceAsync(defineSource, usageSource, \"App.AppResolver.g.cs\", LanguageVersion.Latest);"
+              ],
+              [
+                "+",
+                null,
+                580,
+                "    }"
+              ],
+              [
+                "+",
+                null,
+                581,
+                ""
+              ],
+              [
+                "+",
+                null,
+                582,
+                "    /// <summary>"
+              ],
+              [
+                "+",
+                null,
+                583,
+                "    /// Asserts that a closed generic value type from a referenced assembly whose members lack a key attribute"
+              ],
+              [
+                "+",
+                null,
+                584,
+                "    /// does not crash the generator or analyzer, since its member diagnostics belong to the defining assembly."
+              ],
+              [
+                "+",
+                null,
+                585,
+                "    /// </summary>"
+              ]
+            ],
+            "cut": 103
+          }
+        ],
+        "problems": [],
+        "verified": true
+      },
+      {
+        "id": "F-2283-4",
+        "kind": "found",
+        "ref": 3,
+        "title": "The filter also stops a second crash",
+        "steps": [
+          {
+            "op": "GIVEN",
+            "text": "the other library is linked as a project, so a warning can point at a file outside this one (`not permitted to do`).",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              1442,
+              1442
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          },
+          {
+            "op": "BEFORE",
+            "text": "the warning was sent anyway (`reportAnalyzerDiagnostic`), and the analyzer crashed.",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              239,
+              239
+            ],
+            "side": "old",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          },
+          {
+            "op": "NOW",
+            "text": "such a warning is dropped (`ContainsSyntaxTree`).",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              1446,
+              1446
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          }
+        ],
+        "verdict": "The filter does fix a real crash, so removing it needs a different fix in its place.",
+        "because": [
+          {
+            "text": "Our test cases with a linked project show the warning is now dropped instead of crashing.",
+            "evidence": "evidence/ju26-issue-2283/dropped-warning.json",
+            "result": "fail",
+            "summary": "MsgPack003 (unattributed_consumer_type_inside_metadata_generic) is reported on base without any analyzer crash and is absent on branch; 3 of 6 probe cases lose a diagnostic on branch",
+            "produced_by": "hand",
+            "check": "dropped-warning"
+          }
+        ],
+        "code": [
+          {
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "rows": [
+              [
+                " ",
+                236,
+                236,
+                "    private TypeCollector(Compilation compilation, AnalyzerOptions options, ReferenceSymbols referenceSymbols, ITypeSymbol targetType, Action<Diagnostic>? reportAnalyzerDiagnostic, CancellationToken cancellationToken)"
+              ],
+              [
+                " ",
+                237,
+                237,
+                "    {"
+              ],
+              [
+                " ",
+                238,
+                238,
+                "        this.typeReferences = referenceSymbols;"
+              ],
+              [
+                "-",
+                239,
+                null,
+                "        this.reportDiagnostic = reportAnalyzerDiagnostic;"
+              ],
+              [
+                "+",
+                null,
+                239,
+                "        this.reportDiagnostic = reportAnalyzerDiagnostic is null ? null : diagnostic => ReportIfLocatedInCompilation(reportAnalyzerDiagnostic, diagnostic);"
+              ],
+              [
+                " ",
+                240,
+                240,
+                "        this.options = options;"
+              ],
+              [
+                " ",
+                241,
+                241,
+                "        this.compilation = compilation;"
+              ],
+              [
+                " ",
+                242,
+                242,
+                "        this.cancellationToken = cancellationToken;"
+              ],
+              [
+                "gap",
+                null,
+                null,
+                ""
+              ],
+              [
+                " ",
+                1426,
+                1426,
+                ""
+              ],
+              [
+                " ",
+                1427,
+                1427,
+                "    private static Location? GetIdentifierLocation(INamedTypeSymbol type) => ((BaseTypeDeclarationSyntax?)type.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax())?.Identifier.GetLocation();"
+              ],
+              [
+                " ",
+                1428,
+                1428,
+                ""
+              ],
+              [
+                "+",
+                null,
+                1429,
+                "    /// <summary>"
+              ],
+              [
+                "+",
+                null,
+                1430,
+                "    /// Gets the location of the identifier of a property, if it is declared in source."
+              ],
+              [
+                "+",
+                null,
+                1431,
+                "    /// </summary>"
+              ],
+              [
+                "+",
+                null,
+                1432,
+                "    /// <param name=\"property\">The property symbol. It may be declared in metadata, in which case <see langword=\"null\" /> is returned.</param>"
+              ],
+              [
+                "+",
+                null,
+                1433,
+                "    /// <returns>The location of the identifier, or <see langword=\"null\" /> if the property has no declaration in source.</returns>"
+              ],
+              [
+                "+",
+                null,
+                1434,
+                "    private static Location? GetPropertyIdentifierLocation(IPropertySymbol property) => (property.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as PropertyDeclarationSyntax)?.Identifier.GetLocation();"
+              ],
+              [
+                "+",
+                null,
+                1435,
+                ""
+              ],
+              [
+                "+",
+                null,
+                1436,
+                "    /// <summary>"
+              ],
+              [
+                "+",
+                null,
+                1437,
+                "    /// Reports a diagnostic only when its location belongs to the compilation being analyzed."
+              ],
+              [
+                "+",
+                null,
+                1438,
+                "    /// </summary>"
+              ],
+              [
+                "+",
+                null,
+                1439,
+                "    /// <remarks>"
+              ],
+              [
+                "+",
+                null,
+                1440,
+                "    /// Types and members that come from metadata (or from another compilation) have no location in the compilation being analyzed."
+              ],
+              [
+                "+",
+                null,
+                1441,
+                "    /// Their problems are reported by the compilation that defines them, so they are dropped here rather than being reported"
+              ],
+              [
+                "+",
+                null,
+                1442,
+                "    /// against a location that does not exist, which analyzers are not permitted to do."
+              ],
+              [
+                "+",
+                null,
+                1443,
+                "    /// </remarks>"
+              ],
+              [
+                "+",
+                null,
+                1444,
+                "    private void ReportIfLocatedInCompilation(Action<Diagnostic> report, Diagnostic diagnostic)"
+              ],
+              [
+                "+",
+                null,
+                1445,
+                "    {"
+              ],
+              [
+                "+",
+                null,
+                1446,
+                "        if (diagnostic.Location.IsInSource && this.compilation.ContainsSyntaxTree(diagnostic.Location.SourceTree))"
+              ],
+              [
+                "+",
+                null,
+                1447,
+                "        {"
+              ],
+              [
+                "+",
+                null,
+                1448,
+                "            report(diagnostic);"
+              ],
+              [
+                "+",
+                null,
+                1449,
+                "        }"
+              ],
+              [
+                "+",
+                null,
+                1450,
+                "    }"
+              ],
+              [
+                "+",
+                null,
+                1451,
+                ""
+              ],
+              [
+                " ",
+                1429,
+                1452,
+                "    private static Location? GetLocation(IParameterSymbol parameter) => parameter.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation();"
+              ],
+              [
+                " ",
+                1430,
+                1453,
+                ""
+              ],
+              [
+                " ",
+                1431,
+                1454,
+                "    private static Location? GetParameterListLocation(IMethodSymbol? method) => ((BaseMethodDeclarationSyntax?)method?.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax())?.ParameterList.GetLocation();"
+              ]
+            ],
+            "cut": 0
+          }
+        ],
+        "problems": [],
+        "verified": true
+      },
+      {
+        "id": "F-2283-5",
+        "kind": "found",
+        "ref": 4,
+        "title": "A duplicate key still crashes",
+        "steps": [
+          {
+            "op": "GIVEN",
+            "text": "two properties share one key in a type from another library (`KeysMustBeUnique`).",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              1015,
+              1015
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          },
+          {
+            "op": "THEN",
+            "text": "the analyzer still crashes, before and after the change. Its warning also goes through the filter (`this.reportDiagnostic?.Invoke`).",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              1015,
+              1015
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          }
+        ],
+        "verdict": "This crash is not fixed, but it is outside what the issue asked.",
+        "because": [
+          {
+            "text": "Our test cases tried this mistake on both versions.",
+            "evidence": "evidence/ju26-issue-2283/dropped-warning.json",
+            "result": "fail",
+            "summary": "MsgPack003 (unattributed_consumer_type_inside_metadata_generic) is reported on base without any analyzer crash and is absent on branch; 3 of 6 probe cases lose a diagnostic on branch",
+            "produced_by": "hand",
+            "check": "dropped-warning"
+          }
+        ],
+        "code": [
+          {
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "rows": [
+              [
+                " ",
+                null,
+                1013,
+                "                        if (intMembers.ContainsKey(intKey!.Value))"
+              ],
+              [
+                " ",
+                null,
+                1014,
+                "                        {"
+              ],
+              [
+                " ",
+                null,
+                1015,
+                "                            this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.KeysMustBeUnique, item.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation()));"
+              ],
+              [
+                " ",
+                null,
+                1016,
+                "                        }"
+              ],
+              [
+                " ",
+                null,
+                1017,
+                ""
+              ]
+            ],
+            "cut": 0
+          }
+        ],
+        "problems": [],
+        "verified": true
+      },
+      {
+        "id": "F-2283-6",
+        "kind": "found",
+        "ref": 5,
+        "title": "Same count, different places",
+        "steps": [
+          {
+            "op": "GIVEN",
+            "text": "one warning skips the filter (`reportAnalyzerDiagnostic?.Invoke`).",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              248,
+              248
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          },
+          {
+            "op": "ALSO",
+            "text": "one more is sent a different way (`this.reportDiagnostic(deferred)`).",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              1188,
+              1188
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          },
+          {
+            "op": "BUT",
+            "text": "a simple text search also counts lines that are switched off (`////this.reportDiagnostic`).",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              465,
+              465
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          }
+        ],
+        "verdict": "Our count and the task notes agree on the number, by luck. We trust ours, made by a script.",
+        "because": [
+          {
+            "text": "The script counts only the lines that really run.",
+            "evidence": "evidence/ju26-issue-2283/report-sites.json",
+            "result": "pass",
+            "summary": "29 live report sites in TypeCollector.cs: 28 go through the filter (19 distinct descriptors), 1 bypass it; 28 of the 28 filtered sites can have a location outside the compilation's source; simple grep for 'reportDiagnostic?.Invoke' counts 29 lines (2 of them commented out)",
+            "produced_by": "script",
+            "check": "report-sites"
+          }
+        ],
+        "code": [
+          {
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "rows": [
+              [
+                " ",
+                null,
+                246,
+                "        {"
+              ],
+              [
+                " ",
+                null,
+                247,
+                "            isInaccessible = true;"
+              ],
+              [
+                " ",
+                null,
+                248,
+                "            reportAnalyzerDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.InaccessibleDataType, decl.Identifier.GetLocation()));"
+              ],
+              [
+                " ",
+                null,
+                249,
+                "        }"
+              ],
+              [
+                " ",
+                null,
+                250,
+                ""
+              ],
+              [
+                "gap",
+                null,
+                null,
+                ""
+              ],
+              [
+                " ",
+                null,
+                463,
+                "        if (formatterName is null)"
+              ],
+              [
+                " ",
+                null,
+                464,
+                "        {"
+              ],
+              [
+                " ",
+                null,
+                465,
+                "            ////this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.AotArrayRankTooHigh));"
+              ],
+              [
+                " ",
+                null,
+                466,
+                "            return;"
+              ],
+              [
+                " ",
+                null,
+                467,
+                "        }"
+              ],
+              [
+                "gap",
+                null,
+                null,
+                ""
+              ],
+              [
+                " ",
+                null,
+                1186,
+                "            foreach (Diagnostic deferred in deferredDiagnosticsForNonPublicMembers)"
+              ],
+              [
+                " ",
+                null,
+                1187,
+                "            {"
+              ],
+              [
+                " ",
+                null,
+                1188,
+                "                this.reportDiagnostic(deferred);"
+              ],
+              [
+                " ",
+                null,
+                1189,
+                "            }"
+              ],
+              [
+                " ",
+                null,
+                1190,
+                "        }"
+              ]
+            ],
+            "cut": 0
+          }
+        ],
+        "problems": [],
+        "verified": true
+      },
+      {
+        "id": "D-2283-1",
+        "kind": "drift",
+        "ref": 0,
+        "title": "Extra work nobody asked for",
+        "steps": [
+          {
+            "op": "NOW",
+            "text": "a filter was added (`ReportIfLocatedInCompilation`).",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              239,
+              239
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          },
+          {
+            "op": "ALSO",
+            "text": "the README got a new section (`Generic types from referenced assemblies`).",
+            "file": "README.md",
+            "lines": [
+              1639,
+              1639
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          }
+        ],
+        "verdict": "The issue asked for no crash. The filter and the notes go beyond it.",
+        "because": [
+          {
+            "text": "The filter hides a warning the user needs.",
+            "evidence": "evidence/ju26-issue-2283/dropped-warning.json",
+            "result": "fail",
+            "summary": "MsgPack003 (unattributed_consumer_type_inside_metadata_generic) is reported on base without any analyzer crash and is absent on branch; 3 of 6 probe cases lose a diagnostic on branch",
+            "produced_by": "hand",
+            "check": "dropped-warning"
+          }
+        ],
+        "code": [
+          {
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "rows": [
+              [
+                " ",
+                236,
+                236,
+                "    private TypeCollector(Compilation compilation, AnalyzerOptions options, ReferenceSymbols referenceSymbols, ITypeSymbol targetType, Action<Diagnostic>? reportAnalyzerDiagnostic, CancellationToken cancellationToken)"
+              ],
+              [
+                " ",
+                237,
+                237,
+                "    {"
+              ],
+              [
+                " ",
+                238,
+                238,
+                "        this.typeReferences = referenceSymbols;"
+              ],
+              [
+                "-",
+                239,
+                null,
+                "        this.reportDiagnostic = reportAnalyzerDiagnostic;"
+              ],
+              [
+                "+",
+                null,
+                239,
+                "        this.reportDiagnostic = reportAnalyzerDiagnostic is null ? null : diagnostic => ReportIfLocatedInCompilation(reportAnalyzerDiagnostic, diagnostic);"
+              ],
+              [
+                " ",
+                240,
+                240,
+                "        this.options = options;"
+              ],
+              [
+                " ",
+                241,
+                241,
+                "        this.compilation = compilation;"
+              ],
+              [
+                " ",
+                242,
+                242,
+                "        this.cancellationToken = cancellationToken;"
+              ]
+            ],
+            "cut": 0
+          },
+          {
+            "file": "README.md",
+            "rows": [
+              [
+                " ",
+                1636,
+                1636,
+                ""
+              ],
+              [
+                " ",
+                1637,
+                1637,
+                "Learn more about using a mix of your own custom formatters and automatically generated ones in [the Analyzer section](#analyzer)."
+              ],
+              [
+                " ",
+                1638,
+                1638,
+                ""
+              ],
+              [
+                "+",
+                null,
+                1639,
+                "### Generic types from referenced assemblies"
+              ],
+              [
+                "+",
+                null,
+                1640,
+                ""
+              ],
+              [
+                "+",
+                null,
+                1641,
+                "Closed generic types defined in a referenced assembly (for example, `Item<int>` where `Item<T>` is defined in another project or NuGet package) can be used as members of your `[MessagePackObject]` types, including generic value types and record structs."
+              ],
+              [
+                "+",
+                null,
+                1642,
+                "Diagnostics about the members of such a type are reported by the assembly that defines it rather than by the consuming project, so any problem must be fixed there."
+              ],
+              [
+                "+",
+                null,
+                1643,
+                ""
+              ],
+              [
+                " ",
+                1639,
+                1644,
+                "### MagicOnion"
+              ],
+              [
+                " ",
+                1640,
+                1645,
+                ""
+              ],
+              [
+                " ",
+                1641,
+                1646,
+                "[MagicOnion](https://github.com/Cysharp/MagicOnion) is a code-first gRPC framework based on grpc-dotnet and MessagePack. gRPC usually communicates with Protocol Buffers using IDL. But MagicOnion uses MessagePack for C# and does not need IDL. When communicating C# to C#, schemaless (or rather C# classes as schema) is better than using IDL."
+              ]
+            ],
+            "cut": 0
+          }
+        ],
+        "problems": [],
+        "verified": true
+      },
+      {
+        "id": "D-2283-2",
+        "kind": "drift",
+        "ref": 1,
+        "title": "The filter reaches too far",
+        "steps": [
+          {
+            "op": "NOW",
+            "text": "every warning is wrapped, in one line (`diagnostic => ReportIfLocatedInCompilation`).",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              239,
+              239
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          },
+          {
+            "op": "BUT",
+            "text": "only two places crashed (`GetPropertyIdentifierLocation(item)`).",
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "lines": [
+              985,
+              985
+            ],
+            "side": "new",
+            "verified": true,
+            "problems": [],
+            "in_change": null
+          }
+        ],
+        "verdict": "The filter touches far more than the crash needed.",
+        "because": [
+          {
+            "text": "Almost every warning in the file goes through the filter.",
+            "evidence": "evidence/ju26-issue-2283/report-sites.json",
+            "result": "pass",
+            "summary": "29 live report sites in TypeCollector.cs: 28 go through the filter (19 distinct descriptors), 1 bypass it; 28 of the 28 filtered sites can have a location outside the compilation's source; simple grep for 'reportDiagnostic?.Invoke' counts 29 lines (2 of them commented out)",
+            "produced_by": "script",
+            "check": "report-sites"
+          }
+        ],
+        "code": [
+          {
+            "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+            "rows": [
+              [
+                " ",
+                236,
+                236,
+                "    private TypeCollector(Compilation compilation, AnalyzerOptions options, ReferenceSymbols referenceSymbols, ITypeSymbol targetType, Action<Diagnostic>? reportAnalyzerDiagnostic, CancellationToken cancellationToken)"
+              ],
+              [
+                " ",
+                237,
+                237,
+                "    {"
+              ],
+              [
+                " ",
+                238,
+                238,
+                "        this.typeReferences = referenceSymbols;"
+              ],
+              [
+                "-",
+                239,
+                null,
+                "        this.reportDiagnostic = reportAnalyzerDiagnostic;"
+              ],
+              [
+                "+",
+                null,
+                239,
+                "        this.reportDiagnostic = reportAnalyzerDiagnostic is null ? null : diagnostic => ReportIfLocatedInCompilation(reportAnalyzerDiagnostic, diagnostic);"
+              ],
+              [
+                " ",
+                240,
+                240,
+                "        this.options = options;"
+              ],
+              [
+                " ",
+                241,
+                241,
+                "        this.compilation = compilation;"
+              ],
+              [
+                " ",
+                242,
+                242,
+                "        this.cancellationToken = cancellationToken;"
+              ],
+              [
+                "gap",
+                null,
+                null,
+                ""
+              ],
+              [
+                " ",
+                982,
+                982,
+                "                    var stringKey = key is { Value: string stringKeyValue } ? stringKeyValue : default;"
+              ],
+              [
+                " ",
+                983,
+                983,
+                "                    if (intKey == null && stringKey == null)"
+              ],
+              [
+                " ",
+                984,
+                984,
+                "                    {"
+              ],
+              [
+                "-",
+                985,
+                null,
+                "                        this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.BothStringAndIntKeyAreNull, ((PropertyDeclarationSyntax)item.DeclaringSyntaxReferences[0].GetSyntax()).Identifier.GetLocation(), formattedType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), item.Name));"
+              ],
+              [
+                "+",
+                null,
+                985,
+                "                        this.reportDiagnostic?.Invoke(Diagnostic.Create(MsgPack00xMessagePackAnalyzer.BothStringAndIntKeyAreNull, GetPropertyIdentifierLocation(item), formattedType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), item.Name));"
+              ],
+              [
+                " ",
+                986,
+                986,
+                "                    }"
+              ],
+              [
+                " ",
+                987,
+                987,
+                ""
+              ],
+              [
+                " ",
+                988,
+                988,
+                "                    // A property with an init accessor and an initializer has a default that will be discarded by the deserializer."
+              ]
+            ],
+            "cut": 0
+          }
+        ],
+        "problems": [],
+        "verified": true
+      }
+    ],
+    "problems": [],
+    "spec": "explain/ju26-issue-2283.decisions.json",
+    "pseudo_code_by": "agent"
+  },
+  "tool_versions": {
+    "git": "git version 2.43.0",
+    "python": "3.13.18"
+  },
+  "produced_by": "script"
+}

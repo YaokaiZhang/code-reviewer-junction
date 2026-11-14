@@ -249,11 +249,11 @@
 
   function ownerRow(d, c) {
     var pick = state.picks[c.id];
-    var name = 'pick-' + c.id, x = confOf(d, c);
+    var name = 'pick-' + c.id, x = confOf(d, c), dc = decOf(d, c.id);
     return '<article class="own bn-owner' + (pick ? ' picked' : '') + '" id="row-' + esc(c.id) + '" data-id="' + esc(c.id) + '" data-band="owner" tabindex="-1">' +
       '<div class="own-h">' + scoreHtml(x) + '<span class="id">' + esc(c.id) + '</span>' + needsBadge(x) + '</div>' +
-      '<p class="claim-t">' + rich(c.claim) + '</p>' +
-      gateBlock(x, c.owner_role) + receiptBlock(d, x) + evidenceBlock(d, c) +
+      (dc ? '<p class="claim-t">' + esc(dc.title) + '</p>' + gateBlock(x, c.owner_role) + '<div class="dc">' + decisionPanes(dc) + '</div>' + receiptBlock(d, x) + filesBlock(d, c)
+          : '<p class="claim-t">' + rich(c.claim) + '</p>' + gateBlock(x, c.owner_role) + receiptBlock(d, x) + evidenceBlock(d, c)) +
       '<fieldset class="keys"><legend>' + esc(c.id) + '</legend>' +
         PICKS.map(function (p) {
           var id = name + '-' + p.cls;
@@ -265,11 +265,11 @@
   }
 
   function machineRow(d, c) {
-    var x = confOf(d, c);
-    return '<details class="mach bn-' + esc(x.band) + '" id="row-' + esc(c.id) + '" data-band="' + esc(x.band) + '">' +
+    var x = confOf(d, c), dc = decOf(d, c.id);
+    return '<details class="mach bn-' + esc(x.band) + (dc ? ' dc' : '') + '" id="row-' + esc(c.id) + '" data-band="' + esc(x.band) + '">' +
       '<summary><span class="tn">' + scoreHtml(x) + '</span><span class="id">' + esc(c.id) + '</span>' +
-      '<span class="ct">' + needsBadge(x) + rich(c.claim) + '</span><span class="tw" aria-hidden="true">▸</span></summary>' +
-      '<div class="body">' + gateBlock(x) + receiptBlock(d, x) + evidenceBlock(d, c) + '</div>' +
+      '<span class="ct">' + needsBadge(x) + (dc ? esc(dc.title) : rich(c.claim)) + '</span><span class="tw" aria-hidden="true">▸</span></summary>' +
+      '<div class="body">' + gateBlock(x) + (dc ? decisionPanes(dc) + receiptBlock(d, x) + filesBlock(d, c) : receiptBlock(d, x) + evidenceBlock(d, c)) + '</div>' +
     '</details>';
   }
 
@@ -372,8 +372,8 @@
     var ln = s.lines || [], probs = s.problems || [];
     var where = ln.length ? 'lines ' + ln[0] + (ln[1] !== ln[0] ? '–' + ln[1] : '') : 'no lines cited';
     return '<li class="step op-' + esc(lc(s.op)) + (s.verified === false ? ' unv' : '') + '" tabindex="0" role="button" aria-pressed="false" title="' + esc(where) + '"' +
-        ' data-f="' + esc(s.file || c.file) + '" data-a="' + esc(ln[0]) + '" data-b="' + esc(ln[1] == null ? ln[0] : ln[1]) + '">' +
-      '<span class="op">' + esc(s.op) + '</span><span class="sx">' + rich(s.text) + '</span>' +
+        ' data-f="' + esc(s.file || c.file) + '" data-s="' + (s.side === 'old' ? 'o' : 'n') + '" data-a="' + esc(ln[0]) + '" data-b="' + esc(ln[1] == null ? ln[0] : ln[1]) + '">' +
+      '<span class="op">' + esc(s.op) + '</span><span class="sx">' + rich(s.text) + (s.in_change === false ? ' <span class="ctx" title="These lines are around the change, not part of it">nearby code</span>' : '') + '</span>' +
       (s.verified === false ? '<span class="unv-m"><b>? unverified</b>' + probs.map(function (p) { return ' ' + rich(p); }).join(' ·') + '</span>' : '') +
     '</li>';
   }
@@ -411,10 +411,10 @@
     var more = notes.map(function (n) { return '<p>' + rich(plain(n)) + '</p>'; }).join('') +
       (msgs.length ? '<ul class="msgs">' + msgs.map(function (r) { return '<li><span class="fine">' + esc(plain(r.run)) + '</span><code>' + esc(r.message) + '</code></li>'; }).join('') + '</ul>' : '') +
       ((c.claims || []).length ? '<p class="cl-l"><span class="fine">claims</span> ' + c.claims.map(goto).join(' ') + '</p>' : '');
-    return '<div class="pane an"><h5>Analysis</h5>' +
+    return '<div class="pane an"><h5>Why</h5>' +
       '<p class="verdict">' + (TK[k].say ? esc(TK[k].say) : rich(c.verdict || '')) + '</p>' +
       '<p class="runs">' + runLine(c) + '</p>' +
-      (dnc.length ? '<div class="dnc"><h6>Does not check</h6><ul>' + dnc.map(function (x) { return '<li>' + rich(x) + '</li>'; }).join('') + '</ul></div>' : '') +
+      (dnc.length ? '<div class="dnc"><h6>Doesn\u2019t check</h6><ul>' + dnc.map(function (x) { return '<li>' + rich(x) + '</li>'; }).join('') + '</ul></div>' : '') +
       (more ? '<details class="more"><summary>notes &amp; claims <span class="tw" aria-hidden="true">▸</span></summary>' + more + '</details>' : '') +
     '</div>';
   }
@@ -425,8 +425,8 @@
         '<span class="say">' + esc(k === 'other' ? c.verdict || t.row : t.row) + '</span><span class="tw" aria-hidden="true">▸</span></summary>' +
       '<p class="meth">test method <code>' + esc(c.test) + '</code> in ' + esc(base(c.file)) + '</p>' +
       '<div class="panes">' +
-        '<div class="pane ps"><h5>Pseudo-code</h5><ol class="steps">' + (c.steps || []).map(function (s) { return stepHtml(c, s); }).join('') + '</ol></div>' +
-        '<div class="pane rc"><h5>Real code</h5><div class="code" tabindex="0" aria-label="Code of ' + esc(c.test) + '">' + codeGroups(c) + '</div></div>' +
+        '<div class="pane ps"><h5>What the test does</h5><ol class="steps">' + (c.steps || []).map(function (s) { return stepHtml(c, s); }).join('') + '</ol></div>' +
+        '<div class="pane rc"><h5>The code</h5><div class="code" tabindex="0" aria-label="Code of ' + esc(c.test) + '">' + codeGroups(c) + '</div></div>' +
         analysisPane(c, k) +
       '</div></details>';
   }
@@ -445,7 +445,7 @@
   }
   function wireTests(root) {
     var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    root.querySelectorAll('.tc').forEach(function (card) {
+    root.querySelectorAll('.tc, .dc').forEach(function (card) {
       var pane = card.querySelector('.code'), pinned = null;
       if (!pane) return;
       function show(st) {
@@ -456,8 +456,9 @@
         var a = +st.dataset.a, b = +st.dataset.b, hit = [];
         pane.querySelectorAll('.cl').forEach(function (cl) {
           if (cl.dataset.f !== st.dataset.f) return;
-          cl.querySelectorAll('.r[data-n]').forEach(function (r) {
-            var x = +r.dataset.n;
+          var key = st.dataset.s || 'n';
+          cl.querySelectorAll('.r[data-' + key + ']').forEach(function (r) {
+            var x = +r.dataset[key];
             if (x >= a && x <= b) { r.classList.add('hl'); hit.push(r); }
           });
         });
@@ -480,6 +481,71 @@
         st.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
       });
     });
+  }
+
+  /* ---------- AI decisions, each with pseudo-code, the real code and the reasons ---------- */
+  function decCards(d) { return ((d._decisions || {}).details || {}).cards || []; }
+  function decOf(d, id) { return decCards(d).filter(function (c) { return c.id === id; })[0] || null; }
+  function diffCode(card) {
+    return (card.code || []).map(function (g) {
+      var ind = g.rows.reduce(function (m, r) { return r[0] !== 'gap' && r[3].trim() ? Math.min(m, r[3].match(/^[ \t]*/)[0].length) : m; }, 1e9);
+      if (ind === 1e9) ind = 0;
+      var rows = g.rows.map(function (r) {
+        if (r[0] === 'gap') return '<div class="r gap"><i>⋯</i></div>';
+        var cls = r[0] === '+' ? ' add' : r[0] === '-' ? ' del' : '';
+        return '<div class="r' + cls + '"' + (r[1] != null ? ' data-o="' + r[1] + '"' : '') + (r[2] != null ? ' data-n="' + r[2] + '"' : '') + '>' +
+          '<i>' + (r[2] != null ? r[2] : r[1]) + '</i><u aria-hidden="true">' + (r[0] === '+' ? '+' : r[0] === '-' ? '−' : '') + '</u><span>' + esc(r[3].slice(ind)) + '</span></div>';
+      }).join('');
+      return '<div class="cg"><div class="cgh"><b>' + esc(base(g.file)) + '</b><span class="lg"><em class="lg-del">− old</em> <em class="lg-add">+ new</em></span></div>' +
+        '<div class="cl" data-f="' + esc(g.file) + '">' + rows + (g.cut ? '<div class="r gap"><i>⋯</i><span> ' + g.cut + ' more lines</span></div>' : '') + '</div></div>';
+    }).join('');
+  }
+  var EVW = { pass: 'check passed', fail: 'check found a problem', error: 'check incomplete', missing: 'file missing' };
+  function becauseHtml(b) {
+    var r = lc(b.result);
+    var chip = b.evidence ? '<a class="evc r-' + esc(r || 'none') + '" href="../' + esc(b.evidence) + '" target="_blank" rel="noopener" title="' + esc(plain(b.summary || '')) + '">' +
+      esc(EVW[r] || r || 'evidence') + (b.produced_by === 'hand' ? ' · by hand' : '') + ' ↗</a>' : '';
+    return '<li><span>' + rich(b.text) + '</span>' + chip + '</li>';
+  }
+  function decisionPanes(card) {
+    var bad = (card.steps || []).filter(function (s) { return !s.verified; }).length;
+    var n = (card.steps || []).length;
+    return '<div class="panes dpanes">' +
+      '<div class="pane ps"><h5>What the code does</h5><ol class="steps">' + (card.steps || []).map(function (s) { return stepHtml(card, s); }).join('') + '</ol>' +
+        '<p class="chk' + (bad ? ' bad' : '') + '">' + (bad ? '? ' + bad + ' of ' + n + ' steps don’t match the code' : '✓ every step matches the code') + '</p></div>' +
+      '<div class="pane rc"><h5>The code</h5><div class="code" tabindex="0" aria-label="Code for ' + esc(card.title) + '">' + diffCode(card) + '</div></div>' +
+      '<div class="pane an"><h5>Why</h5><p class="verdict">' + rich(card.verdict) + '</p>' +
+        ((card.because || []).length ? '<ul class="bc">' + card.because.map(becauseHtml).join('') + '</ul>' : '') +
+        (card.unsure ? '<div class="dnc"><h6>Not sure</h6><p>' + rich(card.unsure) + '</p></div>' : '') +
+        (card.ask ? '<div class="ask"><h6>Your call</h6><p>' + rich(card.ask) + '</p></div>' : '') +
+      '</div></div>';
+  }
+  /* the dossier's own wording, the requirement and the raw files, folded away */
+  function filesBlock(d, c) {
+    var out = '<p class="aiw"><span class="fine">The AI’s words</span> ' + rich(c.claim) + '</p>';
+    if (c.requirement) {
+      var rt = (d._requirements || {})[c.requirement];
+      out += '<p class="aiw"><span class="fine">What the issue asks' + (c.requirement_inferred ? ' (our reading)' : '') + '</span> ' + (rt ? rich(rt) : esc(c.requirement)) + '</p>';
+    }
+    out += '<ul class="files">' + (c.evidence || []).map(function (ref) {
+      var ev = (d._evidence || {})[ref], r = ev ? lc(ev.result) : 'missing';
+      return '<li><a href="../' + esc(ref) + '" target="_blank" rel="noopener">' + esc(base(ref).replace(/\.json$/, '').replace(/[-_.]+/g, ' ')) + ' ↗</a>' +
+        '<span class="evc r-' + esc(r) + '">' + esc(EVW[r] || r) + '</span>' + (ev && ev.summary ? '<span class="fs">' + rich(plain(ev.summary)) + '</span>' : '') + '</li>';
+    }).join('') + '</ul>';
+    return '<details class="more fb"><summary>full wording &amp; files <span class="tw" aria-hidden="true">▸</span></summary>' + out + '</details>';
+  }
+  var DK = { found: { g: '◆', w: 'found' }, drift: { g: '↗', w: 'not asked for' } };
+  function findingsSection(d) {
+    var cs = decCards(d).filter(function (c) { return c.kind === 'found' || c.kind === 'drift'; });
+    if (!cs.length) return '';
+    return '<div class="sec-h"><span class="inv">ALSO FOUND</span><span class="rule"></span><span class="dim">' + cs.length + '</span></div>' +
+      '<p class="sec-g">Things the reviewer noticed beyond the claims.</p>' +
+      cs.map(function (c) {
+        var k = DK[c.kind];
+        return '<details class="tc dc k-' + c.kind + '" id="row-' + esc(c.id) + '"><summary><span class="tg" aria-hidden="true">' + k.g + '</span>' +
+          '<span class="tname">' + esc(c.title) + '</span><span class="say">' + k.w + '</span><span class="tw" aria-hidden="true">▸</span></summary>' +
+          decisionPanes(c) + '</details>';
+      }).join('');
   }
 
   /* ---------- readability ---------- */
@@ -549,7 +615,15 @@
 
     app.innerHTML =
       '<section class="dossier">' +
-        '<aside class="side">' +
+        '<aside class="side' + (store('et:rail') ? ' open' : '') + '" id="side">' +
+          '<div class="rail">' +
+            '<button type="button" class="rail-t" id="rail-t" aria-expanded="' + (store('et:rail') ? 'true' : 'false') + '" aria-controls="drawer" title="Issue details and signing">' +
+              '<span class="rn">' + issueNo + '</span><span class="ra" aria-hidden="true">▸</span></button>' +
+            '<div class="p-leds rail-leds" aria-hidden="true">' + leds + '</div>' +
+            '<button type="button" class="rail-sign" id="rail-sign">sign</button>' +
+          '</div>' +
+          '<div class="drawer" id="drawer">' +
+          '<button type="button" class="drawer-x" id="drawer-x" aria-label="Fold the sidebar">◂ fold</button>' +
           '<div class="issue-no">' + issueNo + '</div>' +
           '<h1 class="issue-title">' + esc(d.title || d.branch) + '</h1>' +
           (d.summary ? '<div class="changed"><h2>What the AI changed</h2><p>' + rich(d.summary) + '</p></div>' : '') +
@@ -573,6 +647,7 @@
               '<p class="p-status" id="sign-status" aria-live="polite"></p>' +
             '</form>' +
           '</div>' +
+          '</div>' +
         '</aside>' +
         '<div class="monitor">' +
           '<div class="inset"><div class="crt">' +
@@ -580,22 +655,21 @@
             '<div class="term" id="term" tabindex="0" aria-label="Dossier">' +
               '<div class="t-top"><span class="inv">' + esc(d.branch) + '</span><span id="sigstate" class="dim">' + esc(d.head || '') + '</span></div>' +
               '<div class="tiers">' + tiers + '</div>' +
-              testsSection(d) +
               (human.length ?
                 '<div class="sec-h"><span class="inv" style="background:var(--t-refused)">NEEDS OWNER</span><span class="rule"></span><span id="pickcount"></span></div>' +
-                '<p class="sec-g">A check shows a promise to users changed. Accept, reject, or send it back to the AI.</p>' +
+                '<p class="sec-g">Users would notice these changes. You decide: accept, reject, or send back to the AI.</p>' +
                 human.map(function (c) { return ownerRow(d, c); }).join('') : '') +
               (machine.length ?
-                '<div class="sec-h"><span class="inv">' + (human.length ? 'OTHER CLAIMS' : 'CLAIMS') + '</span><span class="rule"></span><span class="dim">' + machine.length + '</span></div>' +
-                '<p class="sec-g">Strongest evidence first.</p>' +
+                '<div class="sec-h"><span class="inv">' + (human.length ? 'OTHER CHANGES' : 'CHANGES') + '</span><span class="rule"></span><span class="dim">' + machine.length + '</span></div>' +
+                '<p class="sec-g">What the AI changed, best backed first. Open one to see the code and the proof.</p>' +
                 '<div>' + machine.map(function (c) { return machineRow(d, c); }).join('') + '</div>' : '') +
-              '<div class="sec-h"><span class="inv">LEDGER</span><span class="rule"></span></div>' +
+              testsSection(d) +
+              findingsSection(d) +
+              '<div class="sec-h"><span class="inv">GAPS</span><span class="rule"></span></div>' +
               '<div class="lists">' +
-                list('NOT CHECKED', 'What we did not verify.', d.not_checked, rich, true) +
-                list('NO CLAIM', 'Changed code that no claim covers.', d.uncovered_diff_parts, function (p) { return '<code>' + esc(p) + '</code>'; }, true, 'Every changed line is covered by a claim.') +
-                list('FOUND', 'What the reviewer found.', d.found, rich) +
-                list('NEEDS OWNER: WHY', 'Why some claims are left to a person.', d.refused, function (r) { return r && typeof r === 'object' ? '<b>' + rich(r.what) + '</b> — ' + rich(r.why) : rich(r); }) +
-                list('SCOPE DRIFT', 'Changes the issue did not ask for.', d.scope_drift, rich, true) +
+                list('NOT CHECKED', 'What nobody verified.', d.not_checked, rich, true) +
+                list('NO CLAIM', 'Changed code no claim explains.', d.uncovered_diff_parts, function (p) { return '<code>' + esc(p) + '</code>'; }, true, 'Every changed line is explained by a claim.') +
+                (findingsSection(d) ? '' : list('FOUND', 'What the reviewer found.', d.found, rich) + list('SCOPE DRIFT', 'Changes the issue did not ask for.', d.scope_drift, rich, true)) +
                 readabilityBlock(d) +
               '</div>' +
               '<div class="prompt" id="prompt"></div>' +
@@ -621,6 +695,17 @@
         jumpTo(app.querySelector('[data-band="' + b.dataset.jump + '"]'));
       });
     });
+    var side = document.getElementById('side');
+    function setRail(open, focus) {
+      side.classList.toggle('open', open);
+      document.getElementById('rail-t').setAttribute('aria-expanded', open ? 'true' : 'false');
+      store('et:rail', open ? 1 : 0);
+      if (open && focus) focus.focus();
+    }
+    document.getElementById('rail-t').addEventListener('click', function () { setRail(!side.classList.contains('open'), document.getElementById('drawer-x')); });
+    document.getElementById('drawer-x').addEventListener('click', function () { setRail(false, document.getElementById('rail-t')); });
+    document.getElementById('rail-sign').addEventListener('click', function () { setRail(true, signer); });
+    side.addEventListener('keydown', function (e) { if (e.key === 'Escape' && side.classList.contains('open')) setRail(false, document.getElementById('rail-t')); });
     wireTests(app);
     if (state.receipt) printSlip(state.receipt, false);
     refresh();
@@ -643,8 +728,7 @@
     human.forEach(function (c) {
       var row = document.getElementById('row-' + c.id);
       if (row) row.classList.toggle('picked', !!state.picks[c.id]);
-      var led = app.querySelector('[data-led="' + CSS.escape(c.id) + '"]');
-      if (led) led.classList.toggle('on', !!state.picks[c.id]);
+      app.querySelectorAll('[data-led="' + CSS.escape(c.id) + '"]').forEach(function (led) { led.classList.toggle('on', !!state.picks[c.id]); });
     });
     var signer = document.getElementById('signer');
     var ready = picked === human.length && signer && signer.value.trim().length > 0;

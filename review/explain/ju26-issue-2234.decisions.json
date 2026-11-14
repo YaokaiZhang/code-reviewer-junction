@@ -1,0 +1,879 @@
+{
+  "branch": "ju26-issue-2234",
+  "produced_by": "agent",
+  "note": "Written by the reviewing agent. decision_check.py checks every step against the real code and attaches the real evidence results.",
+  "decisions": [
+    {
+      "id": "C-2234-01",
+      "kind": "claim",
+      "title": "The analyzer stops crashing on bad keys",
+      "steps": [
+        {
+          "op": "BEFORE",
+          "text": "a repeated key was added a second time with `intMembers.Add`, and that crashed.",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1022,
+            1022
+          ],
+          "side": "old"
+        },
+        {
+          "op": "BEFORE",
+          "text": "after the mixed-key warning (`DoNotMixStringAndIntKeys`), the code went on with the bad member.",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1007,
+            1007
+          ],
+          "side": "old"
+        },
+        {
+          "op": "NOW",
+          "text": "a key is stored only if it is not there yet (`!intMembers.ContainsKey`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1023,
+            1026
+          ],
+          "side": "new"
+        },
+        {
+          "op": "NOW",
+          "text": "a member with the wrong kind of key is skipped (`continue`) after its warning.",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1008,
+            1008
+          ],
+          "side": "new"
+        },
+        {
+          "op": "ALSO",
+          "text": "the fields loop gets the same guard (`!stringMembers.ContainsKey`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1179,
+            1182
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "We accept this: bad keys now give the user a warning instead of a crash.",
+      "because": [
+        {
+          "text": "Four new tests crash on the old code and pass on the new code.",
+          "evidence": "evidence/ju26-issue-2234/old-vs-new-tests.json"
+        },
+        {
+          "text": "We ran the real analyzer on small examples. The second member of a repeated key now gets the warning.",
+          "evidence": "evidence/ju26-issue-2234/findings-probes.json"
+        }
+      ]
+    },
+    {
+      "id": "C-2234-02",
+      "kind": "claim",
+      "title": "Normal keys can no longer crash it",
+      "steps": [
+        {
+          "op": "IF",
+          "text": "a member's key is a different kind from the first one (`isIntKey && intKey == null`),",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1005,
+            1005
+          ],
+          "side": "new"
+        },
+        {
+          "op": "THEN",
+          "text": "it is skipped (`continue`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1008,
+            1008
+          ],
+          "side": "new"
+        },
+        {
+          "op": "IF",
+          "text": "a number key is already taken (`!intMembers.ContainsKey(member.IntKey)`), the member is not stored again.",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1023,
+            1026
+          ],
+          "side": "new"
+        },
+        {
+          "op": "ALSO",
+          "text": "text keys follow the same rule (`!stringMembers.ContainsKey(member.StringKey)`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1039,
+            1042
+          ],
+          "side": "new"
+        },
+        {
+          "op": "SO",
+          "text": "the fields loop never adds a key twice either (`intMembers.Add`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1163,
+            1166
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "We accept this: for number and text keys, a proof and many real runs show the code no longer crashes.",
+      "because": [
+        {
+          "text": "A proof tool shows a model of this code never fails for number and text keys. The model gives the same answer as the real code on every input we tried.",
+          "evidence": "evidence/ju26-issue-2234/proof.json"
+        }
+      ],
+      "unsure": "The proof is about a model. We compared it with the real code only for types with up to 4 members."
+    },
+    {
+      "id": "C-2234-03",
+      "kind": "claim",
+      "title": "An empty key still crashes it",
+      "steps": [
+        {
+          "op": "GIVEN",
+          "text": "the first field has an empty key, so `isIntKey = intKey != null` treats the type as using text keys.",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1138,
+            1142
+          ],
+          "side": "new"
+        },
+        {
+          "op": "BUT",
+          "text": "the fields loop uses a bare `else`, so it goes on with no key at all.",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1168,
+            1168
+          ],
+          "side": "new"
+        },
+        {
+          "op": "THEN",
+          "text": "`stringMembers.ContainsKey(stringKey!)` gets nothing and crashes.",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1170,
+            1170
+          ],
+          "side": "new"
+        },
+        {
+          "op": "ALSO",
+          "text": "the new guard (`!stringMembers.ContainsKey(member.StringKey)`) comes too late to help.",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1179,
+            1182
+          ],
+          "side": "new"
+        },
+        {
+          "op": "BUT",
+          "text": "the properties loop checks `else if (stringKey is not null)`, so it does not crash.",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1028,
+            1028
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "We flag the fix as incomplete: a field with an empty key still crashes the analyzer, even for opted-out types.",
+      "because": [
+        {
+          "text": "We ran the real analyzer on this case. It crashes before and after the change.",
+          "evidence": "evidence/ju26-issue-2234/findings-probes.json"
+        },
+        {
+          "text": "The proof tool found the same case on its own. It is the only way the new code still fails.",
+          "evidence": "evidence/ju26-issue-2234/proof.json"
+        }
+      ]
+    },
+    {
+      "id": "C-2234-04",
+      "kind": "claim",
+      "title": "One warning is now lost",
+      "steps": [
+        {
+          "op": "BEFORE",
+          "text": "after the mixed-key warning (`DoNotMixStringAndIntKeys`), the code went on.",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1007,
+            1007
+          ],
+          "side": "old"
+        },
+        {
+          "op": "BEFORE",
+          "text": "so it also checked the member's own type (`this.CollectCore(item.Type, item)`), which can give a second warning.",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1043,
+            1043
+          ],
+          "side": "old"
+        },
+        {
+          "op": "NOW",
+          "text": "it stops at `continue`, right after the first warning.",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1008,
+            1008
+          ],
+          "side": "new"
+        },
+        {
+          "op": "SO",
+          "text": "the check of the member's type (`this.CollectCore(item.Type, item)`) never runs for that member.",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1050,
+            1050
+          ],
+          "side": "new"
+        },
+        {
+          "op": "ALSO",
+          "text": "the fields loop has the same `continue`.",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1148,
+            1148
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "We will not accept this on our own: a warning users got before now disappears, so the analyzer's owner must decide.",
+      "because": [
+        {
+          "text": "We ran the real analyzer on a member with a mixed key and a type that cannot be saved. The old code warned about the type. The new code does not.",
+          "evidence": "evidence/ju26-issue-2234/findings-probes.json"
+        }
+      ],
+      "unsure": "The member still gets the mixed-key warning. That may be enough, but it is a product choice.",
+      "ask": "Is it fine to lose the type warning when the member's key is already wrong?"
+    },
+    {
+      "id": "C-2234-05",
+      "kind": "claim",
+      "title": "First member wins, repeats get warned",
+      "steps": [
+        {
+          "op": "IF",
+          "text": "a number key is already used (`intMembers.ContainsKey(intKey!.Value)`), a 'keys must be unique' warning is shown (`KeysMustBeUnique`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1014,
+            1016
+          ],
+          "side": "new"
+        },
+        {
+          "op": "THEN",
+          "text": "the member is stored only if its key is new (`!intMembers.ContainsKey`), so the first one stays.",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1023,
+            1026
+          ],
+          "side": "new"
+        },
+        {
+          "op": "ALSO",
+          "text": "text keys work the same way (`!stringMembers.ContainsKey`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1039,
+            1042
+          ],
+          "side": "new"
+        },
+        {
+          "op": "ALSO",
+          "text": "the fields loop does the same (`!intMembers.ContainsKey(member.IntKey)`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1163,
+            1166
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "We accept this: every repeated key gets a warning, and the first member is the one kept.",
+      "because": [
+        {
+          "text": "The repeated-key tests crash on the old code and pass on the new code.",
+          "evidence": "evidence/ju26-issue-2234/old-vs-new-tests.json"
+        },
+        {
+          "text": "The proof tool shows the first member wins and every repeat is warned. Its model matches the real code.",
+          "evidence": "evidence/ju26-issue-2234/proof.json"
+        },
+        {
+          "text": "Our experiment on the real analyzer shows the second member gets the warning.",
+          "evidence": "evidence/ju26-issue-2234/findings-probes.json"
+        }
+      ]
+    },
+    {
+      "id": "C-2234-06",
+      "kind": "claim",
+      "title": "The same fix is written twice",
+      "steps": [
+        {
+          "op": "GIVEN",
+          "text": "the properties loop gets a new guard (`if (!intMembers.ContainsKey(member.IntKey))`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1023,
+            1026
+          ],
+          "side": "new"
+        },
+        {
+          "op": "AND",
+          "text": "the fields loop gets the very same lines (`if (!intMembers.ContainsKey(member.IntKey))`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1163,
+            1166
+          ],
+          "side": "new"
+        },
+        {
+          "op": "ALSO",
+          "text": "both loops get the same `continue`.",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1148,
+            1148
+          ],
+          "side": "new"
+        },
+        {
+          "op": "SO",
+          "text": "text keys are also copied in both places (`if (!stringMembers.ContainsKey(member.StringKey))`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1179,
+            1182
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "We note this as a cost, not a bug: both copies must be kept in step by hand.",
+      "because": [
+        {
+          "text": "A script counted copied code in this file before and after the change. It grew.",
+          "evidence": "evidence/ju26-issue-2234/clone-complexity.json"
+        }
+      ]
+    },
+    {
+      "id": "C-2234-07",
+      "kind": "claim",
+      "title": "Half the new tests pass anyway",
+      "steps": [
+        {
+          "op": "GIVEN",
+          "text": "`MemberWithoutKeyIsReported` checks a member with no key.",
+          "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+          "lines": [
+            20,
+            21
+          ],
+          "side": "new"
+        },
+        {
+          "op": "ALSO",
+          "text": "`AllowPrivateRequiredIsReported` checks a private member.",
+          "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+          "lines": [
+            38,
+            39
+          ],
+          "side": "new"
+        },
+        {
+          "op": "ALSO",
+          "text": "`MemberTypeMustBeMessagePackObjectIsReported` checks the member's type.",
+          "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+          "lines": [
+            57,
+            58
+          ],
+          "side": "new"
+        },
+        {
+          "op": "ALSO",
+          "text": "`SourceGenerationOnlyDiagnosticsAreNotReportedWhenSuppressed` checks warnings that should stay quiet.",
+          "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+          "lines": [
+            168,
+            169
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "We count these four as guards for old behaviour, not as proof the fix works.",
+      "because": [
+        {
+          "text": "We ran each new test on the old and the new code. These four pass on both.",
+          "evidence": "evidence/ju26-issue-2234/old-vs-new-tests.json"
+        }
+      ]
+    },
+    {
+      "id": "C-2234-08",
+      "kind": "claim",
+      "title": "Run-time tests never actually ran",
+      "steps": [
+        {
+          "op": "GIVEN",
+          "text": "a type `SuppressedSourceGenerationType` opts out with `SuppressSourceGeneration = true`.",
+          "file": "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs",
+          "lines": [
+            8,
+            9
+          ],
+          "side": "new"
+        },
+        {
+          "op": "THEN",
+          "text": "one test expects no generated code for it (`Assert.Null`).",
+          "file": "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs",
+          "lines": [
+            23,
+            23
+          ],
+          "side": "new"
+        },
+        {
+          "op": "AND",
+          "text": "another saves and loads it (`MessagePackSerializer.Serialize`) and checks the values come back.",
+          "file": "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs",
+          "lines": [
+            30,
+            31
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "We could not confirm this: the test project does not build here, before or after the change.",
+      "because": [
+        {
+          "text": "The test project fails to build because the code generator does not load. So these tests never ran.",
+          "evidence": "evidence/ju26-issue-2234/execution-tests-build.json"
+        },
+        {
+          "text": "Two of the new tests could not be run here.",
+          "evidence": "evidence/ju26-issue-2234/old-vs-new-tests.json"
+        }
+      ],
+      "unsure": "The tests look right, but nobody has seen them pass."
+    },
+    {
+      "id": "C-2234-09",
+      "kind": "claim",
+      "title": "The new help text promises too much",
+      "steps": [
+        {
+          "op": "GIVEN",
+          "text": "the README says the analyzer still checks opted-out types (`The analyzer still validates these types`).",
+          "file": "README.md",
+          "lines": [
+            1625,
+            1625
+          ],
+          "side": "new"
+        },
+        {
+          "op": "AND",
+          "text": "it promises keys are unique and of one kind (`Keys are unique and all of the same kind`).",
+          "file": "README.md",
+          "lines": [
+            1627,
+            1627
+          ],
+          "side": "new"
+        },
+        {
+          "op": "ALSO",
+          "text": "it promises a check that types can be reached (`MsgPack012`).",
+          "file": "README.md",
+          "lines": [
+            1630,
+            1630
+          ],
+          "side": "new"
+        },
+        {
+          "op": "AND",
+          "text": "it says some checks are skipped for these types (`MsgPack011`).",
+          "file": "README.md",
+          "lines": [
+            1632,
+            1632
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "We do not trust this text yet: one promise has no test, and the key check can still crash.",
+      "because": [
+        {
+          "text": "Our experiment shows the key check still crashes on a field with an empty key.",
+          "evidence": "evidence/ju26-issue-2234/findings-probes.json"
+        },
+        {
+          "text": "The new tests cover most promises, but none checks that types can be reached.",
+          "evidence": "evidence/ju26-issue-2234/old-vs-new-tests.json"
+        }
+      ]
+    },
+    {
+      "id": "F-2234-1",
+      "kind": "found",
+      "ref": 0,
+      "title": "Type warning skipped after key warning",
+      "steps": [
+        {
+          "op": "WHEN",
+          "text": "a member has the wrong kind of key, the code now stops at `continue`.",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1008,
+            1008
+          ],
+          "side": "new"
+        },
+        {
+          "op": "SO",
+          "text": "it never checks the member's type (`this.CollectCore(item.Type, item)`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1050,
+            1050
+          ],
+          "side": "new"
+        },
+        {
+          "op": "ALSO",
+          "text": "the fields loop does the same (`continue`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1148,
+            1148
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "We report this: a member with a mixed key no longer gets the warning about its type.",
+      "because": [
+        {
+          "text": "Our experiment on the real analyzer confirms the type check is skipped.",
+          "evidence": "evidence/ju26-issue-2234/findings-probes.json"
+        }
+      ]
+    },
+    {
+      "id": "F-2234-2",
+      "kind": "found",
+      "ref": 1,
+      "title": "An empty key in a field crashes",
+      "steps": [
+        {
+          "op": "GIVEN",
+          "text": "the properties loop checks `else if (stringKey is not null)`.",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1028,
+            1028
+          ],
+          "side": "new"
+        },
+        {
+          "op": "BUT",
+          "text": "the fields loop uses a bare `else`.",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1168,
+            1168
+          ],
+          "side": "new"
+        },
+        {
+          "op": "SO",
+          "text": "with an empty key, `stringMembers.ContainsKey(stringKey!)` gets nothing and crashes.",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1170,
+            1170
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "We report the fix as incomplete: one simple case still crashes the analyzer.",
+      "because": [
+        {
+          "text": "Our experiment shows the crash before and after the change.",
+          "evidence": "evidence/ju26-issue-2234/findings-probes.json"
+        },
+        {
+          "text": "The proof tool points at the same case.",
+          "evidence": "evidence/ju26-issue-2234/proof.json"
+        }
+      ]
+    },
+    {
+      "id": "F-2234-3",
+      "kind": "found",
+      "ref": 2,
+      "title": "Our own goal was too strong",
+      "steps": [
+        {
+          "op": "GIVEN",
+          "text": "the first member decides the key kind (`isIntKey = intKey != null`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1141,
+            1141
+          ],
+          "side": "new"
+        },
+        {
+          "op": "IF",
+          "text": "that member is a field with an empty key, the bare `else` still runs,",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1168,
+            1168
+          ],
+          "side": "new"
+        },
+        {
+          "op": "THEN",
+          "text": "`stringMembers.ContainsKey(stringKey!)` fails.",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1170,
+            1170
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "We dropped the goal 'it never fails' and kept the exact rule the proof found instead.",
+      "because": [
+        {
+          "text": "The proof tool shows 'never fails' is false, and names the one case where it fails.",
+          "evidence": "evidence/ju26-issue-2234/proof.json"
+        }
+      ]
+    },
+    {
+      "id": "F-2234-4",
+      "kind": "found",
+      "ref": 3,
+      "title": "A suspected problem was fine",
+      "steps": [
+        {
+          "op": "IF",
+          "text": "a text key is already used (`stringMembers.ContainsKey(stringKey!)`), the 'must be unique' warning is shown (`KeysMustBeUnique`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1030,
+            1032
+          ],
+          "side": "new"
+        },
+        {
+          "op": "THEN",
+          "text": "the first member stays, because a new key is stored only once (`!stringMembers.ContainsKey(member.StringKey)`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1039,
+            1042
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "We dropped this worry: the second member of a repeated key does get the warning.",
+      "because": [
+        {
+          "text": "Our experiment on the real analyzer shows the second member is warned.",
+          "evidence": "evidence/ju26-issue-2234/findings-probes.json"
+        }
+      ]
+    },
+    {
+      "id": "F-2234-5",
+      "kind": "found",
+      "ref": 4,
+      "title": "The crash was not about opting out",
+      "steps": [
+        {
+          "op": "BEFORE",
+          "text": "any type with a repeated key crashed at `intMembers.Add`, opted out or not.",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1022,
+            1022
+          ],
+          "side": "old"
+        },
+        {
+          "op": "GIVEN",
+          "text": "the test `DuplicateKeysAreReportedWithoutAnalyzerFailureForGeneratedTypes` uses a normal type (`[MessagePackObject]`).",
+          "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+          "lines": [
+            147,
+            150
+          ],
+          "side": "new"
+        },
+        {
+          "op": "THEN",
+          "text": "it expects only the warning (`MsgPack005`), and it fails on the old code.",
+          "file": "tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs",
+          "lines": [
+            156,
+            157
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "We note that the fix helps all types, not just opted-out ones, and that opted-out types were already checked before.",
+      "because": [
+        {
+          "text": "We ran the new tests on the old code. Some pass there, some crash.",
+          "evidence": "evidence/ju26-issue-2234/old-vs-new-tests.json"
+        }
+      ]
+    },
+    {
+      "id": "F-2234-6",
+      "kind": "found",
+      "ref": 5,
+      "title": "Test file name breaks a style rule",
+      "steps": [
+        {
+          "op": "GIVEN",
+          "text": "the first type in the file is `SuppressedSourceGenerationType`.",
+          "file": "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs",
+          "lines": [
+            9,
+            9
+          ],
+          "side": "new"
+        },
+        {
+          "op": "BUT",
+          "text": "the file is named after the second type, `SuppressedSourceGenerationTests`.",
+          "file": "tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs",
+          "lines": [
+            18,
+            18
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "We report a small style problem: the file name should match its first type.",
+      "because": [
+        {
+          "text": "The build log for that project shows this style warning.",
+          "evidence": "evidence/ju26-issue-2234/execution-tests-build.json"
+        }
+      ]
+    },
+    {
+      "id": "F-2234-7",
+      "kind": "found",
+      "ref": 6,
+      "title": "An old warning shows blanks",
+      "steps": [
+        {
+          "op": "GIVEN",
+          "text": "the properties loop fills in the type and member names (`item.Name`) for `BothStringAndIntKeyAreNull`.",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            985,
+            985
+          ],
+          "side": "new"
+        },
+        {
+          "op": "BUT",
+          "text": "the fields loop sends `BothStringAndIntKeyAreNull` with only a place, and no names.",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1135,
+            1135
+          ],
+          "side": "new"
+        },
+        {
+          "op": "SO",
+          "text": "the user sees '{0}.{1}' instead of names. This line was not changed (`Diagnostic.Create`).",
+          "file": "src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs",
+          "lines": [
+            1135,
+            1135
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "We note an older bug outside this change: the field warning text has blanks."
+    },
+    {
+      "id": "D-2234-1",
+      "kind": "drift",
+      "ref": 0,
+      "title": "Extra help text was added",
+      "steps": [
+        {
+          "op": "NOW",
+          "text": "the README gets a new section, `Opting out of source generation`.",
+          "file": "README.md",
+          "lines": [
+            1620,
+            1620
+          ],
+          "side": "new"
+        },
+        {
+          "op": "AND",
+          "text": "it lists which checks still run (`The analyzer still validates these types`).",
+          "file": "README.md",
+          "lines": [
+            1625,
+            1632
+          ],
+          "side": "new"
+        }
+      ],
+      "verdict": "We flag this as beyond the issue, which asked only for an analyzer fix. It is harmless but needs its own review.",
+      "because": [
+        {
+          "text": "A script flagged one change that touches user help text.",
+          "evidence": "evidence/ju26-issue-2234/tripwires.json"
+        }
+      ]
+    }
+  ]
+}
