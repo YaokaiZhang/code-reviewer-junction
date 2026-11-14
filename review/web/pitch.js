@@ -326,12 +326,10 @@
     var opts = ['accept', 'send back', 'reject'];
     var t = s.asks.length >= 2 ? s.asks : ['A warning users relied on is gone', 'The docs now promise something new'];
     var lines = [[t[0], 'send back'], [t[1], 'accept']];
-    var ex = s.ownerEx;
-    var who = ex ? ' (here: ' + esc(ex.name) + (ex.n ? ', ' + esc(ex.n) + ' commits' : '') + ')' : '';
     var chain = [
       ['AI', 'The AI writes the trace and the question. It can be wrong.'],
       ['Tools', 'Real tools test the old and the new code. A script checks every AI step against the lines it cites.'],
-      ['Rule', 'A fixed rule, not the AI, flags any change users would notice. The owner is the person with the most commits on that code' + who + '.'],
+      ['Rule', 'The project has a fixed list of things users rely on: its warnings, public API, generated code, data format and docs. When a check shows one of them changed, a fixed rule, not the AI, sends it to a person.'],
       ['You', 'The owner answers the question. The reviewer signs.']
     ];
     var slip = '<div class="p-slip"><div class="p-slip-in">' +
