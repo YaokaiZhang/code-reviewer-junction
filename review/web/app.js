@@ -117,13 +117,11 @@
         '<div class="cap ' + t + '" title="' + esc(BAND[t].long) + '"><b aria-hidden="true">' + BAND[t].g + '</b><i>' + BAND[t].w + '</i><span class="sr">: ' + esc(BAND[t].long) + '</span></div>';
     }).join('');
     var real = ks.filter(function (k) { return !DATA[k].sample; }).length;
-    var nIssues = (NUM[real] || String(real)) + ' issue' + (real === 1 ? '' : 's');
 
     app.innerHTML =
       '<section class="landing">' +
         '<div class="hero">' +
           '<h1><span>Review the evidence,</span><em>not the lines.</em></h1>' +
-          '<p class="lede">An AI agent fixed ' + nIssues + ' in MessagePack-CSharp. Every decision it made is traced to the evidence behind it: tests, old versus new runs, and code metrics. The evidence sets the score. Rules learned from past reviews flag code that will be hard to maintain. Where users would notice, the owner decides.</p>' +
           '<div class="ladder">' + caps +
             '<span class="bracket machine">scored by evidence</span><span class="bracket owner">owner decides</span>' +
           '</div>' +
