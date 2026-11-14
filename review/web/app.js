@@ -123,7 +123,7 @@
       '<section class="landing">' +
         '<div class="hero">' +
           '<h1><span>Trace decisions,</span><em>not lines.</em></h1>' +
-          '<p class="lede">An AI agent fixed ' + nIssues + ' in MessagePack-CSharp. Every decision it made is traced: plain steps, the real code, and why. A script checks each step against the code. Where users would notice, the owner decides; you sign.</p>' +
+          '<p class="lede">An AI agent fixed ' + nIssues + ' in MessagePack-CSharp. A script checks every decision. Where users would notice, the owner decides.</p>' +
           '<div class="ladder">' + caps +
             '<span class="bracket machine">scored by evidence</span><span class="bracket owner">owner decides</span>' +
           '</div>' +
