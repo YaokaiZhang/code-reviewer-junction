@@ -6,6 +6,23 @@
   var TIERS = ['Proved', 'Tested', 'Measured', 'Argued', 'Refused'];
   var MACHINE = { Proved: 1, Tested: 1, Measured: 1 };
   var GLYPH = { Proved: '■', Tested: '▲', Measured: '●', Argued: '◆', Refused: '✕' };
+  /* one-line meaning of each tier (CONVENTIONS.md, "Tier rules") */
+  var DEF = {
+    Proved: 'A checker redid the work on the real code and got exactly the same result.',
+    Tested: 'A test that fails before the change passes after it.',
+    Measured: 'A tool counted something. The number is the evidence; whether it is enough is your call.',
+    Argued: 'Only reasoning backs it. A named owner has to accept it.',
+    Refused: 'No machine may settle it: public API, wire format, silenced warnings or security. A person decides.'
+  };
+  var SHORT = {
+    Proved: 'redone by a checker, same result',
+    Tested: 'a test fails before, passes after',
+    Measured: 'a tool counted it',
+    Argued: 'only reasoning backs it',
+    Refused: 'off-limits for machines'
+  };
+  /* plain glosses for analyzer codes that appear in claim text */
+  var GLOSS = { MsgPack003: 'a build warning', MsgPack005: 'a build error' };
   var CHAPTERS = [
     { id: 'ch-problem', n: '01', title: 'The problem' },
     { id: 'ch-built', n: '02', title: 'What we built' },
@@ -25,7 +42,15 @@
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   }
-  function rich(s) { return esc(s).replace(/`([^`]+)`/g, '<code>$1</code>'); }
+  /* claim text: `code` spans, and a plain gloss after the first analyzer code */
+  function rich(s) {
+    var seen = {};
+    return esc(s).replace(/`([^`]+)`/g, '<code>$1</code>').replace(/MsgPack\d{3}/g, function (m) {
+      if (seen[m] || !GLOSS[m]) return m;
+      seen[m] = 1;
+      return m + ' <span class="p-gloss">(' + GLOSS[m] + ')</span>';
+    });
+  }
   function lc(s) { return String(s || '').toLowerCase(); }
   function fmt(n) { return Math.round(n).toLocaleString('en-US'); }
   function clamp(v, a, b) { return Math.min(b, Math.max(a, v)); }
@@ -35,11 +60,17 @@
     return String(c || '').replace(/^cd \S+ && /, '').replace(/\/(?:tmp|home|root)\/\S*?\/(review\/)/g, '$1');
   }
   function issueOf(d) { return d.issue != null ? d.issue : String(d.branch || '').replace(/\D+/g, ''); }
+  function plural(n, one, many) { return fmt(n) + ' ' + (n === 1 ? one : (many || one + 's')); }
 
   /* claim-coverage evidence, wherever the renderer put it */
   function coverageOf(d) {
     if (d._coverage && d._coverage.details) return d._coverage;
     var ev = d._evidence || {}, k = Object.keys(ev).filter(function (p) { return ev[p] && ev[p].check === 'claim-coverage'; })[0];
+    return k ? ev[k] : null;
+  }
+  function evByCheck(d, check) {
+    var ev = d._evidence || {};
+    var k = Object.keys(ev).filter(function (p) { return ev[p] && ev[p].check === check; })[0];
     return k ? ev[k] : null;
   }
 
@@ -49,15 +80,17 @@
       .filter(function (d) { return !d.sample; });
     var s = {
       ds: ds, lines: 0, files: 0, claims: 0, tiers: {}, byTier: {}, evidence: {}, script: 0, hand: 0,
-      hunks: 0, uncovered: 0, notChecked: 0, commands: [], open: 0
+      hunks: 0, hunksSeen: 0, uncovered: 0, notChecked: 0, notCheckedList: [], commands: [], open: 0, receipts: 0,
+      snap: null
     };
     TIERS.forEach(function (t) { s.tiers[t] = 0; s.byTier[t] = []; });
     ds.forEach(function (d) {
       var df = d.diff || {};
       s.lines += (+df.insertions || 0) + (+df.deletions || 0);
       s.files += +df.files || 0;
-      s.notChecked += (d.not_checked || []).length;
+      (d.not_checked || []).forEach(function (t) { s.notChecked++; s.notCheckedList.push({ t: t, d: d }); });
       s.uncovered += (d.uncovered_diff_parts || []).length;
+      if (d._receipt) s.receipts++;
       claims(d).forEach(function (c) {
         s.claims++;
         if (s.tiers[c.tier] != null) { s.tiers[c.tier]++; s.byTier[c.tier].push({ c: c, d: d }); }
@@ -71,7 +104,14 @@
         if (e.command) s.commands.push(shortCmd(e.command));
       });
       var cv = coverageOf(d);
-      if (cv) s.hunks += +cv.details.hunks_total || 0;
+      if (cv) { s.hunks += +cv.details.hunks_total || 0; s.hunksSeen++; }
+      /* how many changed lines are generated snapshot files (diff classifier) */
+      var dc = evByCheck(d, 'diff-classifier'), dt = dc && dc.details;
+      if (dt && dt.insertions_by_category && dt.insertions_by_category.snapshot != null) {
+        var n = (+dt.insertions_by_category.snapshot || 0) + (+((dt.deletions_by_category || {}).snapshot) || 0);
+        var tot = (+dt.insertions || 0) + (+dt.deletions || 0);
+        if (!s.snap || n > s.snap.n) s.snap = { n: n, files: +dt.snapshots_total || +(dt.counts_by_category || {}).snapshot || 0, of: tot, d: d };
+      }
     });
     s.evidenceCount = s.script + s.hand;
     return s;
@@ -81,48 +121,45 @@
     var ev = (item.d._evidence || {});
     return (item.c.evidence || []).map(function (p) { return ev[p]; }).filter(Boolean);
   }
-  function pickTested(s) {
-    var best = null;
-    s.byTier.Tested.forEach(function (it) {
-      evOf(it).forEach(function (e) {
-        if (!best && lc(e.result) === 'pass' && /fail on base and pass on branch/.test(e.summary || '') && e.produced_by !== 'hand') best = { it: it, e: e };
-      });
-    });
-    if (!best && s.byTier.Tested[0]) best = { it: s.byTier.Tested[0], e: evOf(s.byTier.Tested[0])[0] };
-    return best;
+  /* pick an example claim of a tier: prefer `want(item)`, avoid analyzer codes, then shortest */
+  var JARGON = /MsgPack0\d\d|AD0001|CS\d{4}|\.tt\b|netstandard|TypeCollector/;
+  function pick(s, tier, want, avoid) {
+    var xs = s.byTier[tier].filter(function (it) { return !(avoid && avoid[it.c.id]); });
+    if (!xs.length) xs = s.byTier[tier].slice();
+    return xs.map(function (it) {
+      return { it: it, k: (want && want(it) ? 0 : 1e4) + (JARGON.test(it.c.claim) ? 1e3 : 0) + it.c.claim.length };
+    }).sort(function (a, b) { return a.k - b.k; }).map(function (x) { return x.it; })[0] || null;
   }
-  function pickProved(s) {
-    var it = s.byTier.Proved.slice().sort(function (a, b) { return a.c.claim.length - b.c.claim.length; })[0];
-    return it ? { it: it, e: evOf(it)[0] } : null;
-  }
-  function pickCoverage(s) {
-    var best = null;
-    s.ds.forEach(function (d) {
-      var e = coverageOf(d);
-      if (e && (!best || e.details.hunks_total > best.e.details.hunks_total)) best = { d: d, e: e };
-    });
-    return best;
-  }
-  function pickRefused(s) {
-    return s.byTier.Refused.filter(function (it) { return it.c.owner_role; })
-      .sort(function (a, b) { return a.c.claim.length - b.c.claim.length; })[0] || s.byTier.Refused[0];
-  }
-  function exampleFor(s, t) {
-    var xs = s.byTier[t].slice().sort(function (a, b) { return a.c.claim.length - b.c.claim.length; });
-    return xs[0];
+  function usesCheck(name) { return function (it) { return evOf(it).some(function (e) { return e.check === name; }); }; }
+
+  /* ---------- result lines in plain English, from evidence details ---------- */
+  function plainResult(e) {
+    var dt = (e && e.details) || {};
+    if (e.check === 'regeneration' && Array.isArray(dt.runs)) {
+      var br = dt.runs.filter(function (r) { return r.label === 'branch'; })[0];
+      if (br && br.total != null) return 'The checker regenerated every snapshot and compiled it: ' + br.passed + ' of ' + br.total + ' snapshot tests pass on the branch.';
+    }
+    if (e.check === 'old-vs-new-tests' && dt.counts && dt.counts.new_or_changed_methods != null) {
+      return plural(dt.counts.evidence, 'new test') + ' of ' + dt.counts.new_or_changed_methods + ' fail on the code before the change and pass after it.';
+    }
+    if (e.check === 'clone-complexity' && dt.base && dt.branch && dt.base.clones && dt.branch.clones) {
+      return 'Copy-pasted blocks in the changed file: ' + dt.base.clones.duplicated_blocks + ' before, ' + dt.branch.clones.duplicated_blocks + ' after. Whether that matters is the reader’s call.';
+    }
+    return e.summary || '';
   }
 
   /* ---------- pieces ---------- */
-  function transition(text, hot, ch) {
-    var words = text.split(' ');
+  function transition(text, hot, ch, ctx) {
+    var ws = text.split(' ');
     var c = ch && CHAPTERS.filter(function (x) { return x.id === ch; })[0];
     return '<section class="p-trans"' + (c ? ' id="' + c.id + '" data-chapter="' + c.id + '"' : '') + ' data-progress="trans">' +
       '<div class="p-sticky p-trans-in">' +
         (c ? '<div class="p-chap"><span>' + c.n + '</span><i></i>' + esc(c.title) + '</div>' : '') +
         '<div class="p-line"></div><div class="p-dot"></div>' +
-        '<p class="p-sentence">' + words.map(function (w, i) {
-          return '<span class="w' + (i >= words.length - hot ? ' hot' : '') + '">' + esc(w) + ' </span>';
+        '<p class="p-sentence">' + ws.map(function (w, i) {
+          return '<span class="w' + (i >= ws.length - hot ? ' hot' : '') + '">' + esc(w) + ' </span>';
         }).join('') + '</p>' +
+        (ctx ? '<p class="p-ctx p-trans-ctx">' + ctx + '</p>' : '') +
       '</div></section>';
   }
   function words(text, cls, delay) {
@@ -132,16 +169,15 @@
   }
   function strip(d) {
     var cs = claims(d).slice().sort(function (a, b) { return TIERS.indexOf(a.tier) - TIERS.indexOf(b.tier); });
-    return '<span class="p-strip">' + cs.map(function (c) {
-      return '<i style="background:var(--t-' + lc(c.tier) + ')"' + (MACHINE[c.tier] ? '' : ' class="own"') + '></i>';
+    return '<span class="p-strip" aria-hidden="true">' + cs.map(function (c) {
+      return '<i style="background:var(--t-' + lc(c.tier) + ')"' + (MACHINE[c.tier] ? '' : ' class="p-own"') + ' title="' + esc(c.tier) + '"></i>';
     }).join('') + '</span>';
   }
-  function term(cmd, e) {
-    var res = e ? lc(e.result) : '';
-    return '<div class="p-term">' +
-      (cmd ? '<div class="p-cmd"><span>$</span> ' + esc(cmd) + '</div>' : '') +
-      (e ? '<div class="p-out"><b class="' + esc(res) + '">' + esc(String(e.result || '').toUpperCase()) + '</b> ' + esc(e.summary || '') + '</div>' : '') +
-      '</div>';
+  function cmdLine(e) {
+    if (!e || !e.command) return '';
+    var cmd = shortCmd(e.command);
+    return '<div class="p-term"><span class="p-lbl">' + (e.produced_by === 'hand' ? 'run by hand' : 'run by script') + '</span>' +
+      '<code title="' + esc(cmd) + '">$ ' + esc(cmd) + '</code></div>';
   }
 
   /* ---------- sections ---------- */
@@ -149,21 +185,27 @@
     var rows = s.ds.map(function (d) {
       var df = d.diff || {}, n = (+df.insertions || 0) + (+df.deletions || 0);
       return '<li><span class="b">#' + esc(issueOf(d)) + '</span>' +
-        '<span class="bar"><i data-w="' + (100 * n / s.lines).toFixed(2) + '"></i></span>' +
+        '<span class="bar"><i data-w="' + (100 * n / (s.lines || 1)).toFixed(2) + '"></i></span>' +
         '<span class="n">' + fmt(n) + '</span></li>';
     }).join('');
-    // a ribbon of fake diff gutter marks — pure texture, no text
     var ribbon = '';
     for (var i = 0; i < 64; i++) {
       var w = 20 + ((i * 37) % 70);
       ribbon += '<i class="' + (i % 9 === 4 ? 'del' : 'add') + '" style="width:' + w + '%"></i>';
     }
+    var hook = s.snap && s.snap.n ? '<p class="p-ctx p-hook" data-rv><b>' + fmt(s.snap.n) + '</b> of those lines are ' +
+      (s.snap.files ? plural(s.snap.files, 'generated test snapshot file') : 'generated test snapshots') + ' in #' + esc(issueOf(s.snap.d)) +
+      ' — too many to read, but a machine can regenerate them and compare.</p>' : '';
     return '<section class="p-sec p-problem">' +
       '<div class="p-grid2">' +
         '<div>' +
           '<div class="p-big" data-count="' + s.lines + '">0</div>' +
           '<h2 class="p-h2">' + words('lines changed.') + '<br>' + words('Who reads them?', 'hot', 160) + '</h2>' +
-          '<ul class="p-bars" data-rv>' + rows + '</ul>' +
+          '<p class="p-ctx" data-rv>Lines added or removed by an AI agent on ' + plural(s.ds.length, 'branch', 'branches') +
+            ' of MessagePack-CSharp, a serialisation library for .NET.</p>' +
+          '<ul class="p-bars" data-rv aria-label="Lines changed per branch">' + rows + '</ul>' +
+          '<p class="p-cap">Lines changed per branch, named by its GitHub issue.</p>' +
+          hook +
         '</div>' +
         '<div class="p-choice" data-rv>' +
           '<div class="p-ribbon" aria-hidden="true">' + ribbon + '</div>' +
@@ -171,29 +213,46 @@
             '<span class="p-key big">Approve</span>' +
             '<span class="p-key small">Read</span>' +
           '</div>' +
+          '<p class="p-cap p-keycap">Today a reviewer has two buttons: approve without reading, or read every line.</p>' +
         '</div>' +
       '</div>' +
     '</section>';
   }
 
-  function secLadder(s) {
+  function ladderExamples(s, used) {
+    var ex = {};
+    ex.Proved = pick(s, 'Proved', usesCheck('regeneration'));
+    ex.Tested = pick(s, 'Tested', null, used);
+    ex.Measured = pick(s, 'Measured', function (it) { return usesCheck('diff-classifier')(it) && /snapshot files/i.test(it.c.claim); }, used);
+    ex.Argued = pick(s, 'Argued', null, used);
+    ex.Refused = pick(s, 'Refused', function (it) { return !!it.c.owner_role; }, used);
+    return ex;
+  }
+
+  function secLadder(s, used) {
+    var ex = ladderExamples(s, used);
     var rows = TIERS.map(function (t, i) {
-      return (i === 3 ? '<li class="split" aria-hidden="true"><span>machine</span><span>owner</span></li>' : '') +
+      return (i === 3 ? '<li class="split"><span>Machines settle the top three. People decide the bottom two.</span></li>' : '') +
         '<li class="p-rung c-' + lc(t) + '" data-i="' + i + '" style="--c:var(--t-' + lc(t) + ')">' +
-          '<b>' + GLYPH[t] + '</b><span class="t">' + t + '</span><span class="n">' + s.tiers[t] + '</span></li>';
+          '<b aria-hidden="true">' + GLYPH[t] + '</b><span class="t">' + t + '<small>' + SHORT[t] + '</small></span><span class="n">' + s.tiers[t] + '</span></li>';
     }).join('');
     var cards = TIERS.map(function (t, i) {
-      var ex = exampleFor(s, t);
-      if (!ex) return '';
+      var it = ex[t];
       return '<article class="p-card" data-i="' + i + '" style="--c:var(--t-' + lc(t) + ')">' +
-        '<header><span class="g">' + GLYPH[t] + ' ' + t + '</span><span class="id">' + esc(ex.c.id) + '</span></header>' +
-        '<p>' + rich(ex.c.claim) + '</p>' +
-        (ex.c.owner_role ? '<footer>✎ ' + esc(ex.c.owner_role) + '</footer>' : '<footer class="m">settled by machine</footer>') +
+        '<header><span class="g">' + GLYPH[t] + ' ' + t + '</span><span class="p-cnt">' + plural(s.tiers[t], 'claim') + '</span></header>' +
+        '<p class="p-def">' + esc(DEF[t]) + '</p>' +
+        (it ? '<div class="p-ex"><span class="p-lbl">Example claim · #' + esc(issueOf(it.d)) + '</span>' +
+          '<p>' + rich(it.c.claim) + '</p>' +
+          (t === 'Refused' && it.c.why_this_tier ? '<p class="p-why"><b>Why a person:</b> ' + rich(it.c.why_this_tier) + '</p>' : '') +
+          '</div>' : '') +
+        (MACHINE[t] ? '<footer class="m">Settled by machine — no one needs to sign</footer>'
+          : '<footer>Waits for a named owner' + (it && it.c.owner_role ? ': ' + esc(it.c.owner_role) : '') + '</footer>') +
       '</article>';
     }).join('');
     return '<section class="p-ladder" data-progress="ladder">' +
       '<div class="p-sticky p-ladder-in">' +
-        '<div class="p-ladder-head"><span class="p-big sm" data-count="' + s.claims + '">0</span><span class="p-h3">claims</span></div>' +
+        '<div class="p-ladder-head"><span class="p-big p-sm" data-count="' + s.claims + '">0</span><span class="p-h3">claims, five tiers</span></div>' +
+        '<p class="p-ctx p-ladder-ctx">Each claim gets the tier of the evidence behind it, strongest first.</p>' +
         '<div class="p-ladder-body">' +
           '<ol class="p-rungs">' + rows + '</ol>' +
           '<div class="p-cards">' + cards + '</div>' +
@@ -202,94 +261,120 @@
       '</div></section>';
   }
 
-  function secMachine(s) {
-    var pr = pickProved(s), te = pickTested(s), co = pickCoverage(s);
-    var cols = [];
-    if (pr) cols.push(
-      '<article class="p-ev" style="--c:var(--t-proved)" data-rv>' +
-        '<header><b>■</b> Proved <span>#' + esc(issueOf(pr.it.d)) + '</span></header>' +
-        '<p>' + rich(pr.it.c.claim) + '</p>' + term(pr.e && shortCmd(pr.e.command), pr.e) +
-      '</article>');
-    if (te) cols.push(
-      '<article class="p-ev" style="--c:var(--t-tested)" data-rv>' +
-        '<header><b>▲</b> Tested <span>#' + esc(issueOf(te.it.d)) + '</span></header>' +
-        '<p>' + rich(te.it.c.claim) + '</p>' + term(te.e && shortCmd(te.e.command), te.e) +
-      '</article>');
-    if (!co) {
-      var ms = null;
-      s.byTier.Measured.forEach(function (it) { evOf(it).forEach(function (e) { if (!ms && e.produced_by !== 'hand' && e.command) ms = { it: it, e: e }; }); });
-      if (ms) cols.push(
-        '<article class="p-ev" style="--c:var(--t-measured)" data-rv>' +
-          '<header><b>●</b> Measured <span>#' + esc(issueOf(ms.it.d)) + '</span></header>' +
-          '<p>' + rich(ms.it.c.claim) + '</p>' + term(shortCmd(ms.e.command), ms.e) +
-        '</article>');
-    } else {
-      var dt = co.e.details, cov = dt.hunks_total - dt.hunks_uncovered;
-      cols.push(
-        '<article class="p-ev" style="--c:var(--t-measured)" data-rv>' +
-          '<header><b>●</b> Measured <span>#' + esc(issueOf(co.d)) + '</span></header>' +
-          '<div class="p-ratio"><span data-count="' + cov + '">0</span><i>/</i>' + fmt(dt.hunks_total) + '</div>' +
-          '<div class="p-hunks" data-rv><i style="--p:' + (100 * cov / (dt.hunks_total || 1)).toFixed(1) + '%"></i></div>' +
-          '<p class="sub">changed hunks with a claim</p>' +
-          term(shortCmd(co.e.command), co.e) +
-        '</article>');
+  function machinePicks(s) {
+    var pr = pick(s, 'Proved', usesCheck('regeneration'));
+    var te = pick(s, 'Tested', function (it) {
+      return evOf(it).some(function (e) { return e.check === 'old-vs-new-tests' && e.produced_by !== 'hand' && lc(e.result) === 'pass'; });
+    });
+    var ms = pick(s, 'Measured', usesCheck('clone-complexity'));
+    function evFor(it, test) {
+      if (!it) return null;
+      var es = evOf(it);
+      return es.filter(test)[0] || es.filter(function (e) { return e.produced_by !== 'hand'; })[0] || es[0] || null;
     }
+    return [
+      pr && { t: 'Proved', it: pr, e: evFor(pr, function (e) { return e.check === 'regeneration'; }) },
+      te && { t: 'Tested', it: te, e: evFor(te, function (e) { return e.check === 'old-vs-new-tests' && e.produced_by !== 'hand' && lc(e.result) === 'pass'; }) },
+      ms && { t: 'Measured', it: ms, e: evFor(ms, function (e) { return e.check === 'clone-complexity'; }) }
+    ].filter(Boolean);
+  }
+
+  function secMachine(s, mp) {
+    var cols = mp.map(function (x) {
+      return '<article class="p-ev" style="--c:var(--t-' + lc(x.t) + ')" data-rv>' +
+        '<header><b aria-hidden="true">' + GLYPH[x.t] + '</b> ' + x.t + ' <span>#' + esc(issueOf(x.it.d)) + '</span></header>' +
+        '<p class="p-def">' + esc(DEF[x.t]) + '</p>' +
+        '<span class="p-lbl">The claim</span>' +
+        '<p class="p-cl">' + rich(x.it.c.claim) + '</p>' +
+        (x.e ? '<span class="p-lbl">What the check found</span><p class="p-found">' + rich(plainResult(x.e)) + '</p>' : '') +
+        cmdLine(x.e) +
+      '</article>';
+    }).join('');
     var m = s.tiers.Proved + s.tiers.Tested + s.tiers.Measured;
     return '<section class="p-sec p-machine">' +
-      '<h2 class="p-h2"><span class="p-num" data-count="' + m + '">0</span> ' + words('settled') + '<br>' + words('by machine.', 'hot', 120) + '</h2>' +
-      '<div class="p-evs">' + cols.join('') + '</div>' +
+      '<h2 class="p-h2"><span class="p-num" data-count="' + m + '">0</span> ' + words('of ' + s.claims + ' settled') + '<br>' + words('by machine.', 'hot', 120) + '</h2>' +
+      '<p class="p-ctx" data-rv>Three of them, with what the check actually found:</p>' +
+      '<div class="p-evs">' + cols + '</div>' +
     '</section>';
   }
 
-  function secOwner(s) {
+  function secOwner(s, used) {
     var rows = s.ds.map(function (d) {
       var a = 0, r = 0;
       claims(d).forEach(function (c) { if (c.tier === 'Argued') a++; if (c.tier === 'Refused') r++; });
-      function g(n, t) { var o = ''; for (var i = 0; i < n; i++) o += '<b style="--c:var(--t-' + lc(t) + ');transition-delay:' + (i * 90) + 'ms">' + GLYPH[t] + '</b>'; return o; }
+      function g(n, t) { var o = ''; for (var i = 0; i < n; i++) o += '<b style="--c:var(--t-' + lc(t) + ');transition-delay:' + (i * 90) + 'ms" title="' + t + '">' + GLYPH[t] + '</b>'; return o; }
       return '<li data-rv><span class="b">#' + esc(issueOf(d)) + '</span><span class="g">' + g(a, 'Argued') + g(r, 'Refused') + '</span></li>';
     }).join('');
-    var rf = pickRefused(s);
-    var d0 = rf && rf.d, picks = d0 ? claims(d0).filter(function (c) { return !MACHINE[c.tier]; }) : [];
-    var auto = d0 ? claims(d0).filter(function (c) { return MACHINE[c.tier]; }) : [];
+    /* the quote: an Argued claim that only the agent's word backs, if there is one */
+    var aq = pick(s, 'Argued', function (it) { return /^Agent's claim/i.test(it.c.claim); });
+    if (aq) used[aq.c.id] = 1;
+
+    /* receipt: a real one if any dossier was signed; otherwise an empty, clearly unsigned form */
+    var dr = s.ds.filter(function (d) { return d._receipt; })[0];
+    var d0 = dr || s.ds.slice().sort(function (a, b) { return claims(a).length - claims(b).length; })[0];
     var rc = d0 && d0._receipt;
-    var signer = rc ? rc.signed_by : (rf && rf.c.owner_role) || '';
-    var slip = d0 ? '<div class="p-slip" aria-hidden="true"><div class="p-slip-in">' +
-      '<h4>RECEIPT</h4><div class="c">' + esc(d0.branch) + ' @ ' + esc(d0.head || '') + '</div><hr>' +
-      picks.map(function (c, i) {
-        var pk = rc ? ((rc.picks || []).filter(function (p) { return p.id === c.id; })[0] || {}).pick : ['send back', 'reject', 'accept'][i % 3];
-        return '<div class="ln"><span>' + GLYPH[c.tier] + ' ' + esc(c.id) + '</span><span class="pk">' + esc(String(pk || '').toUpperCase()) + '</span></div>';
+    var picks = d0 ? claims(d0).filter(function (c) { return !MACHINE[c.tier]; }) : [];
+    var auto = d0 ? claims(d0).filter(function (c) { return MACHINE[c.tier]; }) : [];
+    function shortClaim(c) {
+      var w = String(c.claim || '').replace(/`/g, '').split(/\s+/);
+      return w.slice(0, 6).join(' ') + (w.length > 6 ? '…' : '');
+    }
+    var opts = ['accept', 'send back', 'reject'];
+    var slip = d0 ? '<div class="p-slip"><div class="p-slip-in">' +
+      '<h4>RECEIPT</h4>' +
+      (rc ? '' : '<div class="p-ex">EXAMPLE · NOT SIGNED</div>') +
+      '<div class="c">#' + esc(issueOf(d0)) + ' at commit ' + esc(d0.head || '') + '</div><hr>' +
+      '<div class="p-hd">Owner’s call on each open claim</div>' +
+      picks.map(function (c) {
+        var pk = rc ? ((rc.picks || []).filter(function (p) { return p.id === c.id; })[0] || {}).pick : null;
+        return '<div class="ln"><span class="p-q">' + GLYPH[c.tier] + ' ' + esc(shortClaim(c)) + '</span>' +
+          '<span class="p-opts">' + opts.map(function (o) {
+            return '<span class="p-o' + (pk === o ? ' on' : '') + '"><i>' + (pk === o ? '✓' : '') + '</i>' + o + '</span>';
+          }).join('') + '</span></div>';
       }).join('') + '<hr>' +
-      '<div class="auto">AUTO ' + auto.map(function (c) { return GLYPH[c.tier] + ' ' + esc(c.id); }).join(' · ') + '</div><hr>' +
-      '<div class="sig"><span>SIGNED</span><em>' + esc(signer) + '</em></div>' +
-    '</div><span class="tear"></span></div>' : '';
+      '<div class="auto">Settled by machine: ' + plural(auto.length, 'claim') + ' ' + auto.map(function (c) { return GLYPH[c.tier]; }).join(' ') + '</div>' +
+      '<div class="auto">Not checked: ' + plural((d0.not_checked || []).length, 'item') + ', listed</div><hr>' +
+      '<div class="sig"><span>SIGNED</span>' + (rc ? '<em>' + esc(rc.signed_by) + '</em>' : '<span class="p-blank" aria-label="not signed"></span>') + '</div>' +
+    '</div></div>' : '';
+    var cap = '<p class="p-cap p-slip-cap">' +
+      (rc ? 'A signed receipt' : 'What a receipt holds') + ': the owner’s call on each open claim (accept, send back or reject), the claims machines settled, what nobody checked, and who signed — for that exact commit.' +
+      (s.receipts ? '' : ' None of these branches has been signed yet, so the boxes are empty.') + '</p>';
     return '<section class="p-owner" data-progress="owner">' +
       '<div class="p-sticky p-owner-in">' +
         '<div class="p-owner-l">' +
           '<h2 class="p-h2"><span class="p-num hot" data-count="' + s.open + '">0</span> ' + words('left for') + '<br>' + words('a person.', 'hot', 120) + '</h2>' +
+          '<p class="p-ctx" data-rv>Argued and Refused claims wait for a named owner — the person responsible for that part of the code.</p>' +
           '<ul class="p-open">' + rows + '</ul>' +
-          (rf ? '<blockquote class="p-quote" data-rv style="--c:var(--t-refused)">' +
-            '<header>✕ Refused <span>' + esc(rf.c.id) + '</span></header>' +
-            '<p>' + rich(rf.c.claim) + '</p>' +
-            '<footer>✎ ' + esc(rf.c.owner_role || '') + '</footer></blockquote>' : '') +
+          '<p class="p-cap p-open-key"><span>◆ Argued</span><span>✕ Refused</span> open claims per branch</p>' +
+          (aq ? '<blockquote class="p-quote" data-rv style="--c:var(--t-argued)">' +
+            '<header>◆ Argued <span>#' + esc(issueOf(aq.d)) + '</span></header>' +
+            '<p>' + rich(aq.c.claim) + '</p>' +
+            (aq.c.why_this_tier ? '<p class="p-why"><b>Why it waits:</b> ' + rich(aq.c.why_this_tier) + '</p>' : '') +
+            '<footer>Decides: ' + esc(aq.c.owner_role || 'named owner') + '</footer></blockquote>' : '') +
         '</div>' +
-        '<div class="p-owner-r"><div class="p-printer"><span class="mouth"></span></div>' + slip + '</div>' +
+        '<div class="p-owner-r"><div class="p-printer" aria-hidden="true"><span class="mouth"></span></div>' + slip + cap + '</div>' +
       '</div></section>';
   }
 
   function secKnow(s) {
     var cmds = s.commands.slice(0, 12);
     var row = cmds.concat(cmds).map(function (c) { return '<span><b>$</b> ' + esc(c) + '</span>'; }).join('');
+    var nc = s.notCheckedList.slice().sort(function (a, b) { return a.t.length - b.t.length; })[0];
+    var allHunks = s.hunksSeen === s.ds.length;
     return '<section class="p-sec p-know">' +
       '<div class="p-tape" aria-hidden="true"><div class="p-tape-in">' + row + '</div></div>' +
       '<div class="p-stats">' +
         '<div class="p-stat" data-rv><div class="v"><span data-count="' + s.evidenceCount + '">0</span></div>' +
-          '<div class="l">evidence files, each with its command</div>' +
+          '<div class="l">evidence files, each saved with the command that made it</div>' +
           '<div class="split"><span style="--p:' + (100 * s.script / (s.evidenceCount || 1)).toFixed(1) + '%"></span></div>' +
-          '<div class="k"><span><i class="sc"></i>script ' + s.script + '</span><span><i class="hd"></i>by hand ' + s.hand + '</span></div></div>' +
-        '<div class="p-stat" data-rv><div class="v"><span data-count="' + s.uncovered + '">0</span>' + (s.hunks ? '<small> / ' + fmt(s.hunks) + '</small>' : '') + '</div>' +
-          '<div class="l">changed hunks with no claim</div></div>' +
+          '<div class="k"><span><i class="sc"></i>by script ' + s.script + '</span><span><i class="p-hd"></i>by hand ' + s.hand + '</span></div>' +
+          '<p class="n">“By hand” means a person or agent ran it, not our scripts. We only say “the tool found” for script runs.</p></div>' +
+        '<div class="p-stat" data-rv><div class="v"><span data-count="' + s.uncovered + '">0</span>' + (s.hunks ? '<small> of ' + fmt(s.hunks) + '</small>' : '') + '</div>' +
+          '<div class="l">changed parts of the code' + (s.hunks && allHunks ? ', across all ' + s.ds.length + ' branches,' : '') + ' with no claim about them</div>' +
+          '<p class="n">Nothing the agent changed goes undescribed.</p></div>' +
         '<div class="p-stat hot" data-rv><div class="v"><span data-count="' + s.notChecked + '">0</span></div>' +
-          '<div class="l">things we did not check, printed on the dossier</div></div>' +
+          '<div class="l">things we did not check, printed on the dossiers</div>' +
+          (nc ? '<p class="n">For example, #' + esc(issueOf(nc.d)) + ': “' + rich(nc.t) + '”</p>' : '') + '</div>' +
       '</div>' +
     '</section>';
   }
@@ -301,12 +386,16 @@
       return '<a class="p-door" href="#/d/' + encodeURIComponent(d.__key) + '" style="--r:' + tilts[i % tilts.length] + 'deg">' +
         '<span class="no">#' + esc(issueOf(d)) + '</span>' +
         '<span class="tt">' + esc(d.title || d.branch) + '</span>' +
+        (d.summary ? '<span class="p-sm">' + rich(d.summary) + '</span>' : '') +
         strip(d) +
-        '<span class="ft"><span>' + (d._receipt ? 'signed' : open + ' open') + '</span><span>→</span></span>' +
+        '<span class="ft"><span>' + (d._receipt ? 'signed by ' + esc(d._receipt.signed_by) : plural(open, 'open claim') + ', waiting') + '</span><span aria-hidden="true">→</span></span>' +
       '</a>';
     }).join('');
+    var key = TIERS.map(function (t) { return '<span><i style="background:var(--t-' + lc(t) + ')"' + (MACHINE[t] ? '' : ' class="p-own"') + '></i>' + t + '</span>'; }).join('');
     return '<section class="p-sec p-doors" id="p-doors">' +
       '<h2 class="p-h2 c">' + words('Choose') + '<br>' + words('your branch.', 'hot', 140) + '</h2>' +
+      '<p class="p-ctx c" data-rv>Each bar is one claim, coloured by tier. Outlined bars are open: waiting for an owner’s decision.</p>' +
+      '<div class="p-key-row" data-rv>' + key + '</div>' +
       '<div class="p-door-row">' + cards + '</div>' +
     '</section>';
   }
@@ -325,19 +414,23 @@
 
   function setupTransitions(root) {
     root.querySelectorAll('[data-progress="trans"]').forEach(function (sec) {
-      var ws = sec.querySelectorAll('.w'), line = sec.querySelector('.p-line'), dot = sec.querySelector('.p-dot'), chap = sec.querySelector('.p-chap');
+      var ws = sec.querySelectorAll('.w'), line = sec.querySelector('.p-line'), dot = sec.querySelector('.p-dot'),
+        chap = sec.querySelector('.p-chap'), ctx = sec.querySelector('.p-trans-ctx');
       progressFns.push(function () {
-        var p = reduce ? 1 : progressOf(sec);
-        var l = clamp(p / 0.25, 0, 1), shown = Math.max(0, (p - 0.18) / 0.55) * ws.length;
+        /* t: 0 when the section top is 3/4 down the screen, 1 when it is 15% from the top —
+           the sentence is fully readable before it reaches the middle */
+        var t = 1;
+        if (!reduce) { var top = sec.getBoundingClientRect().top; t = clamp((innerHeight * 0.75 - top) / (innerHeight * 0.6), 0, 1); }
+        var l = clamp(t / 0.4, 0, 1), shown = t * 1.1 * ws.length;
         line.style.transform = 'scaleY(' + l + ')';
         dot.style.opacity = l >= 1 ? 1 : 0;
-        if (chap) chap.style.opacity = 0.35 + 0.65 * l;
+        if (chap) chap.style.opacity = 0.6 + 0.4 * l;
         for (var i = 0; i < ws.length; i++) {
-          var t = clamp(shown - i, 0, 1);
-          ws[i].style.opacity = 0.12 + 0.88 * t;
-          ws[i].style.transform = 'translateY(' + ((1 - t) * 0.25).toFixed(3) + 'em)';
-          ws[i].style.filter = t < 1 ? 'blur(' + ((1 - t) * 4).toFixed(2) + 'px)' : 'none';
+          var u = clamp(shown - i, 0, 1);
+          ws[i].style.opacity = (0.35 + 0.65 * u).toFixed(3);
+          ws[i].style.transform = u < 1 ? 'translateY(' + ((1 - u) * 0.15).toFixed(3) + 'em)' : 'none';
         }
+        if (ctx) ctx.style.opacity = (0.35 + 0.65 * clamp((t - 0.55) / 0.35, 0, 1)).toFixed(3);
       });
     });
   }
@@ -346,6 +439,21 @@
     var sec = root.querySelector('[data-progress="ladder"]');
     if (!sec) return;
     var rungs = sec.querySelectorAll('.p-rung'), cards = sec.querySelectorAll('.p-card'), meter = sec.querySelector('.p-meter i');
+    var box = sec.querySelector('.p-cards');
+    function fit() {
+      if (reduce) { box.style.height = ''; return; }
+      var h = 0;
+      cards.forEach(function (c) { h = Math.max(h, c.offsetHeight); });
+      box.style.height = h + 'px';
+    }
+    fit();
+    on(window, 'resize', fit);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { if (box.isConnected) fit(); });
+    if (reduce) {
+      rungs.forEach(function (r) { r.classList.add('on'); });
+      cards.forEach(function (c) { c.classList.add('on'); });
+      return;
+    }
     var last = -1;
     progressFns.push(function () {
       var p = progressOf(sec);
@@ -365,7 +473,7 @@
     var slip = sec.querySelector('.p-slip'), inner = sec.querySelector('.p-slip-in');
     if (!slip) return;
     progressFns.push(function () {
-      var p = reduce ? 1 : clamp((progressOf(sec) - 0.1) / 0.6, 0, 1);
+      var p = reduce ? 1 : clamp((progressOf(sec) - 0.05) / 0.5, 0, 1);
       slip.style.height = (p * inner.offsetHeight).toFixed(1) + 'px';
       sec.classList.toggle('signed', p >= 0.98);
     });
@@ -397,7 +505,7 @@
   function countUp(el) {
     var target = +el.dataset.count;
     if (reduce || !target) { el.textContent = fmt(target); return; }
-    var t0 = performance.now(), ms = 1500;
+    var t0 = performance.now(), ms = 700;
     function step(now) {
       var u = clamp((now - t0) / ms, 0, 1);
       el.textContent = fmt(target * (1 - Math.pow(1 - u, 3)));
@@ -420,10 +528,9 @@
         io.unobserve(el);
         el.classList.add('in');
         if (el.dataset.count != null) countUp(el);
-        el.querySelectorAll && el.querySelectorAll('.p-bars i, i[data-w]').forEach(function (i) { i.style.width = i.dataset.w + '%'; });
-        if (el.matches('.p-bars')) el.querySelectorAll('i[data-w]').forEach(function (i) { i.style.width = i.dataset.w + '%'; });
+        if (el.querySelectorAll) el.querySelectorAll('i[data-w]').forEach(function (i) { i.style.width = i.dataset.w + '%'; });
       });
-    }, { threshold: 0.3 });
+    }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
     els.forEach(function (el) { io.observe(el); });
     cleanup.push(function () { io.disconnect(); });
   }
@@ -447,19 +554,29 @@
     landing.appendChild(down);
     on(down, 'click', function (e) { e.preventDefault(); document.getElementById('ch-problem').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }); });
 
+    /* ch.03 and ch.04 examples first, so the ladder can show different ones */
+    var mp = machinePicks(s), used = {};
+    mp.forEach(function (x) { if (x.t !== 'Proved') used[x.it.c.id] = 1; });
+    var ownerHtml = secOwner(s, used);
+
     var wrap = document.createElement('div');
     wrap.className = 'p-story' + (reduce ? ' p-reduce' : '');
     wrap.innerHTML =
       rail() +
-      transition('An AI agent wrote the change. Now someone has to trust it.', 4, 'ch-problem') +
+      transition('An AI agent wrote the change. Now someone has to trust it.', 4, 'ch-problem',
+        'You maintain an open-source library. An AI agent sends you code. You are the one who merges it.') +
       secProblem(s) +
-      transition('So the change becomes claims, and each claim says what backs it.', 4, 'ch-built') +
-      secLadder(s) +
-      transition('Whatever can be checked, a machine checks.', 3, 'ch-machine') +
-      secMachine(s) +
-      transition('The rest is a judgement call, and a named person signs for it.', 5, 'ch-owner') +
-      secOwner(s) +
-      transition('Every number carries the command that made it.', 5, 'ch-know') +
+      transition('So we turn each change into claims, and each claim says what backs it.', 4, 'ch-built',
+        'A claim is one plain sentence about what the change does. An AI reviewer writes them; scripts and checks collect the evidence.') +
+      secLadder(s, used) +
+      transition('Whatever can be checked, a machine checks.', 3, 'ch-machine',
+        'Proved, Tested and Measured claims are settled by running the real code, not by taking the agent’s word.') +
+      secMachine(s, mp) +
+      transition('The rest is a judgement call, and a named person signs for it.', 5, 'ch-owner',
+        'No machine may settle these. The owner reads the evidence and decides each one.') +
+      ownerHtml +
+      transition('Every number carries the command that made it.', 5, 'ch-know',
+        'Each result is saved with the exact command behind it, so anyone can re-run it. So is what we skipped.') +
       secKnow(s) +
       secDoors(s);
     landing.insertAdjacentElement('afterend', wrap);
