@@ -362,35 +362,31 @@
 
   /* learning from the project: how its maintainers want code to read and to last */
   var RD_RULES = [
-    ['Readable', 'A small helper beats #if blocks scattered through the code.'],
-    ['Maintainable', 'Keep logic out of templates. Fix it fully, not with a patch.']
+    ['Readable', 'Small helpers, not scattered #if.'],
+    ['Maintainable', 'No logic in templates. Fix it fully.']
   ];
   function rdPhrase(f) {
     var m = f.measure || '';
-    if (/preprocessor/.test(m)) return '#if logic added inside templates';
-    if (/identical added block/.test(m)) return 'the same new code pasted in several places';
-    if (/duplicated/.test(m)) return 'more copy-pasted lines than before';
-    return 'see the change page';
+    if (/preprocessor/.test(m)) return '#if in templates';
+    if (/identical added block|duplicated/.test(m)) return 'copy-pasted code';
+    return 'see the change';
   }
   function rdRow(d) {
     var fl = ((d._readability || {}).details || {}).flags || [], seen = {}, ph = [];
     fl.forEach(function (f) { var t = rdPhrase(f); if (!seen[t]) { seen[t] = 1; ph.push(t); } });
     return '<li><span class="no">#' + esc(issueOf(d)) + '</span>' +
       '<b class="' + (fl.length ? 'warn' : 'none') + '">' + fl.length + '</b>' +
-      '<span class="w">' + (fl.length ? esc(ph.slice(0, 2).join('; ')) : 'nothing flagged') + '</span></li>';
+      '<span class="w">' + (fl.length ? esc(ph.join(', ')) : 'clean') + '</span></li>';
   }
-  /* the measure behind the flags: copy-pasted blocks and paths through a function, before vs after */
+  /* the measure behind the flags, one fix: before -> after */
   function rdMeasure(s) {
     var cc = findEv(s, 'clone-complexity'), cd = cc && cc.details;
     if (!(cd && cd.base && cd.branch)) return '';
-    var b0 = +cd.base.clones.duplicated_blocks, b1 = +cd.branch.clones.duplicated_blocks, mx = Math.max(b0, b1) || 1;
-    var m = /method (\w+) complexity estimate (\d+) -> (\d+)/.exec(cc.summary || '');
-    return '<div class="p-rdm">' +
-      '<div class="p-lbl">Measured, before vs after</div>' +
-      '<div class="p-mbar"><span>before</span><i data-w="' + (100 * b0 / mx).toFixed(1) + '"></i><b>' + b0 + '</b></div>' +
-      '<div class="p-mbar"><span>after</span><i data-w="' + (100 * b1 / mx).toFixed(1) + '"></i><b>' + b1 + '</b></div>' +
-      '<p class="p-out">copy-pasted blocks in TypeCollector.cs, fix #2234' +
-      (m ? '. Paths through ' + esc(m[1]) + ': ' + m[2] + ' → ' + m[3] : '') + '</p></div>';
+    var m = /complexity estimate (\d+) -> (\d+)/.exec(cc.summary || '');
+    var stat = function (a, b, t) { return '<div><b>' + a + '<i>→</i>' + b + '</b><span>' + t + '</span></div>'; };
+    return '<div class="p-rdm"><div class="p-lbl">Measured on #2234</div><div class="p-rdstat">' +
+      stat(+cd.base.clones.duplicated_blocks, +cd.branch.clones.duplicated_blocks, 'copy-pasted blocks') +
+      (m ? stat(m[1], m[2], 'paths in one function') : '') + '</div></div>';
   }
   function secLearn(s) {
     var L = LEARN, rules = s.rules || L.rules;
@@ -398,17 +394,16 @@
       '<div class="p-grid2">' +
         '<div>' +
           '<h2 class="p-h2">' + words('Readable today.') + '<br>' + words('Maintainable later.', 'hot', 140) + '</h2>' +
-          '<p class="p-ctx" data-rv><b class="p-num hot">' + rules + ' rules</b> learned from ' + L.prs + ' past pull requests: what this project’s maintainers ask for in review.</p>' +
+          '<p class="p-ctx" data-rv><b class="p-num hot">' + rules + ' rules</b> from ' + L.prs + ' past reviews.</p>' +
           '<ul class="p-rdrules" data-rv>' + RD_RULES.map(function (r) {
             return '<li><span>' + r[0] + '</span>' + esc(r[1]) + '</li>';
           }).join('') + '</ul>' +
-          '<p class="p-ctx" data-rv>A script measures each change: copy-pasted blocks, and the paths (if, case, &amp;&amp;) through each function. Code can get harder to read without breaking.</p>' +
         '</div>' +
         '<div class="p-panel" data-rv>' +
-          '<div class="p-lbl">Flags on these changes</div>' +
+          '<div class="p-lbl">Flags</div>' +
           '<ul class="p-rdflags">' + s.ds.map(rdRow).join('') + '</ul>' +
           rdMeasure(s) +
-          '<p class="p-note">Tried on past pull requests first: found <b>' + L.caught + ' of ' + L.breaking + '</b> real problems. <b>' + L.falseAlarm + '%</b> of its flags were false alarms. Flags tell the reviewer where to look. They do not change the score.</p>' +
+          '<p class="p-note">Flags point where to look. They don’t change the score.</p>' +
         '</div>' +
       '</div>' +
     '</section>';

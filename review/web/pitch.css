@@ -538,7 +538,8 @@
 .p-reduce .p-same.p-sticky { position: relative; height: auto; overflow: visible; }
 .p-reduce .p-sstep { grid-area: auto; }
 .p-vt-n { flex-basis: 100%; }
-.p-rdm { margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(255,179,0,.14); }
-.p-rdm .p-mbar { margin-top: 8px; }
-.p-rdm .p-mbar i { height: 22px; }
-.p-rdm .p-out { margin-top: 8px; }
+.p-rdm { margin-top: 22px; padding-top: 18px; border-top: 1px solid rgba(255,179,0,.14); }
+.p-rdstat { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 10px; }
+.p-rdstat b { display: block; font-family: var(--serif); font-weight: 400; font-size: 2.4rem; line-height: 1; color: #fff3d6; }
+.p-rdstat b i { font-style: normal; color: var(--hot); margin: 0 .25em; font-size: .7em; vertical-align: .12em; }
+.p-rdstat span { display: block; margin-top: 6px; font-size: 14px; color: #d9c08a; }
