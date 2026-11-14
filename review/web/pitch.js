@@ -47,7 +47,7 @@
   var CHAPTERS = [
     { id: 'ch-problem', n: '01', title: 'The problem' },
     { id: 'ch-trace', n: '02', title: 'The trace' },
-    { id: 'ch-same', n: '03', title: 'Old code safe' },
+    { id: 'ch-same', n: '03', title: 'Nothing broke' },
     { id: 'ch-score', n: '04', title: 'The score' },
     { id: 'ch-owner', n: '05', title: 'Needs owner' },
     { id: 'ch-learn', n: '06', title: 'Readable' }
@@ -184,7 +184,7 @@
             '<span class="p-key big">Approve</span>' +
             '<span class="p-key small">Read</span>' +
           '</div>' +
-          '<p class="p-cap p-keycap">Two buttons today: approve unread, or read every line.</p>' +
+          '<p class="p-cap p-keycap">Two buttons today: approve without reading, or read every line. We want a third way.</p>' +
         '</div>' +
       '</div>' +
     '</section>';
@@ -202,7 +202,7 @@
       '<div class="p-grid2">' +
         '<div>' +
           '<h2 class="p-h2">' + words('The evidence') + '<br>' + words('sets the score.', 'hot', 140) + '</h2>' +
-          '<p class="p-ctx" data-rv>Deterministic checks and a fixed formula do the math. No AI picks the number.</p>' +
+          '<p class="p-ctx" data-rv>A claim gets the score of its strongest check: −10 if someone ran it by hand, +5 if a clean machine got the same result. No AI picks the number.</p>' +
           bandsBar(s) +
         '</div>' +
         '<div class="p-panel" data-rv>' +
@@ -244,7 +244,7 @@
     var iso = s.ds.filter(function (d) { return d._isolation && d._isolation.coverage && +d._isolation.coverage.trackable; });
     if (iso.length) rows.push({ c: 'high', g: 'Old vs new', v: 90, h: 'Old code still works.',
       p: 'Run the old and the new version on the same real projects. Same output means nothing broke.',
-      why: 'Old projects often have weak tests. This check needs none: the old version is the answer key, so it also catches what nobody thought to test.',
+      why: 'This is the check from chapter 03. It needs no tests: the old version is the answer key.',
       lim: 'It only speaks for changed lines that ran. Lines that never ran go to the reviewer.',
       fig: '<div class="p-fig p-ran">' + iso.map(function (d) {
         var c = d._isolation.coverage, ran = +c.reached || 0, tot = +c.trackable, pc = Math.round(100 * ran / tot);
@@ -265,12 +265,12 @@
     if (pd && mv && mv.branch) {
       var vl = ((pd.dafny_verify || {}).result_line || [''])[0], nv = (String(vl).match(/(\d+) verified/) || [])[1];
       rows.push({ c: 'high', g: 'Formal verification', v: 80, h: 'Prove it for every case.',
-        p: 'Formal verification: write the rule as a small model, and a prover (Dafny) checks it for every input.',
+        p: 'Formal verification: write what the code must do as a small model. A prover (Dafny) checks it for every possible input.',
         why: 'A test checks a few inputs. A proof covers all of them, so it finds the one case nobody tried.',
         lim: 'The model is a copy of the code, not the code. So we also run the model and the real code on the same inputs.',
         fig: '<div class="p-fig p-proof">' +
-          (nv ? '<div><b>' + nv + '</b><span>proof parts checked by the prover, 0 errors</span></div>' : '') +
-          '<div class="bad"><b>1</b><span>case found that still crashes: a field with an empty key comes first</span></div>' +
+          (nv ? '<div><b>' + nv + '</b><span>proof steps checked by the prover, 0 errors</span></div>' : '') +
+          '<div class="bad"><b>1</b><span>input still crashes: a field with an empty key comes first. It goes to the reviewer as an open problem.</span></div>' +
           '<div><b>' + fmt(+mv.branch.inputs) + '</b><span>inputs, model vs real code: ' + (+mv.branch.mismatches) + ' differences</span></div>' +
           '<p class="p-out">fix #2234</p></div>' });
     }
@@ -298,7 +298,7 @@
         fig: '<div class="p-fig">' +
           '<div class="p-mbar"><span>before</span><i data-w="' + (100 * b0 / mx).toFixed(1) + '"></i><b>' + b0 + '</b></div>' +
           '<div class="p-mbar"><span>after</span><i data-w="' + (100 * b1 / mx).toFixed(1) + '"></i><b>' + b1 + '</b></div>' +
-          '<p class="p-out">copy-pasted blocks in one file, fix #2234</p></div>' });
+          '<p class="p-out">copy-pasted blocks in one file, fix #2234: a cost, not a failure</p></div>' });
     }
 
     return '<section class="p-machine" data-progress="machine" style="--n:' + rows.length + '">' +
@@ -333,7 +333,7 @@
       ['AI', 'The AI writes the trace and the question. It can be wrong.'],
       ['Tools', 'Real tools test the old and the new code. A script checks every AI step against the lines it cites.'],
       ['Rule', 'The project has a fixed list of things users rely on: its warnings, public API, generated code, data format and docs. When a check shows one of them changed, a fixed rule, not the AI, sends it to a person.'],
-      ['You', 'The owner answers the question. The reviewer signs.']
+      ['You', 'The owner of that part answers the question. You, the reviewer, sign the change.']
     ];
     var slip = '<div class="p-slip"><div class="p-slip-in">' +
       '<h4>NEEDS OWNER</h4>' +
@@ -349,12 +349,12 @@
     return '<section class="p-owner" data-progress="owner">' +
       '<div class="p-sticky p-owner-in">' +
         '<div class="p-owner-l">' +
-          '<h2 class="p-h2"><span class="p-num hot" data-count="' + s.owner + '">0</span> ' + words('decisions') + '<br>' + words('need an owner.', 'hot', 120) + '</h2>' +
+          '<h2 class="p-h2"><span class="p-num hot" data-count="' + s.owner + '">0</span> ' + words('claims') + '<br>' + words('need an owner.', 'hot', 120) + '</h2>' +
           '<ol class="p-chain" data-rv>' + chain.map(function (c) {
             return '<li><b>' + c[0] + '</b><span>' + c[1] + '</span></li>';
           }).join('') + '</ol>' +
-          '<p class="p-cant" data-rv>The AI can’t pick the score, clear the flag, or mark its own steps as checked.</p>' +
-          '<p class="p-rule" data-rv>A high score never clears it.</p>' +
+          '<p class="p-cant" data-rv>The AI can’t set the score, remove the owner’s question, or mark its own steps as checked.</p>' +
+          '<p class="p-rule" data-rv>A high score does not remove the question.</p>' +
         '</div>' +
         '<div class="p-owner-r"><div class="p-printer" aria-hidden="true"><span class="mouth"></span></div>' + slip + '</div>' +
       '</div></section>';
@@ -393,7 +393,7 @@
         '<div class="p-panel" data-rv>' +
           '<div class="p-lbl">Flags on these changes</div>' +
           '<ul class="p-rdflags">' + s.ds.map(rdRow).join('') + '</ul>' +
-          '<p class="p-note">Tried on past pull requests first: caught <b>' + L.caught + ' of ' + L.breaking + '</b> real problems, with <b>' + L.falseAlarm + '%</b> false alarms. We show the misses too.</p>' +
+          '<p class="p-note">Tried on past pull requests first: found <b>' + L.caught + ' of ' + L.breaking + '</b> real problems. <b>' + L.falseAlarm + '%</b> of its flags were false alarms. Flags tell the reviewer where to look. They do not change the score.</p>' +
         '</div>' +
       '</div>' +
     '</section>';
@@ -445,7 +445,7 @@
       '<div class="p-sticky p-trace-in">' +
         '<div class="p-trace-hd">' +
           '<h2 class="p-h2"><span class="p-num hot" data-count="' + s.dec + '">0</span> ' + words('decisions.') + ' ' + words('Each one traced.', 'hot', 120) + '</h2>' +
-          '<p class="p-cap">A real one from fix #' + esc(issueOf(d)) + ': <b>“' + esc(c.title) + '”</b></p>' +
+          '<p class="p-cap">The AI writes each step. A script checks each step against the lines it points to (✓). A real one from fix #' + esc(issueOf(d)) + ': <b>“' + esc(c.title) + '”</b></p>' +
         '</div>' +
         '<div class="p-trace-p">' +
           '<div class="p-pane p-pane-s"><div class="p-pt"><span>1</span>What the code does</div><ol>' + steps + '</ol></div>' +
@@ -453,7 +453,7 @@
           '<div class="p-pane p-pane-w"><div class="p-pt"><span>3</span>Why</div>' +
             '<p class="p-verdict">' + esc(c.verdict) + '</p>' +
             (ev ? '<p class="p-bec">' + esc(ev.text) + '</p><span class="p-chip ' + (ev.result === 'pass' ? 'ok' : 'x') + '">' + (ev.result === 'pass' ? '✓ check passed' : '✗ check found a problem') + '</span>' : '') +
-            (c.ask ? '<div class="p-ask"><b>Your call</b>' + esc(c.ask) + '</div>' : '') +
+            (c.ask ? '<div class="p-ask"><b>Question for the owner</b>' + esc(c.ask) + '</div>' : '') +
           '</div>' +
         '</div>' +
       '</div></section>';
@@ -484,7 +484,7 @@
     return '<section class="p-sec p-same">' +
       '<div class="p-grid2">' +
         '<div>' +
-          '<h2 class="p-h2">' + words('Did it break') + '<br>' + words('old code?', 'hot', 140) + '</h2>' +
+          '<h2 class="p-h2">' + words('Did it break') + '<br>' + words('anything?', 'hot', 140) + '</h2>' +
           '<p class="p-cap p-same-lede" data-rv>Old projects often have weak tests, and new tests only check what someone thought of. This check needs no tests: the old version is the answer key.</p>' +
           '<p class="p-same-big" data-rv>Same input, same output.</p>' +
           '<ul class="p-rules" data-rv>' +
@@ -757,23 +757,23 @@
     wrap.innerHTML =
       rail() +
       transition('An AI made the change. Can you see why?', 4, 'ch-problem',
-        'You maintain a library. An AI agent sends you a fix: hundreds of lines, dozens of choices.') +
+        'You maintain a library: it generates code for its users and warns them about mistakes. An AI agent sends you a fix: hundreds of lines, dozens of choices.') +
       secProblem(s) +
-      transition('So every decision leaves a trace.', 3, 'ch-trace',
-        'What the code does, in plain steps. The real code. And why.') +
+      transition('So the AI must explain every decision.', 3, 'ch-trace',
+        'In plain steps, next to the real code, with a reason.') +
       secTrace(s) +
-      transition('A fix must not break old code.', 3, 'ch-same',
-        'Even when the tests are weak. So we run the old and the new version on the same code, and compare.') +
+      transition('A fix must not break what already works.', 3, 'ch-same',
+        'Even when the tests are weak. So we run the old and the new library on the same real projects, and compare the output.') +
       secSame(s) +
-      transition('Every reason points to a real check.', 3, 'ch-score',
-        'Deterministic checks and a fixed formula set the score.') +
+      transition('Every reason must point to a real check.', 3, 'ch-score',
+        'The AI sums up the change as claims: one short sentence each. The stronger the check behind a claim, the higher its score.') +
       secKinds(s) +
       secMachine(s) +
       transition('Some decisions belong to a person.', 3, 'ch-owner',
-        'When users would notice a change, the trace ends with a question for its owner.') +
+        'When users would notice a change, the trace ends with a question for the person who owns that part of the code.') +
       secOwner(s) +
       transition('Code is written once, then read for years.', 3, 'ch-learn',
-        'Rules come from what maintainers said on past pull requests.') +
+        'We read what maintainers asked for on past pull requests, and turned it into checks.') +
       secLearn(s) +
       secDoors(s);
     landing.insertAdjacentElement('afterend', wrap);
