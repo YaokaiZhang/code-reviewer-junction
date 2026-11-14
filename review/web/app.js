@@ -474,6 +474,12 @@
     var d = m && DATA[m[1]];
     document.title = d ? (d.issue != null ? '#' + d.issue + ' · ' : '') + 'Earned Trust' : 'Earned Trust';
   }
+  var skip = document.querySelector('.skip');
+  if (skip) skip.addEventListener('click', function (e) {
+    e.preventDefault();
+    var t = document.querySelector('.own input, .blist a, #term') || app;
+    t.focus();
+  });
   window.addEventListener('hashchange', route);
   route();
 })();

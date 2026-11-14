@@ -19,3 +19,11 @@ Source: the branch title and commit message only; we did not have the issue text
 - R-2297-2 *(inferred)*: Generated code still compiles for every consumer target MessagePack supports (netstandard2.0, netstandard2.1, net472, net8.0), and it compiles for existing user code that already compiled.
 - R-2297-3 *(inferred)*: Apart from the attribute, generated output does not change.
 - R-2297-4 *(inferred)*: The README describes the behaviour accurately.
+
+## 2283 — Generator and analyzer crash with IndexOutOfRangeException on a closed generic struct from a referenced assembly
+
+Source: issue text on github.com/MessagePack-CSharp/MessagePack-CSharp/issues/2283 (read 2026-11-14). The issue has no maintainer statement on how diagnostics for referenced types should behave.
+
+- R-2283-1: A `[MessagePackObject]` type with a member whose type is a closed generic value type (struct or record struct) from a referenced assembly builds without CS8785 or AD0001.
+- R-2283-2: The consuming project gets its generated resolver ("a clean build, with a generated resolver in `app`").
+- R-2283-3 *(inferred)*: The fix does not remove diagnostics that base reported about problems the consumer can fix in its own code.

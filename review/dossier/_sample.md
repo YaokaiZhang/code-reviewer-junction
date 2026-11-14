@@ -63,7 +63,7 @@ R-2283-1
 - ▲ Tested — Test reproduces the crash on base
 - ▲ Tested — Same test passes on branch head
 
-- [`old-vs-new-tests`](../evidence/ju26-issue-2283/old-vs-new-tests.json) **pass** · hand — 3 of 3 new tests fail on base and pass on branch; 1 of them (ClosedGenericStruct_FromMetadataReference_UnkeyedMember) also fails when only the filter is removed
+- [`old-vs-new-tests`](../evidence/ju26-issue-2283/old-vs-new-tests.json) **pass** · hand — 3 of 3 new tests fail on base and pass on branch; 1 of them (ClosedGenericStruct_FromMetadataReference_UnkeyedMember) also fails when only the filter is removed; whole test project: 167 of 167 pre-existing tests pass on base and 167 on branch
 - `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:236-240`
 - `tests/MessagePack.SourceGenerator.Tests/MetadataMemberTests.cs:1-64`
 
