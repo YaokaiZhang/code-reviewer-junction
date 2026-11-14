@@ -301,20 +301,6 @@
           '<span class="hd">old code</span><span class="hd">new code</span>' + cells + '</div><p class="p-out">fix #2283, ' + nT + ' new tests</p></div>' });
     }
 
-    var cc = findEv(s, 'clone-complexity'), cd = cc && cc.details;
-    if (cd && cd.base && cd.branch) {
-      var b0 = +cd.base.clones.duplicated_blocks, b1 = +cd.branch.clones.duplicated_blocks, mx = Math.max(b0, b1) || 1;
-      rows.push({ c: 'low', g: 'Readable?', v: 40, h: 'Still easy to read and change?',
-        p: 'A script counts copy-pasted blocks and the paths through each function, before and after the fix.',
-        use: 'Code can get harder to read and maintain without breaking.',
-        why: 'It shows costs that never fail a test.',
-        lim: 'Whether the fix is right. So it scores low.',
-        fig: '<div class="p-fig">' +
-          '<div class="p-mbar"><span>before</span><i data-w="' + (100 * b0 / mx).toFixed(1) + '"></i><b>' + b0 + '</b></div>' +
-          '<div class="p-mbar"><span>after</span><i data-w="' + (100 * b1 / mx).toFixed(1) + '"></i><b>' + b1 + '</b></div>' +
-          '<p class="p-out">copy-pasted blocks in TypeCollector.cs, fix #2234: more copying, nothing broken</p></div>' });
-    }
-
     return '<section class="p-machine" data-progress="machine" style="--n:' + rows.length + '">' +
       '<div class="p-sticky p-machine-in">' +
         '<header class="p-mhead">' +
@@ -393,6 +379,19 @@
       '<b class="' + (fl.length ? 'warn' : 'none') + '">' + fl.length + '</b>' +
       '<span class="w">' + (fl.length ? esc(ph.slice(0, 2).join('; ')) : 'nothing flagged') + '</span></li>';
   }
+  /* the measure behind the flags: copy-pasted blocks and paths through a function, before vs after */
+  function rdMeasure(s) {
+    var cc = findEv(s, 'clone-complexity'), cd = cc && cc.details;
+    if (!(cd && cd.base && cd.branch)) return '';
+    var b0 = +cd.base.clones.duplicated_blocks, b1 = +cd.branch.clones.duplicated_blocks, mx = Math.max(b0, b1) || 1;
+    var m = /method (\w+) complexity estimate (\d+) -> (\d+)/.exec(cc.summary || '');
+    return '<div class="p-rdm">' +
+      '<div class="p-lbl">Measured, before vs after</div>' +
+      '<div class="p-mbar"><span>before</span><i data-w="' + (100 * b0 / mx).toFixed(1) + '"></i><b>' + b0 + '</b></div>' +
+      '<div class="p-mbar"><span>after</span><i data-w="' + (100 * b1 / mx).toFixed(1) + '"></i><b>' + b1 + '</b></div>' +
+      '<p class="p-out">copy-pasted blocks in TypeCollector.cs, fix #2234' +
+      (m ? '. Paths through ' + esc(m[1]) + ': ' + m[2] + ' → ' + m[3] : '') + '</p></div>';
+  }
   function secLearn(s) {
     var L = LEARN, rules = s.rules || L.rules;
     return '<section class="p-sec p-learn">' +
@@ -403,10 +402,12 @@
           '<ul class="p-rdrules" data-rv>' + RD_RULES.map(function (r) {
             return '<li><span>' + r[0] + '</span>' + esc(r[1]) + '</li>';
           }).join('') + '</ul>' +
+          '<p class="p-ctx" data-rv>A script measures each change: copy-pasted blocks, and the paths (if, case, &amp;&amp;) through each function. Code can get harder to read without breaking.</p>' +
         '</div>' +
         '<div class="p-panel" data-rv>' +
           '<div class="p-lbl">Flags on these changes</div>' +
           '<ul class="p-rdflags">' + s.ds.map(rdRow).join('') + '</ul>' +
+          rdMeasure(s) +
           '<p class="p-note">Tried on past pull requests first: found <b>' + L.caught + ' of ' + L.breaking + '</b> real problems. <b>' + L.falseAlarm + '%</b> of its flags were false alarms. Flags tell the reviewer where to look. They do not change the score.</p>' +
         '</div>' +
       '</div>' +

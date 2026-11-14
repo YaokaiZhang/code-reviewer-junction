@@ -538,3 +538,7 @@
 .p-reduce .p-same.p-sticky { position: relative; height: auto; overflow: visible; }
 .p-reduce .p-sstep { grid-area: auto; }
 .p-vt-n { flex-basis: 100%; }
+.p-rdm { margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(255,179,0,.14); }
+.p-rdm .p-mbar { margin-top: 8px; }
+.p-rdm .p-mbar i { height: 22px; }
+.p-rdm .p-out { margin-top: 8px; }
