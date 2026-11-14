@@ -251,6 +251,7 @@
     var ovLo = Math.min.apply(null, ovs), ovHi = Math.max.apply(null, ovs);
     if (iso.length && ovs.length) rows.push({ c: band(ovHi), g: 'Old vs new', v: ovLo === ovHi ? ovLo : ovLo + '–' + ovHi, h: 'Old code still works.',
       p: 'Run old and new code on the same projects. Same output, nothing broke.',
+      use: 'Most changes should not change what users see.',
       why: 'No tests needed. The old code is the answer key.',
       lim: 'Lines that never ran. The score drops with them.',
       fig: '<div class="p-fig p-ran">' + iso.map(function (d) {
@@ -263,6 +264,7 @@
     var nSnap = s.snap || 0;
     if (findEv(s, 'regeneration') && nSnap) rows.push({ c: 'high', g: 'Rebuilt and compared', v: 90, h: 'Rebuild the generated code.',
       p: 'Run the code generator again. Its output must match the files exactly.',
+      use: 'Many edits are just docs, comments, or renamed functions.',
       why: 'Nobody edited them by hand, so nobody has to read them.',
       lim: 'If the generator itself is right.',
       fig: '<div class="p-fig p-fig-proved">' +
@@ -275,6 +277,7 @@
       var vl = ((pd.dafny_verify || {}).result_line || [''])[0], nv = (String(vl).match(/(\d+) verified/) || [])[1];
       rows.push({ c: 'high', g: 'Formal verification', v: 80, h: 'Prove it for every case.',
         p: 'Model the code. A prover checks it for every possible input.',
+        use: 'Some bugs hide in rare inputs no test tries.',
         why: 'Tests try a few inputs. A proof tries all of them.',
         lim: 'If the model matches the real code. So we compare them too.',
         fig: '<div class="p-fig p-proof">' +
@@ -291,6 +294,7 @@
       for (var i = 0; i < nT; i++) cells += '<span class="x">✗</span><span class="ok">✓</span>';
       rows.push({ c: 'medium', g: 'Test first (TDD)', v: 75, h: 'Check the test, not the code.',
         p: 'Each new test fails on the old code and passes on the new.',
+        use: 'A bug fix should come with a test that shows the bug.',
         why: 'Check the test asks the right question, not every line.',
         lim: 'Cases the test does not ask about.',
         fig: '<div class="p-fig"><div class="p-tgrid">' +
@@ -302,6 +306,7 @@
       var b0 = +cd.base.clones.duplicated_blocks, b1 = +cd.branch.clones.duplicated_blocks, mx = Math.max(b0, b1) || 1;
       rows.push({ c: 'low', g: 'A number from a tool', v: 40, h: 'Count it.',
         p: 'A tool measures something, like copy-pasted code, before and after.',
+        use: 'Code can get worse without breaking.',
         why: 'It shows costs that never fail a test.',
         lim: 'If the fix is right. So it scores low.',
         fig: '<div class="p-fig">' +
@@ -324,7 +329,7 @@
               '<span class="g c-' + r.c + '">score <b>' + esc(String(r.v)) + '</b></span>' +
               '<h3>' + esc(r.h) + '</h3>' +
               '<p>' + esc(r.p) + '</p>' +
-              '<dl><dt>Counts because</dt><dd>' + esc(r.why) + '</dd><dt>Can’t tell</dt><dd>' + esc(r.lim) + '</dd></dl>' +
+              '<dl><dt>Why use it</dt><dd>' + esc(r.use) + '</dd><dt>Counts because</dt><dd>' + esc(r.why) + '</dd><dt>Can’t tell</dt><dd>' + esc(r.lim) + '</dd></dl>' +
             '</div>' +
             '<div class="p-how-f">' + r.fig + '</div>' +
           '</article>';
