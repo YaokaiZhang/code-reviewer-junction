@@ -171,7 +171,7 @@
       "id": "C-2297-07",
       "claim": "The change breaks the build for users who already put [ExcludeFromCodeCoverage] on their resolver by hand: they get compile error CS0579. The generator now adds the attribute to the user's own partial resolver classes (ResolverTemplate, CompositeResolverTemplate). The user picks their visibility, and they can be public.",
       "tier": "Refused",
-      "why_this_tier": "It changes public API, so a person must decide. The attribute ends up in the user's public type and breaks the build for a plausible existing pattern. An experiment on the real generator confirms this: it builds before the change and fails after.",
+      "why_this_tier": "It changes public API, so it needs the owner to decide. The attribute ends up in the user's public type and breaks the build for a plausible existing pattern. An experiment on the real generator confirms this: it builds before the change and fails after.",
       "requirement": "R-2297-1",
       "requirement_inferred": true,
       "evidence": [
@@ -196,7 +196,7 @@
       "id": "C-2297-08",
       "claim": "The AI says the guard `#if !NETSTANDARD2_0 && !NETFRAMEWORK` is needed because the attribute is not available on netstandard2.0 or .NET Framework.",
       "tier": "Argued",
-      "why_this_tier": "Only the AI's word backs this, and our check contradicts it. The attribute is in the netstandard2.0 and net472 reference assemblies, and code without the guard compiles on both. So the guard turns the feature off on 2 targets. Whether to turn it on there is a product decision.",
+      "why_this_tier": "Only the AI's word backs this, and our check contradicts it. The attribute is in the netstandard2.0 and net472 reference assemblies, and code without the guard compiles on both. So the guard turns the feature off on 2 targets. Whether to turn it on there needs the owner to decide.",
       "requirement": "R-2297-2",
       "requirement_inferred": true,
       "evidence": [
@@ -256,33 +256,33 @@
     }
   ],
   "found": [
-    "The diff classifier (script) flagged 2 of 222 snapshots that change beyond attribute and guard lines, both in Resources/GenericDataTypeWithPrivateMember/: Named (the line `{\\tinternal sealed class ...` is split so `{` stands alone) and Ordinal (one added blank line).",
-    "The TransformUtilities.cs edit has no stated reason (the commit message has no body). We found it is required: with it reverted, the generated code fails with CS1040; its one visible side effect is the extra blank line in the Ordinal snapshot.",
-    "We found the guard too strict: ExcludeFromCodeCoverageAttribute exists in the netstandard2.0 and net472 reference assemblies, so netstandard2.0 and .NET Framework consumers silently get no exclusion. The README and the test comment state the opposite.",
-    "We found a break for existing users: a hand-written [ExcludeFromCodeCoverage] on the user's partial resolver compiles on base and fails with CS0579 (duplicate attribute) on the branch. No branch test covers it.",
+    "2 of the 222 snapshots change by more than the attribute and guard lines; the diff-sorting script flagged both. They are in Resources/GenericDataTypeWithPrivateMember/: in Named, the line `{\\tinternal sealed class ...` is split so `{` stands alone; in Ordinal, one blank line is added.",
+    "The TransformUtilities.cs edit is needed, though the commit gives no reason for it. With it undone, the generated code fails to compile (CS1040). Its one visible side effect is the extra blank line in the Ordinal snapshot.",
+    "The guard is too strict. ExcludeFromCodeCoverageAttribute exists in the netstandard2.0 and net472 reference assemblies, so netstandard2.0 and .NET Framework users silently get no exclusion. The README and the test comment say the opposite.",
+    "The change breaks existing users. A hand-written [ExcludeFromCodeCoverage] on the user's partial resolver compiles before the change and fails after with CS0579 (duplicate attribute). No test on the branch covers this.",
     "CodeCoverageExclusionTests hard-codes the guard text, so widening the guard also means changing the test.",
-    "By reading the test verifier: no preprocessor symbols are set in the snapshot compilations, so the guarded-out path (netstandard2.0, .NET Framework) is never compiled by the tests.",
-    "The diff classifier (script) flagged 1 Resources directory with no test method (Resources/InterfaceUnion/, 3 files). It already exists on base, is not run by any test, and the branch leaves it without the attribute, so it is now stale.",
-    "Correction to the handoff: the verifier writes actual output to Resources/ only when WRITE_EXPECTED is defined (the method is [Conditional(\"WRITE_EXPECTED\")]); a plain test run only compares.",
-    "When generated content differs, the test framework reports 'Expected source file list to match' rather than the content diff, which hides the real cause (here CS1040)."
+    "The tests never compile the guarded-out path for netstandard2.0 or .NET Framework. Reading the test verifier shows no preprocessor symbols are set in the snapshot compilations.",
+    "Resources/InterfaceUnion/ (3 files) is now stale. It already existed, no test uses it, and the change leaves it without the attribute. The diff-sorting script flagged it as a Resources folder with no test method.",
+    "Correction to our task notes: the verifier writes actual output to Resources/ only when WRITE_EXPECTED is defined (the method is [Conditional(\"WRITE_EXPECTED\")]). A plain test run only compares.",
+    "When generated content differs, the test framework reports 'Expected source file list to match' instead of the content difference. That hides the real cause, here CS1040."
   ],
   "refused": [
     {
-      "what": "[ExcludeFromCodeCoverage] added to the user-declared partial resolver classes (C-2297-07)",
-      "why": "It changes the consumer's public type metadata and breaks the build (CS0579) for users who already excluded their resolver by hand. That is a public API and compatibility call, so the owner decides."
+      "what": "[ExcludeFromCodeCoverage] added to the user's own partial resolver classes (C-2297-07).",
+      "why": "It changes the user's public type and breaks the build (CS0579) for users who already excluded their resolver by hand. That is a public API and compatibility question, so it needs the owner to decide."
     }
   ],
   "scope_drift": [
-    "None found. The TransformUtilities.cs edit looked like drift (it has no stated reason) but the removal test shows the feature does not compile without it."
+    "None found. The TransformUtilities.cs edit looked like drift because it has no stated reason, but the generated code does not compile without it."
   ],
   "not_checked": [
-    "The text of issue #2297: we could not read it here, so R-2297-1..4 are inferred from the branch title and commit.",
-    "macOS: all runs were on Linux (6.18.44, x86_64). Per .gitattributes the snapshots check out as CRLF on every OS, but that was not run on a Mac.",
-    "Compiling real generated output for netstandard2.0, netstandard2.1 or net472 consumers: only a small probe was compiled for those targets.",
-    "Whether coverage tools (coverlet, dotnet-coverage) actually drop the generated types from their reports.",
-    "Unity, Mono and other builds with their own preprocessor symbols; netstandard1.x and .NET Framework before 4.0.",
-    "Union and enum formatters nested in a generic type with constraints: no snapshot covers them; the need for the edit (Union) and the blank line (Enum) are by reading only.",
-    "Byte-for-byte equality with Visual Studio's TextTemplatingFilePreprocessor: dotnet-t4 was compared on emitted text only.",
+    "The text of issue #2297: we could not read it here, so requirements R-2297-1..4 are worked out from the branch title and commit.",
+    "macOS: all runs were on Linux (6.18.44, x86_64). .gitattributes should check the snapshots out with CRLF on every OS, but we did not try a Mac.",
+    "Compiling real generated output for netstandard2.0, netstandard2.1 or net472 projects. Only a small probe was compiled for those targets.",
+    "Whether coverage tools such as coverlet and dotnet-coverage actually leave the generated types out of their reports.",
+    "Unity, Mono and other builds with their own preprocessor symbols; netstandard1.x; and .NET Framework before 4.0.",
+    "Union and enum formatters inside a generic type with constraints. No snapshot covers them; that Union needs the edit and Enum gets the blank line comes from reading the code only.",
+    "Byte-for-byte equality with Visual Studio's TextTemplatingFilePreprocessor. We compared dotnet-t4 output on emitted text only.",
     "Test projects other than tests/MessagePack.SourceGenerator.Tests."
   ],
   "uncovered_diff_parts": []

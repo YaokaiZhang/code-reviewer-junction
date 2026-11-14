@@ -46,7 +46,7 @@
       "id": "C-2234-02",
       "claim": "After the change, the real TypeCollector never throws on any list of 1 to 4 keyed members with integer or string keys. Before the change, it threw on most of them.",
       "tier": "Tested",
-      "why_this_tier": "A formal model, written in Dafny, proves this for lists of any length. The model matches the real C# code on every input up to 4 members. The real code throws before the change and not after. The weakest step is a test, so the claim counts as Tested.",
+      "why_this_tier": "A formal model, written in Dafny, proves this for lists of any length. The model matches the real C# code on every input up to 4 members. The weakest step is a test: the real code throws before the change and not after.",
       "requirement": "R-2234-2",
       "requirement_inferred": true,
       "evidence": [
@@ -81,7 +81,7 @@
       "id": "C-2234-03",
       "claim": "The fix is incomplete. If a type's first keyed member is a field with [Key(null)], the analyzer still crashes (AD0001, ArgumentNullException). This also happens with SuppressSourceGeneration = true.",
       "tier": "Argued",
-      "why_this_tier": "An experiment on the real analyzer shows the crash before and after the change. That is a gap, not a passing check, so it cannot count as Tested and the owner decides.",
+      "why_this_tier": "An experiment on the real analyzer shows the crash before and after the change. That shows a gap in the fix, not a passing check, so it needs the owner to decide.",
       "requirement": "R-2234-2",
       "requirement_inferred": true,
       "evidence": [
@@ -104,7 +104,7 @@
       "id": "C-2234-04",
       "claim": "The change hides a diagnostic. The new `continue` also skips collecting the member's type. So a member with a mixed key and an unserializable type no longer gets MsgPack003. Before the change, it got MsgPack003 when the first key was a string.",
       "tier": "Refused",
-      "why_this_tier": "It drops a diagnostic the old code reported. Whether that is fine, given the same member already gets the MsgPack005 error, is a product decision.",
+      "why_this_tier": "It drops a diagnostic the old code reported. Whether that is fine, given the same member already gets the MsgPack005 error, is a product decision that needs the owner to decide.",
       "requirement": "R-2234-4",
       "requirement_inferred": true,
       "evidence": [
@@ -257,31 +257,31 @@
     }
   ],
   "found": [
-    "We found (probe, real analyzer): the new `continue` skips CollectCore for the member's type, so MsgPack003 is lost for a mixed-key member (C-2234-04).",
-    "We found (probe, real analyzer, Dafny model): a first field with [Key(null)] still crashes the analyzer with ArgumentNullException, on base and branch, with SuppressSourceGeneration too. The properties loop guards with `else if (stringKey is not null)`; the fields loop uses a bare `else` (C-2234-03).",
-    "The theorem in the brief ('collecting keys never fails, whatever keys repeat or mix kinds') is false for the real code. Dafny proves the exact condition instead: it fails if and only if the first keyed member is a field with [Key(null)].",
-    "Finding (b) dropped: the second member of a repeated key gets MsgPack005 on the branch, and the first one is kept (C-2234-05).",
-    "The base crash on repeated keys also happens without SuppressSourceGeneration (test DuplicateKeysAreReportedWithoutAnalyzerFailureForGeneratedTypes fails on base). The bug is not specific to suppressed types, and 4 of the 8 analyzer tests show the analyzer already validated suppressed types on base.",
-    "SuppressedSourceGenerationTests.cs raises StyleCop SA1649 (file name does not match first type name).",
-    "Pre-existing, outside the diff: the fields-loop BothStringAndIntKeyAreNull diagnostic passes no message arguments, so the message reads 'Both int and string keys are null: {0}.{1}'."
+    "The change loses a diagnostic. The new `continue` skips CollectCore for the member's type, so a member with a mixed key no longer gets MsgPack003 (C-2234-04). We found this with an experiment on the real analyzer.",
+    "The fix is incomplete. If the first keyed member is a field with [Key(null)], the analyzer still crashes with ArgumentNullException, before and after the change, with SuppressSourceGeneration too (C-2234-03). The cause: the properties loop checks `else if (stringKey is not null)`, but the fields loop uses a bare `else`. We found this with an experiment on the real analyzer and with the Dafny model.",
+    "The goal in our task notes is false for the real code: 'collecting keys never fails, whatever keys repeat or mix kinds'. Dafny proves the exact condition instead: it fails exactly when the first keyed member is a field with [Key(null)].",
+    "One suspected problem turned out fine: with a repeated key, the first member is kept and the second gets MsgPack005 (C-2234-05).",
+    "The crash on repeated keys is not specific to suppressed types. It also happens without SuppressSourceGeneration: the test DuplicateKeysAreReportedWithoutAnalyzerFailureForGeneratedTypes fails before the change. And 4 of the 8 analyzer tests show the analyzer already checked suppressed types before the change.",
+    "SuppressedSourceGenerationTests.cs breaks style rule SA1649: the file name does not match the name of its first type.",
+    "An older bug, outside the diff: the fields loop reports BothStringAndIntKeyAreNull without message arguments, so the message reads 'Both int and string keys are null: {0}.{1}'."
   ],
   "refused": [
     {
-      "what": "C-2234-04: the `continue` drops MsgPack003 for mixed-key members",
-      "why": "Dropping a diagnostic that base reported is a product call for the analyzer owner."
+      "what": "C-2234-04: the `continue` drops MsgPack003 for members with a mixed key.",
+      "why": "Dropping a diagnostic the old code reported is a product decision, so it needs the analyzer owner to decide."
     }
   ],
   "scope_drift": [
-    "README.md gains a 14-line 'Opting out of source generation' section. The issue title asks for an analyzer fix, not documentation."
+    "The README gains a 14-line section, 'Opting out of source generation'. The issue title asks for an analyzer fix, not documentation."
   ],
   "not_checked": [
-    "The 2 execution tests (SuppressedSourceGenerationTests.cs): the project does not build here because the generator needs compiler 4.12 and SDK 8.0.402 has 4.11 (CS9057).",
-    "Source generator output (reportDiagnostic is null in the generator path) for repeated or mixed keys: what code is emitted when the first member wins.",
-    "MsgPack012 (inaccessible types) for suppressed types, which the README claims.",
-    "The full test suite on the branch; only the new tests and our probes were run.",
-    "Members without any [Key] attribute, inherited members, records with positional parameters: not in the model's input domain.",
-    "The model's input domain is keys 0, 1, \"a\", \"b\" and null, with up to 4 members, so the model-vs-C# check covers 3710 inputs, not all inputs.",
-    "The issue body: only the issue title was available to us."
+    "The 2 execution tests in SuppressedSourceGenerationTests.cs. Their project does not build here: the generator needs compiler 4.12, but SDK 8.0.402 has 4.11 (CS9057).",
+    "The code the source generator emits for repeated or mixed keys, when the first member wins. The generator shows no diagnostics here (reportDiagnostic is null).",
+    "Whether suppressed types get MsgPack012 (inaccessible types), as the README claims.",
+    "The full test suite after the change. We ran only the new tests and our experiments.",
+    "Members with no [Key] attribute, inherited members, and records with positional parameters. The model does not cover them.",
+    "The model only tries keys 0, 1, \"a\", \"b\" and null, with up to 4 members. So the model-versus-C# check covers 3710 inputs, not all inputs.",
+    "The issue body: we had only the issue title."
   ],
   "uncovered_diff_parts": []
 }

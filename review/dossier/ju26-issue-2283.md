@@ -12,7 +12,7 @@
 
 **✕ Refused · C-2283-02** — A new filter drops every analyzer diagnostic located outside this project's source. We showed it hides MsgPack003, an error about the app's own type that lacks [MessagePackObject].
 
-> Silencing diagnostics is a product decision for the analyzer owner; a test cannot settle it.
+> Silencing diagnostics is a product decision, so it needs the analyzer owner to decide; a test cannot settle it.
 
 R-2283-3 *(inferred)* · owner: **analyser owner**
 
@@ -34,7 +34,7 @@ R-2283-3 *(inferred)* · owner: **analyser owner**
 
 **✕ Refused · C-2283-03** — The README and the MsgPack004 page now say the defining assembly reports diagnostics about types from referenced assemblies. For the MsgPack003 case above that is not true: no assembly reports it.
 
-> The text presents the dropped diagnostics as intended behaviour, so it stands or falls with C-2283-02.
+> The text presents the dropped diagnostics as intended behaviour, so it stands or falls with C-2283-02 and needs the owner to decide.
 
 R-2283-3 *(inferred)* · owner: **analyser owner**
 
@@ -84,31 +84,31 @@ R-2283-1
 
 #### Found · 6
 
-- We found (with a hand-written probe test, not a rule) that the filter hides MsgPack003 for the consumer's own unattributed type when it is wrapped in a generic from a referenced assembly. A rule cannot notice that a filter hides warnings; the rule only set the tier once the test showed it.
-- The change does two things, not one: a crash fix (2 lines plus a helper) and a filter on 28 of 29 live report sites. The issue asked only for the first.
-- One of the 3 new tests (ClosedGenericStruct_FromMetadataReference_UnkeyedMember) is a test of the filter, not of the crash fix: it fails when only the filter is removed.
-- The filter also prevents a second base crash: with a project (compilation) reference, base throws 'Reported diagnostic MsgPack003 has a source location in file Lib.cs, which is not part of the compilation' (AD0001). On the branch that diagnostic is dropped instead.
-- A duplicate [Key(0)] in a generic type from a referenced assembly still crashes the analyzer on the branch (ArgumentException: same key added), as on base; its MsgPack005 is now dropped. Outside this issue's scope.
-- Report-site count: 29 live sites by our method (28 through the filter, 1 bypass); the handoff's 29 was a simple grep that includes 2 commented-out lines and misses 2 live calls. Same number, different sites.
+- The filter hides MsgPack003 when the app's own type lacks [MessagePackObject] and is wrapped in a generic from a referenced assembly. We found this with a hand-written probe test. No automatic rule can notice that a filter hides warnings; the rules only scored it once the test showed it.
+- The change does two things, but the issue asked only for the first: a crash fix (2 lines plus a helper), and a filter on 28 of the 29 active places that report a diagnostic.
+- One of the 3 new tests, ClosedGenericStruct_FromMetadataReference_UnkeyedMember, tests the filter, not the crash fix: it fails when only the filter is removed.
+- The filter also prevents a second crash. With a project reference instead of a compiled one, the old code crashes with AD0001: 'Reported diagnostic MsgPack003 has a source location in file Lib.cs, which is not part of the compilation'. After the change, that diagnostic is dropped instead.
+- A duplicate [Key(0)] in a generic type from a referenced assembly still crashes the analyzer (ArgumentException: same key added), before and after the change. Its MsgPack005 is now dropped. This is outside the issue's scope.
+- We count 29 active places that report a diagnostic: 28 go through the filter and 1 bypasses it. Our task notes also said 29, but from a simple grep that includes 2 commented-out lines and misses 2 real calls. Same number, different places.
 
 #### Refused · 2
 
-- **Accept ReportIfLocatedInCompilation, which drops analyzer diagnostics located in metadata, in another project, or with no location.** — Dropping warnings is a product call. The analyser owner decides whether these are dropped, reported at the consumer's member instead, or kept; the MsgPack003 case shows at least one is a real problem in the consumer's own code.
-- **Accept the README and MsgPack004.md text saying the defining assembly reports these diagnostics.** — It describes the filter as intended behaviour, and for MsgPack003 on a consumer type it is not true; it follows the decision on the filter.
+- **Accept ReportIfLocatedInCompilation, the filter that drops analyzer diagnostics located in a referenced assembly, in another project, or nowhere.** — Dropping warnings is a product decision, so it needs the analyzer owner to decide: drop them, report them on the app's member instead, or keep them. The MsgPack003 case shows at least one is a real problem in the app's own code.
+- **Accept the README and MsgPack004.md text saying the defining assembly reports these diagnostics.** — It presents the filter as intended behaviour, and for MsgPack003 on the app's own type it is not true. It follows the owner's decision on the filter.
 
 #### Scope drift · 2
 
-- Issue 2283 asks for no crash and a generated resolver. The filter, and the docs on where diagnostics are reported, were not asked for; the issue has no maintainer statement on diagnostics for referenced types.
-- The filter wraps all 28 filtered report sites, not only the 2 sites that crashed.
+- The issue asks for no crash and a generated resolver. Nobody asked for the filter or for docs on where diagnostics are reported, and no maintainer says anything in the issue about diagnostics for referenced types.
+- The filter wraps 28 places that report diagnostics, not only the 2 that crashed.
 
 #### Not checked · 6
 
-- The issue's exact setup (ProjectReference in a real MSBuild or IDE build). The new tests reference the library as a compiled image; our probe covers a compilation reference only for two other shapes.
-- The content of the generated resolver: the new tests use SkipGeneratedSourcesCheck and only check that the resolver file exists.
-- Runtime behaviour after a dropped MsgPack003 (does serialising Box&lt;Plain&gt; fail at run time).
-- Only MsgPack003, MsgPack004 and MsgPack005 were exercised through the filter; 'can be outside the compilation' for the other filtered sites is a text heuristic in report_sites.py.
-- The issue's trigger matrix (class vs struct, generic vs not) beyond the 3 new tests and 6 probe cases.
-- The generator path: the generator passes no report callback, so the filter does not apply there (read, not run).
+- The issue's exact setup: a ProjectReference in a real MSBuild or IDE build. The new tests reference the library as a compiled file. Our probe covers a project reference only for two other cases.
+- What the generated resolver contains. The new tests skip that check (SkipGeneratedSourcesCheck) and only check that the resolver file exists.
+- What happens at run time after MsgPack003 is dropped, for example whether serializing Box&lt;Plain&gt; fails.
+- Only MsgPack003, MsgPack004 and MsgPack005 were tried through the filter. For the other filtered places, whether they can point outside the project is a text-based guess by a script.
+- Other combinations from the issue (class or struct, generic or not) beyond the 3 new tests and 6 probe cases.
+- Running the generator path. The generator passes no report callback, so the filter does not apply there; we read this in the code but did not run it.
 
 ---
 <sub>Sign: `python3 review/scripts/sign_receipt.py ju26-issue-2283` · read the evidence, not the diff</sub>
