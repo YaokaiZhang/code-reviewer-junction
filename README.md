@@ -2,7 +2,7 @@
 
 *Read the evidence, not the diff.*
 
-An AI agent writes a change. The reviewer turns it into checkable claims, each with a tier that says what backs it — **Proved, Tested, Measured, Argued, Refused**. Machines settle the first three; a named owner decides the rest and signs a receipt.
+An AI agent writes a change. The reviewer turns it into checkable claims. Each claim gets a **confidence score** (0–100) from the evidence behind it, by a fixed formula. When a check shows a promise to users changed, the claim **needs an owner**: a named maintainer decides and signs a receipt.
 
 Target: [`junction26-messagepack-csharp`](https://github.com/te-industry-tech-office/junction26-messagepack-csharp), base `32258fdb`.
 
@@ -10,21 +10,21 @@ Target: [`junction26-messagepack-csharp`](https://github.com/te-industry-tech-of
 
 Open `review/web/index.html` (works from disk). Markdown versions for PR comments: `review/dossier/<branch>.md`.
 
-| Branch | Claims | Proved | Tested | Measured | Argued | Refused |
+| Branch | Claims | High (80+) | Medium (50–79) | Low (<50) | Needs owner | New tests that prove the fix |
 |---|---|---|---|---|---|---|
-| [2297](review/dossier/ju26-issue-2297.md) | 10 | 2 | 2 | 3 | 2 | 1 |
-| [2234](review/dossier/ju26-issue-2234.md) | 9 | 0 | 3 | 2 | 3 | 1 |
-| [2283](review/dossier/ju26-issue-2283.md) | 4 | 0 | 1 | 1 | 0 | 2 |
+| [2297](review/dossier/ju26-issue-2297.md) | 10 | 4 | 3 | 3 | 1 | 2 of 2 |
+| [2234](review/dossier/ju26-issue-2234.md) | 9 | 3 | 2 | 4 | 1 | 4 of 10 |
+| [2283](review/dossier/ju26-issue-2283.md) | 4 | 1 | 2 | 1 | 2 | 3 of 3 |
 
 ## Layout
 
 ```
 review/
-  CONVENTIONS.md       schemas, tier rules, honesty rules
+  CONVENTIONS.md       schemas, score formula, owner gate, honesty rules
   REQUIREMENTS.md      R-<issue>-n, inferred lines marked
   LESSONS.md DECISIONS.md
   evidence/<branch>/   one JSON per check, each with the command that produced it
-  dossier/<branch>.*   claims with tiers (.json) and the owner view (.md)
+  dossier/<branch>.*   claims (.json) and the PR comment (.md)
   source/<branch>.json diff hunks behind each claim, with GitHub links
   receipts/            signed receipts
   proof/               Dafny model + proof for 2234

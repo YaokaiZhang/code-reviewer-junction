@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
-"""Sign a dossier: the owner picks accept / reject / send back for every
-Argued and Refused claim, and a receipt is written to review/receipts/<branch>.json.
+"""Sign a dossier: the owner picks accept / reject / send back for every claim that
+needs an owner (evidence/<branch>/confidence.json `gate`), and a receipt is written to
+review/receipts/<branch>.json. Same claims and fields as the web page's receipt.
 
     python3 review/scripts/sign_receipt.py ju26-issue-2283                     # interactive
     python3 review/scripts/sign_receipt.py ju26-issue-2283 --name "Ada L" \\
         --picks C-2283-03=reject,C-2283-04=accept
     python3 review/scripts/sign_receipt.py review/dossier/_sample.json --name X --picks ...
 
-Nothing is pre-picked. Every Argued/Refused claim needs a pick or nothing is written.
+Nothing is pre-picked. Every needs-owner claim needs a pick or nothing is written.
 A sample dossier signs to review/receipts/_sample.json. Standard library only.
 """
 import argparse
@@ -19,7 +20,30 @@ from pathlib import Path
 REVIEW = Path(__file__).resolve().parent.parent
 DOSSIER_DIR = REVIEW / "dossier"
 RECEIPT_DIR = REVIEW / "receipts"
-MACHINE = ("Proved", "Tested", "Measured")
+
+
+def confidence(d):
+    p = REVIEW / "evidence" / str(d.get("branch")) / "confidence.json"
+    return json.loads(p.read_text(encoding="utf-8"))["details"]["claims"] if p.is_file() else {}
+
+
+def split(d):
+    """(needs owner, other claims); a claim with no score yet counts as needing an owner."""
+    conf = confidence(d)
+    owner, other = [], []
+    for c in d.get("claims") or []:
+        k = conf.get(c["id"])
+        (owner if not k or k.get("gate") else other).append(c)
+    return owner, other, conf
+
+
+def scored(conf, c, o):
+    k = conf.get(c["id"]) or {}
+    if "score" in k:
+        o["score"], o["band"] = k["score"], k["band"]
+    if k.get("gate"):
+        o["owner"] = k["gate"].get("owner") or ""
+    return o
 PICKS = {"accept": "accept", "a": "accept",
          "reject": "reject", "r": "reject",
          "send back": "send back", "send-back": "send back", "sendback": "send back", "s": "send back"}
@@ -55,14 +79,13 @@ def ask(prompt):
 
 
 def build_receipt(d, name, picks, signed_at=None):
-    claims = d.get("claims") or []
-    human = [c for c in claims if c.get("tier") not in MACHINE]
+    human, other, conf = split(d)
     missing = [c["id"] for c in human if c["id"] not in picks]
     if missing:
         raise ValueError("no pick for: " + ", ".join(missing))
     unknown = set(picks) - {c["id"] for c in human}
     if unknown:
-        raise ValueError("not an Argued/Refused claim: " + ", ".join(sorted(unknown)))
+        raise ValueError("not a needs-owner claim: " + ", ".join(sorted(unknown)))
     if not name.strip():
         raise ValueError("signed_by is empty")
     r = {
@@ -70,8 +93,8 @@ def build_receipt(d, name, picks, signed_at=None):
         "head": d.get("head"),
         "signed_by": name.strip(),
         "signed_at": signed_at or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "picks": [{"id": c["id"], "tier": c["tier"], "pick": picks[c["id"]], "claim": c.get("claim", "")} for c in human],
-        "auto_settled": [{"id": c["id"], "tier": c["tier"]} for c in claims if c.get("tier") in MACHINE],
+        "picks": [scored(conf, c, {"id": c["id"], "pick": picks[c["id"]], "claim": c.get("claim", "")}) for c in human],
+        "auto_settled": [scored(conf, c, {"id": c["id"]}) for c in other],
         "not_checked": list(d.get("not_checked") or []),
         "uncovered_diff_parts": list(d.get("uncovered_diff_parts") or []),
     }
@@ -93,20 +116,19 @@ def main():
     d = json.loads(path.read_text(encoding="utf-8"))
     if path.name.startswith("_"):
         d["sample"] = True
-    claims = d.get("claims") or []
-    human = [c for c in claims if c.get("tier") not in MACHINE]
+    human, other, conf = split(d)
     picks = parse_picks(a.picks) if a.picks else {}
 
     print(f"{d.get('branch')} @ {d.get('head')}" + ("   [SAMPLE]" if d.get("sample") else ""))
-    for c in claims:
-        if c.get("tier") in MACHINE:
-            print(f"  {c['tier']:<8} {c['id']}  settled")
+    for c in sorted(other, key=lambda c: -conf[c["id"]]["score"]):
+        print(f"  {conf[c['id']]['score']:3} {conf[c['id']]['band']:<6} {c['id']}")
     batch = a.picks is not None and a.name is not None  # fully scripted: never prompt
     for c in human:
         if c["id"] in picks or batch:
             continue
         print()
-        print(f"  {c['tier'].upper()}  {c['id']}" + (f"  · {c['owner_role']}" if c.get("owner_role") else ""))
+        g = (conf.get(c["id"]) or {}).get("gate") or {}
+        print(f"  NEEDS OWNER  {c['id']}" + (f"  · {g.get('owner')} ({g.get('contract')})" if g else ""))
         print(f"  {c.get('claim', '')}")
         if c.get("why_this_tier"):
             print(f"  > {c['why_this_tier']}")
