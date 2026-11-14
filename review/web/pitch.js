@@ -237,13 +237,14 @@
     return null;
   }
 
-  /* each check, one per row: what it does, why it counts, what it cannot tell */
+  /* each check, one per row: what it does, why we use it, why it counts, what it cannot tell */
   function secMachine(s) {
     var rows = [];
 
     var iso = s.ds.filter(function (d) { return d._isolation && d._isolation.coverage && +d._isolation.coverage.trackable; });
     if (iso.length) rows.push({ c: 'high', g: 'Old vs new', v: 90, h: 'Old code still works.',
       p: 'Run the old and the new version on the same real projects. Same output means nothing broke.',
+      use: 'Most fixes come with no test for the bug. The old version is always there, so we can check any fix against it.',
       why: 'This is the check from chapter 03. It needs no tests: the old version is the answer key.',
       lim: 'It only speaks for changed lines that ran. Lines that never ran go to the reviewer.',
       fig: '<div class="p-fig p-ran">' + iso.map(function (d) {
@@ -254,6 +255,7 @@
     var nSnap = s.snap || 0;
     if (findEv(s, 'regeneration') && nSnap) rows.push({ c: 'high', g: 'Rebuilt and compared', v: 90, h: 'Rebuild the generated code.',
       p: 'Some files in a change come from a code generator, not a person. Run the generator again. Its output must match those files exactly.',
+      use: 'Generated files can make a change look huge. This takes them off the reviewer’s desk, so only hand-written code is left.',
       why: 'Generated files are too long to read. If the generator makes the same files again, nobody edited them by hand.',
       lim: 'It shows the files match the generator, not that the generator is right.',
       fig: '<div class="p-fig p-fig-proved">' +
@@ -266,6 +268,7 @@
       var vl = ((pd.dafny_verify || {}).result_line || [''])[0], nv = (String(vl).match(/(\d+) verified/) || [])[1];
       rows.push({ c: 'high', g: 'Formal verification', v: 80, h: 'Prove it for every case.',
         p: 'Formal verification: write what the code must do as a small model. A prover (Dafny) checks it for every possible input.',
+        use: 'For small, tricky code, like a parser, where one missed input breaks things.',
         why: 'A test checks a few inputs. A proof covers all of them, so it finds the one case nobody tried.',
         lim: 'The model is a copy of the code, not the code. So we also run the model and the real code on the same inputs.',
         fig: '<div class="p-fig p-proof">' +
@@ -282,6 +285,7 @@
       for (var i = 0; i < nT; i++) cells += '<span class="x">✗</span><span class="ok">✓</span>';
       rows.push({ c: 'medium', g: 'Test first (TDD)', v: 75, h: 'Check the test, not the code.',
         p: 'Each new test fails on the old code and passes on the new code. So the test is what proves the fix.',
+        use: 'When a fix comes with new tests, they are the fastest way into it.',
         why: 'The reviewer only has to confirm the test asks the right question. Each test comes with a trace in plain steps, so that takes minutes, not a full read.',
         lim: 'It only covers the cases the test asks about.',
         fig: '<div class="p-fig"><div class="p-tgrid">' +
@@ -293,6 +297,7 @@
       var b0 = +cd.base.clones.duplicated_blocks, b1 = +cd.branch.clones.duplicated_blocks, mx = Math.max(b0, b1) || 1;
       rows.push({ c: 'low', g: 'A number from a tool', v: 40, h: 'Count it.',
         p: 'A tool measures something, for example how much code is copy-pasted, before and after.',
+        use: 'Some costs never show up as a failure, like copied code. A tool is the cheapest way to see them.',
         why: 'It points the reviewer to a cost that is easy to miss in a long change.',
         lim: 'A number alone cannot say if the fix is right. So it scores low.',
         fig: '<div class="p-fig">' +
@@ -304,7 +309,7 @@
     return '<section class="p-machine" data-progress="machine" style="--n:' + rows.length + '">' +
       '<div class="p-sticky p-machine-in">' +
         '<header class="p-mhead">' +
-          '<h2 class="p-h2">' + words('Each check,') + ' ' + words('and why it counts.', 'hot', 140) + '</h2>' +
+          '<h2 class="p-h2">' + words('Each check,') + ' ' + words('why we use it, why it counts.', 'hot', 140) + '</h2>' +
           '<ol class="p-mtabs">' + rows.map(function (r, i) {
             return '<li class="c-' + r.c + '" data-i="' + i + '"><i></i>' + esc(r.g) + '</li>';
           }).join('') + '</ol>' +
@@ -315,7 +320,7 @@
               '<span class="g c-' + r.c + '">score <b>' + r.v + '</b></span>' +
               '<h3>' + esc(r.h) + '</h3>' +
               '<p>' + esc(r.p) + '</p>' +
-              '<dl><dt>Why it counts</dt><dd>' + esc(r.why) + '</dd><dt>What it can’t tell</dt><dd>' + esc(r.lim) + '</dd></dl>' +
+              '<dl><dt>Why we use it</dt><dd>' + esc(r.use) + '</dd><dt>Why it counts</dt><dd>' + esc(r.why) + '</dd><dt>What it can’t tell</dt><dd>' + esc(r.lim) + '</dd></dl>' +
             '</div>' +
             '<div class="p-how-f">' + r.fig + '</div>' +
           '</article>';
