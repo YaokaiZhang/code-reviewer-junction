@@ -16,9 +16,8 @@ from pathlib import Path
 REVIEW = Path(__file__).resolve().parent.parent
 DOSSIER_DIR = REVIEW / "dossier"
 
-TIERS = ["Proved", "Tested", "Measured", "Argued", "Refused"]
-MACHINE = {"Proved", "Tested", "Measured"}
-GLYPH = {"Proved": "■", "Tested": "▲", "Measured": "●", "Argued": "◆", "Refused": "✕"}
+BANDS = ["high", "medium", "low"]
+GLYPH = {"high": "●", "medium": "◐", "low": "○"}
 RESULT = {"pass": "pass", "fail": "FAIL", "error": "ERROR"}
 
 
@@ -65,14 +64,14 @@ def claim_body(c, md_dir):
     if c.get("requirement"):
         r = c["requirement"] + (" *(inferred)*" if c.get("requirement_inferred") else "")
         meta.append(r)
-    if c.get("owner_role") and c.get("tier") not in MACHINE:
-        meta.append(f"owner: **{md_escape(c['owner_role'])}**")
+    g = c.get("_conf", {}).get("gate")
+    if g:
+        meta.append(f"owner: **{md_escape(g.get('owner') or '?')}** ({md_escape(g['contract'])})")
     if meta:
         out.append(" · ".join(meta))
         out.append("")
     for link in c.get("chain") or []:
-        t = link.get("tier", "?")
-        out.append(f"- {GLYPH.get(t, '·')} {t} — {md_escape(link.get('link', ''))}")
+        out.append(f"- {md_escape(link.get('link', ''))}")
     if c.get("chain"):
         out.append("")
     for ref in c.get("evidence") or []:
@@ -86,12 +85,17 @@ def claim_body(c, md_dir):
 
 def render(d, md_dir=DOSSIER_DIR):
     claims = d.get("claims") or []
-    counts = {t: sum(1 for c in claims if c.get("tier") == t) for t in TIERS}
-    human = [c for c in claims if c.get("tier") not in MACHINE]
-    machine = [c for c in claims if c.get("tier") in MACHINE]
-    # Refused first, then Argued; machine rows in tier order
-    human.sort(key=lambda c: (0 if c.get("tier") == "Refused" else 1, c.get("id", "")))
-    machine.sort(key=lambda c: (TIERS.index(c["tier"]), c.get("id", "")))
+    conf = (load_evidence(f"evidence/{d.get('branch')}/confidence.json") or {}).get("details", {}).get("claims", {})
+    for c in claims:
+        c["_conf"] = conf.get(c.get("id"), {"score": 0, "band": "low"})
+    counts = {b: sum(1 for c in claims if c["_conf"]["band"] == b) for b in BANDS}
+    owner = sorted((c for c in claims if c["_conf"].get("gate")), key=lambda c: c.get("id", ""))
+    rest = sorted((c for c in claims if not c["_conf"].get("gate")),
+                  key=lambda c: (-c["_conf"]["score"], c.get("id", "")))
+
+    def label(c):
+        k = c["_conf"]
+        return f"{GLYPH[k['band']]} {k['score']} · {c.get('id', '?')}"
 
     L = []
     issue = d.get("issue")
@@ -113,27 +117,27 @@ def render(d, md_dir=DOSSIER_DIR):
     if d.get("summary"):
         L += [f"**What the AI changed:** {md_escape(d['summary'])}", ""]
 
-    L.append("| " + " | ".join(f"{GLYPH[t]} {t}" for t in TIERS) + " |")
-    L.append("|" + ":-:|" * len(TIERS))
-    L.append("| " + " | ".join(str(counts[t]) if counts[t] else "·" for t in TIERS) + " |")
+    L.append("| " + " | ".join(f"{GLYPH[b]} {b}" for b in BANDS) + " | needs owner |")
+    L.append("|" + ":-:|" * (len(BANDS) + 1))
+    L.append("| " + " | ".join(str(counts[b]) if counts[b] else "·" for b in BANDS) + f" | {len(owner) or '·'} |")
+    L.append("")
+    L.append("<sub>Confidence 0–100 from the evidence, by a fixed formula. Needs owner: a check shows a promise to users changed.</sub>")
     L.append("")
 
-    if human:
-        L.append(f"#### Owner decides · {len(human)}")
+    if owner:
+        L.append(f"#### Needs owner · {len(owner)}")
         L.append("")
-        for c in human:
-            t = c.get("tier", "Argued")
-            L.append(f"**{GLYPH.get(t, '◆')} {t} · {c.get('id', '?')}** — {md_escape(c.get('claim', ''))}")
+        for c in owner:
+            L.append(f"**{label(c)}** — {md_escape(c.get('claim', ''))}")
             L.append("")
             L += claim_body(c, md_dir)
             L += ["- [ ] accept", "- [ ] reject", "- [ ] send back", ""]
 
-    if machine:
-        L.append(f"#### Machine settled · {len(machine)}")
+    if rest:
+        L.append(f"#### By confidence · {len(rest)}")
         L.append("")
-        for c in machine:
-            t = c["tier"]
-            L.append(f"<details><summary>{GLYPH[t]} {t} · {c.get('id', '?')} — {md_escape(c.get('claim', ''))}</summary>")
+        for c in rest:
+            L.append(f"<details><summary>{label(c)} — {md_escape(c.get('claim', ''))}</summary>")
             L.append("")
             L += claim_body(c, md_dir)
             L.append("</details>")
@@ -149,7 +153,7 @@ def render(d, md_dir=DOSSIER_DIR):
         L.append("")
 
     section("Found", d.get("found"))
-    section("Refused", d.get("refused"),
+    section("Needs owner: why", d.get("refused"),
             lambda r: f"**{md_escape(r.get('what', ''))}** — {md_escape(r.get('why', ''))}" if isinstance(r, dict) else md_escape(r))
     section("Scope drift", d.get("scope_drift"))
     section("Not checked", d.get("not_checked"))

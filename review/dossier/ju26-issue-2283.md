@@ -4,22 +4,24 @@
 
 **What the AI changed:** The generator and analyzer crashed when a project used a generic struct, such as Box&lt;int&gt;, defined in another assembly. They looked up source locations that such a type does not have. The AI made those lookups safe. It also added a filter in TypeCollector.cs that drops every analyzer diagnostic located outside the project's own source. It added 3 tests, and notes in the README and the MsgPack004 page saying the defining assembly reports such diagnostics.
 
-| ■ Proved | ▲ Tested | ● Measured | ◆ Argued | ✕ Refused |
-|:-:|:-:|:-:|:-:|:-:|
-| · | 1 | 1 | · | 2 |
+| ● high | ◐ medium | ○ low | needs owner |
+|:-:|:-:|:-:|:-:|
+| 1 | 2 | 1 | 2 |
 
-#### Owner decides · 2
+<sub>Confidence 0–100 from the evidence, by a fixed formula. Needs owner: a check shows a promise to users changed.</sub>
 
-**✕ Refused · C-2283-02** — A new filter drops every analyzer diagnostic located outside this project's source. We showed it hides MsgPack003, an error about the app's own type that lacks [MessagePackObject].
+#### Needs owner · 2
+
+**◐ 50 · C-2283-02** — A new filter drops every analyzer diagnostic located outside this project's source. We showed it hides MsgPack003, an error about the app's own type that lacks [MessagePackObject].
 
 > Silencing diagnostics is a product decision, so it needs the analyzer owner to decide; a test cannot settle it.
 
-R-2283-3 *(inferred)* · owner: **analyser owner**
+R-2283-3 *(inferred)* · owner: **Andrew Arnott** (diagnostics)
 
-- ▲ Tested — A probe test uses the app's own class Plain as Lib.Box&lt;Plain&gt;. Before the change this reports MsgPack003 'Type must be marked with MessagePackObjectAttribute: Box.Content' (an error, no crash). After the change it is gone, and nothing else reports it.
-- ● Measured — 28 of the 29 active places in TypeCollector.cs that report a diagnostic go through the filter. This is a script count; whether each one can point outside the project is a text-based guess.
-- ▲ Tested — The new test ClosedGenericStruct_FromMetadataReference_UnkeyedMember needs the filter: without it, the test fails on 2 MsgPack004 diagnostics. So the test locks in the dropped diagnostics.
-- ✕ Refused — Open question for the owner: should diagnostics about types from other assemblies be dropped, reported on the app's member instead, or kept?
+- A probe test uses the app's own class Plain as Lib.Box&lt;Plain&gt;. Before the change this reports MsgPack003 'Type must be marked with MessagePackObjectAttribute: Box.Content' (an error, no crash). After the change it is gone, and nothing else reports it.
+- 28 of the 29 active places in TypeCollector.cs that report a diagnostic go through the filter. This is a script count; whether each one can point outside the project is a text-based guess.
+- The new test ClosedGenericStruct_FromMetadataReference_UnkeyedMember needs the filter: without it, the test fails on 2 MsgPack004 diagnostics. So the test locks in the dropped diagnostics.
+- Open question for the owner: should diagnostics about types from other assemblies be dropped, reported on the app's member instead, or kept?
 
 - [`dropped-warning`](../evidence/ju26-issue-2283/dropped-warning.json) **FAIL** · hand — MsgPack003 (unattributed_consumer_type_inside_metadata_generic) is reported on base without any analyzer crash and is absent on branch; 3 of 6 probe cases lose a diagnostic on branch
 - [`report-sites`](../evidence/ju26-issue-2283/report-sites.json) **pass** — 29 live report sites in TypeCollector.cs: 28 go through the filter (19 distinct descriptors), 1 bypass it; 28 of the 28 filtered sites can have a location outside the compilation's source; simple grep for 'reportDiagnostic?.Invoke' counts 29 lines (2 of them commented out)
@@ -32,11 +34,11 @@ R-2283-3 *(inferred)* · owner: **analyser owner**
 - [ ] reject
 - [ ] send back
 
-**✕ Refused · C-2283-03** — The README and the MsgPack004 page now say the defining assembly reports diagnostics about types from referenced assemblies. For the MsgPack003 case above that is not true: no assembly reports it.
+**◐ 50 · C-2283-03** — The README and the MsgPack004 page now say the defining assembly reports diagnostics about types from referenced assemblies. For the MsgPack003 case above that is not true: no assembly reports it.
 
 > The text presents the dropped diagnostics as intended behaviour, so it stands or falls with C-2283-02 and needs the owner to decide.
 
-R-2283-3 *(inferred)* · owner: **analyser owner**
+R-2283-3 *(inferred)* · owner: **Andrew Arnott** (diagnostics)
 
 - [`dropped-warning`](../evidence/ju26-issue-2283/dropped-warning.json) **FAIL** · hand — MsgPack003 (unattributed_consumer_type_inside_metadata_generic) is reported on base without any analyzer crash and is absent on branch; 3 of 6 probe cases lose a diagnostic on branch
 - `README.md:1639-1643`
@@ -46,17 +48,17 @@ R-2283-3 *(inferred)* · owner: **analyser owner**
 - [ ] reject
 - [ ] send back
 
-#### Machine settled · 2
+#### By confidence · 2
 
-<details><summary>▲ Tested · C-2283-01 — The crash is fixed: a closed generic struct or record struct from a referenced assembly no longer crashes the generator or analyzer, and the resolver is generated again.</summary>
+<details><summary>● 85 · C-2283-01 — The crash is fixed: a closed generic struct or record struct from a referenced assembly no longer crashes the generator or analyzer, and the resolver is generated again.</summary>
 
 > 2 new tests fail before the change with the issue's crash (AD0001 and CS8785, an IndexOutOfRangeException) and pass after. They still pass with the new filter removed, so the crash fix alone makes them pass.
 
 R-2283-1
 
-- ▲ Tested — ClosedGenericStruct_FromMetadataReference and ClosedGenericRecordStruct_FromMetadataReference crash before the change with AD0001 and CS8785 (an IndexOutOfRangeException).
-- ▲ Tested — After the change both pass, and both check that the resolver file is generated (requirement R-2283-2).
-- ▲ Tested — Both still pass with the filter line undone, so the crash fix alone makes them pass.
+- ClosedGenericStruct_FromMetadataReference and ClosedGenericRecordStruct_FromMetadataReference crash before the change with AD0001 and CS8785 (an IndexOutOfRangeException).
+- After the change both pass, and both check that the resolver file is generated (requirement R-2283-2).
+- Both still pass with the filter line undone, so the crash fix alone makes them pass.
 
 - [`old-vs-new-tests`](../evidence/ju26-issue-2283/old-vs-new-tests.json) **pass** · hand — 3 of 3 new tests fail on base and pass on branch; 1 of them (ClosedGenericStruct_FromMetadataReference_UnkeyedMember) also fails when only the filter is removed; whole test project: 167 of 167 pre-existing tests pass on base and 167 on branch
 - [`old-vs-new-tests.script`](../evidence/ju26-issue-2283/old-vs-new-tests.script.json) **pass** — 3 new or changed test methods (3 added, 0 modified): 3 fail on base and pass on branch, 0 pass on base (not evidence), 0 fail on branch, 0 not runnable here (project does not build on branch)
@@ -69,7 +71,7 @@ R-2283-1
 
 </details>
 
-<details><summary>● Measured · C-2283-04 — No existing test in the source generator test project changes result: 167 of 167 pass before and after the change.</summary>
+<details><summary>○ 30 · C-2283-04 — No existing test in the source generator test project changes result: 167 of 167 pass before and after the change.</summary>
 
 > This is a count from a test run. Passing both times shows nothing that is tested got worse; it does not prove the change is correct.
 
@@ -91,7 +93,7 @@ R-2283-1
 - A duplicate [Key(0)] in a generic type from a referenced assembly still crashes the analyzer (ArgumentException: same key added), before and after the change. Its MsgPack005 is now dropped. This is outside the issue's scope.
 - We count 29 active places that report a diagnostic: 28 go through the filter and 1 bypasses it. Our task notes also said 29, but from a simple grep that includes 2 commented-out lines and misses 2 real calls. Same number, different places.
 
-#### Refused · 2
+#### Needs owner: why · 2
 
 - **Accept ReportIfLocatedInCompilation, the filter that drops analyzer diagnostics located in a referenced assembly, in another project, or nowhere.** — Dropping warnings is a product decision, so it needs the analyzer owner to decide: drop them, report them on the app's member instead, or keep them. The MsgPack003 case shows at least one is a real problem in the app's own code.
 - **Accept the README and MsgPack004.md text saying the defining assembly reports these diagnostics.** — It presents the filter as intended behaviour, and for MsgPack003 on the app's own type it is not true. It follows the owner's decision on the filter.
