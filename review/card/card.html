@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Earned Trust — Concept Card</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,500;0,600;1,500&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#f4f1e6;--ink:#0f0f0f;--soft:#4a463d;--mute:#7a6a55;--orange:#C05621;--line:#d9d2bf;
+--hi:#e9c75a;--md:#ffb300;--lo:#ff5a36;
+--serif:'EB Garamond',Garamond,serif;--sans:'IBM Plex Sans',system-ui,sans-serif;--mono:'IBM Plex Mono',monospace}
+@page{size:297mm 210mm;margin:0}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--paper)}
+body{width:297mm;height:210mm;padding:11mm 13mm 9mm;color:var(--ink);font:9.4pt/1.38 var(--sans);display:flex;flex-direction:column;gap:5mm;overflow:hidden}
+.lbl{font:600 7pt var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--orange)}
+header{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:1.5px solid var(--ink);padding-bottom:3.5mm}
+h1{font:600 30pt/1 var(--serif);letter-spacing:-.01em}
+h1 em{font-style:italic;color:var(--orange)}
+.lede{max-width:118mm;font-size:10pt;color:var(--soft);text-align:right}
+.lede b{color:var(--ink)}
+.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:0;border:1px solid var(--ink)}
+.step{padding:2.6mm 3.2mm;border-right:1px solid var(--ink);position:relative}
+.step:last-child{border-right:0;background:var(--ink);color:var(--paper)}
+.step:last-child .n{color:var(--md)}
+.step:last-child p{color:#cfc8b6}
+.step:not(:last-child):after{content:"";position:absolute;right:-2.2mm;top:50%;width:4mm;height:4mm;background:var(--paper);border-top:1px solid var(--ink);border-right:1px solid var(--ink);transform:translateY(-50%) rotate(45deg);z-index:2}
+.n{font:600 7pt var(--mono);color:var(--orange);letter-spacing:.1em}
+.step h3{font:600 13pt/1.1 var(--serif);margin:.6mm 0 .8mm}
+.step p{font-size:8.2pt;color:var(--soft);line-height:1.32}
+.grid{flex:1;display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:6mm;min-height:0}
+.col{display:flex;flex-direction:column;gap:4.5mm}
+section h2{font:600 14pt/1 var(--serif);margin:.8mm 0 1.6mm}
+ul{list-style:none}
+li{padding:1.15mm 0;border-top:1px solid var(--line);font-size:8.6pt}
+li:first-child{border-top:0}
+li b{font-weight:600}
+.k{display:inline-block;min-width:23mm;font:500 7.2pt var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--mute)}
+li:has(.k){display:grid;grid-template-columns:27mm 1fr;align-items:baseline}
+.pm b{color:var(--orange)}
+.stats{display:flex;gap:0;border:1px solid var(--ink);margin-bottom:1.6mm}
+.stats div{flex:1;padding:1.6mm 2mm;border-right:1px solid var(--ink)}
+.stats div:last-child{border-right:0}
+.stats strong{display:block;font:600 17pt/1 var(--serif)}
+.stats span{font:500 6.6pt var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--mute)}
+.bar{display:flex;height:2.2mm;margin:0 0 1.8mm}
+.bar i{display:block}
+.box{border:1px solid var(--ink);padding:2.6mm 3mm;background:#fbf9f2}
+.sign li{font-size:8.4pt}
+footer{display:flex;justify-content:space-between;font:500 7pt var(--mono);color:var(--mute);letter-spacing:.04em;border-top:1px solid var(--line);padding-top:2mm}
+</style></head><body>
+<header>
+  <div><div class="lbl">Earned Trust in AI Code · Concept card</div>
+  <h1>Review the <em>evidence</em>, not the lines.</h1></div>
+  <p class="lede">The AI turns an agent's PR into <b>claims</b>, tries to break each one with checks anyone can re-run, and scores only the evidence. Where a promise to users changes, it <b>refuses to decide</b>. A <b>named owner</b> signs.</p>
+</header>
+
+<div class="flow">
+  <div class="step"><div class="n">01</div><h3>Claim</h3><p>Each change becomes short claims, each tied to a requirement ID.</p></div>
+  <div class="step"><div class="n">02</div><h3>Attack</h3><p>Fails on old code, passes on new. Undo one part. Old vs new on the same inputs. Probes. Proof.</p></div>
+  <div class="step"><div class="n">03</div><h3>Score</h3><p>A fixed formula, 0–100, from the evidence only. The model's own confidence counts for nothing.</p></div>
+  <div class="step"><div class="n">04</div><h3>Gate</h3><p>Touches warnings, generated code or public API, and no old input proves it? Needs an owner.</p></div>
+  <div class="step"><div class="n">05</div><h3>Owner signs</h3><p>Named from git history. Signs what was checked, what was not, and the risk accepted.</p></div>
+</div>
+
+<div class="grid">
+  <div class="col">
+    <section><div class="lbl">How it balances</div><h2>Principles</h2>
+      <ul>
+        <li><span class="k">Risk</span><span>Depth follows risk. Light checks on high scores; the owner's full attention on gated claims. <b>A high score never clears the gate.</b></span></li>
+        <li><span class="k">Hallucination</span>If it can't be re-run, it doesn't count. The agent's reasons are claims to test, not facts.</li>
+        <li><span class="k">Transparency</span>Every number links to the command that made it and the requirement it serves.</li>
+        <li><span class="k">Confidence</span>Earned from evidence by a published formula, never stated by the model.</li>
+        <li><span class="k">Quality</span>Readability measured before and after: copy-paste blocks, paths per function.</li>
+      </ul></section>
+    <section class="box sign"><div class="lbl">Who owns the decision</div>
+      <ul>
+        <li>The <b>AI advises</b> with evidence. It never approves.</li>
+        <li>The <b>owner</b> (most commits on those paths) decides on every gated claim and signs a receipt.</li>
+        <li>Owners edit the review rules; every edit carries their name.</li>
+      </ul></section>
+  </div>
+
+  <div class="col">
+    <section><div class="lbl">What you give up</div><h2>Trade-offs</h2>
+      <ul class="pm">
+        <li><b>+</b> The owner reads claims and evidence, not the whole diff.</li>
+        <li><b>+</b> Weak evidence is shown as weak. Nothing is rounded up.</li>
+        <li><b>−</b> Real builds cost time: the old-vs-new test run takes ~4 min.</li>
+        <li><b>−</b> The gate is strict. At first many claims go to a human.</li>
+        <li><b>−</b> Probes are hand-written: they test what someone thought of.</li>
+      </ul></section>
+    <section><div class="lbl">When not to trust it</div><h2>Limits</h2>
+      <ul>
+        <li>Evidence is only as good as the inputs. Lines no old input runs stay unproven, so they go to a human.</li>
+        <li>Owner by git history is a guess: the most commits is not always the right person.</li>
+        <li>Shown on 3 of 4 sample branches. No production data yet.</li>
+      </ul></section>
+  </div>
+
+  <div class="col">
+    <section><div class="lbl">Shown on the sample PRs</div><h2>Evidence</h2>
+      <div class="stats">
+        <div><strong>3</strong><span>branches</span></div>
+        <div><strong>23</strong><span>claims</span></div>
+        <div><strong>11</strong><span>to an owner</span></div>
+      </div>
+      <div class="bar"><i style="flex:8;background:var(--hi)"></i><i style="flex:7;background:var(--md)"></i><i style="flex:8;background:var(--lo)"></i></div>
+      <ul>
+        <li><b>#2283</b> A filter hides warnings users need. No test saw it; a probe did.</li>
+        <li><b>#2297</b> The agent's reason for a guard was false. The change breaks builds (CS0579) for users who already did it by hand.</li>
+        <li><b>#2234</b> 4 of 8 new tests already pass on old code. They looked like evidence.</li>
+      </ul></section>
+    <section><div class="lbl">How trust is measured</div><h2>Measurement</h2>
+      <ul>
+        <li><span class="k">Escapes</span>Reverts and incidents per area must not rise as review time falls.</li>
+        <li><span class="k">Real findings</span>Share of AI findings the owner accepts.</li>
+        <li><span class="k">Routed</span>Share of claims sent to a human, and time to merge.</li>
+        <li><span class="k">Track record</span>Trust is earned per area and withdrawn after an escape.</li>
+      </ul></section>
+  </div>
+</div>
+
+<footer><span>Score bands: <span style="color:#a8871a">■</span> high 80+ &nbsp; <span style="color:#c98d00">■</span> medium 50–79 &nbsp; <span style="color:var(--lo)">■</span> low &lt;50</span><span>Scale: checks run in CI on every PR; people see only gated and low claims.</span><span>AI reviews. Humans stay accountable.</span></footer>
+</body></html>
