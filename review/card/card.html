@@ -53,7 +53,7 @@ footer{display:flex;justify-content:space-between;font:500 7pt var(--mono);color
 
 <div class="flow">
   <div class="step"><div class="n">01</div><h3>Claim</h3><p>Each change becomes short claims, each tied to a requirement ID.</p></div>
-  <div class="step"><div class="n">02</div><h3>Attack</h3><p>Fails on old code, passes on new. Undo one part. Old vs new on the same inputs. Probes. Proof.</p></div>
+  <div class="step"><div class="n">02</div><h3>Attack</h3><p>Fails on old code, passes on new. Undo one part. Old vs new on the same inputs. Proof.</p></div>
   <div class="step"><div class="n">03</div><h3>Score</h3><p>A fixed formula, 0–100, from the evidence only. The model's own confidence counts for nothing.</p></div>
   <div class="step"><div class="n">04</div><h3>Gate</h3><p>Touches warnings, generated code or public API, and no old input proves it? Needs an owner.</p></div>
   <div class="step"><div class="n">05</div><h3>Owner signs</h3><p>Named from git history. Signs what was checked, what was not, and the risk accepted.</p></div>
@@ -84,7 +84,6 @@ footer{display:flex;justify-content:space-between;font:500 7pt var(--mono);color
         <li><b>+</b> Weak evidence is shown as weak. Nothing is rounded up.</li>
         <li><b>−</b> Real builds cost time: the old-vs-new test run takes ~4 min.</li>
         <li><b>−</b> The gate is strict. At first many claims go to a human.</li>
-        <li><b>−</b> Probes are hand-written: they test what someone thought of.</li>
       </ul></section>
     <section><div class="lbl">When not to trust it</div><h2>Limits</h2>
       <ul>
@@ -103,7 +102,7 @@ footer{display:flex;justify-content:space-between;font:500 7pt var(--mono);color
       </div>
       <div class="bar"><i style="flex:8;background:var(--hi)"></i><i style="flex:7;background:var(--md)"></i><i style="flex:8;background:var(--lo)"></i></div>
       <ul>
-        <li><b>#2283</b> A filter hides warnings users need. No test saw it; a probe did.</li>
+        <li><b>#2283</b> A filter hides warnings users need. No test saw it.</li>
         <li><b>#2297</b> The agent's reason for a guard was false. The change breaks builds (CS0579) for users who already did it by hand.</li>
         <li><b>#2234</b> 4 of 8 new tests already pass on old code. They looked like evidence.</li>
       </ul></section>
