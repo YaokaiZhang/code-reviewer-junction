@@ -6,11 +6,67 @@
 
 | ● high | ◐ medium | ○ low | needs owner |
 |:-:|:-:|:-:|:-:|
-| 3 | 2 | 4 | 1 |
+| 3 | 2 | 4 | 6 |
 
 <sub>Confidence 0–100 from the evidence, by a fixed formula. Needs owner: a check shows a promise to users changed.</sub>
 
-#### Needs owner · 1
+#### Needs owner · 6
+
+**● 80 · C-2234-01** — The analyzer no longer crashes on duplicate integer keys, duplicate string keys or mixed key kinds. It reports MsgPack005 instead, with or without SuppressSourceGeneration.
+
+> 4 new tests fail before the change, because the analyzer crashes (AD0001) next to the MsgPack005. They pass after.
+
+R-2234-1 · owner: **Andrew Arnott** (diagnostics)
+
+- [`old-vs-new-tests`](../evidence/ju26-issue-2234/old-vs-new-tests.json) **pass** — 10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 6 pass on base (not evidence), 0 fail on branch, 0 not runnable here (project does not build on branch)
+- [`findings-probes`](../evidence/ju26-issue-2234/findings-probes.json) **pass** — (a) continue skips member type: confirmed; (b) second member of a duplicate key gets MsgPack005: yes, finding dropped; null-key first field crashes analyzer on branch: confirmed (11 scenarios, real analyzer, base and branch)
+- `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1008`
+- `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1023-1026`
+- `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1039-1042`
+- `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1148`
+- `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1163-1166`
+- `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1179-1182`
+- `tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs:80-167`
+
+- [ ] accept
+- [ ] reject
+- [ ] send back
+
+**● 85 · C-2234-02** — After the change, the real TypeCollector never throws on any list of 1 to 4 keyed members with integer or string keys. Before the change, it threw on most of them.
+
+> A formal model, written in Dafny, proves this for lists of any length. The model matches the real C# code on every input up to 4 members. The weakest step is a test: the real code throws before the change and not after.
+
+R-2234-2 *(inferred)* · owner: **Andrew Arnott** (diagnostics)
+
+- The Dafny model proves BranchNeverFailsForIntAndStringKeys with no unproven assumptions.
+- The model matches the real TypeCollector on 3710 inputs, before and after the change, with 0 mismatches.
+
+- [`proof`](../evidence/ju26-issue-2234/proof.json) **pass** — Dafny: Dafny program verifier finished with 23 verified, 0 errors; locked theorem 'never fails' is false for the branch (counterexample: first keyed member is a field with [Key(null)]), the stated mutation fails to verify; model vs real C# on 3710 inputs of 1..4 members: branch 0 mismatches, base 0 mismatches; C# threw on 156 branch inputs and 3346 base inputs; with int/string keys only (1592 inputs) C# threw on 1500 on base and 0 on branch
+- `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1008`
+- `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1023-1026`
+- `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1039-1042`
+- `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1148`
+- `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1163-1166`
+- `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1179-1182`
+
+- [ ] accept
+- [ ] reject
+- [ ] send back
+
+**◐ 65 · C-2234-03** — The fix is incomplete. If a type's first keyed member is a field with [Key(null)], the analyzer still crashes (AD0001, ArgumentNullException). This also happens with SuppressSourceGeneration = true.
+
+> An experiment on the real analyzer shows the crash before and after the change. That shows a gap in the fix, not a passing check, so it needs the owner to decide.
+
+R-2234-2 *(inferred)* · owner: **Andrew Arnott** (diagnostics)
+
+- [`findings-probes`](../evidence/ju26-issue-2234/findings-probes.json) **pass** — (a) continue skips member type: confirmed; (b) second member of a duplicate key gets MsgPack005: yes, finding dropped; null-key first field crashes analyzer on branch: confirmed (11 scenarios, real analyzer, base and branch)
+- [`proof`](../evidence/ju26-issue-2234/proof.json) **pass** — Dafny: Dafny program verifier finished with 23 verified, 0 errors; locked theorem 'never fails' is false for the branch (counterexample: first keyed member is a field with [Key(null)]), the stated mutation fails to verify; model vs real C# on 3710 inputs of 1..4 members: branch 0 mismatches, base 0 mismatches; C# threw on 156 branch inputs and 3346 base inputs; with int/string keys only (1592 inputs) C# threw on 1500 on base and 0 on branch
+- `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1148`
+- `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1179-1182`
+
+- [ ] accept
+- [ ] reject
+- [ ] send back
 
 **◐ 65 · C-2234-04** — The change hides a diagnostic. The new `continue` also skips collecting the member's type. So a member with a mixed key and an unserializable type no longer gets MsgPack003. Before the change, it got MsgPack003 when the first key was a string.
 
@@ -26,18 +82,13 @@ R-2234-4 *(inferred)* · owner: **Andrew Arnott** (diagnostics)
 - [ ] reject
 - [ ] send back
 
-#### By confidence · 8
+**○ 45 · C-2234-06** — The fix is copied into both the properties loop and the fields loop, which adds duplicate code to TypeCollector.cs.
 
-<details><summary>● 85 · C-2234-02 — After the change, the real TypeCollector never throws on any list of 1 to 4 keyed members with integer or string keys. Before the change, it threw on most of them.</summary>
+> The numbers come from a script that measures duplicate code and complexity, run before and after the change.
 
-> A formal model, written in Dafny, proves this for lists of any length. The model matches the real C# code on every input up to 4 members. The weakest step is a test: the real code throws before the change and not after.
+R-2234-1 · owner: **Andrew Arnott** (diagnostics)
 
-R-2234-2 *(inferred)*
-
-- The Dafny model proves BranchNeverFailsForIntAndStringKeys with no unproven assumptions.
-- The model matches the real TypeCollector on 3710 inputs, before and after the change, with 0 mismatches.
-
-- [`proof`](../evidence/ju26-issue-2234/proof.json) **pass** — Dafny: Dafny program verifier finished with 23 verified, 0 errors; locked theorem 'never fails' is false for the branch (counterexample: first keyed member is a field with [Key(null)]), the stated mutation fails to verify; model vs real C# on 3710 inputs of 1..4 members: branch 0 mismatches, base 0 mismatches; C# threw on 156 branch inputs and 3346 base inputs; with int/string keys only (1592 inputs) C# threw on 1500 on base and 0 on branch
+- [`clone-complexity`](../evidence/ju26-issue-2234/clone-complexity.json) **pass** — TypeCollector.cs: duplicated blocks 10 -&gt; 12, duplicated normalised lines 244 -&gt; 258 (window 6); 6 of 10 added code lines sit in duplicated blocks; method GetObjectInfo complexity estimate 162 -&gt; 166
 - `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1008`
 - `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1023-1026`
 - `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1039-1042`
@@ -45,25 +96,25 @@ R-2234-2 *(inferred)*
 - `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1163-1166`
 - `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1179-1182`
 
-</details>
+- [ ] accept
+- [ ] reject
+- [ ] send back
 
-<details><summary>● 80 · C-2234-01 — The analyzer no longer crashes on duplicate integer keys, duplicate string keys or mixed key kinds. It reports MsgPack005 instead, with or without SuppressSourceGeneration.</summary>
+**○ 15 · C-2234-09** — The new README section says the analyzer still checks suppressed types for MsgPack003, 004, 005, 012 and 015, and skips MsgPack011, 016 and 017 for them.
 
-> 4 new tests fail before the change, because the analyzer crashes (AD0001) next to the MsgPack005. They pass after.
+> It is documentation. Tests cover 003, 004, 005, 015 and the skipped ones, but not 012. And C-2234-03 shows a case where the MsgPack005 check still crashes.
 
-R-2234-1
+R-2234-1 · owner: **Andrew Arnott** (diagnostics)
 
 - [`old-vs-new-tests`](../evidence/ju26-issue-2234/old-vs-new-tests.json) **pass** — 10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 6 pass on base (not evidence), 0 fail on branch, 0 not runnable here (project does not build on branch)
 - [`findings-probes`](../evidence/ju26-issue-2234/findings-probes.json) **pass** — (a) continue skips member type: confirmed; (b) second member of a duplicate key gets MsgPack005: yes, finding dropped; null-key first field crashes analyzer on branch: confirmed (11 scenarios, real analyzer, base and branch)
-- `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1008`
-- `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1023-1026`
-- `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1039-1042`
-- `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1148`
-- `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1163-1166`
-- `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1179-1182`
-- `tests/MessagePack.SourceGenerator.Tests/SuppressSourceGenerationAnalyzerTests.cs:80-167`
+- `README.md:1620-1633`
 
-</details>
+- [ ] accept
+- [ ] reject
+- [ ] send back
+
+#### By confidence · 3
 
 <details><summary>● 80 · C-2234-05 — Every repeated key is reported. When two members share a key, the first one is kept and the second gets MsgPack005 ('must be unique').</summary>
 
@@ -80,35 +131,6 @@ R-2234-3 *(inferred)*
 - [`proof`](../evidence/ju26-issue-2234/proof.json) **pass** — Dafny: Dafny program verifier finished with 23 verified, 0 errors; locked theorem 'never fails' is false for the branch (counterexample: first keyed member is a field with [Key(null)]), the stated mutation fails to verify; model vs real C# on 3710 inputs of 1..4 members: branch 0 mismatches, base 0 mismatches; C# threw on 156 branch inputs and 3346 base inputs; with int/string keys only (1592 inputs) C# threw on 1500 on base and 0 on branch
 - `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1023-1026`
 - `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1039-1042`
-- `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1163-1166`
-- `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1179-1182`
-
-</details>
-
-<details><summary>◐ 65 · C-2234-03 — The fix is incomplete. If a type's first keyed member is a field with [Key(null)], the analyzer still crashes (AD0001, ArgumentNullException). This also happens with SuppressSourceGeneration = true.</summary>
-
-> An experiment on the real analyzer shows the crash before and after the change. That shows a gap in the fix, not a passing check, so it needs the owner to decide.
-
-R-2234-2 *(inferred)*
-
-- [`findings-probes`](../evidence/ju26-issue-2234/findings-probes.json) **pass** — (a) continue skips member type: confirmed; (b) second member of a duplicate key gets MsgPack005: yes, finding dropped; null-key first field crashes analyzer on branch: confirmed (11 scenarios, real analyzer, base and branch)
-- [`proof`](../evidence/ju26-issue-2234/proof.json) **pass** — Dafny: Dafny program verifier finished with 23 verified, 0 errors; locked theorem 'never fails' is false for the branch (counterexample: first keyed member is a field with [Key(null)]), the stated mutation fails to verify; model vs real C# on 3710 inputs of 1..4 members: branch 0 mismatches, base 0 mismatches; C# threw on 156 branch inputs and 3346 base inputs; with int/string keys only (1592 inputs) C# threw on 1500 on base and 0 on branch
-- `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1148`
-- `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1179-1182`
-
-</details>
-
-<details><summary>○ 45 · C-2234-06 — The fix is copied into both the properties loop and the fields loop, which adds duplicate code to TypeCollector.cs.</summary>
-
-> The numbers come from a script that measures duplicate code and complexity, run before and after the change.
-
-R-2234-1
-
-- [`clone-complexity`](../evidence/ju26-issue-2234/clone-complexity.json) **pass** — TypeCollector.cs: duplicated blocks 10 -&gt; 12, duplicated normalised lines 244 -&gt; 258 (window 6); 6 of 10 added code lines sit in duplicated blocks; method GetObjectInfo complexity estimate 162 -&gt; 166
-- `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1008`
-- `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1023-1026`
-- `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1039-1042`
-- `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1148`
 - `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1163-1166`
 - `src/MessagePack.SourceGenerator/CodeAnalysis/TypeCollector.cs:1179-1182`
 
@@ -135,18 +157,6 @@ R-2234-1
 - [`old-vs-new-tests`](../evidence/ju26-issue-2234/old-vs-new-tests.json) **pass** — 10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 6 pass on base (not evidence), 0 fail on branch, 0 not runnable here (project does not build on branch)
 - [`execution-tests-build`](../evidence/ju26-issue-2234/execution-tests-build.json) **pass** · hand — ExecutionTests builds with SDK 9.0.321 (0 errors). SDK 8.0.402, which global.json pins, could not load the source generator (CS9057: it needs compiler 4.12, that SDK has 4.11). The new test file raises SA1649
 - `tests/MessagePack.SourceGenerator.ExecutionTests/SuppressedSourceGenerationTests.cs:1-37`
-
-</details>
-
-<details><summary>○ 15 · C-2234-09 — The new README section says the analyzer still checks suppressed types for MsgPack003, 004, 005, 012 and 015, and skips MsgPack011, 016 and 017 for them.</summary>
-
-> It is documentation. Tests cover 003, 004, 005, 015 and the skipped ones, but not 012. And C-2234-03 shows a case where the MsgPack005 check still crashes.
-
-R-2234-1
-
-- [`old-vs-new-tests`](../evidence/ju26-issue-2234/old-vs-new-tests.json) **pass** — 10 new or changed test methods (10 added, 0 modified): 4 fail on base and pass on branch, 6 pass on base (not evidence), 0 fail on branch, 0 not runnable here (project does not build on branch)
-- [`findings-probes`](../evidence/ju26-issue-2234/findings-probes.json) **pass** — (a) continue skips member type: confirmed; (b) second member of a duplicate key gets MsgPack005: yes, finding dropped; null-key first field crashes analyzer on branch: confirmed (11 scenarios, real analyzer, base and branch)
-- `README.md:1620-1633`
 
 </details>
 

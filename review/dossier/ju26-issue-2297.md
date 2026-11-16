@@ -6,11 +6,39 @@
 
 | ● high | ◐ medium | ○ low | needs owner |
 |:-:|:-:|:-:|:-:|
-| 4 | 3 | 3 | 1 |
+| 4 | 3 | 3 | 3 |
 
 <sub>Confidence 0–100 from the evidence, by a fixed formula. Needs owner: a check shows a promise to users changed.</sub>
 
-#### Needs owner · 1
+#### Needs owner · 3
+
+**○ 45 · C-2297-01** — 220 of the 222 changed snapshot files only gain the attribute and its #if/#endif lines. The other 2 are both in Resources/GenericDataTypeWithPrivateMember/: in Named a brace moves to its own line, and in Ordinal there is one extra blank line.
+
+> This is a count from a script that sorts the diff. It describes the change; it does not by itself show the snapshots are correct.
+
+R-2297-3 *(inferred)* · owner: **Andrew Arnott** (generated)
+
+- [`diff-classifier`](../evidence/ju26-issue-2297/diff-classifier.json) **pass** — 237 files changed: 222 snapshot, 6 template, 6 generated-output, 1 test, 1 doc, 1 logic; 220 of 222 snapshots change only by attribute and #if/#endif guard lines, 2 do not; 3 snapshot files left unchanged, 1 Resources dir(s) with no test method
+- `tests/MessagePack.SourceGenerator.Tests/Resources/*`
+
+- [ ] accept
+- [ ] reject
+- [ ] send back
+
+**◐ 50 · C-2297-06** — The TransformUtilities.cs edit has one visible side effect in the snapshots: an extra blank line in the Ordinal formatter of GenericDataTypeWithPrivateMember.
+
+> The diff-sorting script counted it, and the run with the edit removed confirmed it. Two things are not machine-checked: that the blank line is harmless, and that EnumTemplate gets the same blank line, which we found by reading the code.
+
+R-2297-3 *(inferred)* · owner: **Andrew Arnott** (generated)
+
+- [`diff-classifier`](../evidence/ju26-issue-2297/diff-classifier.json) **pass** — 237 files changed: 222 snapshot, 6 template, 6 generated-output, 1 test, 1 doc, 1 logic; 220 of 222 snapshots change only by attribute and #if/#endif guard lines, 2 do not; 3 snapshot files left unchanged, 1 Resources dir(s) with no test method
+- [`transformutilities-removal-output`](../evidence/ju26-issue-2297/transformutilities-removal-output.json) **FAIL** · hand — Without the TransformUtilities.cs edit the generator emits `{#if !NETSTANDARD2_0 && !NETFRAMEWORK` on one line for the formatter nested in a constrained generic type, which fails to compile with 1 error CS1040; the Ordinal formatter loses the 1 extra blank line, so that blank line is a side effect of the edit
+- `tests/MessagePack.SourceGenerator.Tests/Resources/GenericDataTypeWithPrivateMember/*`
+- `src/MessagePack.SourceGenerator/Transforms/TransformUtilities.cs:58`
+
+- [ ] accept
+- [ ] reject
+- [ ] send back
 
 **◐ 50 · C-2297-07** — The change breaks the build for users who already put [ExcludeFromCodeCoverage] on their resolver by hand: they get compile error CS0579. The generator now adds the attribute to the user's own partial resolver classes (ResolverTemplate, CompositeResolverTemplate). The user picks their visibility, and they can be public.
 
@@ -29,7 +57,7 @@ R-2297-1 *(inferred)* · owner: **Andrew Arnott** (generated)
 - [ ] reject
 - [ ] send back
 
-#### By confidence · 9
+#### By confidence · 7
 
 <details><summary>● 95 · C-2297-02 — All 222 changed snapshots are exactly what the new generator emits, and that code compiles. The snapshot tests pass 169 of 169 after the change (167 of 167 before).</summary>
 
@@ -95,30 +123,6 @@ R-2297-3 *(inferred)*
 
 - [`snapshot-line-endings`](../evidence/ju26-issue-2297/snapshot-line-endings.json) **FAIL** — branch-lf: 80 passed, 89 failed of 169
 - [`regeneration`](../evidence/ju26-issue-2297/regeneration.json) **pass** — base: 167 passed, 0 failed of 167; branch: 169 passed, 0 failed of 169
-- `tests/MessagePack.SourceGenerator.Tests/Resources/*`
-
-</details>
-
-<details><summary>◐ 50 · C-2297-06 — The TransformUtilities.cs edit has one visible side effect in the snapshots: an extra blank line in the Ordinal formatter of GenericDataTypeWithPrivateMember.</summary>
-
-> The diff-sorting script counted it, and the run with the edit removed confirmed it. Two things are not machine-checked: that the blank line is harmless, and that EnumTemplate gets the same blank line, which we found by reading the code.
-
-R-2297-3 *(inferred)*
-
-- [`diff-classifier`](../evidence/ju26-issue-2297/diff-classifier.json) **pass** — 237 files changed: 222 snapshot, 6 template, 6 generated-output, 1 test, 1 doc, 1 logic; 220 of 222 snapshots change only by attribute and #if/#endif guard lines, 2 do not; 3 snapshot files left unchanged, 1 Resources dir(s) with no test method
-- [`transformutilities-removal-output`](../evidence/ju26-issue-2297/transformutilities-removal-output.json) **FAIL** · hand — Without the TransformUtilities.cs edit the generator emits `{#if !NETSTANDARD2_0 && !NETFRAMEWORK` on one line for the formatter nested in a constrained generic type, which fails to compile with 1 error CS1040; the Ordinal formatter loses the 1 extra blank line, so that blank line is a side effect of the edit
-- `tests/MessagePack.SourceGenerator.Tests/Resources/GenericDataTypeWithPrivateMember/*`
-- `src/MessagePack.SourceGenerator/Transforms/TransformUtilities.cs:58`
-
-</details>
-
-<details><summary>○ 45 · C-2297-01 — 220 of the 222 changed snapshot files only gain the attribute and its #if/#endif lines. The other 2 are both in Resources/GenericDataTypeWithPrivateMember/: in Named a brace moves to its own line, and in Ordinal there is one extra blank line.</summary>
-
-> This is a count from a script that sorts the diff. It describes the change; it does not by itself show the snapshots are correct.
-
-R-2297-3 *(inferred)*
-
-- [`diff-classifier`](../evidence/ju26-issue-2297/diff-classifier.json) **pass** — 237 files changed: 222 snapshot, 6 template, 6 generated-output, 1 test, 1 doc, 1 logic; 220 of 222 snapshots change only by attribute and #if/#endif guard lines, 2 do not; 3 snapshot files left unchanged, 1 Resources dir(s) with no test method
 - `tests/MessagePack.SourceGenerator.Tests/Resources/*`
 
 </details>

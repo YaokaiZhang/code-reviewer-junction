@@ -1,6 +1,7 @@
 {
   "name": "earned-trust",
   "private": true,
+  "license": "MIT",
   "description": "Read the evidence, not the diff.",
   "scripts": {
     "dev": "bash review.sh dev",
