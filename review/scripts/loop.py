@@ -658,9 +658,9 @@ def propose_rules(history, decisions, cutoff, use_llm=False):
 
 
 def llm_rule(text, reword=False):
-    """Optional: ask the Messages API to phrase a rule. Returns None without ANTHROPIC_API_KEY or on error."""
+    """Optional: ask the Messages API to phrase a rule. Returns None without a key (LLM_KEY or ANTHROPIC_API_KEY) or on error."""
     import urllib.request
-    keyv = os.environ.get("ANTHROPIC_API_KEY")
+    keyv = os.environ.get("LLM_KEY") or os.environ.get("ANTHROPIC_API_KEY")
     if not keyv:
         return None
     ask = ("Rewrite this rule so it also covers the owner reasons below, as one imperative code review rule, at most 40 "

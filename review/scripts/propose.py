@@ -12,7 +12,7 @@ context/proposals.json. Generators, gate and choice rules: see loop.py's docstri
                 at REV instead of the working tree, e.g. while uncommitted test data sits there.
 --no-guards     gate without loop.GUARDS. By default the guards are on here (the live list a person decides on);
                 the replay's headline arm runs without them, and its guarded variants with them.
---llm           phrase new-rule / rule-reword text with the Messages API (needs ANTHROPIC_API_KEY;
+--llm           phrase new-rule / rule-reword text with the Messages API (needs LLM_KEY or ANTHROPIC_API_KEY;
                 otherwise prints a note and keeps the script draft). The verbatim quote and URL stay in `why`.
 
 Ids are "P-" + 6 hex of sha1(kind, target, change), so a re-run gives the same id to the same change.
@@ -99,8 +99,8 @@ def main():
     ap.add_argument("--from-git", dest="rev")
     ap.add_argument("--no-guards", action="store_true", help="gate without loop.GUARDS (the replay's pre-declared headline gate)")
     a = ap.parse_args()
-    if a.llm and not os.environ.get("ANTHROPIC_API_KEY"):
-        print("note: --llm needs ANTHROPIC_API_KEY; using the script drafts (drafted_by script)", file=sys.stderr)
+    if a.llm and not (os.environ.get("LLM_KEY") or os.environ.get("ANTHROPIC_API_KEY")):
+        print("note: --llm needs LLM_KEY or ANTHROPIC_API_KEY; using the script drafts (drafted_by script)", file=sys.stderr)
     cmd = "python3 review/scripts/propose.py" + (f" --cutoff {a.cutoff}" if a.cutoff else "") + \
           (" --llm" if a.llm else "") + (f" --from-git {a.rev}" if a.rev else "") + (" --no-guards" if a.no_guards else "") + " --write"
     doc = build(a.cutoff, a.llm, a.rev, cmd, guards=() if a.no_guards else tuple(loop.GUARDS))
