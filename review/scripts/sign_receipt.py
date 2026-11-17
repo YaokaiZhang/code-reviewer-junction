@@ -10,12 +10,18 @@ review/receipts/<branch>.json. Same claims and fields as the web page's receipt.
 
 Nothing is pre-picked. Every needs-owner claim needs a pick or nothing is written.
 A sample dossier signs to review/receipts/_sample.json. Standard library only.
+
+Signing a real dossier also appends one line per pick to review/context/decisions.jsonl (the
+maintainer decision log, see decision_log.py). Sample dossiers and --stdout do not; --no-log skips it.
 """
 import argparse
 import json
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import decision_log  # noqa: E402
 
 REVIEW = Path(__file__).resolve().parent.parent
 DOSSIER_DIR = REVIEW / "dossier"
@@ -103,6 +109,44 @@ def build_receipt(d, name, picks, signed_at=None):
     return r
 
 
+def receipt_decisions(d, r):
+    """One decision-log line per pick of a signed receipt. A sample dossier gives none."""
+    if d.get("sample") or r.get("sample"):
+        return []
+    branch = r.get("branch")
+    conf = confidence(d)
+    rp = REVIEW / "evidence" / str(branch) / "readability.json"
+    flags = ((json.loads(rp.read_text(encoding="utf-8")).get("details") or {}).get("flags") or []) if rp.is_file() else []
+    out = []
+    for p in r.get("picks") or []:
+        gate = (conf.get(p["id"]) or {}).get("gate") or {}
+        cited = [f["rule"] for f in flags if p["id"] in (f.get("claims") or []) and f.get("rule")]
+        cited += [x["id"] for x in gate.get("rules") or [] if x.get("id")]
+        claim = " ".join(str(p.get("claim") or "").split())
+        out.append({
+            "source": "receipt", "pr_or_branch": branch, "claim_id": p["id"],
+            "rule_ids_cited": sorted(set(cited)),
+            "contracts_tripped": [gate["contract"]] if gate.get("contract") else [],
+            "decision": p["pick"].replace(" ", "_"),
+            "reason": claim if len(claim) <= 200 else claim[:199] + "…",
+            "who": r["signed_by"], "when": r["signed_at"][:10], "url": None,
+        })
+    return out
+
+
+def write_receipt(d, r, out=None, log=True):
+    """Write the receipt (default review/receipts/<branch>.json) and append its picks to the decision log.
+    Returns (path, number of decision lines appended)."""
+    lines = receipt_decisions(d, r) if log else []
+    for ln in lines:  # check the log lines before anything is written
+        if decision_log.problems(ln):
+            raise ValueError(f"{ln['claim_id']}: " + "; ".join(decision_log.problems(ln)))
+    out = Path(out) if out else RECEIPT_DIR / (("_sample" if d.get("sample") else d.get("branch")) + ".json")
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(r, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return out, decision_log.append(lines)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("branch", help="branch name or dossier path")
@@ -110,6 +154,7 @@ def main():
     ap.add_argument("--picks", help="ID=accept|reject|send back, comma separated")
     ap.add_argument("--out", help="override output path")
     ap.add_argument("--stdout", action="store_true", help="print the receipt, do not write it")
+    ap.add_argument("--no-log", action="store_true", help="do not append the picks to context/decisions.jsonl")
     a = ap.parse_args()
 
     path = resolve(a.branch)
@@ -144,14 +189,11 @@ def main():
     except ValueError as e:
         sys.exit(f"not signed: {e}")
 
-    text = json.dumps(r, ensure_ascii=False, indent=2) + "\n"
     if a.stdout:
-        print(text)
+        print(json.dumps(r, ensure_ascii=False, indent=2))
         return
-    out = Path(a.out) if a.out else RECEIPT_DIR / (("_sample" if d.get("sample") else d.get("branch")) + ".json")
-    out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(text, encoding="utf-8")
-    print(f"\nsigned → {out}")
+    out, n = write_receipt(d, r, a.out, log=not a.no_log)
+    print(f"\nsigned → {out}" + (f"\nlogged {n} decision(s) → {decision_log.LOG.relative_to(REVIEW.parent)}" if n else ""))
 
 
 if __name__ == "__main__":
