@@ -119,6 +119,16 @@ People edit the rules on the owner view's Rules page (`#/rules`), served by `scr
 and render_web.py. Turned-off rules are left out of owner-gate citations and readability flags. The page
 reads rule text from this file, so a reworded rule shows on every flag at once.
 
+## Learning loop — `context/decisions.jsonl`, `context/proposals.json`, `context/contract_overrides.json`
+
+`decisions.jsonl` is append-only (`scripts/decision_log.py`): one maintainer decision per line. Signing a
+receipt (`npm run sign` or the page's Sign with `npm run dev`, `POST /api/receipt`) appends one line per pick;
+sample dossiers do not. Proposals are decided on the Rules page (`POST /api/proposals`): only a proposal whose
+gate is `eligible` can be accepted. An accepted rule change goes through the same edit path as a rules save, and
+its edit (or `added_by`) carries `proposal_id`. An accepted contract change goes to `contract_overrides.json`,
+which tripwires.py and the dossiers do not read, so dossier scores never move because of it. Deciding a
+proposal adds nothing to `decisions.jsonl`; who decided and when is on the proposal itself.
+
 ## Honesty rules
 
 - Every number in a summary, dossier or UI must appear in an evidence file with its command.

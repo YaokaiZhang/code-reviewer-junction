@@ -125,6 +125,10 @@ def main():
                       ("context", "context/project.json")):
         f = REVIEW / rel
         project[name] = load(f) if f.is_file() else None
+    # learning loop: proposed rule and contract changes, and the accepted contract changes (only when present)
+    for name, rel in (("proposals", "context/proposals.json"), ("overrides", "context/contract_overrides.json")):
+        if (REVIEW / rel).is_file():
+            project[name] = load(REVIEW / rel)
     body = (f"window.DOSSIERS = {json.dumps(bundle, ensure_ascii=False, indent=1)};\n"
             f"window.PROJECT = {json.dumps(project, ensure_ascii=False, indent=1)};\n")
     # Rewrite only when the data changed, so re-rendering leaves the tree clean.

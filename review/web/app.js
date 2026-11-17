@@ -639,7 +639,8 @@
           return '<option' + (c === r.concern ? ' selected' : '') + '>' + esc(c) + '</option>'; }).join('') + '</select></label>' +
         '<label class="lr-on"><input type="checkbox" data-f="on"' + (r.off ? '' : ' checked') + '> in use</label>' +
         '<span class="lr-meta">' + (r.isNew ? 'new' : (r.added_by ? 'added by ' + esc(r.added_by.who) : 'learned from history') +
-          (last ? ' · edited by ' + esc(last.who) + ' ' + esc(String(last.when).slice(0, 10)) : '')) + '</span></div>' +
+          (last ? ' · edited by ' + esc(last.who) + ' ' + esc(String(last.when).slice(0, 10)) : '') +
+          ((last && last.proposal_id) || (!last && r.added_by && r.added_by.proposal_id) ? ' · from ' + esc((last && last.proposal_id) || r.added_by.proposal_id) : '')) + '</span></div>' +
       '<label class="sr" for="lr-t-' + i + '">Rule ' + esc(r.id) + '</label>' +
       '<textarea id="lr-t-' + i + '" data-f="rule" rows="2">' + esc(r.rule) + '</textarea>' +
       (src ? '<ul class="lr-src">' + src + '</ul>' : '<p class="lr-none">No maintainer quote backs this rule yet. Add a link below.</p>') +
@@ -649,6 +650,120 @@
       '</details>' +
     '</li>';
   }
+  /* ---------- proposed changes (context/proposals.json, written by propose.py) ---------- */
+  var KIND_WORDS = { 'widen-contract': 'Widen a promise', 'narrow-contract': 'Narrow a promise', 'rule-off': 'Turn a rule off',
+    'rule-reword': 'Reword a rule', 'new-rule': 'New rule' };
+  var SPEC_WORDS = { dir_segments: 'folders', file_names: 'files', line_patterns: 'lines matching', path_prefixes: 'paths starting with' };
+  var propMsg = { text: '', bad: false };
+  function proposalsDoc() { return (window.PROJECT || {}).proposals || null; }
+  function prUrl(n) {
+    var repo = rulesDoc().repo;
+    return /^\d+$/.test(String(n)) && repo ? 'https://github.com/' + repo + '/pull/' + n : null;
+  }
+  function prLink(n, url) {
+    url = url || prUrl(n);
+    var t = /^\d+$/.test(String(n)) ? '#' + esc(n) : esc(n);
+    return url ? '<a href="' + esc(url) + '" target="_blank" rel="noopener">' + t + ' ↗</a>' : t;
+  }
+  function specWords(spec) {
+    return Object.keys(spec || {}).filter(function (k) { return (spec[k] || []).length; }).map(function (k) {
+      return (SPEC_WORDS[k] || k) + ' ' + spec[k].map(function (x) { return '<code>' + esc(x) + '</code>'; }).join(', ');
+    }).join('; ');
+  }
+  function changeWords(p) {
+    var t = p.target || {}, c = p.change || {}, r = t.rule ? ruleById(t.rule) : null;
+    var area = !t.contract ? '' : CONTRACT_WORDS[t.contract] ? '<b>' + esc(CONTRACT_WORDS[t.contract]) + '</b> <span class="fine">(' + esc(t.contract) + ')</span>' : '<b>' + esc(t.contract) + '</b>';
+    switch (p.kind) {
+      case 'widen-contract': return 'Also treat as ' + area + ': ' + specWords(c.add) + '.';
+      case 'narrow-contract': return 'Stop treating as ' + area + ': ' + specWords(c.exclude) + '.';
+      case 'rule-off': return 'Turn off <b>' + esc(t.rule) + '</b>' + (r ? ': <s>' + esc(r.rule) + '</s>' : '.');
+      case 'rule-reword': return 'Reword <b>' + esc(t.rule) + '</b>' + (r ? ' from <s>' + esc(r.rule) + '</s>' : '') + ' to “' + esc(c.rule) + '”';
+      case 'new-rule':
+        var n = c.rule || {};
+        return 'Add a <b>' + esc(n.concern) + '</b> rule: “' + esc(n.rule) + '”' + ((n.sources || []).length ? ' <span class="fine">' +
+          n.sources.map(function (u, i) { return '<a href="' + esc(u) + '" target="_blank" rel="noopener">source ' + (i + 1) + ' ↗</a>'; }).join(' ') + '</span>' : '');
+    }
+    return esc(JSON.stringify(c));
+  }
+  /* why a proposal did not pass the gate: its own reason, or what the replay shows */
+  function gateWhyNot(g) {
+    if (g.reason) return g.reason;
+    var b = g.before || {}, a = g.after || {}, out = [];
+    if ((a.noise || 0) > (b.noise || 0)) out.push('would add noise: ' + (a.noise - b.noise) + ' more flag' + (a.noise - b.noise === 1 ? '' : 's') + ' on changes maintainers merged clean');
+    if ((g.regressions || []).length) out.push('would miss ' + g.regressions.length + ' change' + (g.regressions.length === 1 ? '' : 's') + ' it caught before');
+    if ((a.caught || 0) <= (b.caught || 0) && !out.length) out.push('catches nothing new in the replay');
+    return out.join('; ') || 'did not pass the evidence gate';
+  }
+  function gateCounts(g) {
+    var b = g.before || {}, a = g.after || {};
+    var good = { caught: 1, missed: -1, noise: -1, controls: 0 };
+    return '<table class="pp-g"><thead><tr><th></th>' + ['caught', 'missed', 'noise', 'controls'].map(function (k) { return '<th>' + k + '</th>'; }).join('') + '</tr></thead><tbody>' +
+      '<tr><th>before</th>' + ['caught', 'missed', 'noise', 'controls'].map(function (k) { return '<td>' + esc(b[k] != null ? b[k] : '–') + '</td>'; }).join('') + '</tr>' +
+      '<tr><th>after</th>' + ['caught', 'missed', 'noise', 'controls'].map(function (k) {
+        var d = (a[k] || 0) - (b[k] || 0), cls = !d || !good[k] ? '' : d * good[k] > 0 ? ' class="up"' : ' class="down"';
+        return '<td' + cls + '>' + esc(a[k] != null ? a[k] : '–') + (d && a[k] != null && b[k] != null ? ' <span>' + delta(d) + '</span>' : '') + '</td>';
+      }).join('') + '</tr></tbody></table>';
+  }
+  function proposalCard(p) {
+    var g = p.gate || {}, open = (p.status || 'open') === 'open', llm = p.drafted_by === 'llm';
+    var head = '<div class="pp-h"><b class="lr-id">' + esc(p.id) + '</b><span class="pp-k">' + esc(KIND_WORDS[p.kind] || p.kind) + '</span>' +
+      '<span class="pp-by' + (llm ? ' llm' : '') + '">' + (llm ? 'drafted by an LLM' : 'drafted by a script') + '</span>' +
+      (open ? '' : '<span class="pp-st ' + esc(p.status) + '">' + esc(p.status) + (p.decided ? ' by ' + esc(p.decided.who) + ' ' + esc(String(p.decided.when || '').slice(0, 10)) : '') + '</span>') + '</div>';
+    var trig = (p.triggered_by || []).map(function (t) { return prLink(t.pr_or_branch, t.url) + ' <span class="fine">' + esc(String(t.decision || '').replace('_', ' ')) + '</span>'; }).join(', ');
+    var body = '<p class="pp-c">' + changeWords(p) + '</p>' +
+      (p.why ? '<p class="pp-why">' + rich(p.why) + '</p>' : '') +
+      (trig ? '<p class="pp-m">Triggered by ' + trig + '</p>' : '') +
+      '<div class="pp-gate"><p class="pp-m">' + (g.replayed_on ? 'Replayed on ' + esc(g.replayed_on) : 'Replay') + '</p>' + gateCounts(g) +
+        ((g.helped || []).length ? '<p class="pp-m">Helped ' + g.helped.map(function (n) { return prLink(n); }).join(', ') + '</p>' : '') +
+        ((g.regressions || []).length ? '<p class="pp-m bad">Regressions ' + g.regressions.map(function (n) { return prLink(n); }).join(', ') + '</p>' : '') +
+      '</div>';
+    if (open && !g.eligible) {
+      return '<li class="pp inel"><details><summary>' + head + '<span class="pp-no">Not eligible · ' + esc(gateWhyNot(g)) + '</span></summary>' + body + '</details></li>';
+    }
+    return '<li class="pp' + (open ? '' : ' done') + '" data-p="' + esc(p.id) + '">' + head + body +
+      (open ? '<div class="pp-act"><button type="button" class="pp-yes" data-pact="accept">Accept</button><button type="button" class="pp-no-b" data-pact="reject">Reject</button></div>' : '') +
+    '</li>';
+  }
+  function proposalsSection() {
+    var doc = proposalsDoc();
+    if (!doc || !(doc.proposals || []).length) {
+      return '<section class="pps"><h2>Proposed changes</h2><p class="pp-empty">No proposals yet. Run <code>python3 review/scripts/propose.py --write</code>.</p></section>';
+    }
+    var ps = doc.proposals, rank = function (p) { var s = p.status || 'open'; return s !== 'open' ? 2 : (p.gate || {}).eligible ? 0 : 1; };
+    var sorted = ps.slice().sort(function (a, b) { return rank(a) - rank(b) || String(a.id).localeCompare(String(b.id)); });
+    var nOpen = ps.filter(function (p) { return rank(p) === 0; }).length;
+    return '<section class="pps"><h2>Proposed changes</h2>' +
+      '<p class="pp-lede">Learned from maintainer decisions' + (doc.cutoff ? ' up to ' + esc(doc.cutoff) : '') + '. Each change was replayed on past pull requests first. ' +
+        'Only a change that catches more without adding noise can be accepted. ' + nOpen + ' ready to decide.</p>' +
+      '<ol class="pps-l">' + sorted.map(proposalCard).join('') + '</ol>' +
+      '<p class="lr-msg pp-msg' + (propMsg.bad ? ' bad' : '') + '" role="status">' + esc(propMsg.text) + '</p>' +
+    '</section>';
+  }
+  function decideProposal(id, action) {
+    var who = ((document.getElementById('lr-who') || {}).value || '').trim();
+    function say(t, bad) { propMsg = { text: t, bad: bad }; var m = app.querySelector('.pp-msg'); if (m) { m.textContent = t; m.classList.toggle('bad', bad); } }
+    if (!who) { say('Add your name in the bar below first: each decision records who made it.', true); return; }
+    if (rulesState && rulesDirty()) { say('Save or undo your rule edits first.', true); return; }
+    store('et:name', who);
+    say((action === 'accept' ? 'Accepting ' : 'Rejecting ') + id + '…', false);
+    fetch('/api/proposals', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ who: who, id: id, action: action }) })
+      .then(function (res) {
+        if (res.status === 405 || res.status === 501) throw { offline: true };
+        return res.json().then(function (j) { if (!res.ok || !j.ok) throw { msg: j.error || 'failed' }; return j; }, function () { throw { offline: true }; });
+      })
+      .then(function (j) {
+        rulesState = null;
+        try { sessionStorage.setItem('et:rules-msg', j.summary + (action === 'accept' ? '. Scores re-computed.' : '.')); } catch (e) {}
+        location.reload();
+      })
+      .catch(function (e) { say(e && e.msg ? e.msg : 'Deciding needs the dev server: run npm run dev.', true); });
+  }
+  app.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('[data-pact]');
+    if (!b) return;
+    decideProposal(b.closest('[data-p]').dataset.p, b.dataset.pact);
+  });
+
   function renderRules() {
     state.key = null;
     mastRight.innerHTML = '<a href="#/" style="text-decoration:none">↩ dossiers</a>';
@@ -660,6 +775,8 @@
         '<p class="lede">' + esc(doc.summary || '') + ' Each rule says what the maintainers expect, with links to where they said it. ' +
         'The owner gate and the readability flags cite these rules. You can reword a rule, change its concern, turn it off, or add one.</p>' +
         '<p class="lrdoc-n">' + on + ' of ' + rulesState.rules.length + ' rules in use</p></header>' +
+      proposalsSection() +
+      '<h2 class="lrs-h">Rules</h2>' +
       '<ol class="lrs">' + rulesState.rules.map(function (r, i) { return ruleCard(r, i, Q, U); }).join('') + '</ol>' +
       '<div class="lrdoc-bar"><button type="button" class="lr-add">+ Add a rule</button>' +
         '<label class="lr-who">Your name <input id="lr-who" autocomplete="name" value="' + esc(store('et:name') || '') + '"></label>' +
@@ -986,6 +1103,31 @@
     refresh();
     var st = document.getElementById('sign-status');
     if (st) st.textContent = 'Signed by ' + name + '. Receipt printed.';
+    saveReceipt(d, name);
+  }
+
+  /* With the dev server, the receipt is also written to review/receipts/ and each pick goes to the decision log.
+     A static host (file://, Modal) has no /api/receipt: the printed slip and Download stay the way to keep it. */
+  function saveReceipt(d, name) {
+    var key = state.key, picks = {};
+    humanOf(d).forEach(function (c) { picks[c.id] = state.picks[c.id]; });
+    function say(t) { var st = document.getElementById('sign-status'); if (st && state.key === key) st.textContent = t; }
+    fetch('/api/receipt', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: key, signed_by: name, picks: picks }) })
+      .then(function (res) {
+        if (res.status === 405 || res.status === 501) throw { offline: true };
+        return res.json().then(function (j) { if (!res.ok || !j.ok) throw { msg: j.error || 'not saved' }; return j; }, function () { throw { offline: true }; });
+      })
+      .then(function (j) {
+        d._receipt = j.receipt;
+        if (state.key !== key) return;
+        state.receipt = j.receipt;
+        printSlip(state.receipt, false);
+        refresh();
+        say('Signed by ' + name + '. Saved to review/' + j.file + (j.logged ? ' and the decision log.' : '.'));
+      })
+      .catch(function (e) {
+        if (e && e.msg) say('Receipt printed but not saved: ' + e.msg);
+      });
   }
 
   function printSlip(r, animate) {
