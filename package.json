@@ -10,6 +10,7 @@
     "evidence": "bash review.sh evidence",
     "tests": "bash review.sh tests",
     "all": "bash review.sh all",
-    "sign": "bash review.sh sign"
+    "sign": "bash review.sh sign",
+    "learn": "bash review.sh learn"
   }
 }

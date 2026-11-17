@@ -93,6 +93,16 @@ cmd_tests() {
   render
 }
 
+# Learning loop: offline, from the cached PR stream and the decision log (seconds).
+cmd_learn() {
+  say "decision log (backfill; receipt lines kept)"; python3 review/scripts/build_decisions.py --write
+  say "matcher self-test";  python3 review/scripts/loop.py --self-test
+  say "proposals";          python3 review/scripts/propose.py --write | tail -1
+  say "replay vs baseline"; python3 review/scripts/replay_loop.py --write | grep -i verdict || true
+  python3 review/scripts/render_loop_chart.py
+  render
+}
+
 cmd_sign() { python3 review/scripts/sign_receipt.py "${1:-ju26-issue-2283}" "${@:2}"; render >/dev/null; }
 
 case "${1:-dev}" in
@@ -104,5 +114,6 @@ case "${1:-dev}" in
   tests) cmd_tests ;;
   all) cmd_setup; cmd_evidence; cmd_tests ;;
   sign) shift; cmd_sign "$@" ;;
-  *) echo "usage: $0 dev [--port N]|render|setup|evidence|tests|all|sign [branch]"; exit 1 ;;
+  learn) cmd_learn ;;
+  *) echo "usage: $0 dev [--port N]|render|setup|evidence|tests|all|sign [branch]|learn"; exit 1 ;;
 esac
