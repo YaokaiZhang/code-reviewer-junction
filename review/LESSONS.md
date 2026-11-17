@@ -27,3 +27,12 @@ Running log, newest last.
 - Isolation: "0 differences" on 2283 and 2234 means only that the real projects never reach the change. Coverage of the changed lines shows it: on 2283, 2 of 10 trackable changed lines run, and the filter body never runs because the consumer projects produce no analyzer diagnostics. Report "unreached" next to "same", or the pass reads as safety.
 - Isolation: coverlet.console does not instrument the generator unless `Microsoft.CodeAnalysis*.dll` sit next to the copy it instruments ("Instrumented modules: 0" appears only with `--verbosity detailed`), and it needs `--include-test-assembly`. A line hit on `writer(anyConstraints ? ... : ...)` does not show which side of the ternary ran.
 - Isolation: in-memory references (`MetadataReference.CreateFromImage`, used by 2283's new tests) have no file path. Save the metadata block and rebuild it with `ModuleMetadata.CreateFromMetadata`, or those inputs crash the recorder.
+
+## 2026-11-17
+
+- Learning loop: the replay beats the frozen baseline by a small margin (11 vs 10 of 16 caught, 30 vs 33 of 60 noise), and the margin rests on 4 of 23 accepted changes. Report which changes moved which PRs, not only the totals.
+- A "no regression" gate is empty when the replay set has no positives yet. On 2019-06-10 it accepted excluding all of `src/MessagePack/` from wire-format, which later lost #2139. A gate needs a minimum of cases of each kind before it means anything.
+- Narrowing is the easy way to cut noise: exclude the contract's own files. Unguarded, the proposer offered to drop `MessagePackReader.cs`/`MessagePackWriter.cs` from wire-format and `MessagePack.csproj` from targets, and the general-choice variant got to 21 noise mostly that way. Guard declared paths, declared file names and the files a contract's sources cite.
+- Widening from one missed PR usually picks a feature only that PR has, so it passes the gate and never helps again (memorising). Only 1 of 6 widenings paid off later (`MessagePackSerializerOptions.cs` for public API: #1828, #2013).
+- Narrow proposals also offered to exclude `TypeCollector.cs` and `MsgPack00xMessagePackAnalyzer.cs` from diagnostics, where ju26-issue-2234's change lives. Clean merges there do not mean the area is safe. Keep overrides opt-in and let a person decide.
+- history.json dates are merge/close dates, and two reverts (#777, #1124) predate their PR. Order by when a decision was knowable and never let a PR see its own decision.

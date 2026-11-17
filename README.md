@@ -85,6 +85,41 @@ Three AI-made fixes on [`junction26-messagepack-csharp`](https://github.com/te-i
 
 On #2234 the Dafny model was checked against the real code on 3,710 inputs with 0 differences, and it found one input where the fix still crashes.
 
+## Learns from maintainer decisions
+
+The owner gate starts from hand-written contracts. The loop changes them from what maintainers actually decide:
+
+1. **Log.** Every decision goes to [`decisions.jsonl`](review/context/decisions.jsonl): owner picks on a receipt, and past upstream PRs (pushed back, reverted, or merged with no objection).
+2. **Propose.** A script suggests changes: widen a contract that missed a pushed-back PR, narrow one that keeps flagging clean merges, turn off a rule owners keep overruling, or add a rule that quotes a maintainer.
+3. **Gate.** Each change is replayed on earlier PRs. It must fix the case it came from without missing anything it caught before or adding noise. Rule proposals have no ground truth, so they only get a citation check.
+4. **Accept.** A person accepts or rejects it on the Rules page. Nothing is applied automatically, and accepted contract changes do not touch the three dossiers.
+
+**Replay.** All 97 PRs in date order: 16 the maintainers pushed back on for a user promise, 60 ordinary merges, and 21 other pushbacks. Each PR is scored before its decision is fed back. Approvals are simulated (every change that passes the gate is accepted).
+
+| | Learning loop | Frozen baseline |
+|---|---:|---:|
+| Pushed-back PRs caught (of 16) | 11 | 10 |
+| Clean merges flagged as noise (of 60) | 30 | 33 |
+| Later half: caught (of 9) | 6 | 5 |
+| Later half: noise (of 27) | 17 | 20 |
+
+<p align="center"><img src="docs/feedback-loop.svg" alt="Cumulative catches and noise over the 97 PRs: the loop ends at 11 catches and 30 noise, the baseline at 10 and 33" width="900"></p>
+
+It beats the baseline, but only just, and on few changes. The loop accepted 23 changes, and only 4 changed a scored result:
+- Adding `MessagePackSerializerOptions.cs` to the public API contract caught #1828 and #2013 later.
+- Two narrowed analyzer paths removed 2 noisy flags.
+- One bad narrowing, accepted before any pushback had been seen, removed 1 noisy flag but lost #2139.
+
+Most widenings only memorise the PR they came from. Guards against blinding a contract's own files score better (12 caught, 27 noise), but we added them after seeing the results, so they are not the headline. They are on in the live proposals list.
+
+**Limits:** small numbers, so one PR moves a rate by about 6 points. Approvals are simulated. The data comes from one upstream repo, and the 2025 contracts were written after these PRs. Full numbers and what we tried are in [`feedback-loop.json`](review/evidence/feedback-loop.json).
+
+```bash
+npm run learn
+```
+
+Rebuilds the decision log, the proposals and the replay offline from the cached PR stream. To rebuild that cache: `python3 review/scripts/pr_stream.py --repo $MP_REPO --fetch --write --verify`.
+
 ## Quick start
 
 Needs Python 3, git and Node.
@@ -111,7 +146,8 @@ The learned rules are at http://localhost:5173/web/#/rules. Reword a rule, chang
 | `npm run evidence` | git-only collectors: diff classifier, clones and complexity, report sites, claim coverage, source excerpts | seconds |
 | `npm run tests` | build and run the C# tests: regeneration, TransformUtilities removal, old-vs-new tests, dropped-warning probe | ~4 min |
 | `npm run render` | rebuild the dossiers and `review/web/data.js` | 1 s |
-| `npm run sign -- ju26-issue-2283` | sign a dossier from the terminal, writes `review/receipts/` | — |
+| `npm run sign -- ju26-issue-2283` | sign a dossier from the terminal, writes `review/receipts/` and `decisions.jsonl` | — |
+| `npm run learn` | decision log, proposals, replay vs baseline, chart (offline) | seconds |
 
 Use your own clone with `MP_REPO=/path/to/clone npm run evidence`. The Dafny proof (`review/proof/`) needs Dafny and is not part of `npm run tests`. Every evidence file has a `command` field with the exact command that produced it.
 
@@ -133,7 +169,7 @@ review/
   REQUIREMENTS.md      requirements per issue; inferred lines are marked
   LESSONS.md           what we learned
   DECISIONS.md         design decisions and why
-  context/             maintainer history and the learned rules
+  context/             maintainer history, learned rules, decision log, proposals
   evidence/<branch>/   one JSON per check, each with its command
   explain/<branch>     the AI's step-by-step trace of each decision
   dossier/<branch>.*   claims (.json) and the PR comment (.md)
