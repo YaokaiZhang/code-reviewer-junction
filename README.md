@@ -72,6 +72,8 @@ Adjustments: run by hand −10 · an undo test also backs it +5 · a clean-machi
 
 **Needs owner** is separate from the score. A claim goes to a person when the old and new code give a different result on something users rely on, or when no input runs a changed line. The owner is the top committer on those paths. They accept, reject, or send the change back to the AI.
 
+**Tripwires** (like contract testing for API contracts) mark which changed code is tied to a public promise. There are 7 contracts: diagnostics, public API, generated files, targets, wire format, security and user docs. Each one lists paths and line patterns. [`tripwires.py`](review/scripts/tripwires.py) checks every changed hunk against them and finds the claims that cover it. A tripped hunk must be covered by a claim. If no input runs a changed line in a tripped hunk, the claim needs an owner. Trips on the three branches: #2297 31 (out of 423 hunks), #2234 7, #2283 7. Every trip is covered by a claim. A trip does not mean the change is wrong. It means someone who knows that promise should look.
+
 ## Results
 
 Three AI-made fixes on [`junction26-messagepack-csharp`](https://github.com/te-industry-tech-office/junction26-messagepack-csharp), base `32258fdb`:
